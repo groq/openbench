@@ -30,8 +30,11 @@ Repository = "https://github.com/groq/openbench"
 bench = "openbench._cli:main"
 
 [tool.setuptools]
-packages = ["openbench"]
 package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["openbench*"]
 
 [tool.pytest.ini_options]
 minversion = "8.0"
