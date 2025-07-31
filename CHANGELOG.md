@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.1](https://github.com/groq/openbench/compare/v0.1.0...v0.1.1) (2025-07-31)
+
+
+### Bug Fixes
+
+* add missing __init__.py files and fix package discovery for PyPI ([#10](https://github.com/groq/openbench/issues/10)) ([29fcdf6](https://github.com/groq/openbench/commit/29fcdf6fefa48fcf480db1f84cf5845f7f7758ce))
+
+
+### Documentation
+
+* update README to streamline setup instructions for OpenBench, use pypi ([16e08a0](https://github.com/groq/openbench/commit/16e08a091b6fcc56422df21d1352bcc88481f175))
+
 ## 0.1.0 (2025-07-31)
 
 
