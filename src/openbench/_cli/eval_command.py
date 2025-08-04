@@ -333,7 +333,7 @@ def run_eval(
         timeout=timeout,
         reasoning_effort=reasoning_effort.value if reasoning_effort else None,
         sandbox=sandbox,
-        log_format=json,
+        log_format="json" if json else "eval",
     )
 
     # Placeholder - actual implementation would run the evaluation
