@@ -104,7 +104,8 @@ def run_eval(
     benchmarks: Annotated[
         List[str],
         typer.Argument(
-            help="Benchmark(s) to use for evaluation", envvar="BENCH_BENCHMARKS"
+            help="Benchmark(s) to run. Can be a built-in name (e.g. mmlu) or a path to a local eval directory/file containing __metadata__", 
+            envvar="BENCH_BENCHMARKS"
         ),
     ],
     model: Annotated[
