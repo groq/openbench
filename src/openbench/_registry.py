@@ -85,12 +85,12 @@ def load_task(benchmark_name: str) -> Callable:
         module_path, func_name = import_path.rsplit(".", 1)
         module = importlib.import_module(module_path)
         return getattr(module, func_name)
-    
+
     # Fallback to path-based loading
     path = Path(benchmark_name).expanduser()
     if path.exists():
         return _load_task_from_local_path(path)
-    
+
     # Neither registry nor valid path
     raise ValueError(
         f"Unknown benchmark: '{benchmark_name}'. "
@@ -101,13 +101,13 @@ def load_task(benchmark_name: str) -> Callable:
 def _load_task_from_local_path(path: Path) -> Callable:
     """
     Load a task from a local path containing __metadata__.
-    
+
     Args:
         path: Path to a directory or .py file containing an eval
-        
+
     Returns:
         Callable: The imported function object
-        
+
     Raises:
         ValueError: If no valid __metadata__ is found
         AttributeError: If the function does not exist in the module
@@ -115,10 +115,10 @@ def _load_task_from_local_path(path: Path) -> Callable:
     """
     root_module = _import_module_from_path(path)
     metadata = getattr(root_module, "__metadata__", None)
-    
+
     if not isinstance(metadata, BenchmarkMetadata):
         raise ValueError(f"{path} has no valid __metadata__")
-    
+
     # Resolve module path relative to root module
     # For local evals, module_path is typically relative like "simpleqa.simpleqa"
     # We need to extract just the last part and combine with the root module name
@@ -126,15 +126,15 @@ def _load_task_from_local_path(path: Path) -> Callable:
         full_module_name = metadata.module_path
     else:
         # For paths like "simpleqa.simpleqa", we want the last component "simpleqa"
-        module_components = metadata.module_path.split('.')
+        module_components = metadata.module_path.split(".")
         module_name = module_components[-1]  # Take the last component
         full_module_name = f"{root_module.__name__}.{module_name}"
-    
+
     try:
         module = importlib.import_module(full_module_name)
     except ImportError as e:
         raise ImportError(f"Cannot import module '{full_module_name}': {e}")
-    
+
     try:
         return getattr(module, metadata.function_name)
     except AttributeError:
