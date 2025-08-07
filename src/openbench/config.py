@@ -81,6 +81,30 @@ BENCHMARKS = {
         module_path="openbench.evals.simpleqa",
         function_name="simpleqa",
     ),
+    "healthbench": BenchmarkMetadata(
+        name="HealthBench",
+        description="Medical dialogue evaluation using physician-created rubrics for assessing healthcare conversations",
+        category="core",
+        tags=["medical", "dialogue", "graded", "rubric-based"],
+        module_path="openbench.evals.healthbench",
+        function_name="healthbench",
+    ),
+    "healthbench_hard": BenchmarkMetadata(
+        name="HealthBench Hard",
+        description="Most challenging medical dialogue cases from HealthBench requiring nuanced medical knowledge",
+        category="core",
+        tags=["medical", "dialogue", "graded", "rubric-based", "hard"],
+        module_path="openbench.evals.healthbench",
+        function_name="healthbench_hard",
+    ),
+    "healthbench_consensus": BenchmarkMetadata(
+        name="HealthBench Consensus",
+        description="Medical dialogue cases with strong physician consensus on appropriate responses",
+        category="core",
+        tags=["medical", "dialogue", "graded", "rubric-based", "consensus"],
+        module_path="openbench.evals.healthbench",
+        function_name="healthbench_consensus",
+    ),
     # Math competitions
     "aime_2023_I": BenchmarkMetadata(
         name="AIME 2023 I",
