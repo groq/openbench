@@ -5,7 +5,7 @@ import string
 from typing import Callable, List, Set, Tuple, Union
 
 import numpy as np
-from scipy.optimize import linear_sum_assignment
+from scipy.optimize import linear_sum_assignment  # type: ignore[import-untyped]
 
 from inspect_ai.scorer import (
     Score,

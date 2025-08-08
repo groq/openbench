@@ -12,3 +12,4 @@ logs/
 .*cache/
 .*cache
 .coverage*
+.claude/settings.local.json
