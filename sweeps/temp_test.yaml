@@ -1,0 +1,39 @@
+# Example sweep config: Testing GPT-OSS 20B at different temperatures
+name: "aime_2025_II_temperature_sweep"
+log_dir: "./logs"
+
+benchmarks:
+  - name: "aime_2025_II"
+
+runs:
+  - label: "20b-temp-0.0"
+    model: "groq/openai/gpt-oss-20b"
+    temperature: 0.0
+
+  # - label: "20b-temp-0.2"
+  #   model: "groq/openai/gpt-oss-20b"
+  #   temperature: 0.2
+
+  # - label: "20b-temp-0.4"
+  #   model: "groq/openai/gpt-oss-20b"
+  #   temperature: 0.4
+
+  - label: "20b-temp-0.6"
+    model: "groq/openai/gpt-oss-20b"
+    temperature: 0.6
+
+  # - label: "20b-temp-0.8"
+  #   model: "groq/openai/gpt-oss-20b"
+  #   temperature: 0.8
+
+  - label: "20b-temp-1.0"
+    model: "groq/openai/gpt-oss-20b"
+    temperature: 1.0
+
+shared:
+  # Common eval knobs (override here if desired)
+  epochs: 1
+  limit: "0,300"   # uncomment to run only the first 300 problems, or set a single int
+  top_p: 1.0
+  # max_tokens: 8000   # optional global cap
+  timeout: 10000

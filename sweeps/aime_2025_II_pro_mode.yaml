@@ -1,0 +1,45 @@
+# Example sweep config: AIME 2025 II across GPT-OSS 20B single vs. pro-mode fanout
+name: "supergpqa_pro_mode_sweep"
+log_dir: "./logs"
+
+benchmarks:
+  - name: "supergpqa"
+
+runs:
+  # Baseline single-generation 20B on Groq
+  - label: "20b-single"
+    model: "groq/openai/gpt-oss-20b"
+
+  # Pro mode (pyfunc fan-out + synth) with varying n_runs, all using GPT-OSS-20B underneath
+  - label: "pro-2x-20b"
+    model: "pyfunc/openbench.examples.groq_gpt_oss_pro:gpt_5_pro_mode"
+    model_args:
+      n_runs: 2
+      model: "openai/gpt-oss-20b"
+
+  - label: "pro-4x-20b"
+    model: "pyfunc/openbench.examples.groq_gpt_oss_pro:gpt_5_pro_mode"
+    model_args:
+      n_runs: 4
+      model: "openai/gpt-oss-20b"
+
+  - label: "pro-8x-20b"
+    model: "pyfunc/openbench.examples.groq_gpt_oss_pro:gpt_5_pro_mode"
+    model_args:
+      n_runs: 8
+      model: "openai/gpt-oss-20b"
+
+  - label: "pro-12x-20b"
+    model: "pyfunc/openbench.examples.groq_gpt_oss_pro:gpt_5_pro_mode"
+    model_args:
+      n_runs: 12
+      model: "openai/gpt-oss-20b"
+
+shared:
+  # Common eval knobs (override here if desired)
+  epochs: 1
+  limit: "0,300"   # uncomment to run only the first 300 problems, or set a single int
+  temperature: 0.6
+  top_p: 1.0
+  # max_tokens: 8000   # optional global cap
+  timeout: 10000

@@ -62,6 +62,77 @@ bench eval mmlu --model google/gemini-2.5-pro
 bench eval musr --model ollama/llama3.1:70b
 
 # Any provider supported by Inspect AI!
+````
+
+### 🔌 Use a Python function as a "model" (MoA / custom router)
+
+OpenBench registers a custom provider `pyfunc` so you can benchmark a Python callable like it was a chat model.
+
+**Model string format:**
+
+```
+pyfunc/<module_or_file>:<function>
+```
+
+**Examples:**
+
+```bash
+# From a module path
+bench eval mmlu --model pyfunc/my_pkg.my_mod:gpt_5_pro_mode -M n_runs=8
+
+# From a local file path
+bench eval simpleqa --model pyfunc/./pro_mode.py:pro_mode -M n_runs=6
+
+# From $HOME
+bench eval gpqa_diamond --model pyfunc/~/proj/pro_mode.py:pro_mode -M n_runs=12
+```
+
+**Function signatures supported:**
+
+* `f(messages: List[Dict[str, str]], **kwargs) -> str | dict`
+* `f(prompt: str, **kwargs) -> str | dict`
+* `f(text: str, **kwargs) -> str | dict`
+* `f(input: str, **kwargs) -> str | dict`
+
+If the function returns a dict containing `{"final": "...text..."}`, that `final` string is used as the completion. Otherwise, the return value is stringified.
+
+**Passing extra kwargs to your function:**
+Use `-M/--model-arg key=value` (repeatable). These are forwarded to your function. Simple types are coerced:
+
+```bash
+bench eval mmlu \
+  --model pyfunc/my_pkg.my_mod:gpt_5_pro_mode \
+  -M n_runs=8 -M temperature=0.9 -M debug=true
+```
+
+The provider also forwards generation config when your function accepts it:
+
+* `temperature` → `temperature`
+* `max_tokens` → `max_tokens` or `max_completion_tokens`
+
+Environment variables like `GROQ_API_KEY` and `OPENAI_API_KEY` are auto-injected if your function defines corresponding parameters (`groq_api_key`, `openai_api_key`).
+
+> **Tip:** The provider extracts the last user message as the `prompt` when your function doesn’t accept `messages`.
+
+\
+
+```bash
+# Groq (blazing fast!)
+bench eval gpqa_diamond --model groq/meta-llama/llama-4-maverick-17b-128e-instruct
+
+# OpenAI
+bench eval humaneval --model openai/o3-2025-04-16
+
+# Anthropic
+bench eval simpleqa --model anthropic/claude-sonnet-4-20250514
+
+# Google
+bench eval mmlu --model google/gemini-2.5-pro
+
+# Local models with Ollama
+bench eval musr --model ollama/llama3.1:70b
+
+# Any provider supported by Inspect AI!
 ```
 | Category | Benchmarks |
 |----------|------------|

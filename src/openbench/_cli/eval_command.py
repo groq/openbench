@@ -1,4 +1,4 @@
-from typing import Optional, List, Dict, Annotated, Tuple, Union
+from typing import Optional, List, Dict, Annotated, Tuple, Union, Any
 from enum import Enum
 import sys
 import typer
@@ -101,6 +101,40 @@ def validate_model_role(model_role: Optional[str]) -> Dict[str, str | Model]:
         raise typer.BadParameter(str(e))
 
 
+def _parse_model_args(kv_items: List[str]) -> Dict[str, Any]:
+    """
+    Parse repeated key=value items into a dict with simple type coercion.
+    Accepts: --model-arg n_runs=8 --model-arg debug=true --model-arg temp=0.9
+    Also remaps reserved key 'model' -> 'inner_model' to avoid collision with Inspect's get_model().
+    """
+    args: Dict[str, Any] = {}
+    for item in kv_items:
+        if "=" not in item:
+            raise typer.BadParameter(
+                f"Invalid --model-arg '{item}'. Expected format key=value"
+            )
+        key, value = item.split("=", 1)
+        key = key.strip()
+        val = value.strip()
+        # basic coercion: bool, int, float, else str
+        low = val.lower()
+        if low in ("true", "false"):
+            coerced: Any = (low == "true")
+        else:
+            try:
+                coerced = int(val)
+            except ValueError:
+                try:
+                    coerced = float(val)
+                except ValueError:
+                    coerced = val
+        # Remap reserved key to prevent collision in inspect_ai.model.get_model(model=..., **kwargs)
+        if key == "model":
+            key = "inner_model"
+        args[key] = coerced
+    return args
+
+
 def run_eval(
     benchmarks: Annotated[
         List[str],
@@ -132,6 +166,15 @@ def run_eval(
         typer.Option(
             help="Model role(s). For example, --model-role grader=groq/meta-llama/llama-4-scout-17b-16e-instruct. Can be specified multiple times.",
             envvar="BENCH_MODEL_ROLE",
+        ),
+    ] = [],
+    model_arg: Annotated[
+        List[str],
+        typer.Option(
+            "--model-arg",
+            "-M",
+            help="Custom model arg(s) as KEY=VALUE. Repeat to pass multiple arguments (forwarded to provider).",
+            envvar="BENCH_MODEL_ARG",
         ),
     ] = [],
     logfile: Annotated[
@@ -319,6 +362,7 @@ def run_eval(
             model=model,
             max_connections=max_connections,
             model_base_url=model_base_url,
+            model_args=_parse_model_args(model_arg),
             model_roles=role_models if role_models else None,
             epochs=epochs,
             limit=parsed_limit,
