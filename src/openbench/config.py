@@ -143,6 +143,20 @@ BENCHMARKS = {
         module_path="openbench.evals.mgsm",
         function_name="mgsm_non_latin",
     ),
+    "drop": BenchmarkMetadata(
+        name="DROP",
+        description="Reading comprehension benchmark requiring discrete reasoning over paragraphs (arithmetic, counting, sorting)",
+        category="core",
+        tags=[
+            "reading-comprehension",
+            "reasoning",
+            "arithmetic",
+            "counting",
+            "sorting",
+        ],
+        module_path="openbench.evals.drop",
+        function_name="drop",
+    ),
     # Math competitions
     "aime_2023_I": BenchmarkMetadata(
         name="AIME 2023 I",
