@@ -140,3 +140,68 @@ MULTILINGUAL_ANSWER_REGEXES = [
 
 # Adapted from https://github.com/openai/simple-evals
 ANSWER_PATTERN_MULTIPLE_CHOICE = r"(?i)Answer[ \t]*:[ \t]*\$?([A-D])\$?"
+
+
+def parse_json_from_response(text: str) -> dict:
+    """
+    Extract and parse JSON from a model response that may contain markdown formatting.
+
+    This function handles common patterns where models wrap JSON in markdown code blocks
+    or include extra text around the JSON object.
+
+    Parameters:
+        text (str): The model response potentially containing JSON
+
+    Returns:
+        dict: Parsed JSON as a dictionary, or empty dict if parsing fails
+    """
+    import json
+    import re
+
+    # First try to extract from markdown code blocks
+    json_match = re.search(r"```(?:json)?\s*(.*?)\s*```", text, re.DOTALL)
+    if json_match:
+        text = json_match.group(1)
+
+    # Try direct parsing
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        # Try to find JSON object in the text
+        json_pattern = r"\{[^{}]*\}"
+        matches = re.findall(json_pattern, text)
+        for match in matches:
+            try:
+                return json.loads(match)
+            except json.JSONDecodeError:
+                continue
+        return {}
+
+
+def format_chat_messages(messages: list) -> str:
+    """
+    Format a list of chat messages into a readable conversation string.
+
+    Handles both dictionary-style messages and ChatMessage objects from Inspect AI.
+
+    Parameters:
+        messages (list): List of messages (dicts or ChatMessage objects)
+
+    Returns:
+        str: Formatted conversation with role labels
+    """
+    formatted = []
+    for msg in messages:
+        # Handle both dict messages and ChatMessage objects
+        if isinstance(msg, dict):
+            role = msg.get("role", "")
+            content = msg.get("content", "")
+        else:
+            # ChatMessage object
+            role = getattr(msg, "role", "")
+            content = getattr(msg, "text", getattr(msg, "content", ""))
+
+        if role and content:
+            formatted.append(f"{role}: {content}")
+
+    return "\n\n".join(formatted)

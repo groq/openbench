@@ -34,7 +34,7 @@ def healthbench(
         name="healthbench",
         config=GenerateConfig(
             temperature=0.0,  # Use deterministic generation for medical advice
-            max_tokens=2048,  # Allow longer responses for detailed medical explanations
+            max_tokens=8192,  # Allow longer responses for detailed medical explanations
         ),
     )
 
@@ -56,7 +56,7 @@ def healthbench_hard(grader_model: str = "openai/gpt-4.1-2025-04-14") -> Task:
         name="healthbench_hard",
         config=GenerateConfig(
             temperature=0.0,
-            max_tokens=2048,
+            max_tokens=8192,
         ),
     )
 
@@ -78,6 +78,6 @@ def healthbench_consensus(grader_model: str = "openai/gpt-4.1-2025-04-14") -> Ta
         name="healthbench_consensus",
         config=GenerateConfig(
             temperature=0.0,
-            max_tokens=2048,
+            max_tokens=8192,
         ),
     )

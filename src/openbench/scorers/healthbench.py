@@ -1,14 +1,14 @@
 """HealthBench scorer implementation."""
 
-import json
-import re
 from collections import defaultdict
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict
 
 import numpy as np
 from inspect_ai.model import ChatMessageUser, get_model
 from inspect_ai.scorer import Score, Target, accuracy, metric, scorer, stderr
 from inspect_ai.solver import TaskState
+
+from openbench.utils.text import format_chat_messages, parse_json_from_response
 
 
 GRADER_TEMPLATE = """
@@ -63,46 +63,9 @@ Return just the json object in markdown format. Do not include any other text in
 """.strip()
 
 
-def parse_json_response(text: str) -> Dict[str, Any]:
-    """Extract and parse JSON from model response."""
-    # Remove markdown code blocks if present
-    json_match = re.search(r"```(?:json)?\s*(.*?)\s*```", text, re.DOTALL)
-    if json_match:
-        text = json_match.group(1)
-
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        # Try to find JSON object in the text
-        json_pattern = r"\{[^{}]*\}"
-        matches = re.findall(json_pattern, text)
-        for match in matches:
-            try:
-                return json.loads(match)
-            except json.JSONDecodeError:
-                continue
-        return {}
-
-
 def format_rubric(rubric: Dict[str, Any]) -> str:
     """Format a rubric item for display."""
     return f"[{rubric['points']}] {rubric['criterion']}"
-
-
-def format_conversation(messages: List[Any]) -> str:
-    """Format conversation messages."""
-    formatted = []
-    for msg in messages:
-        # Handle both dict messages and ChatMessage objects
-        if isinstance(msg, dict):
-            role = msg.get("role", "")
-            content = msg.get("content", "")
-        else:
-            # ChatMessage object
-            role = getattr(msg, "role", "")
-            content = getattr(msg, "text", "")
-        formatted.append(f"{role}: {content}")
-    return "\n\n".join(formatted)
 
 
 @metric
@@ -156,7 +119,7 @@ def healthbench_scorer(
         convo_with_response = prompt_messages + [
             {"role": "assistant", "content": state.output.completion}
         ]
-        convo_str = format_conversation(convo_with_response)
+        convo_str = format_chat_messages(convo_with_response)
 
         # Grade each rubric
         grading_results = []
@@ -166,9 +129,9 @@ def healthbench_scorer(
                 conversation=convo_str, rubric_item=format_rubric(rubric)
             )
 
-            # Get grading from model (Inspect handles retries automatically)
+            # Get grading from model
             result = await model.generate([ChatMessageUser(content=grader_prompt)])
-            grading_dict = parse_json_response(result.completion)
+            grading_dict = parse_json_from_response(result.completion)
 
             # Check if we got valid response
             if "criteria_met" in grading_dict and isinstance(
