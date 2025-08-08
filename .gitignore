@@ -13,3 +13,4 @@ logs/
 .*cache
 .coverage*
 .claude/settings.local.json
+local-prompts.md
