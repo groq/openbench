@@ -205,3 +205,79 @@ def format_chat_messages(messages: list) -> str:
             formatted.append(f"{role}: {content}")
 
     return "\n\n".join(formatted)
+
+
+def parse_numeric_answer(response: str, answer_prefix: str = "Answer") -> str:
+    """
+    Extract a numerical answer from model response after a given prefix.
+
+    Useful for math problems where the answer follows a pattern like "Answer: 42"
+    or in other languages like "答え: 42". Extracts the last number found after
+    the prefix, handling commas and decimal points.
+
+    Parameters:
+        response (str): Model's complete response
+        answer_prefix (str): Prefix that precedes the answer (default: "Answer")
+
+    Returns:
+        str: Extracted numerical answer, or empty string if not found
+
+    Examples:
+        >>> parse_numeric_answer("The calculation gives us Answer: 42")
+        '42'
+        >>> parse_numeric_answer("答え: 3.14", "答え")
+        '3.14'
+        >>> parse_numeric_answer("Answer: 1,234.5")
+        '1234.5'
+    """
+    import re
+
+    if answer_prefix not in response:
+        return ""
+
+    # Get text after the answer prefix
+    answer_text = response.split(answer_prefix)[-1].strip()
+
+    # Remove colon if present
+    if answer_text.startswith(":"):
+        answer_text = answer_text[1:].strip()
+
+    # Find all numbers (including decimals) in the string
+    # Remove commas first, then extract numbers
+    numbers = re.findall(r"\d+\.?\d*", answer_text.replace(",", ""))
+
+    # Return the last number (removing trailing decimal point if present)
+    return numbers[-1].rstrip(".") if numbers else ""
+
+
+def normalize_number(value: str) -> str:
+    """
+    Normalize a numerical string for comparison.
+
+    Removes commas, trailing zeros after decimal points, and trailing decimal
+    points. Useful for comparing numerical answers where formatting may vary.
+
+    Parameters:
+        value (str): String representation of a number
+
+    Returns:
+        str: Normalized number string
+
+    Examples:
+        >>> normalize_number("1,234")
+        '1234'
+        >>> normalize_number("3.1400")
+        '3.14'
+        >>> normalize_number("5.0")
+        '5'
+        >>> normalize_number("42.")
+        '42'
+    """
+    # Remove commas
+    value = value.replace(",", "")
+
+    # If it has a decimal point, remove trailing zeros and the decimal point if needed
+    if "." in value:
+        value = value.rstrip("0").rstrip(".")
+
+    return value
