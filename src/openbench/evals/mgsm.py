@@ -33,7 +33,7 @@ def mgsm() -> Task:
         scorer=mgsm_scorer(),
         name="mgsm",
         config=GenerateConfig(
-            temperature=0.0,  # Deterministic for math problems
+            temperature=0.5,  # Simple Evals uses 0.5
             max_tokens=8192,  # Allow space for reasoning steps
         ),
     )
