@@ -1,3 +1,11 @@
+import json
+from inspect_ai.model import (
+    ChatMessageUser,
+    ChatMessageAssistant,
+    ChatMessageSystem,
+    ChatMessage,
+)
+
 """Text processing utilities for openbench.
 
 This module contains helper functions for processing and normalizing text in various
@@ -326,3 +334,25 @@ def extract_confidence_score(response: str, default: int = 100) -> int:
             return min(100, max(0, int(value)))
 
     return default
+
+
+def str_to_chat_messages(messages_str: str) -> list[ChatMessage]:
+    """
+    Convert a string to a list of chat messages.
+
+    Parameters:
+        messages_str (str): The string to convert
+
+    Returns:
+        list[ChatMessage]: The list of chat messages
+    """
+    message_mapping = {
+        "system": ChatMessageSystem,
+        "user": ChatMessageUser,
+        "assistant": ChatMessageAssistant,
+    }
+    messages = json.loads(messages_str)
+    return [
+        message_mapping[message["role"]](content=message["content"])
+        for message in messages
+    ]

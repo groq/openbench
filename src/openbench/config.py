@@ -33,6 +33,14 @@ BENCHMARKS = {
         module_path="openbench.evals.mmlu",
         function_name="mmlu",
     ),
+    "mrcr": BenchmarkMetadata(
+        name="MRCR",
+        description="Memory-Recall with Contextual Retrieval - long-context evaluation that measures recall of needles across million-token contexts",
+        category="core",
+        tags=["long-context", "retrieval", "needle", "sequence-matching"],
+        module_path="openbench.evals.mrcr",
+        function_name="mrcr",
+    ),
     "gpqa_diamond": BenchmarkMetadata(
         name="GPQA Diamond",
         description="Graduate-level Google-Proof Q&A in biology, chemistry, and physics",
