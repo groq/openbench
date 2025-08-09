@@ -281,3 +281,48 @@ def normalize_number(value: str) -> str:
         value = value.rstrip("0").rstrip(".")
 
     return value
+
+
+def extract_confidence_score(response: str, default: int = 100) -> int:
+    """
+    Extract a confidence score from model response.
+
+    Looks for patterns like "Confidence: 85%", "confidence: 0.85", etc.
+    Handles both percentage (0-100) and decimal (0-1) formats.
+
+    Parameters:
+        response (str): Model response potentially containing confidence score
+        default (int): Default confidence to return if none found (default: 100)
+
+    Returns:
+        int: Confidence score between 0 and 100
+
+    Examples:
+        >>> extract_confidence_score("Answer: A\\nConfidence: 85%")
+        85
+        >>> extract_confidence_score("I am 0.95 confident in this answer")
+        95
+        >>> extract_confidence_score("No confidence mentioned")
+        100
+    """
+    import re
+
+    patterns = [
+        r"[Cc]onfidence:\s*(\d+(?:\.\d+)?)\s*%",  # Confidence: 85%
+        r"[Cc]onfidence:\s*(\d+)",  # Confidence: 85
+        r"[Cc]onfidence:\s*(0?\.\d+)",  # Confidence: 0.85
+        r"(\d+(?:\.\d+)?)\s*%\s*[Cc]onfident",  # 85% confident
+        r"(0?\.\d+)\s*[Cc]onfident",  # 0.85 confident
+    ]
+
+    for pattern in patterns:
+        match = re.search(pattern, response)
+        if match:
+            value = float(match.group(1))
+            # Convert to percentage if it's a decimal
+            if value <= 1:
+                return int(value * 100)
+            # Clamp to valid range
+            return min(100, max(0, int(value)))
+
+    return default

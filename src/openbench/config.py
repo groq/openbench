@@ -81,6 +81,22 @@ BENCHMARKS = {
         module_path="openbench.evals.simpleqa",
         function_name="simpleqa",
     ),
+    "hle": BenchmarkMetadata(
+        name="Humanity's Last Exam",
+        description="Multi-modal benchmark at the frontier of human knowledge - 2,500 questions across mathematics, humanities, and natural sciences designed by subject-matter experts globally",
+        category="core",
+        tags=["knowledge", "reasoning", "multi-modal", "graded", "frontier"],
+        module_path="openbench.evals.hle",
+        function_name="hle",
+    ),
+    "hle_text": BenchmarkMetadata(
+        name="Humanity's Last Exam (Text-Only)",
+        description="Text-only variant of HLE with multi-modal questions filtered out - evaluates models without vision capabilities on text-based questions from the frontier of human knowledge",
+        category="core",
+        tags=["knowledge", "reasoning", "text-only", "graded", "frontier"],
+        module_path="openbench.evals.hle",
+        function_name="hle_text",
+    ),
     "healthbench": BenchmarkMetadata(
         name="HealthBench",
         description="Medical dialogue evaluation using physician-created rubrics for assessing healthcare conversations",
