@@ -157,6 +157,29 @@ BENCHMARKS = {
         module_path="openbench.evals.drop",
         function_name="drop",
     ),
+    "math": BenchmarkMetadata(
+        name="MATH",
+        description="Measuring Mathematical Problem Solving - 5000 competition math problems across 7 subjects and 5 difficulty levels",
+        category="core",
+        tags=["math", "problem-solving", "reasoning", "competition", "graded"],
+        module_path="openbench.evals.math",
+        function_name="math",
+    ),
+    "math_500": BenchmarkMetadata(
+        name="MATH-500",
+        description="500-problem subset of MATH dataset for faster evaluation of mathematical problem solving",
+        category="core",
+        tags=[
+            "math",
+            "problem-solving",
+            "reasoning",
+            "competition",
+            "graded",
+            "subset",
+        ],
+        module_path="openbench.evals.math",
+        function_name="math_500",
+    ),
     # Math competitions
     "aime_2023_I": BenchmarkMetadata(
         name="AIME 2023 I",
