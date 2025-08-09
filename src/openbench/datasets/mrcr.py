@@ -1,7 +1,7 @@
 from typing import Any, Callable
 
-from inspect_ai.dataset import Sample, Dataset, MemoryDataset, hf_dataset
-from openbench.utils.text import str_to_chat_messages
+from inspect_ai.dataset import Sample, Dataset, hf_dataset
+from openbench.utils.text import get_token_count, str_to_chat_messages
 
 
 def record_to_sample() -> Callable[[dict[str, Any]], Sample]:
@@ -24,6 +24,7 @@ def record_to_sample() -> Callable[[dict[str, Any]], Sample]:
             "desired_msg_index": record.get("desired_msg_index"),
             "total_messages": record.get("total_messages"),
             "n_chars": record.get("n_chars"),
+            "raw_input_tok_cnt": get_token_count(record.get("prompt")),
         }
 
         return Sample(
@@ -35,26 +36,26 @@ def record_to_sample() -> Callable[[dict[str, Any]], Sample]:
     return _record_to_sample
 
 
-def get_dataset(needles: int = 2) -> Dataset:
-    """Load the MRCR dataset, filtered by number of needles.
+def get_dataset(needles: int = None) -> Dataset:
+    """Load the MRCR dataset.
 
     Args:
-        needles: Number of needles to include (2, 4, or 8). Defaults to 2.
+        needles: Number of needles to include (2, 4, or 8). Defaults to None.
 
     Returns:
         Dataset filtered to the requested number of needles.
     """
 
-    # Load from HuggingFace Hub
-    dataset = hf_dataset(
+    if needles in (2, 4, 8):
+        return hf_dataset(
+            path="openai/mrcr",
+            split="train",
+            sample_fields=record_to_sample(),
+            data_files=f"{needles}needle.parquet",
+        )
+
+    return hf_dataset(
         path="openai/mrcr",
         split="train",
         sample_fields=record_to_sample(),
     )
-
-    # Filter to requested needles and return a named in-memory dataset
-    samples = [
-        s for s in dataset if s.metadata and s.metadata.get("n_needles") == needles
-    ]
-
-    return MemoryDataset(samples=samples, name=f"mrcr_{needles}")

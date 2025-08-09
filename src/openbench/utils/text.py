@@ -1,4 +1,5 @@
 import json
+import tiktoken
 from inspect_ai.model import (
     ChatMessageUser,
     ChatMessageAssistant,
@@ -356,3 +357,10 @@ def str_to_chat_messages(messages_str: str) -> list[ChatMessage]:
         message_mapping[message["role"]](content=message["content"])
         for message in messages
     ]
+
+
+def get_token_count(text: str, model: str = "gpt-4o") -> int:
+    """
+    Get the token count of a text.
+    """
+    return len(tiktoken.encoding_for_model(model).encode(text))
