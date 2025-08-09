@@ -285,6 +285,14 @@ BENCHMARKS = {
         module_path="openbench.evals.matharena.hmmt_feb_2025.hmmt_feb_2025",
         function_name="hmmt_feb_2025",
     ),
+    "lcb": BenchmarkMetadata(
+        name="LCB",
+        description="LiveCodeBench",
+        category="core",
+        tags=["code-generation"],
+        module_path="openbench.evals.lcb",
+        function_name="lcb",
+    ),
 }
 
 
