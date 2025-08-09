@@ -33,14 +33,13 @@ def math(grader_model: str = "openai/gpt-4-turbo-preview") -> Task:
     dataset = get_dataset("math_test")
     for sample in dataset:
         sample.input = QUERY_TEMPLATE.format(problem=sample.input)
-    
+
     return Task(
         dataset=dataset,
         solver=[generate()],
         scorer=math_scorer(model=grader_model),
         name="math",
         config=GenerateConfig(
-            temperature=0.0,  # Use deterministic generation for math problems
             max_tokens=8192,  # Allow long reasoning chains
         ),
     )
@@ -63,14 +62,13 @@ def math_500(grader_model: str = "openai/gpt-4-turbo-preview") -> Task:
     dataset = get_dataset("math_500_test")
     for sample in dataset:
         sample.input = QUERY_TEMPLATE.format(problem=sample.input)
-    
+
     return Task(
         dataset=dataset,
         solver=[generate()],
         scorer=math_scorer(model=grader_model),
         name="math_500",
         config=GenerateConfig(
-            temperature=0.0,  # Use deterministic generation for math problems
             max_tokens=8192,  # Allow long reasoning chains
         ),
     )

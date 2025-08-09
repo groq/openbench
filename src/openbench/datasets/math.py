@@ -29,4 +29,3 @@ def get_dataset(split: str = "math_test") -> Dataset:
     samples = list(dataset)
 
     return MemoryDataset(samples=samples, name=split)
-

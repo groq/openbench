@@ -128,4 +128,3 @@ def math_scorer(model: str = "openai/gpt-4-turbo-preview") -> Callable:
         )
 
     return score
-
