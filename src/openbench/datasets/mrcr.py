@@ -1,6 +1,6 @@
 from typing import Any, Callable
 
-from inspect_ai.dataset import Sample, Dataset, hf_dataset
+from inspect_ai.dataset import Sample, Dataset, MemoryDataset, hf_dataset
 from openbench.utils.text import get_token_count, str_to_chat_messages
 
 
@@ -36,26 +36,36 @@ def record_to_sample() -> Callable[[dict[str, Any]], Sample]:
     return _record_to_sample
 
 
-def get_dataset(needles: int = None) -> Dataset:
+def get_dataset(needles: int = None, max_context_size: int = None) -> Dataset:
     """Load the MRCR dataset.
 
     Args:
         needles: Number of needles to include (2, 4, or 8). Defaults to None.
-
+        max_context_size: Maximum context size in tokens. Defaults to None.
     Returns:
         Dataset filtered to the requested number of needles.
     """
 
+    def context_size_filter(x: dict[str, Any]) -> bool:
+        return x["raw_input_tok_cnt"] <= max_context_size
+
     if needles in (2, 4, 8):
-        return hf_dataset(
+        dataset = hf_dataset(
             path="openai/mrcr",
             split="train",
             sample_fields=record_to_sample(),
             data_files=f"{needles}needle.parquet",
         )
+    else:
+        dataset = hf_dataset(
+            path="openai/mrcr",
+            split="train",
+            sample_fields=record_to_sample(),
+        )
 
-    return hf_dataset(
-        path="openai/mrcr",
-        split="train",
-        sample_fields=record_to_sample(),
-    )
+    dataset = list(dataset)
+    if max_context_size:
+        dataset = [s for s in dataset if context_size_filter(s.metadata)]
+    name = f"mrcr_{needles}n" if needles else "mrcr_full"
+    print(f"Loaded {len(dataset)} samples from {name}")
+    return MemoryDataset(samples=dataset, name=name)
