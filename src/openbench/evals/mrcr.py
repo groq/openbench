@@ -9,8 +9,7 @@ from openbench.scorers.mrcr import mrcr_scorer
 def openai_mrcr() -> Task:
     """Memory-Recall with Contextual Retrieval (MRCR).
 
-    Evaluates retrieval and recall in long contexts by placing a specified
-    number of "needles" (facts) in the prompt and measuring whether the
+    Evaluates retrieval and recall in long contexts by placing 2, 4 or 8 needles in the prompt and measuring whether the
     model can correctly extract and use them.
 
     Args:
@@ -33,15 +32,14 @@ def openai_mrcr() -> Task:
 def openai_mrcr_2n() -> Task:
     """Memory-Recall with Contextual Retrieval (MRCR).
 
-    Evaluates retrieval and recall in long contexts by placing a specified
-    number of "needles" (facts) in the prompt and measuring whether the
+    Evaluates retrieval and recall in long contexts by placing 2 needles in the prompt and measuring whether the
     model can correctly extract and use them.
 
     Args:
         None
 
     Returns:
-        Task configured for MRCR evaluation.
+        Task configured for MRCR 2 needles evaluation.
     """
 
     return Task(
@@ -57,15 +55,14 @@ def openai_mrcr_2n() -> Task:
 def openai_mrcr_4n() -> Task:
     """Memory-Recall with Contextual Retrieval (MRCR).
 
-    Evaluates retrieval and recall in long contexts by placing a specified
-    number of "needles" (facts) in the prompt and measuring whether the
+    Evaluates retrieval and recall in long contexts by placing 4 needles in the prompt and measuring whether the
     model can correctly extract and use them.
 
     Args:
         None
 
     Returns:
-        Task configured for MRCR evaluation.
+        Task configured for MRCR 4 needles evaluation.
     """
 
     return Task(
@@ -81,15 +78,14 @@ def openai_mrcr_4n() -> Task:
 def openai_mrcr_8n() -> Task:
     """Memory-Recall with Contextual Retrieval (MRCR).
 
-    Evaluates retrieval and recall in long contexts by placing a specified
-    number of "needles" (facts) in the prompt and measuring whether the
+    Evaluates retrieval and recall in long contexts by placing 8 needles in the prompt and measuring whether the
     model can correctly extract and use them.
 
     Args:
         None
 
     Returns:
-        Task configured for MRCR evaluation.
+        Task configured for MRCR 8 needles evaluation.
     """
 
     return Task(
