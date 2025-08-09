@@ -111,7 +111,7 @@ For a complete list of all commands and options, run: `bench --help`
 | `--timeout`          | `BENCH_TIMEOUT`          | `10000`                                          | Timeout for each API request (seconds)           |
 | `--display`          | `BENCH_DISPLAY`          | `None`                                           | Display type (full/conversation/rich/plain/none) |
 | `--reasoning-effort` | `BENCH_REASONING_EFFORT` | `None`                                           | Reasoning effort level (low/medium/high)         |
-| `--json`             | None                     | `False`                                          | Output results in JSON format                    |
+| `--json`             | `BENCH_JSON`             | `False`                                          | Output results in JSON format                    |
 
 ## Building Your Own Evals
 

@@ -258,6 +258,13 @@ def run_eval(
             case_sensitive=False,
         ),
     ] = None,
+    json: Annotated[
+        bool,
+        typer.Option(
+            help="Output results in JSON format",
+            envvar="BENCH_JSON",
+        ),
+    ] = False,
 ) -> None:
     """
     Run a benchmark on a model.
@@ -327,6 +334,7 @@ def run_eval(
         timeout=timeout,
         reasoning_effort=reasoning_effort.value if reasoning_effort else None,
         sandbox=sandbox,
+        log_format="json" if json else "eval",
     )
 
     # Placeholder - actual implementation would run the evaluation
