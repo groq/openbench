@@ -1,3 +1,4 @@
+from typing import Optional
 from inspect_ai import Task, task
 from inspect_ai.model import GenerateConfig
 from inspect_ai.solver import generate
@@ -6,7 +7,7 @@ from openbench.scorers.mrcr import mrcr_scorer
 
 
 @task
-def openai_mrcr(max_context_size: int = None) -> Task:
+def openai_mrcr(max_context_size: Optional[int] = None) -> Task:
     """Memory-Recall with Contextual Retrieval (MRCR).
 
     Evaluates retrieval and recall in long contexts by placing 2, 4 or 8 needles in the prompt and measuring whether the
@@ -29,7 +30,7 @@ def openai_mrcr(max_context_size: int = None) -> Task:
 
 
 @task
-def openai_mrcr_2n(max_context_size: int = None) -> Task:
+def openai_mrcr_2n(max_context_size: Optional[int] = None) -> Task:
     """Memory-Recall with Contextual Retrieval (MRCR).
 
     Evaluates retrieval and recall in long contexts by placing 2 needles in the prompt and measuring whether the
@@ -52,7 +53,7 @@ def openai_mrcr_2n(max_context_size: int = None) -> Task:
 
 
 @task
-def openai_mrcr_4n(max_context_size: int = None) -> Task:
+def openai_mrcr_4n(max_context_size: Optional[int] = None) -> Task:
     """Memory-Recall with Contextual Retrieval (MRCR).
 
     Evaluates retrieval and recall in long contexts by placing 4 needles in the prompt and measuring whether the
@@ -75,7 +76,7 @@ def openai_mrcr_4n(max_context_size: int = None) -> Task:
 
 
 @task
-def openai_mrcr_8n(max_context_size: int = None) -> Task:
+def openai_mrcr_8n(max_context_size: Optional[int] = None) -> Task:
     """Memory-Recall with Contextual Retrieval (MRCR).
 
     Evaluates retrieval and recall in long contexts by placing 8 needles in the prompt and measuring whether the

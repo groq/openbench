@@ -61,8 +61,8 @@ def mrcr_metrics() -> Metric:
     """
 
     def metric_calculator(scores: list[SampleScore]) -> Value:
-        accuracy_by_token_count_bin = {}
-        bin_counts = {}
+        accuracy_by_token_count_bin: dict[str, float] = {}
+        bin_counts: dict[str, int] = {}
 
         for left_bin, right_bin in OPENAI_MRCR_BINS:
             bin_key = f"{left_bin}-{right_bin}"
@@ -73,10 +73,18 @@ def mrcr_metrics() -> Metric:
             return accuracy_by_token_count_bin
 
         for sample_score in scores:
+            if sample_score.score.metadata is None:
+                continue
             bin_index = sample_score.score.metadata.get("bin_index")
+            if (
+                not isinstance(bin_index, int)
+                or bin_index < 0
+                or bin_index >= len(OPENAI_MRCR_BINS)
+            ):
+                continue
             left_bin, right_bin = OPENAI_MRCR_BINS[bin_index]
             bin_key = f"{left_bin}-{right_bin}"
-            accuracy_by_token_count_bin[bin_key] += sample_score.score.value
+            accuracy_by_token_count_bin[bin_key] += sample_score.score.as_float()
             bin_counts[bin_key] += 1
 
         # calculate accuracy for each bin
@@ -118,10 +126,12 @@ def mrcr_scorer() -> Callable:
         )
 
         # get token count of input and target
-        total_tok_cnt = state.metadata.get("raw_input_tok_cnt") + get_token_count(
-            target.text
-        )
+        input_tok_cnt = state.metadata.get("raw_input_tok_cnt", 0)
+        output_tok_cnt = get_token_count(target.text)
+        total_tok_cnt = input_tok_cnt + output_tok_cnt
         state.metadata["total_tok_cnt"] = total_tok_cnt
+
+        # get bin index
         bin_index = 0
         for i, (left_bin, right_bin) in enumerate(OPENAI_MRCR_BINS):
             if i == 0 or i == len(OPENAI_MRCR_BINS) - 1:

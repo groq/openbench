@@ -1,10 +1,12 @@
-from typing import Any, Callable
+from typing import Any, Callable, Optional
 
-from inspect_ai.dataset import Sample, Dataset, MemoryDataset, hf_dataset
+from inspect_ai.dataset import Sample, Dataset, hf_dataset, FieldSpec
 from openbench.utils.text import get_chatml_tok_cnt, str_to_chat_messages
 
 
-def record_to_sample() -> Callable[[dict[str, Any]], Sample]:
+def record_to_sample(
+    max_context_size: Optional[int] = None,
+) -> FieldSpec | Callable[[dict[str, Any]], Sample | list[Sample]]:
     """Create a mapper from MRCR records to Inspect Samples.
 
     Expected fields in the source record:
@@ -17,9 +19,11 @@ def record_to_sample() -> Callable[[dict[str, Any]], Sample]:
     - n_chars (int)
     """
 
-    def _record_to_sample(record: dict[str, Any]) -> Sample:
+    def _record_to_sample(record: dict[str, Any]) -> Sample | list[Sample]:
         chat_messages = str_to_chat_messages(record["prompt"])
         input_tok_cnt = get_chatml_tok_cnt(record["prompt"])
+        if max_context_size is not None and input_tok_cnt > max_context_size:
+            return []
         metadata = {
             "random_string_to_prepend": record.get("random_string_to_prepend"),
             "n_needles": record.get("n_needles"),
@@ -38,7 +42,9 @@ def record_to_sample() -> Callable[[dict[str, Any]], Sample]:
     return _record_to_sample
 
 
-def get_dataset(needles: int = None, max_context_size: int = None) -> Dataset:
+def get_dataset(
+    needles: Optional[int] = None, max_context_size: Optional[int] = None
+) -> Dataset:
     """Load the MRCR dataset.
 
     Args:
@@ -48,26 +54,16 @@ def get_dataset(needles: int = None, max_context_size: int = None) -> Dataset:
         Dataset filtered to the requested number of needles.
     """
 
-    def context_size_filter(x: dict[str, Any]) -> bool:
-        return x["raw_input_tok_cnt"] <= max_context_size
-
     if needles in (2, 4, 8):
-        dataset = hf_dataset(
+        return hf_dataset(
             path="openai/mrcr",
             split="train",
-            sample_fields=record_to_sample(),
+            sample_fields=record_to_sample(max_context_size),
             data_files=f"{needles}needle.parquet",
         )
-    else:
-        dataset = hf_dataset(
-            path="openai/mrcr",
-            split="train",
-            sample_fields=record_to_sample(),
-        )
 
-    dataset = list(dataset)
-    if max_context_size:
-        dataset = [s for s in dataset if context_size_filter(s.metadata)]
-    name = f"mrcr_{needles}n" if needles else "mrcr_full"
-    print(f"Loaded {len(dataset)} samples from {name}")
-    return MemoryDataset(samples=dataset, name=name)
+    return hf_dataset(
+        path="openai/mrcr",
+        split="train",
+        sample_fields=record_to_sample(max_context_size),
+    )
