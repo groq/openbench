@@ -121,14 +121,17 @@ def mrcr_scorer() -> Callable:
         total_tok_cnt = state.metadata.get("raw_input_tok_cnt") + get_token_count(
             target.text
         )
+        state.metadata["total_tok_cnt"] = total_tok_cnt
         bin_index = 0
         for i, (left_bin, right_bin) in enumerate(OPENAI_MRCR_BINS):
             if i == 0 or i == len(OPENAI_MRCR_BINS) - 1:
                 if left_bin <= total_tok_cnt <= right_bin:
                     bin_index = i
+                    break
             else:
                 if left_bin <= total_tok_cnt < right_bin:
                     bin_index = i
+                    break
 
         return Score(
             value=ratio,

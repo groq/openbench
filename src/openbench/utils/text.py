@@ -364,3 +364,18 @@ def get_token_count(text: str, model: str = "gpt-4o") -> int:
     Get the token count of a text.
     """
     return len(tiktoken.encoding_for_model(model).encode(text))
+
+
+def get_chatml_tok_cnt(chat_messages_str: str) -> int:
+    """
+    Get the token count of a string in chatml format.
+    """
+    messages = json.loads(chat_messages_str)
+    total = 3
+    for message in messages:
+        total += 3
+        for key, value in message.items():
+            total += get_token_count(value)
+            if key == "name":
+                total += 1
+    return total

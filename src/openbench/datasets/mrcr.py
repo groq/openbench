@@ -1,7 +1,7 @@
 from typing import Any, Callable
 
 from inspect_ai.dataset import Sample, Dataset, MemoryDataset, hf_dataset
-from openbench.utils.text import get_token_count, str_to_chat_messages
+from openbench.utils.text import get_chatml_tok_cnt, str_to_chat_messages
 
 
 def record_to_sample() -> Callable[[dict[str, Any]], Sample]:
@@ -18,17 +18,19 @@ def record_to_sample() -> Callable[[dict[str, Any]], Sample]:
     """
 
     def _record_to_sample(record: dict[str, Any]) -> Sample:
+        chat_messages = str_to_chat_messages(record["prompt"])
+        input_tok_cnt = get_chatml_tok_cnt(record["prompt"])
         metadata = {
             "random_string_to_prepend": record.get("random_string_to_prepend"),
             "n_needles": record.get("n_needles"),
             "desired_msg_index": record.get("desired_msg_index"),
             "total_messages": record.get("total_messages"),
             "n_chars": record.get("n_chars"),
-            "raw_input_tok_cnt": get_token_count(record.get("prompt")),
+            "raw_input_tok_cnt": input_tok_cnt,
         }
 
         return Sample(
-            input=str_to_chat_messages(record["prompt"]),
+            input=chat_messages,
             target=record["answer"],
             metadata=metadata,
         )
