@@ -6,19 +6,20 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 
-OpenBench provides standardized, reproducible benchmarking for LLMs across 20+ evaluation suites spanning knowledge, reasoning, coding, and mathematics. **Works with any model provider** - Groq, OpenAI, Anthropic, Cohere, Google, AWS Bedrock, Azure, local models via Ollama, and more.
+OpenBench provides standardized, reproducible benchmarking for LLMs across 20+ evaluation suites (and growing) spanning knowledge, math, reasoning, reading comprehension, health, long-context recall, and first-class support for your own local evals to preserve privacy. **Works with any model provider** - Groq, OpenAI, Anthropic, Cohere, Google, AWS Bedrock, Azure, local models via Ollama, and more.
 
-## 🚧 Alpha Release (v0.1)
+## 🚧 Alpha Release
 
 We're building in public! This is an alpha release - expect rapid iteration. The first stable release is coming soon.
 
 ## Features
 
-- **🎯 20+ Benchmarks**: MMLU, GPQA, HumanEval, SimpleQA, and competition math (AIME, HMMT)
+- **🎯 30+ Benchmarks**: MMLU, GPQA, HumanEval, SimpleQA, and competition math (AIME, HMMT)
 - **🔧 Simple CLI**: `bench list`, `bench describe`, `bench eval`
 - **🏗️ Built on inspect-ai**: Industry-standard evaluation framework
 - **📊 Extensible**: Easy to add new benchmarks and metrics
 - **🤖 Provider-agnostic**: Works with 15+ model providers out of the box
+- **🛠️ Local Eval Support**: Privatized benchmarks can now be run with `bench eval <path>`
 
 ## 🏃 Speedrun: Evaluate a Model in 60 Seconds
 
@@ -62,15 +63,14 @@ bench eval musr --model ollama/llama3.1:70b
 
 # Any provider supported by Inspect AI!
 ```
-
-## Available Benchmarks
-
 | Category | Benchmarks |
 |----------|------------|
-| **Knowledge** | MMLU (57 subjects), GPQA (graduate-level), SuperGPQA (285 disciplines), OpenBookQA |
+| **Knowledge** | MMLU (57 subjects), GPQA (graduate-level), SuperGPQA (285 disciplines), OpenBookQA, HLE (Humanity's Last Exam - 2,500 questions from 1,000+ experts), HLE_text (text-only version) |
 | **Coding** | HumanEval (164 problems) |
-| **Math** | AIME 2023-2025, HMMT Feb 2023-2025, BRUMO 2025 |
+| **Math** | AIME 2023-2025, HMMT Feb 2023-2025, BRUMO 2025, MATH (competition-level problems), MATH-500 (challenging subset), MGSM (multilingual grade school math), MGSM_en (English), MGSM_latin (5 languages), MGSM_non_latin (6 languages) |
 | **Reasoning** | SimpleQA (factuality), MuSR (multi-step reasoning) |
+| **Long Context** | OpenAI MRCR (multiple needle retrieval), OpenAI MRCR_2n (2 needle), OpenAI MRCR_4 (4 needle), OpenAI MRCR_8n (8 needle) |
+| **Healthcare** | HealthBench (open-ended healthcare eval), HealthBench_hard (challenging variant), HealthBench_consensus (consensus variant) |
 
 ## Configuration
 
@@ -87,12 +87,13 @@ export BENCH_MODEL=groq/llama-3.1-70b
 
 For a complete list of all commands and options, run: `bench --help`
 
-| Command                  | Description                                   |
-|--------------------------|-----------------------------------------------|
-| `bench`                  | Show main menu with available commands        |
-| `bench list`             | List available evaluations, models, and flags |
-| `bench eval <benchmark>` | Run benchmark evaluation on a model           |
-| `bench view`             | View logs from previous benchmark runs        |
+| Command                  | Description                                        |
+|--------------------------|----------------------------------------------------|
+| `bench`                  | Show main menu with available commands             |
+| `bench list`             | List available evaluations, models, and flags      |
+| `bench eval <benchmark>` | Run benchmark evaluation on a model                |
+| `bench view`             | View logs from previous benchmark runs             |
+| `bench eval <path>`      | Run your local/private evals built with Inspect AI |
 
 ### Key `eval` Command Options
 
@@ -115,7 +116,8 @@ For a complete list of all commands and options, run: `bench --help`
 
 ## Building Your Own Evals
 
-OpenBench is built on [Inspect AI](https://inspect.aisi.org.uk/). To create custom evaluations, check out their excellent [documentation](https://inspect.aisi.org.uk/).
+OpenBench is built on [Inspect AI](https://inspect.aisi.org.uk/). To create custom evaluations, check out their excellent [documentation](https://inspect.aisi.org.uk/). Once you do build your own private evaluations with Inspect AI that you don't want to open-source, you can point OpenBench  at them with `bench eval <path>` to run!
+
 
 ## FAQ
 
