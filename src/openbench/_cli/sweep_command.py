@@ -23,7 +23,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 from inspect_ai import eval as inspect_eval  # type: ignore
-from openbench._registry import load_task
+from openbench.config import load_task
 from openbench.monkeypatch.display_results_patch import patch_display_results
 from openbench.monkeypatch.file_recorder_logfile_patch import patch_file_recorder_logfile
 
