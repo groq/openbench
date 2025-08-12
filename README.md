@@ -60,6 +60,9 @@ bench eval mmlu --model google/gemini-2.5-pro
 # Local models with Ollama
 bench eval musr --model ollama/llama3.1:70b
 
+# Hugging Face Inference Providers
+bench eval mmlu --model huggingface/gpt-oss-120b:groq
+
 # Any provider supported by Inspect AI!
 ```
 
@@ -77,6 +80,7 @@ bench eval musr --model ollama/llama3.1:70b
 ```bash
 # Set your API keys
 export GROQ_API_KEY=your_key
+export HF_TOKEN=your_key
 export OPENAI_API_KEY=your_key  # Optional
 
 # Set default model
