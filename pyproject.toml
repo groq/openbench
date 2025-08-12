@@ -31,6 +31,9 @@ Repository = "https://github.com/groq/openbench"
 [project.scripts]
 bench = "openbench._cli:main"
 
+[project.entry-points.inspect_ai]
+openbench = "openbench._registry"
+
 [tool.setuptools]
 package-dir = {"" = "src"}
 
