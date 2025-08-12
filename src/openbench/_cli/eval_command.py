@@ -269,6 +269,7 @@ def run_eval(
         typer.Option(
             help="Output logging format",
             envvar="BENCH_LOG_FORMAT",
+            case_sensitive=False,
         ),
     ] = LogFormat.EVAL,
 ) -> None:
@@ -340,7 +341,7 @@ def run_eval(
         timeout=timeout,
         reasoning_effort=reasoning_effort.value if reasoning_effort else None,
         sandbox=sandbox,
-        log_format=log_format,
+        log_format=log_format.value if log_format else None,
     )
 
     # Placeholder - actual implementation would run the evaluation
