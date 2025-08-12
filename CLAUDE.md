@@ -5,6 +5,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Essential Setup
 - Always source the virtual environment before running Python commands: `source .venv/bin/activate`
 - This project uses UV as the package manager, not pip
+- **Dependencies must be pinned**: When adding dependencies with UV, always pin to specific versions (e.g., `uv add package==1.2.3` not `uv add package`)
+  - Pin to the latest stable version available to keep dependencies healthy and secure
+  - Check latest versions with `uv pip list --outdated` or on PyPI
 
 ## Key Commands
 
@@ -98,4 +101,10 @@ uv publish
 - Follow conventional commits (feat, fix, docs, etc.)
 - Line length: 88 characters (configured in ruff)
 - Test new features with both unit and integration tests
-- Run linting and type checking before committing
+- **IMPORTANT: All pre-commit hooks MUST pass before committing**
+  - Run `pre-commit run --all-files` to check all hooks
+  - The configured hooks are:
+    1. `ruff check --fix` - Linting with auto-fix
+    2. `ruff format` - Code formatting
+    3. `mypy .` - Type checking
+  - If any hook fails, fix the issues and re-run until all pass

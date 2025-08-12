@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "openbench"
-version = "0.1.1"
+version = "0.2.0"
 requires-python = ">=3.10"
 description = "OpenBench - open source, replicable, and standardized evaluation infrastructure"
 readme = "README.md"
@@ -19,6 +19,8 @@ dependencies = [
     "inspect-ai==0.3.115",
     "openai==1.97.1",
     "pydantic-settings==2.9.1",
+    "scipy==1.15.3",
+    "tiktoken==0.11.0",
     "typer==0.15.3",
 ]
 
@@ -28,6 +30,10 @@ Repository = "https://github.com/groq/openbench"
 
 [project.scripts]
 bench = "openbench._cli:main"
+openbench = "openbench._cli:main"
+
+[project.entry-points.inspect_ai]
+openbench = "openbench._registry"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

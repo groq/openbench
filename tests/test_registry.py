@@ -1,7 +1,7 @@
 """Test the registry module functionality."""
 
 import pytest
-from openbench._registry import load_task, TASK_REGISTRY
+from openbench.config import load_task, TASK_REGISTRY
 
 
 def test_task_registry_contents():
