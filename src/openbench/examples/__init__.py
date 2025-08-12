@@ -1,0 +1,1 @@
+"""Example callable 'models' that can be evaluated via the `pyfunc` provider."""

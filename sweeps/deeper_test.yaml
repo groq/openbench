@@ -1,0 +1,62 @@
+# Example sweep config: AIME 2025 II across GPT-OSS 20B single vs. pro-mode fanout
+name: "brumo_2025_all_modes_sweep"
+log_dir: "./logs"
+
+benchmarks:
+  - name: "brumo_2025"
+
+runs:
+  # Baseline single-generation 120B on Groq
+  - label: "120b-single"
+    model: "groq/openai/gpt-oss-120b"
+
+  # # # Pro mode (pyfunc fan-out + synth) with varying n_runs, all using GPT-OSS-20B underneath
+  - label: "pro-2x-120b"
+    model: "pyfunc/openbench.examples.groq_gpt_oss_pro:gpt_5_pro_mode"
+    model_args:
+      n_runs: 2
+      model: "openai/gpt-oss-120b"
+  
+  - label: "pro-4x-120b"
+    model: "pyfunc/openbench.examples.groq_gpt_oss_pro:gpt_5_pro_mode"
+    model_args:
+      n_runs: 4
+      model: "openai/gpt-oss-120b"
+
+  - label: "deeper-4x2-120b"
+    model: "pyfunc/openbench.examples.groq_gpt_oss_pro:gpt_5_pro_mode_deeper"
+    model_args:
+      num_groups: 4
+      runs_per_group: 2
+      model: "openai/gpt-oss-120b"
+
+  # - label: "deeper-16x2-120b"
+  #   model: "pyfunc/openbench.examples.groq_gpt_oss_pro:gpt_5_pro_mode_deeper"
+  #   model_args:
+  #     num_groups: 16
+  #     runs_per_group: 2
+  #     model: "openai/gpt-oss-120b"
+
+  # - label: "costar-4x2-120b"
+  #   model: "pyfunc/openbench.examples.groq_gpt_oss_pro:gpt_5_pro_mode_costar"
+  #   model_args:
+  #     num_groups: 4
+  #     runs_per_group: 2
+  #     model: "openai/gpt-oss-120b"
+
+  # - label: "costar-8x4-20b"
+  #   model: "pyfunc/openbench.examples.groq_gpt_oss_pro:gpt_5_pro_mode_costar"
+  #   model_args:
+  #     num_groups: 8
+  #     runs_per_group: 4
+  #     model: "openai/gpt-oss-20b"
+
+
+shared:
+  # Common eval knobs (override here if desired)
+  epochs: 3
+  limit: "0,600"   # uncomment to run only the first 200 problems, or set a single int
+  temperature: 0.6
+  top_p: 1.0
+  # max_tokens: 8000   # optional global cap
+  timeout: 10000
