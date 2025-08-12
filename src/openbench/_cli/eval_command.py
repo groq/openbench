@@ -1,10 +1,11 @@
 from typing import Optional, List, Dict, Annotated, Tuple, Union
 from enum import Enum
+import sys
 import typer
 from inspect_ai import eval
 from inspect_ai.model import Model
 
-from openbench._registry import load_task
+from openbench.config import load_task
 from openbench.monkeypatch.display_results_patch import patch_display_results
 
 
@@ -258,6 +259,14 @@ def run_eval(
             case_sensitive=False,
         ),
     ] = None,
+    debug: Annotated[
+        bool,
+        typer.Option(
+            "--debug",
+            help="Enable debug mode with full stack traces",
+            envvar="BENCH_DEBUG",
+        ),
+    ] = False,
 ) -> None:
     """
     Run a benchmark on a model.
@@ -304,30 +313,45 @@ def run_eval(
     # Apply display patch
     patch_display_results()
 
-    eval(
-        tasks=tasks,
-        model=model,
-        max_connections=max_connections,
-        model_base_url=model_base_url,
-        model_roles=role_models if role_models else None,
-        epochs=epochs,
-        limit=parsed_limit,
-        fail_on_error=fail_on_error,
-        message_limit=message_limit,
-        max_subprocesses=max_subprocesses,
-        log_samples=log_samples,
-        log_images=log_images,
-        log_buffer=log_buffer,
-        score=score,
-        temperature=temperature,
-        top_p=top_p,
-        max_tokens=max_tokens,
-        seed=seed,
-        display=display.value if display else None,
-        timeout=timeout,
-        reasoning_effort=reasoning_effort.value if reasoning_effort else None,
-        sandbox=sandbox,
-    )
+    try:
+        eval(
+            tasks=tasks,
+            model=model,
+            max_connections=max_connections,
+            model_base_url=model_base_url,
+            model_roles=role_models if role_models else None,
+            epochs=epochs,
+            limit=parsed_limit,
+            fail_on_error=fail_on_error,
+            message_limit=message_limit,
+            max_subprocesses=max_subprocesses,
+            log_samples=log_samples,
+            log_images=log_images,
+            log_buffer=log_buffer,
+            score=score,
+            temperature=temperature,
+            top_p=top_p,
+            max_tokens=max_tokens,
+            seed=seed,
+            display=display.value if display else None,
+            timeout=timeout,
+            reasoning_effort=reasoning_effort.value if reasoning_effort else None,
+            sandbox=sandbox,
+        )
 
-    # Placeholder - actual implementation would run the evaluation
-    typer.echo("Evaluation complete!")
+        # Placeholder - actual implementation would run the evaluation
+        typer.echo("Evaluation complete!")
+    except Exception as e:
+        if debug:
+            # In debug mode, let the full stack trace show
+            raise
+        else:
+            # In normal mode, show clean error message
+            error_msg = str(e)
+            typer.secho(f"\n❌ Error: {error_msg}", fg=typer.colors.RED, err=True)
+            typer.secho(
+                "\nFor full stack trace, run with --debug flag",
+                fg=typer.colors.CYAN,
+                err=True,
+            )
+            sys.exit(1)

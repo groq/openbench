@@ -7,8 +7,7 @@ from typing import Optional, List, Dict, Any
 from dataclasses import dataclass, field
 from functools import lru_cache
 
-from openbench.config import get_benchmark_metadata
-from openbench._registry import load_task
+from openbench.config import get_benchmark_metadata, load_task
 
 
 @dataclass
