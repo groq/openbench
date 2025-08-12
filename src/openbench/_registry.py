@@ -35,6 +35,14 @@ def nebius() -> Type[ModelAPI]:
     return NebiusAPI
 
 
+@modelapi(name="nous")
+def nous() -> Type[ModelAPI]:
+    """Register Nous Research provider."""
+    from .model._providers.nous import NousAPI
+
+    return NousAPI
+
+
 # Task Registration
 
 # Core benchmarks
