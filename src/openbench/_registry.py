@@ -27,6 +27,14 @@ def sambanova() -> Type[ModelAPI]:
     return SambaNovaAPI
 
 
+@modelapi(name="nebius")
+def nebius() -> Type[ModelAPI]:
+    """Register Nebius provider."""
+    from .model._providers.nebius import NebiusAPI
+
+    return NebiusAPI
+
+
 # Task Registration
 
 # Core benchmarks
