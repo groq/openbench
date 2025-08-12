@@ -30,6 +30,7 @@ Repository = "https://github.com/groq/openbench"
 
 [project.scripts]
 bench = "openbench._cli:main"
+openbench = "openbench._cli:main"
 
 [project.entry-points.inspect_ai]
 openbench = "openbench._registry"
