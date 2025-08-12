@@ -44,9 +44,7 @@ class HFInferenceProvidersAPI(OpenAICompatibleAPI):
         # Remove provider prefix
         model_name_clean = model_name.replace("huggingface/", "", 1)
 
-        base_url = (
-            base_url or os.environ.get("HF_BASE_URL") or self.DEFAULT_BASE_URL
-        )
+        base_url = base_url or os.environ.get("HF_BASE_URL") or self.DEFAULT_BASE_URL
         api_key = api_key or os.environ.get("HF_TOKEN")
 
         if not api_key:
