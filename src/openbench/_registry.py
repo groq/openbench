@@ -11,6 +11,14 @@ from inspect_ai.model._registry import modelapi
 # Model Provider Registration
 
 
+@modelapi(name="huggingface")
+def huggingface() -> Type[ModelAPI]:
+    """Register Hugging Face Inference Providers router provider."""
+    from .model._providers.huggingface import HFInferenceProvidersAPI
+
+    return HFInferenceProvidersAPI
+
+
 @modelapi(name="cerebras")
 def cerebras() -> Type[ModelAPI]:
     """Register Cerebras provider."""
