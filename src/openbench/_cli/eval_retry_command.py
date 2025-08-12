@@ -1,4 +1,5 @@
 from typing import List, Optional, Annotated
+import sys
 import typer
 from inspect_ai import eval_retry
 from inspect_ai.log._file import log_file_info
@@ -151,6 +152,14 @@ def run_eval_retry(
             envvar="BENCH_DEBUG_ERRORS",
         ),
     ] = False,
+    debug: Annotated[
+        bool,
+        typer.Option(
+            "--debug",
+            help="Enable debug mode with full stack traces",
+            envvar="BENCH_DEBUG",
+        ),
+    ] = False,
 ) -> None:
     """Retry failed evaluation(s) from log files."""
 
@@ -186,31 +195,46 @@ def run_eval_retry(
     # Apply display patch
     patch_display_results()
 
-    # Retry
-    eval_retry(
-        retry_log_files,
-        log_level=log_level,
-        log_level_transcript=log_level_transcript,
-        log_dir=log_dir,
-        max_connections=max_connections,
-        max_subprocesses=max_subprocesses,
-        fail_on_error=fail_on_error,
-        retry_on_error=retry_on_error,
-        debug_errors=debug_errors,
-        log_samples=log_samples,
-        log_images=log_images,
-        log_buffer=log_buffer,
-        score=score,
-        timeout=timeout,
-        max_retries=max_retries,
-        sandbox_cleanup=sandbox_cleanup,
-        trace=trace,
-        # These are additional retry-specific parameters
-        max_samples=None,
-        max_tasks=None,
-        max_sandboxes=None,
-        log_shared=None,
-        score_display=None,
-    )
+    try:
+        # Retry
+        eval_retry(
+            retry_log_files,
+            log_level=log_level,
+            log_level_transcript=log_level_transcript,
+            log_dir=log_dir,
+            max_connections=max_connections,
+            max_subprocesses=max_subprocesses,
+            fail_on_error=fail_on_error,
+            retry_on_error=retry_on_error,
+            debug_errors=debug_errors,
+            log_samples=log_samples,
+            log_images=log_images,
+            log_buffer=log_buffer,
+            score=score,
+            timeout=timeout,
+            max_retries=max_retries,
+            sandbox_cleanup=sandbox_cleanup,
+            trace=trace,
+            # These are additional retry-specific parameters
+            max_samples=None,
+            max_tasks=None,
+            max_sandboxes=None,
+            log_shared=None,
+            score_display=None,
+        )
 
-    typer.echo("Retry evaluation complete!")
+        typer.echo("Retry evaluation complete!")
+    except Exception as e:
+        if debug:
+            # In debug mode, let the full stack trace show
+            raise
+        else:
+            # In normal mode, show clean error message
+            error_msg = str(e)
+            typer.secho(f"\n❌ Error: {error_msg}", fg=typer.colors.RED, err=True)
+            typer.secho(
+                "\nFor full stack trace, run with --debug flag",
+                fg=typer.colors.CYAN,
+                err=True,
+            )
+            sys.exit(1)
