@@ -209,19 +209,19 @@ def run_eval(
         ),
     ] = True,
     temperature: Annotated[
-        float,
+        Optional[float],
         typer.Option(
             help="Model temperature",
             envvar="BENCH_TEMPERATURE",
         ),
-    ] = 0.6,
+    ] = None,
     top_p: Annotated[
-        float,
+        Optional[float],
         typer.Option(
             help="Model top-p",
             envvar="BENCH_TOP_P",
         ),
-    ] = 1.0,
+    ] = None,
     max_tokens: Annotated[
         Optional[int],
         typer.Option(
