@@ -332,6 +332,14 @@ BENCHMARKS = {
         module_path="openbench.evals.boolq",
         function_name="boolq",
     ),
+    "scicode": BenchmarkMetadata(
+        name="SCICode",
+        description="SCICode",
+        category="core",
+        tags=["code-generation"],
+        module_path="openbench.evals.scicode",
+        function_name="scicode",
+    ),
 }
 
 

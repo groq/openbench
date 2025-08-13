@@ -14,11 +14,12 @@ authors = [
     { name="Groq" }
 ]
 dependencies = [
-    "datasets==4.0.0",
+    "datasets==3.6.0",
     "groq==0.30.0",
     "inspect-ai==0.3.115",
     "openai==1.97.1",
     "pydantic-settings==2.9.1",
+    "scicode",
     "scipy==1.15.3",
     "tiktoken==0.11.0",
     "typer==0.15.3",
@@ -66,6 +67,9 @@ exclude_lines = [
 ]
 precision = 2
 show_missing = true
+
+[tool.uv.sources]
+scicode = { git = "https://github.com/TheFloatingString/SciCode-fork.git", rev = "4f20d721ba3e2227196262083b9b7a70484d54f7" }
 
 [dependency-groups]
 dev = [
