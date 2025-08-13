@@ -1,3 +1,17 @@
+"""
+SCICode implementation.
+
+Code attribution:
+
+This implementation is adapted from the following repository:
+https://github.com/scicode-bench/SciCode
+
+Implemented by Minyang Tian et al.
+
+As of August 13, 2025, this implementation uses the validation split of the dataset, due to a bug with the test split in this implementation.
+When 'test' is runnable, revert to 'test'.
+"""
+
 import copy
 from typing import Any
 from pathlib import Path
@@ -163,6 +177,7 @@ class ScicodePromptingAssistant:
                         )
                         self.previous_llm_code[prev_step] = function_code
                     else:
+                        # print(f"Generating problem {prob_id} step {num_steps} ahead of step {prev_step + 1}.")
                         raise Exception(
                             f"Generating problem {prob_id} step {num_steps} ahead of step {prev_step + 1}."
                         )
@@ -244,12 +259,17 @@ def scicode_solver(**params: dict[str, Any]):
 
 @task
 def scicode(
-    split: str = "test",
+    split: str = "validation",  # TODO: when 'test' is runnable, revert to 'test'
     output_dir: str = "./tmp",
     with_background: bool = False,
     h5py_file: str = "../data/test_data.h5",
     mode: str = "normal",
 ):
+    print(
+        "As of August 13, 2025, this implementation uses the validation split of the dataset, due to a bug with the test split in this implementation."
+    )
+    print("When 'test' is runnable, revert to 'test'.")
+
     return Task(
         dataset=return_hf_dataset(split),
         solver=scicode_solver(
