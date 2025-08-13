@@ -4,7 +4,7 @@ from typing import Optional, List, Dict, Any
 import os
 import json
 import typer
-from datasets import Dataset
+from datasets import Dataset  # type: ignore[import-untyped]
 
 
 def _read_log_json(path: str) -> Dict[str, Any]:
