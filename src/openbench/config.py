@@ -324,6 +324,14 @@ BENCHMARKS = {
         module_path="openbench.evals.matharena.hmmt_feb_2025.hmmt_feb_2025",
         function_name="hmmt_feb_2025",
     ),
+    "scicode": BenchmarkMetadata(
+        name="SCICode",
+        description="SCICode",
+        category="core",
+        tags=["code-generation"],
+        module_path="openbench.evals.scicode",
+        function_name="scicode",
+    ),
 }
 
 
