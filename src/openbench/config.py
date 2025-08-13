@@ -324,6 +324,22 @@ BENCHMARKS = {
         module_path="openbench.evals.matharena.hmmt_feb_2025.hmmt_feb_2025",
         function_name="hmmt_feb_2025",
     ),
+    "lcb": BenchmarkMetadata(
+        name="LCB",
+        description="LiveCodeBench",
+        category="core",
+        tags=["code-generation"],
+        module_path="openbench.evals.lcb",
+        function_name="lcb",
+    ),
+    "taubench": BenchmarkMetadata(
+        name="TauBench",
+        description="Tau-Bench",
+        category="core",
+        tags=["translation", "long-context"],
+        module_path="openbench.evals.taubench",
+        function_name="taubench",
+    ),
 }
 
 

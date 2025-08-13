@@ -251,6 +251,16 @@ def run_eval(
             envvar="BENCH_TIMEOUT",
         ),
     ] = 10000,
+    task_args: Annotated[
+        Optional[str],
+        typer.Option(
+            # None,
+            "-T",
+            "--task-args",
+            help="Task arguments",
+            envvar="BENCH_TASK_ARGS",
+        ),
+    ] = None,
     reasoning_effort: Annotated[
         Optional[ReasoningEffortLevel],
         typer.Option(
@@ -313,6 +323,13 @@ def run_eval(
     # Apply display patch
     patch_display_results()
 
+    # Parse single task_args TODO: accept multiple task_args
+    task_args_dict = {}
+    if task_args:
+        for task_arg in task_args.split(","):
+            task_key, task_value = task_arg.split("=")
+            task_args_dict[task_key] = task_value
+
     try:
         eval(
             tasks=tasks,
@@ -337,6 +354,7 @@ def run_eval(
             timeout=timeout,
             reasoning_effort=reasoning_effort.value if reasoning_effort else None,
             sandbox=sandbox,
+            task_args=task_args_dict,
         )
 
         # Placeholder - actual implementation would run the evaluation
