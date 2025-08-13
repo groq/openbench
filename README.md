@@ -117,11 +117,23 @@ For a complete list of all commands and options, run: `bench --help`
 | `--display`          | `BENCH_DISPLAY`          | `None`                                           | Display type (full/conversation/rich/plain/none) |
 | `--reasoning-effort` | `BENCH_REASONING_EFFORT` | `None`                                           | Reasoning effort level (low/medium/high)         |
 | `--json`             | None                     | `False`                                          | Output results in JSON format                    |
+| `--hub-repo`         | `BENCH_HUB_REPO`         | `None`                                           | Push results to a Hugging Face Hub dataset                    |
 
 ## Building Your Own Evals
 
 OpenBench is built on [Inspect AI](https://inspect.aisi.org.uk/). To create custom evaluations, check out their excellent [documentation](https://inspect.aisi.org.uk/). Once you do build your own private evaluations with Inspect AI that you don't want to open-source, you can point OpenBench  at them with `bench eval <path>` to run!
 
+## Exporting Logs to Hugging Face
+
+OpenBench can export logs to a Hugging Face Hub dataset. This is useful if you want to share your results with the community or use them for further analysis.
+
+```bash
+export HF_TOKEN=<your-huggingface-token>
+
+bench eval mmlu --model groq/llama-3.3-70b-versatile --limit 10 --hub-repo <your-username>/openbench-logs 
+```
+
+This will export the logs to a Hugging Face Hub dataset with the name `openbench-logs`.
 
 ## FAQ
 
