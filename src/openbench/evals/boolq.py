@@ -1,3 +1,13 @@
+"""
+BoolQ: A Question Answering Dataset for Boolean Reasoning
+https://arxiv.org/abs/1905.10044
+
+Sample usage:
+```bash
+uv run openbench eval boolq --model "groq/llama-3.1-8b-instant"
+```
+"""
+
 from inspect_ai import Task, task
 from inspect_ai.dataset import hf_dataset
 from inspect_ai.scorer import choice
