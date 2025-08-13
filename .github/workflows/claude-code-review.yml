@@ -36,23 +36,25 @@ jobs:
         uses: anthropics/claude-code-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-
+          
           # Optional: Specify model (defaults to Claude Sonnet 4, uncomment for Claude Opus 4.1)
-          # model: "claude-opus-4-1-20250805"
-
+          model: "claude-opus-4-1-20250805"
+          
           # Direct prompt for automated review (no @claude mention needed)
           direct_prompt: |
-            Please review this pull request and provide feedback on:
-            - Code quality and best practices
-            - Potential bugs or issues
-            - Performance considerations
-            - Security concerns
-            - Test coverage
-            
-            Be constructive and helpful in your feedback.
+            Review this PR like a chill staff engineer. Focus on NEW changes only and think DRY.
 
-          # Optional: Use sticky comments to make Claude reuse the same comment on subsequent pushes to the same PR
-          # use_sticky_comment: true
+            ONLY bring up things if they're actually important - you don't need to comment on every category or find something to say. Quality over quantity.
+
+            PRIORITY ORDER:
+            - Critical bugs, security issues, performance problems  
+            - Code quality: proper separation of concerns, clear naming, best practices
+            - Missing tests for new functionality
+            - Suggestions for cleaner patterns (only if they meaningfully improve the code)
+
+            Be constructive and EXTREMELY concise. Think "would a 10x engineer actually care about this?" If it's not blocking or genuinely helpful, skip it entirely. Respect separation of concerns.
+
+            Stay chill: flag real issues, suggest improvements where they add value, but don't nitpick or over-engineer. Sometimes the best review is a LGTM. ultrathink.
           
           # Optional: Customize review based on file types
           # direct_prompt: |
