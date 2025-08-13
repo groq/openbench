@@ -31,6 +31,15 @@ class BenchmarkMetadata:
 
 # Benchmark metadata - minimal, no duplication
 BENCHMARKS = {
+    # New - graphwalks
+    "graphwalks": BenchmarkMetadata(
+        name="Graphwalks",
+        description="Multi Hop Reasoning Long Context Benchmark - operation performance given a graph represented by its edge list",
+        category="core",
+        tags=["long-context", "graphs", "reasoning"],
+        module_path="openbench.evals.graphwalks",
+        function_name="graphwalks",
+    ),
     # Core benchmarks
     "mmlu": BenchmarkMetadata(
         name="MMLU (cais/mmlu)",
@@ -323,6 +332,14 @@ BENCHMARKS = {
         tags=["math", "competition", "hmmt", "2025"],
         module_path="openbench.evals.matharena.hmmt_feb_2025.hmmt_feb_2025",
         function_name="hmmt_feb_2025",
+    ),
+    "scicode": BenchmarkMetadata(
+        name="SCICode",
+        description="SCICode",
+        category="core",
+        tags=["code-generation"],
+        module_path="openbench.evals.scicode",
+        function_name="scicode",
     ),
 }
 
