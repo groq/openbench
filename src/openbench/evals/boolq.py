@@ -6,6 +6,10 @@ Sample usage:
 ```bash
 uv run openbench eval boolq --model "groq/llama-3.1-8b-instant"
 ```
+The prompt is based on the default prompt (default.yaml) from
+the EleutherAI/lm-evaluation-harness implementation:
+
+https://github.com/EleutherAI/lm-evaluation-harness/blob/main/lm_eval/tasks/super_glue/boolq/default.yaml
 """
 
 from inspect_ai import Task, task
