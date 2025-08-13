@@ -232,7 +232,7 @@ BENCHMARKS = {
             "graded",
             "subset",
         ],
-        module_path="openbench.evals.math",
+        module_path="openbench.evals.math_500",
         function_name="math_500",
     ),
     # Math competitions

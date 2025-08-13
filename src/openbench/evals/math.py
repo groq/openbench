@@ -16,7 +16,7 @@ Remember to put your answer on its own line after "Answer:", and you do not need
 
 
 @task
-def math(grader_model: str = "openai/gpt-4-turbo-preview") -> Task:
+def math(grader_model: str = "groq/openai/gpt-oss-20b") -> Task:
     """MATH: Measuring Mathematical Problem Solving.
 
     Based on the paper by Hendrycks et al. (2021).
@@ -39,35 +39,6 @@ def math(grader_model: str = "openai/gpt-4-turbo-preview") -> Task:
         solver=[generate()],
         scorer=math_scorer(model=grader_model),
         name="math",
-        config=GenerateConfig(
-            max_tokens=8192,  # Allow long reasoning chains
-        ),
-    )
-
-
-@task
-def math_500(grader_model: str = "openai/gpt-4-turbo-preview") -> Task:
-    """MATH-500: A 500-problem subset of the MATH dataset.
-
-    A smaller, representative subset of the full MATH dataset for faster evaluation.
-    Uses the same scoring and configuration as the full dataset.
-
-    Args:
-        grader_model: Model to use for checking answer equality (defaults to gpt-4-turbo-preview)
-
-    Returns:
-        Task configured for MATH-500 evaluation
-    """
-    # Get the dataset and format problems
-    dataset = get_dataset("math_500_test")
-    for sample in dataset:
-        sample.input = QUERY_TEMPLATE.format(problem=sample.input)
-
-    return Task(
-        dataset=dataset,
-        solver=[generate()],
-        scorer=math_scorer(model=grader_model),
-        name="math_500",
         config=GenerateConfig(
             max_tokens=8192,  # Allow long reasoning chains
         ),
