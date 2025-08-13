@@ -324,6 +324,22 @@ BENCHMARKS = {
         module_path="openbench.evals.matharena.hmmt_feb_2025.hmmt_feb_2025",
         function_name="hmmt_feb_2025",
     ),
+    "lcb": BenchmarkMetadata(
+        name="LCB",
+        description="LiveCodeBench",
+        category="core",
+        tags=["code-generation"],
+        module_path="openbench.evals.lcb",
+        function_name="lcb",
+    ),
+    "gmcq": BenchmarkMetadata(
+        name="GMCQ",
+        description="GitHub Multiple Choice Questions",
+        category="core",
+        tags=["code-understanding"],
+        module_path="openbench.evals.gmcq",
+        function_name="gmcq",
+    ),
     "scicode": BenchmarkMetadata(
         name="SCICode",
         description="SCICode",
