@@ -66,6 +66,11 @@ bench eval mmlu --model huggingface/gpt-oss-120b:groq
 
 # Any provider supported by Inspect AI!
 ```
+
+# Available Benchmarks
+
+Here are the currently available benchmarks. For an up-to-date list use `bench list`.
+
 | Category | Benchmarks |
 |----------|------------|
 | **Knowledge** | MMLU (57 subjects), GPQA (graduate-level), SuperGPQA (285 disciplines), OpenBookQA, HLE (Humanity's Last Exam - 2,500 questions from 1,000+ experts), HLE_text (text-only version) |
