@@ -91,6 +91,14 @@ def parasail() -> Type[ModelAPI]:
     return ParasailAPI
 
 
+@modelapi(name="crusoe")
+def crusoe() -> Type[ModelAPI]:
+    """Register Crusoe provider."""
+    from .model._providers.crusoe import CrusoeAPI
+
+    return CrusoeAPI
+
+
 # Task Registration
 
 # Core benchmarks
