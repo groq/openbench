@@ -14,15 +14,20 @@ authors = [
     { name="Groq" }
 ]
 dependencies = [
+    "colorama>=0.4.6",
     "datasets==3.6.0",
     "groq==0.30.0",
+    "immutabledict>=4.2.1",
     "inspect-ai==0.3.115",
+    "langdetect>=1.0.9",
+    "nltk>=3.9.1",
     "openai==1.97.1",
     "pydantic-settings==2.9.1",
     "scicode",
     "scipy==1.15.3",
     "tiktoken==0.11.0",
     "typer==0.15.3",
+    "types-colorama>=0.4.15.20250801",
 ]
 
 [project.urls]

@@ -349,7 +349,23 @@ BENCHMARKS = {
         module_path="openbench.evals.matharena.hmmt_feb_2025.hmmt_feb_2025",
         function_name="hmmt_feb_2025",
     ),
-    "scicode": BenchmarkMetadata(
+    "lcb": BenchmarkMetadata(
+        name="LCB",
+        description="LiveCodeBench",
+        category="core",
+        tags=["code-generation"],
+        module_path="openbench.evals.lcb",
+        function_name="lcb",
+    ),
+    "ifeval": BenchmarkMetadata(
+        name="IFEval",
+        description="IFEval",
+        category="core",
+        tags=["instruction-following"],
+        module_path="openbench.evals.ifeval",
+        function_name="ifeval",
+    ),
+      "scicode": BenchmarkMetadata(
         name="SCICode",
         description="SCICode",
         category="core",
