@@ -51,6 +51,14 @@ def nous() -> Type[ModelAPI]:
     return NousAPI
 
 
+@modelapi(name="novita")
+def novita() -> Type[ModelAPI]:
+    """Register Novita provider."""
+    from .model._providers.novita import NovitaAPI
+
+    return NovitaAPI
+
+
 # Task Registration
 
 # Core benchmarks
