@@ -6,20 +6,28 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 
-OpenBench provides standardized, reproducible benchmarking for LLMs across 20+ evaluation suites (and growing) spanning knowledge, math, reasoning, reading comprehension, health, long-context recall, and first-class support for your own local evals to preserve privacy. **Works with any model provider** - Groq, OpenAI, Anthropic, Cohere, Google, AWS Bedrock, Azure, local models via Ollama, and more.
+OpenBench provides standardized, reproducible benchmarking for LLMs across 30+ evaluation suites (and growing) spanning knowledge, math, reasoning, coding, science, reading comprehension, health, long-context recall, graph reasoning, and first-class support for your own local evals to preserve privacy. **Works with any model provider** - Groq, OpenAI, Anthropic, Cohere, Google, AWS Bedrock, Azure, local models via Ollama, Hugging Face, and 30+ other providers.
 
 ## 🚧 Alpha Release
 
 We're building in public! This is an alpha release - expect rapid iteration. The first stable release is coming soon.
 
+## 🎉 What's New in v0.3.0
+
+- **📡 18 More Model Providers**: Added support for AI21, Baseten, Cerebras, Cohere, Crusoe, DeepInfra, Friendli, Hugging Face, Hyperbolic, Lambda, MiniMax, Moonshot, Nebius, Nous, Novita, Parasail, Reka, SambaNova and more
+- **🧪 New Benchmarks**: DROP (reading comprehension), experimental benchmarks available with `--alpha` flag
+- **⚡ CLI Enhancements**: `openbench` alias, `-M`/`-T` flags for model/task args, `--debug` mode for eval-retry
+- **🔧 Developer Tools**: GitHub Actions integration, Inspect AI extension support
+
 ## Features
 
-- **🎯 30+ Benchmarks**: MMLU, GPQA, HumanEval, SimpleQA, and competition math (AIME, HMMT)
-- **🔧 Simple CLI**: `bench list`, `bench describe`, `bench eval`
+- **🎯 35+ Benchmarks**: MMLU, GPQA, HumanEval, SimpleQA, competition math (AIME, HMMT), SciCode, GraphWalks, and more
+- **🔧 Simple CLI**: `bench list`, `bench describe`, `bench eval` (also available as `openbench`)
 - **🏗️ Built on inspect-ai**: Industry-standard evaluation framework
 - **📊 Extensible**: Easy to add new benchmarks and metrics
-- **🤖 Provider-agnostic**: Works with 15+ model providers out of the box
+- **🤖 Provider-agnostic**: Works with 30+ model providers out of the box
 - **🛠️ Local Eval Support**: Privatized benchmarks can now be run with `bench eval <path>`
+- **📤 Hugging Face Integration**: Push evaluation results directly to Hugging Face datasets
 
 ## 🏃 Speedrun: Evaluate a Model in 60 Seconds
 
@@ -64,14 +72,54 @@ bench eval musr --model ollama/llama3.1:70b
 # Hugging Face Inference Providers
 bench eval mmlu --model huggingface/gpt-oss-120b:groq
 
-# Any provider supported by Inspect AI!
+# 30+ providers supported - see full list below
 ```
+
+## Supported Providers
+
+OpenBench supports 30+ model providers through Inspect AI. Set the appropriate API key environment variable and you're ready to go:
+
+| Provider | Environment Variable | Example Model String |
+|----------|---------------------|---------------------|
+| **AI21 Labs** | `AI21_API_KEY` | `ai21/model-name` |
+| **Anthropic** | `ANTHROPIC_API_KEY` | `anthropic/model-name` |
+| **AWS Bedrock** | AWS credentials | `bedrock/model-name` |
+| **Azure** | `AZURE_OPENAI_API_KEY` | `azure/<deployment-name>` |
+| **Baseten** | `BASETEN_API_KEY` | `baseten/model-name` |
+| **Cerebras** | `CEREBRAS_API_KEY` | `cerebras/model-name` |
+| **Cohere** | `COHERE_API_KEY` | `cohere/model-name` |
+| **Crusoe** | `CRUSOE_API_KEY` | `crusoe/model-name` |
+| **DeepInfra** | `DEEPINFRA_API_KEY` | `deepinfra/model-name` |
+| **Friendli** | `FRIENDLI_TOKEN` | `friendli/model-name` |
+| **Google** | `GOOGLE_API_KEY` | `google/model-name` |
+| **Groq** | `GROQ_API_KEY` | `groq/model-name` |
+| **Hugging Face** | `HF_TOKEN` | `huggingface/model-name` |
+| **Hyperbolic** | `HYPERBOLIC_API_KEY` | `hyperbolic/model-name` |
+| **Lambda** | `LAMBDA_API_KEY` | `lambda/model-name` |
+| **MiniMax** | `MINIMAX_API_KEY` | `minimax/model-name` |
+| **Mistral** | `MISTRAL_API_KEY` | `mistral/model-name` |
+| **Moonshot** | `MOONSHOT_API_KEY` | `moonshot/model-name` |
+| **Nebius** | `NEBIUS_API_KEY` | `nebius/model-name` |
+| **Nous Research** | `NOUS_API_KEY` | `nous/model-name` |
+| **Novita AI** | `NOVITA_API_KEY` | `novita/model-name` |
+| **Ollama** | None (local) | `ollama/model-name` |
+| **OpenAI** | `OPENAI_API_KEY` | `openai/model-name` |
+| **OpenRouter** | `OPENROUTER_API_KEY` | `openrouter/model-name` |
+| **Parasail** | `PARASAIL_API_KEY` | `parasail/model-name` |
+| **Perplexity** | `PERPLEXITY_API_KEY` | `perplexity/model-name` |
+| **Reka** | `REKA_API_KEY` | `reka/model-name` |
+| **SambaNova** | `SAMBANOVA_API_KEY` | `sambanova/model-name` |
+| **Together AI** | `TOGETHER_API_KEY` | `together/model-name` |
+| **vLLM** | None (local) | `vllm/model-name` |
+
+## Available Benchmarks
+
 | Category | Benchmarks |
 |----------|------------|
 | **Knowledge** | MMLU (57 subjects), GPQA (graduate-level), SuperGPQA (285 disciplines), OpenBookQA, HLE (Humanity's Last Exam - 2,500 questions from 1,000+ experts), HLE_text (text-only version) |
 | **Coding** | HumanEval (164 problems) |
 | **Math** | AIME 2023-2025, HMMT Feb 2023-2025, BRUMO 2025, MATH (competition-level problems), MATH-500 (challenging subset), MGSM (multilingual grade school math), MGSM_en (English), MGSM_latin (5 languages), MGSM_non_latin (6 languages) |
-| **Reasoning** | SimpleQA (factuality), MuSR (multi-step reasoning) |
+| **Reasoning** | SimpleQA (factuality), MuSR (multi-step reasoning), DROP (discrete reasoning over paragraphs) |
 | **Long Context** | OpenAI MRCR (multiple needle retrieval), OpenAI MRCR_2n (2 needle), OpenAI MRCR_4 (4 needle), OpenAI MRCR_8n (8 needle) |
 | **Healthcare** | HealthBench (open-ended healthcare eval), HealthBench_hard (challenging variant), HealthBench_consensus (consensus variant) |
 
@@ -93,9 +141,10 @@ For a complete list of all commands and options, run: `bench --help`
 
 | Command                  | Description                                        |
 |--------------------------|----------------------------------------------------|
-| `bench`                  | Show main menu with available commands             |
+| `bench` or `openbench`   | Show main menu with available commands             |
 | `bench list`             | List available evaluations, models, and flags      |
 | `bench eval <benchmark>` | Run benchmark evaluation on a model                |
+| `bench eval-retry`       | Retry a failed evaluation                          |
 | `bench view`             | View logs from previous benchmark runs             |
 | `bench eval <path>`      | Run your local/private evals built with Inspect AI |
 
@@ -103,7 +152,9 @@ For a complete list of all commands and options, run: `bench --help`
 
 | Option               | Environment Variable     | Default                                          | Description                                      |
 |----------------------|--------------------------|--------------------------------------------------|--------------------------------------------------|
-| `--model`            | `BENCH_MODEL`            | `groq/meta-llama/llama-4-scout-17b-16e-instruct` | Model(s) to evaluate                             |
+| `-M <args>`          | None                     | None                                             | Pass model-specific arguments (e.g., `-M reasoning_effort=high`) |
+| `-T <args>`          | None                     | None                                             | Pass task-specific arguments to the benchmark   |
+| `--model`            | `BENCH_MODEL`            | None (required)                                 | Model(s) to evaluate                             |
 | `--epochs`           | `BENCH_EPOCHS`           | `1`                                              | Number of epochs to run each evaluation          |
 | `--max-connections`  | `BENCH_MAX_CONNECTIONS`  | `10`                                             | Maximum parallel requests to model               |
 | `--temperature`      | `BENCH_TEMPERATURE`      | `0.6`                                            | Model temperature                                |
