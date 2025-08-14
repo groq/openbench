@@ -142,21 +142,23 @@ Closes #123
 ## 🏗️ Architecture Guidelines
 
 ### Adding a New Benchmark
-1. Create a new module in `src/bench/evals/<benchmark_name>/`
-2. Implement the evaluation following existing patterns
-3. Use shared utilities from `src/bench/common/` where possible
-4. Add comprehensive tests
-5. Update the CLI to include your benchmark
-6. Document usage in the README
+1. Create a new evaluation file in `src/openbench/evals/`
+2. Add dataset loader in `src/openbench/datasets/` if needed
+3. Add custom scorer in `src/openbench/scorers/` if needed
+4. Register benchmark metadata in `src/openbench/config.py`
+5. Use existing utilities from `src/openbench/utils/`
+6. Add comprehensive tests
 
 Example structure:
 ```
-src/bench/evals/my_benchmark/
-├── __init__.py
-├── my_benchmark.py    # Main evaluation logic
-├── dataset.py         # Dataset loading
-├── scorer.py          # Custom scoring if needed
-└── README.md          # Benchmark documentation
+src/openbench/
+├── evals/
+│   └── my_benchmark.py      # Main evaluation logic
+├── datasets/
+│   └── my_benchmark.py      # Dataset loader
+├── scorers/
+│   └── my_benchmark.py      # Custom scorer (if needed)
+└── config.py                # Add benchmark metadata here
 ```
 
 ### Code Style
