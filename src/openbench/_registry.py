@@ -51,6 +51,22 @@ def nous() -> Type[ModelAPI]:
     return NousAPI
 
 
+@modelapi(name="baseten")
+def baseten() -> Type[ModelAPI]:
+    """Register Baseten provider."""
+    from .model._providers.baseten import BasetenAPI
+
+    return BasetenAPI
+
+
+@modelapi(name="hyperbolic")
+def hyperbolic() -> Type[ModelAPI]:
+    """Register Hyperbolic provider."""
+    from .model._providers.hyperbolic import HyperbolicAPI
+
+    return HyperbolicAPI
+
+
 @modelapi(name="novita")
 def novita() -> Type[ModelAPI]:
     """Register Novita provider."""
