@@ -51,6 +51,14 @@ def nous() -> Type[ModelAPI]:
     return NousAPI
 
 
+@modelapi(name="lambda")
+def lambda_provider() -> Type[ModelAPI]:
+    """Register Lambda provider."""
+    from .model._providers.lambda_ai import LambdaAPI
+
+    return LambdaAPI
+
+
 # Task Registration
 
 # Core benchmarks
