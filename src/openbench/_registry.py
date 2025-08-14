@@ -59,6 +59,14 @@ def baseten() -> Type[ModelAPI]:
     return BasetenAPI
 
 
+@modelapi(name="hyperbolic")
+def hyperbolic() -> Type[ModelAPI]:
+    """Register Hyperbolic provider."""
+    from .model._providers.hyperbolic import HyperbolicAPI
+
+    return HyperbolicAPI
+
+
 # Task Registration
 
 # Core benchmarks
