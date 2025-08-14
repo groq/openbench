@@ -139,6 +139,14 @@ def reka() -> Type[ModelAPI]:
     return RekaAPI
 
 
+@modelapi(name="cohere")
+def cohere() -> Type[ModelAPI]:
+    """Register Cohere provider."""
+    from .model._providers.cohere import CohereAPI
+
+    return CohereAPI
+
+
 # Task Registration
 
 # Core benchmarks
