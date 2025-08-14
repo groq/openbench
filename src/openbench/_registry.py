@@ -131,6 +131,14 @@ def friendli() -> Type[ModelAPI]:
     return FriendliAPI
 
 
+@modelapi(name="reka")
+def reka() -> Type[ModelAPI]:
+    """Register Reka provider."""
+    from .model._providers.reka import RekaAPI
+
+    return RekaAPI
+
+
 # Task Registration
 
 # Core benchmarks
