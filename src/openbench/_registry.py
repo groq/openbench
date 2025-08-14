@@ -115,6 +115,14 @@ def ai21() -> Type[ModelAPI]:
     return AI21API
 
 
+@modelapi(name="minimax")
+def minimax() -> Type[ModelAPI]:
+    """Register MiniMax provider."""
+    from .model._providers.minimax import MiniMaxAPI
+
+    return MiniMaxAPI
+
+
 # Task Registration
 
 # Core benchmarks
