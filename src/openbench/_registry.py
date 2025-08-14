@@ -123,6 +123,14 @@ def minimax() -> Type[ModelAPI]:
     return MiniMaxAPI
 
 
+@modelapi(name="friendli")
+def friendli() -> Type[ModelAPI]:
+    """Register Friendli provider."""
+    from .model._providers.friendli import FriendliAPI
+
+    return FriendliAPI
+
+
 # Task Registration
 
 # Core benchmarks
