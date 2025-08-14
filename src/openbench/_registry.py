@@ -107,6 +107,14 @@ def deepinfra() -> Type[ModelAPI]:
     return DeepInfraAPI
 
 
+@modelapi(name="ai21")
+def ai21() -> Type[ModelAPI]:
+    """Register AI21 Labs provider."""
+    from .model._providers.ai21 import AI21API
+
+    return AI21API
+
+
 # Task Registration
 
 # Core benchmarks
