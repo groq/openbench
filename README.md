@@ -84,7 +84,7 @@ export HF_TOKEN=your_key
 export OPENAI_API_KEY=your_key  # Optional
 
 # Set default model
-export BENCH_MODEL=groq/llama-3.1-70b
+export BENCH_MODEL=groq/llama-3.1-8b-instant
 ```
 
 ## Commands and Options
