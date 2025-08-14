@@ -302,6 +302,14 @@ def run_eval(
             envvar="BENCH_HUB_PRIVATE",
         ),
     ] = False,
+    alpha: Annotated[
+        bool,
+        typer.Option(
+            "--alpha",
+            help="Allow running experimental/alpha benchmarks",
+            envvar="BENCH_ALPHA",
+        ),
+    ] = False,
 ) -> None:
     """
     Run a benchmark on a model.
@@ -333,7 +341,7 @@ def run_eval(
     tasks = []
     for benchmark in benchmarks:
         try:
-            task = load_task(benchmark)
+            task = load_task(benchmark, allow_alpha=alpha)
             tasks.append(task)
         except (ValueError, ImportError, AttributeError) as e:
             raise typer.BadParameter(str(e))

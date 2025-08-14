@@ -28,33 +28,39 @@ class BenchmarkMetadata:
     module_path: str
     function_name: str
 
+    # Alpha/experimental flag
+    is_alpha: bool = False  # Whether this benchmark is experimental/alpha
+
 
 # Benchmark metadata - minimal, no duplication
 BENCHMARKS = {
-    # Graphwalks benchmarks
+    # Graphwalks benchmarks (alpha)
     "graphwalks": BenchmarkMetadata(
         name="GraphWalks",
         description="Multi-hop reasoning on graphs - both BFS and parent finding tasks",
         category="core",
-        tags=["long-context", "graphs", "reasoning"],
+        tags=["long-context", "graphs", "reasoning", "alpha"],
         module_path="openbench.evals.graphwalks",
         function_name="graphwalks",
+        is_alpha=True,
     ),
     "graphwalks_bfs": BenchmarkMetadata(
         name="GraphWalks BFS",
         description="Multi-hop reasoning on graphs - BFS traversal tasks only",
         category="core",
-        tags=["long-context", "graphs", "reasoning", "bfs"],
+        tags=["long-context", "graphs", "reasoning", "bfs", "alpha"],
         module_path="openbench.evals.graphwalks",
         function_name="graphwalks_bfs",
+        is_alpha=True,
     ),
     "graphwalks_parents": BenchmarkMetadata(
         name="GraphWalks Parents",
         description="Multi-hop reasoning on graphs - parent finding tasks only",
         category="core",
-        tags=["long-context", "graphs", "reasoning", "parents"],
+        tags=["long-context", "graphs", "reasoning", "parents", "alpha"],
         module_path="openbench.evals.graphwalks",
         function_name="graphwalks_parents",
+        is_alpha=True,
     ),
     # Core benchmarks
     "mmlu": BenchmarkMetadata(
@@ -350,12 +356,13 @@ BENCHMARKS = {
         function_name="hmmt_feb_2025",
     ),
     "scicode": BenchmarkMetadata(
-        name="SCICode",
-        description="SCICode",
+        name="SciCode",
+        description="Scientific computing and programming challenges",
         category="core",
-        tags=["code-generation"],
+        tags=["code-generation", "science", "alpha"],
         module_path="openbench.evals.scicode",
         function_name="scicode",
+        is_alpha=True,
     ),
 }
 
@@ -365,16 +372,32 @@ def get_benchmark_metadata(name: str) -> Optional[BenchmarkMetadata]:
     return BENCHMARKS.get(name)
 
 
-def get_all_benchmarks() -> dict[str, BenchmarkMetadata]:
-    """Get all benchmark metadata."""
-    return BENCHMARKS
+def get_all_benchmarks(include_alpha: bool = False) -> dict[str, BenchmarkMetadata]:
+    """Get all benchmark metadata.
+
+    Args:
+        include_alpha: Whether to include alpha/experimental benchmarks
+    """
+    if include_alpha:
+        return BENCHMARKS
+    return {name: meta for name, meta in BENCHMARKS.items() if not meta.is_alpha}
 
 
-def get_benchmarks_by_category(category: str) -> dict[str, BenchmarkMetadata]:
-    """Get all benchmarks in a category."""
-    return {
+def get_benchmarks_by_category(
+    category: str, include_alpha: bool = False
+) -> dict[str, BenchmarkMetadata]:
+    """Get all benchmarks in a category.
+
+    Args:
+        category: Category to filter by
+        include_alpha: Whether to include alpha/experimental benchmarks
+    """
+    results = {
         name: meta for name, meta in BENCHMARKS.items() if meta.category == category
     }
+    if not include_alpha:
+        results = {name: meta for name, meta in results.items() if not meta.is_alpha}
+    return results
 
 
 def get_categories() -> List[str]:
@@ -382,12 +405,21 @@ def get_categories() -> List[str]:
     return sorted(list(set(meta.category for meta in BENCHMARKS.values())))
 
 
-def search_benchmarks(query: str) -> dict[str, BenchmarkMetadata]:
-    """Search benchmarks by name, description, or tags."""
+def search_benchmarks(
+    query: str, include_alpha: bool = False
+) -> dict[str, BenchmarkMetadata]:
+    """Search benchmarks by name, description, or tags.
+
+    Args:
+        query: Search query
+        include_alpha: Whether to include alpha/experimental benchmarks
+    """
     query = query.lower()
     results = {}
 
     for name, meta in BENCHMARKS.items():
+        if not include_alpha and meta.is_alpha:
+            continue
         if (
             query in meta.name.lower()
             or query in meta.description.lower()
@@ -403,15 +435,20 @@ def search_benchmarks(query: str) -> dict[str, BenchmarkMetadata]:
 # ============================================================================
 
 
-def _generate_task_registry():
-    """Generate task registry from config."""
+def _generate_task_registry(include_alpha: bool = True):
+    """Generate task registry from config.
+
+    Args:
+        include_alpha: Whether to include alpha/experimental benchmarks
+    """
     registry = {}
-    for name, metadata in get_all_benchmarks().items():
+    for name, metadata in get_all_benchmarks(include_alpha=include_alpha).items():
         registry[name] = f"{metadata.module_path}.{metadata.function_name}"
     return registry
 
 
-TASK_REGISTRY = _generate_task_registry()
+# Full registry including alpha benchmarks for backward compatibility
+TASK_REGISTRY = _generate_task_registry(include_alpha=True)
 
 
 def _import_module_from_path(path: Path) -> ModuleType:
@@ -457,12 +494,13 @@ def _import_module_from_path(path: Path) -> ModuleType:
 
 
 @lru_cache()
-def load_task(benchmark_name: str) -> Callable:
+def load_task(benchmark_name: str, allow_alpha: bool = False) -> Callable:
     """
     Loads a task by benchmark name using the registry or from a local path.
 
     Args:
         benchmark_name (str): The name of the benchmark or path to a local eval.
+        allow_alpha (bool): Whether to allow loading alpha/experimental benchmarks.
 
     Returns:
         Callable: The imported function object.
@@ -472,6 +510,14 @@ def load_task(benchmark_name: str) -> Callable:
         ImportError: If the module cannot be imported.
         AttributeError: If the function does not exist in the module.
     """
+    # Check if this is an alpha benchmark
+    benchmark_meta = get_benchmark_metadata(benchmark_name)
+    if benchmark_meta and benchmark_meta.is_alpha and not allow_alpha:
+        raise ValueError(
+            f"'{benchmark_name}' is an experimental/alpha benchmark. "
+            f"Use --alpha flag to run it."
+        )
+
     # Try registry first (registry names take precedence)
     import_path = TASK_REGISTRY.get(benchmark_name)
     if import_path:
