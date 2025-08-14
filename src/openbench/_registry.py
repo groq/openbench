@@ -50,13 +50,15 @@ def nous() -> Type[ModelAPI]:
 
     return NousAPI
 
+
 @modelapi(name="lambda")
 def lambda_provider() -> Type[ModelAPI]:
     """Register Lambda provider."""
     from .model._providers.lambda_ai import LambdaAPI
 
     return LambdaAPI
-  
+
+
 @modelapi(name="baseten")
 def baseten() -> Type[ModelAPI]:
     """Register Baseten provider."""
@@ -71,7 +73,6 @@ def hyperbolic() -> Type[ModelAPI]:
     from .model._providers.hyperbolic import HyperbolicAPI
 
     return HyperbolicAPI
-  
 
 
 # Task Registration
