@@ -99,6 +99,14 @@ def crusoe() -> Type[ModelAPI]:
     return CrusoeAPI
 
 
+@modelapi(name="deepinfra")
+def deepinfra() -> Type[ModelAPI]:
+    """Register DeepInfra provider."""
+    from .model._providers.deepinfra import DeepInfraAPI
+
+    return DeepInfraAPI
+
+
 # Task Registration
 
 # Core benchmarks
