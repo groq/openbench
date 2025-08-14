@@ -349,6 +349,22 @@ BENCHMARKS = {
         module_path="openbench.evals.matharena.hmmt_feb_2025.hmmt_feb_2025",
         function_name="hmmt_feb_2025",
     ),
+    "lcb": BenchmarkMetadata(
+        name="LCB",
+        description="LiveCodeBench",
+        category="core",
+        tags=["code-generation"],
+        module_path="openbench.evals.lcb",
+        function_name="lcb",
+    ),
+    "bbh": BenchmarkMetadata(
+        name="BBH",
+        description="Big-Bench-Hard",
+        category="core",
+        tags=["reasoning"],
+        module_path="openbench.evals.bbh",
+        function_name="bbh",
+    ),
     "scicode": BenchmarkMetadata(
         name="SCICode",
         description="SCICode",
