@@ -147,6 +147,14 @@ def cohere() -> Type[ModelAPI]:
     return CohereAPI
 
 
+@modelapi(name="moonshot")
+def moonshot() -> Type[ModelAPI]:
+    """Register Moonshot provider."""
+    from .model._providers.moonshot import MoonshotAPI
+
+    return MoonshotAPI
+
+
 # Task Registration
 
 # Core benchmarks
