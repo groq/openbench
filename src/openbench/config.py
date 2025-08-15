@@ -355,6 +355,14 @@ BENCHMARKS = {
         module_path="openbench.evals.matharena.hmmt_feb_2025.hmmt_feb_2025",
         function_name="hmmt_feb_2025",
     ),
+    "mathvista": BenchmarkMetadata(
+        name="MathVista",
+        description="MathVista: Evaluating Math Reasoning in Visual Contexts",
+        category="math",
+        tags=["math", "reasoning", "visual"],
+        module_path="openbench.evals.mathvista",
+        function_name="mathvista",
+    ),
     "scicode": BenchmarkMetadata(
         name="SciCode",
         description="Scientific computing and programming challenges",
