@@ -1,12 +1,14 @@
 from typing import Optional, List, Dict, Annotated, Tuple, Union
 from enum import Enum
 import sys
+import time
 import typer
 from inspect_ai import eval
 from inspect_ai.model import Model
 
 from openbench.config import load_task
 from openbench.monkeypatch.display_results_patch import patch_display_results
+from openbench._cli.utils import parse_cli_args
 
 
 class SandboxType(str, Enum):
@@ -134,6 +136,22 @@ def run_eval(
             envvar="BENCH_MODEL_ROLE",
         ),
     ] = [],
+    m: Annotated[
+        List[str],
+        typer.Option(
+            "-M",
+            help="One or more native model arguments (e.g. -M arg=value)",
+            envvar="BENCH_MODEL_ARGS",
+        ),
+    ] = [],
+    t: Annotated[
+        List[str],
+        typer.Option(
+            "-T",
+            help="One or more task arguments (e.g. -T arg=value)",
+            envvar="BENCH_TASK_ARGS",
+        ),
+    ] = [],
     logfile: Annotated[
         Optional[str],
         typer.Option(help="Output file for results", envvar="BENCH_OUTPUT"),
@@ -209,19 +227,19 @@ def run_eval(
         ),
     ] = True,
     temperature: Annotated[
-        float,
+        Optional[float],
         typer.Option(
             help="Model temperature",
             envvar="BENCH_TEMPERATURE",
         ),
-    ] = 0.6,
+    ] = None,
     top_p: Annotated[
-        float,
+        Optional[float],
         typer.Option(
             help="Model top-p",
             envvar="BENCH_TOP_P",
         ),
-    ] = 1.0,
+    ] = None,
     max_tokens: Annotated[
         Optional[int],
         typer.Option(
@@ -267,10 +285,39 @@ def run_eval(
             envvar="BENCH_DEBUG",
         ),
     ] = False,
+    hub_repo: Annotated[
+        Optional[str],
+        typer.Option(
+            help=(
+                "Target Hub dataset repo (e.g. username/openbench-logs). "
+                "If provided, logs will be exported to this dataset"
+            ),
+            envvar="BENCH_HUB_REPO",
+        ),
+    ] = None,
+    hub_private: Annotated[
+        Optional[bool],
+        typer.Option(
+            help="Create/update the Hub dataset as private",
+            envvar="BENCH_HUB_PRIVATE",
+        ),
+    ] = False,
+    alpha: Annotated[
+        bool,
+        typer.Option(
+            "--alpha",
+            help="Allow running experimental/alpha benchmarks",
+            envvar="BENCH_ALPHA",
+        ),
+    ] = False,
 ) -> None:
     """
     Run a benchmark on a model.
     """
+    # Parse model and task arguments
+    model_args = parse_cli_args(m) if m else {}
+    task_args = parse_cli_args(t) if t else {}
+
     # Validate and aggregate model_role(s) into a dict
     role_models = {}
     for mr in model_role:
@@ -287,14 +334,14 @@ def run_eval(
         )
 
     # Validate model names
-    for m in model:
-        validate_model_name(m)
+    for model_name in model:
+        validate_model_name(model_name)
 
     # Load tasks from registry
     tasks = []
     for benchmark in benchmarks:
         try:
-            task = load_task(benchmark)
+            task = load_task(benchmark, allow_alpha=alpha)
             tasks.append(task)
         except (ValueError, ImportError, AttributeError) as e:
             raise typer.BadParameter(str(e))
@@ -313,13 +360,18 @@ def run_eval(
     # Apply display patch
     patch_display_results()
 
+    # Capture start time to locate logs created by this run
+    start_time = time.time()
+
     try:
         eval(
             tasks=tasks,
             model=model,
             max_connections=max_connections,
             model_base_url=model_base_url,
+            model_args=model_args,
             model_roles=role_models if role_models else None,
+            task_args=task_args,
             epochs=epochs,
             limit=parsed_limit,
             fail_on_error=fail_on_error,
@@ -339,8 +391,17 @@ def run_eval(
             sandbox=sandbox,
         )
 
-        # Placeholder - actual implementation would run the evaluation
         typer.echo("Evaluation complete!")
+
+        if hub_repo:
+            from openbench._cli.export import export_logs_to_hub
+
+            export_logs_to_hub(
+                logfile=logfile,
+                start_time=start_time,
+                hub_repo=hub_repo,
+                hub_private=hub_private,
+            )
     except Exception as e:
         if debug:
             # In debug mode, let the full stack trace show
