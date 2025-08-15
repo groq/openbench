@@ -36,6 +36,13 @@ class ReasoningEffortLevel(str, Enum):
     HIGH = "high"
 
 
+class LogFormat(str, Enum):
+    """Output format for benchmark logs."""
+
+    EVAL = "eval"
+    JSON = "json"
+
+
 def parse_limit(value: Optional[str]) -> Optional[Union[int, Tuple[int, int]]]:
     """Parse the limit parameter which can be an int or a tuple of ints.
 
@@ -277,6 +284,14 @@ def run_eval(
             case_sensitive=False,
         ),
     ] = None,
+    log_format: Annotated[
+        Optional[LogFormat],
+        typer.Option(
+            help="Output logging format",
+            envvar="BENCH_LOG_FORMAT",
+            case_sensitive=False,
+        ),
+    ] = LogFormat.EVAL,
     debug: Annotated[
         bool,
         typer.Option(
@@ -389,6 +404,7 @@ def run_eval(
             timeout=timeout,
             reasoning_effort=reasoning_effort.value if reasoning_effort else None,
             sandbox=sandbox,
+            log_format=log_format.value if log_format else None,
         )
 
         typer.echo("Evaluation complete!")
