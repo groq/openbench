@@ -367,7 +367,7 @@ BENCHMARKS = {
     # Cybersecurity benchmarks
     "cti_bench": BenchmarkMetadata(
         name="CTI-Bench",
-        description="Comprehensive evaluation framework for cyber threat intelligence understanding, covering CTI standards, threats, detection strategies, and mitigation plans",
+        description="Comprehensive evaluation framework for cyber threat intelligence understanding with 4 tasks: knowledge questions, vulnerability classification, CVSS scoring, and technique extraction",
         category="cybersecurity",
         tags=["cybersecurity", "multi-task"],
         module_path="openbench.evals.cti_bench",
@@ -396,14 +396,6 @@ BENCHMARKS = {
         tags=["classification", "cybersecurity"],
         module_path="openbench.evals.cti_bench",
         function_name="cti_bench_rcm",
-    ),
-    "cti_bench_taa": BenchmarkMetadata(
-        name="CTI-Bench TAA",
-        description="Analyzing threat reports to attribute attacks to specific threat actors or malware families",
-        category="cybersecurity",
-        tags=["classification", "cybersecurity"],
-        module_path="openbench.evals.cti_bench",
-        function_name="cti_bench_taa",
     ),
     "cti_bench_vsp": BenchmarkMetadata(
         name="CTI-Bench VSP",
