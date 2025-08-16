@@ -364,6 +364,47 @@ BENCHMARKS = {
         function_name="scicode",
         is_alpha=True,
     ),
+    # Cybersecurity benchmarks
+    "cti_bench": BenchmarkMetadata(
+        name="CTI-Bench",
+        description="Comprehensive evaluation framework for cyber threat intelligence understanding with 4 tasks: knowledge questions, vulnerability classification, CVSS scoring, and technique extraction",
+        category="cybersecurity",
+        tags=["cybersecurity", "multi-task"],
+        module_path="openbench.evals.cti_bench",
+        function_name="cti_bench",
+    ),
+    "cti_bench_ate": BenchmarkMetadata(
+        name="CTI-Bench ATE",
+        description="Extracting MITRE ATT&CK techniques from malware and threat descriptions",
+        category="cybersecurity",
+        tags=["extraction", "cybersecurity"],
+        module_path="openbench.evals.cti_bench",
+        function_name="cti_bench_ate",
+    ),
+    "cti_bench_mcq": BenchmarkMetadata(
+        name="CTI-Bench MCQ",
+        description="Multiple-choice questions evaluating understanding of CTI standards, threats, detection strategies, and best practices using authoritative sources like NIST and MITRE",
+        category="cybersecurity",
+        tags=["multiple-choice", "cybersecurity", "knowledge"],
+        module_path="openbench.evals.cti_bench",
+        function_name="cti_bench_mcq",
+    ),
+    "cti_bench_rcm": BenchmarkMetadata(
+        name="CTI-Bench RCM",
+        description="Mapping CVE descriptions to CWE categories to evaluate vulnerability classification ability",
+        category="cybersecurity",
+        tags=["classification", "cybersecurity"],
+        module_path="openbench.evals.cti_bench",
+        function_name="cti_bench_rcm",
+    ),
+    "cti_bench_vsp": BenchmarkMetadata(
+        name="CTI-Bench VSP",
+        description="Calculating CVSS scores from vulnerability descriptions to assess severity evaluation skills",
+        category="cybersecurity",
+        tags=["regression", "cybersecurity"],
+        module_path="openbench.evals.cti_bench",
+        function_name="cti_bench_vsp",
+    ),
 }
 
 
