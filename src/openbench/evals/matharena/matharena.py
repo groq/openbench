@@ -1,7 +1,7 @@
 from inspect_ai.dataset import hf_dataset, Sample
 from inspect_ai import Task
 from inspect_ai.model import GenerateConfig
-from openbench.scorers import fallback_scorer, score_boxed, score_last_integer
+from openbench.scorers import aime_scorer
 from inspect_ai.solver import generate, prompt_template
 
 
@@ -36,9 +36,7 @@ def matharena_task(
     return Task(
         dataset=dataset,
         solver=[prompt_template(TEMPLATE), generate()],
-        scorer=fallback_scorer(
-            scorers=[score_boxed(), score_last_integer()], strategy="first_correct"
-        ),
+        scorer=aime_scorer(),  # Use specialized AIME scorer with robust extraction
         name=name,
         config=GenerateConfig(
             temperature=default_temperature,
