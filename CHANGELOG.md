@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/groq/openbench/compare/v0.3.0...v0.3.1) (2025-08-16)
+
+
+### Chores
+
+* update uv.lock package version ([3583d71](https://github.com/groq/openbench/commit/3583d71fee81d681861e0015383f8471459b4002))
+
 ## [0.3.0](https://github.com/groq/openbench/compare/v0.2.0...v0.3.0) (2025-08-14)
 
 
