@@ -39,6 +39,7 @@ class VercelAPI(OpenAICompatibleAPI):
         **model_args: Any,
     ) -> None:
         # Remove provider prefix if present
+        # Result is in creator/model format
         model_name_clean = model_name.replace("vercel/", "", 1)
        
         base_url = base_url or os.environ.get("AI_GATEWAY_BASE_URL") or self.DEFAULT_BASE_URL
