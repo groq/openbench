@@ -1,12 +1,12 @@
 """Vercel AI Gateway provider implementation.
 
-The AI Gateway provides OpenAI-compatible API endpoints, letting you use multiple 
-AI providers through a familiar interface. The AI Gateway can route requests across 
+The AI Gateway provides OpenAI-compatible API endpoints, letting you use multiple
+AI providers through a familiar interface. The AI Gateway can route requests across
 multiple AI providers for better reliability and performance.
 
 Environment variables:
   - AI_GATEWAY_API_KEY: AI Gateway API key (required)
-  - AI_GATEWAY_BASE_URL: Override the default base URL (defaults to 
+  - AI_GATEWAY_BASE_URL: Override the default base URL (defaults to
     https://ai-gateway.vercel.sh/v1)
 
 Model naming follows the creator/model format, e.g.:
@@ -41,9 +41,15 @@ class VercelAPI(OpenAICompatibleAPI):
         # Remove provider prefix if present
         # Result is in creator/model format
         model_name_clean = model_name.replace("vercel/", "", 1)
-       
-        base_url = base_url or os.environ.get("AI_GATEWAY_BASE_URL") or self.DEFAULT_BASE_URL
-        api_key = api_key or os.environ.get("AI_GATEWAY_API_KEY") or os.environ.get("VERCEL_OIDC_TOKEN")
+
+        base_url = (
+            base_url or os.environ.get("AI_GATEWAY_BASE_URL") or self.DEFAULT_BASE_URL
+        )
+        api_key = (
+            api_key
+            or os.environ.get("AI_GATEWAY_API_KEY")
+            or os.environ.get("VERCEL_OIDC_TOKEN")
+        )
 
         if not api_key:
             raise ValueError(
