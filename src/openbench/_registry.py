@@ -155,6 +155,14 @@ def moonshot() -> Type[ModelAPI]:
     return MoonshotAPI
 
 
+@modelapi(name="vercel")
+def vercel() -> Type[ModelAPI]:
+    """Register Vercel AI Gateway provider."""
+    from .model._providers.vercel import VercelAPI
+
+    return VercelAPI
+
+
 # Task Registration
 
 # Core benchmarks

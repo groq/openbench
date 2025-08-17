@@ -110,6 +110,7 @@ OpenBench supports 30+ model providers through Inspect AI. Set the appropriate A
 | **Reka** | `REKA_API_KEY` | `reka/model-name` |
 | **SambaNova** | `SAMBANOVA_API_KEY` | `sambanova/model-name` |
 | **Together AI** | `TOGETHER_API_KEY` | `together/model-name` |
+| **Vercel AI Gateway** | `AI_GATEWAY_API_KEY` | `vercel/creator-name/model-name` |
 | **vLLM** | None (local) | `vllm/model-name` |
 
 ## Available Benchmarks
