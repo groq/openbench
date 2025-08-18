@@ -17,6 +17,13 @@ from inspect_ai.scorer import (
 )
 
 
+def _strip_markdown(text: str) -> str:
+    """Strip markdown code blocks from text."""
+    markdown_prefix = "```json"
+    markdown_suffix = "```"
+    return text.removeprefix(markdown_prefix).removesuffix(markdown_suffix)
+
+
 @metric
 def json_validity() -> Metric:
     """Calculates the percentage of outputs that are valid JSON."""
@@ -63,38 +70,15 @@ def schema_compliance() -> Metric:
     return metric_calculator
 
 
-@metric
-def overall_success() -> Metric:
-    """Calculates the percentage of outputs that are both valid JSON and schema compliant."""
-
-    def metric_calculator(scores: list[SampleScore]) -> Value:
-        if not scores:
-            return 0.0
-
-        success_count = sum(
-            1
-            for score in scores
-            if (
-                score.score.metadata
-                and score.score.metadata.get("json_valid", False)
-                and score.score.metadata.get("schema_compliant", False)
-            )
-        )
-        return success_count / len(scores)
-
-    return metric_calculator
-
-
 @scorer(
     metrics=[
         accuracy(),
         stderr(),
         json_validity(),
         schema_compliance(),
-        overall_success(),
     ]
 )
-def json_schema_scorer() -> Callable:
+def json_schema_scorer(strip_markdown: bool = True) -> Callable:
     """
     Scorer that validates JSON output against a provided schema.
 
@@ -102,6 +86,10 @@ def json_schema_scorer() -> Callable:
     - Uses Draft2020-12 validator with format checking
     - Returns separate metrics for JSON validity and schema compliance
     - Single attempt per schema (no retries)
+    - Optionally strips markdown code blocks from output
+
+    Args:
+        strip_markdown: Whether to remove ```json``` markdown blocks from output (default True)
 
     Expects schema in state.metadata["schema"]
     """
@@ -123,9 +111,10 @@ def json_schema_scorer() -> Callable:
         # Handle both string (from dataset) and dict (from tests) formats
         schema = json.loads(schema_data) if isinstance(schema_data, str) else schema_data
         raw_output = state.output.completion
-        processed_output = raw_output.strip() if raw_output else ""
+        processed_output = raw_output.strip()
+        processed_output = _strip_markdown(processed_output) if strip_markdown else processed_output
 
-        # Step 1: Check if output is valid JSON
+        # Check if output is valid JSON
         try:
             json_data = json.loads(processed_output)
             json_valid = True
@@ -140,7 +129,7 @@ def json_schema_scorer() -> Callable:
                 },
             )
 
-        # Step 2: Validate against schema using JSONSchemaBench methodology
+        # Validate against schema using JSONSchemaBench methodology
         try:
             # Use Draft2020-12 with format checking (as per JSB paper)
             validator = Draft202012Validator(schema, format_checker=FormatChecker())

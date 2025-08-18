@@ -16,27 +16,31 @@ from openbench.scorers.json_schema import json_schema_scorer
 
 
 @task
-def jsonschemabench(subset: str | None = None, split: str = "test") -> Task:
+def jsonschemabench(subset: str | None = None, split: str = "all", num_shots: int = 0, strip_markdown: bool = True) -> Task:
     """JSONSchemaBench: JSON Schema generation benchmark.
     
     Evaluates the ability of language models to generate valid JSON
     that conforms to provided JSON schemas. Based on ~10K real-world
     schemas from GitHub, Kubernetes, APIs, and other sources.
     
-    Uses the prompt: "Generate a valid JSON object that matches the schema below."
+    Following the paper methodology:
+    - Zero-shot: "You need to generate a JSON object that matches the schema below."
+    - Few-shot: Includes examples with "## Input Schema:" and "## Expected Output:" format
     
     Args:
         subset: Specific subset to evaluate (e.g., "Github_easy", "Kubernetes")
-               or None for mixed benchmark
-        split: Dataset split to use ("test", "val", "train")
+                or None for mixed benchmark
+        split: Dataset split to use ("all", "test", "val", "train")
+        num_shots: Number of few-shot examples to include (0 for zero-shot, paper used 2)
+        strip_markdown: Whether to remove ```json``` markdown blocks from output (default True)
     
     Returns:
         Task configured for JSONSchemaBench evaluation
     """
     return Task(
-        dataset=get_dataset(subset=subset, split=split),
+        dataset=get_dataset(subset=subset, split=split, num_shots=num_shots),
         solver=[generate()],
-        scorer=json_schema_scorer(),
+        scorer=json_schema_scorer(strip_markdown=strip_markdown),
         name="jsonschemabench",
         config=GenerateConfig(
             temperature=0.0,  # Deterministic for structured output
