@@ -250,7 +250,15 @@ pytest
 
 ## Contributing
 
-We welcome contributions! Please open issues and PRs at [github.com/groq/openbench](https://github.com/groq/openbench).
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for detailed instructions on:
+- Setting up the development environment
+- Adding new benchmarks and model providers
+- Code style and testing requirements
+- Submitting issues and pull requests
+
+Quick links:
+- [Report a bug](https://github.com/groq/openbench/issues/new?assignees=&labels=bug&projects=&template=bug_report.yml)
+- [Request a feature](https://github.com/groq/openbench/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.yml)
 
 
 ## Reproducibility Statement

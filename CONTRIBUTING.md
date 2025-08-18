@@ -2,6 +2,25 @@
 
 Thank you for your interest in contributing to OpenBench! We welcome contributions from the community and are grateful for your support in making language model evaluation more accessible and reliable.
 
+## 🚀 Quick Start
+
+### Prerequisites
+- Python 3.10+
+- [UV package manager](https://docs.astral.sh/uv/getting-started/installation/)
+- Git
+
+### Setup
+```bash
+# Clone and setup
+git clone https://github.com/groq/openbench.git
+cd openbench
+uv venv && uv sync --dev
+source .venv/bin/activate
+
+# Run tests to verify setup
+pytest
+```
+
 ## 🎯 Core Principles
 
 ### Single Responsibility
@@ -97,12 +116,14 @@ Closes #123
 
 3. **Test your changes**
    ```bash
-   # Run tests
+   # Run all tests
    pytest
    
-   # Run linting
-   ruff check .
-   ruff format .
+   # Run integration tests (requires API keys)
+   pytest -m integration
+   
+   # Run pre-commit hooks (REQUIRED)
+   pre-commit run --all-files
    
    # Test your specific changes
    bench eval <your-benchmark> --limit 5
@@ -161,6 +182,20 @@ src/openbench/
 └── config.py                # Add benchmark metadata here
 ```
 
+### Adding a New Model Provider
+1. Create provider file in `src/openbench/model/_providers/`
+2. Follow existing provider patterns (see `ai21.py`, `cerebras.py`, etc.)
+3. Add environment variable documentation
+4. Test with multiple benchmarks
+5. Update provider table in README.md
+
+### Key Development Tools
+- **UV**: Package manager (not pip) - use `uv add package==version` for dependencies
+- **Ruff**: Linting and formatting - replaces Black, isort, flake8
+- **MyPy**: Type checking - required for all new code
+- **Pre-commit**: Automated code quality checks - must pass before commits
+- **Pytest**: Testing framework with integration test markers
+
 ### Code Style
 - Follow PEP 8 with a line length of 88 characters (Black default)
 - Use type hints for all function signatures
@@ -176,20 +211,23 @@ src/openbench/
 
 ## 🐛 Reporting Issues
 
-When reporting issues, please include:
-1. OpenBench version (`uv pip show openbench`)
-2. Python version
-3. Operating system
-4. Minimal reproducible example
-5. Full error output with traceback
+We have structured issue templates to help you report problems effectively:
 
-## 💡 Feature Requests
+### Bug Reports
+Use our [bug report template](https://github.com/groq/openbench/issues/new?assignees=&labels=bug&projects=&template=bug_report.yml) which includes:
+- OpenBench version and environment details
+- Exact command that failed
+- Expected vs actual behavior
+- Error logs and reproduction steps
 
-We love hearing ideas for improvements! When proposing features:
-1. Explain the use case
-2. Describe the desired behavior
-3. Consider backward compatibility
-4. Be open to alternative solutions
+### Feature Requests
+Use our [feature request template](https://github.com/groq/openbench/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.yml) for:
+- New benchmarks/evaluations
+- New model providers
+- CLI enhancements
+- Performance improvements
+- API/SDK features
+- Integration requests
 
 ## 📚 Resources
 
