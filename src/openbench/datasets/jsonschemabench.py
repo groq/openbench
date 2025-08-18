@@ -1,9 +1,10 @@
-import json
 from typing import Dict, List, Tuple
 from datasets import load_dataset  # type: ignore[import-untyped]
 from inspect_ai.dataset import Dataset, Sample, MemoryDataset
 
-JSONSCHEMABENCH_SYSTEM_PROMPT = "You need to generate a JSON object that matches the schema below."
+JSONSCHEMABENCH_SYSTEM_PROMPT = (
+    "You need to generate a JSON object that matches the schema below."
+)
 
 FEWSHOT_EXAMPLES: Dict[Tuple[str], List[Tuple[str, str]]] = {
     ("Snowplow",): [
@@ -71,7 +72,7 @@ FEWSHOT_EXAMPLES: Dict[Tuple[str], List[Tuple[str, str]]] = {
 
 
 def _find_examples_for_subset(subset: str | None) -> List[Tuple[str, str]]:
-    """Find examples for a given subset."""
+    """Find few-shot examples for a subset."""
     for key, examples in FEWSHOT_EXAMPLES.items():
         if subset in key:
             return examples
@@ -79,45 +80,45 @@ def _find_examples_for_subset(subset: str | None) -> List[Tuple[str, str]]:
 
 
 def _get_few_shot_examples(subset: str | None, num_shots: int) -> List[Tuple[str, str]]:
-    """Get examples for a given subset."""
+    """Get first N few-shot examples for a subset."""
     examples = _find_examples_for_subset(subset)
     if num_shots > len(examples):
-        raise ValueError(f"Not enough {subset} examples to prompt with {num_shots} shots")
+        raise ValueError(
+            f"Not enough {subset} examples to prompt with {num_shots} shots"
+        )
     return examples[:num_shots]
 
 
-def _build_messages(schema: str, examples: List[Tuple[str, str]]) -> List[Dict[str, str]]:
-    """Build message list with examples, matching jsonschemabench format."""
+def _build_messages(
+    schema: str, examples: List[Tuple[str, str]]
+) -> List[Dict[str, str]]:
+    """Build message list with few-shot examples."""
     messages = [
         {
             "role": "system",
             "content": JSONSCHEMABENCH_SYSTEM_PROMPT,
         }
     ]
-    
+
     for schema_str, json_str in examples:
         messages.append({"role": "user", "content": schema_str})
         messages.append({"role": "assistant", "content": json_str})
-    
+
     messages.append({"role": "user", "content": schema})
     return messages
 
 
-def record_to_sample(record: dict, num_shots: int = 0, subset: str | None = None) -> Sample:
-    """Convert a JSONSchemaBench record to an Inspect Sample.
-    
-    Args:
-        record: HuggingFace dataset record
-        num_shots: Number of few-shot examples to include (0 for zero-shot)
-        subset: Dataset subset name for selecting appropriate examples
-    """
+def record_to_sample(
+    record: dict, num_shots: int = 0, subset: str | None = None
+) -> Sample:
+    """Convert HuggingFace dataset record to Inspect Sample with few-shot prompting."""
     schema = record["json_schema"]
     unique_id = record["unique_id"]
-    
+
     # Build few-shot prompt if requested
     examples = _get_few_shot_examples(subset, num_shots)
     messages = _build_messages(schema, examples)
-    
+
     return Sample(
         input=messages,
         target="",
@@ -129,23 +130,29 @@ def record_to_sample(record: dict, num_shots: int = 0, subset: str | None = None
     )
 
 
-def get_dataset(subset: str | None = None, split: str = "all", num_shots: int = 0) -> Dataset:
-    """Load the JSONSchemaBench dataset from HuggingFace.
-    
+def get_dataset(
+    subset: str | None = None, split: str = "all", num_shots: int = 0
+) -> Dataset:
+    """Load JSONSchemaBench dataset from HuggingFace with few-shot examples.
+
     Args:
-        subset: Dataset subset (e.g., "Github_easy", "Github_medium", "Github_hard")
-        split: Dataset split to use ("test", "val", "train", or "all")
-        num_shots: Number of few-shot examples to include (0 for zero-shot)
-        strip_markdown: Whether to remove ```json``` markdown blocks from output
+        subset: Dataset subset (e.g., "Github_easy", "Kubernetes", "Snowplow")
+        split: Dataset split ("test", "val", "train", or "all")
+        num_shots: Number of few-shot examples (0 for zero-shot, paper used 2)
     """
     split_param = {
         "test": "test",
         "val": "val",
         "train": "train",
-        "all": "train[:]+val[:]+test[:]"
+        "all": "train[:]+val[:]+test[:]",
     }
     config = subset if subset else "default"
     name = f"jsonschemabench_{config}_{split}_{num_shots}shot"
-    dataset = load_dataset("epfl-dlab/JSONSchemaBench", config, split=split_param[split])
-    samples = [record_to_sample(record, num_shots=num_shots, subset=subset) for record in dataset]
+    dataset = load_dataset(
+        "epfl-dlab/JSONSchemaBench", config, split=split_param[split]
+    )
+    samples = [
+        record_to_sample(record, num_shots=num_shots, subset=subset)
+        for record in dataset
+    ]
     return MemoryDataset(samples=samples, name=name)

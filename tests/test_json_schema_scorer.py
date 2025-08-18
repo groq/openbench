@@ -1,6 +1,5 @@
 """Unit tests for JSON schema scorer."""
 
-import pytest
 from unittest.mock import Mock
 from inspect_ai.scorer import Target, Score, SampleScore, CORRECT, INCORRECT
 
@@ -12,7 +11,9 @@ from openbench.scorers.json_schema import (
 )
 
 
-def create_mock_state(completion: str, metadata: dict | None = None, error: str | None = None) -> Mock:
+def create_mock_state(
+    completion: str, metadata: dict | None = None, error: str | None = None
+) -> Mock:
     """Create a mock TaskState for testing."""
     mock_state = Mock()
     mock_state.output.completion = completion
@@ -210,9 +211,9 @@ class TestJSONSchemaScorer:
 
         # Create state that simulates an API error
         state = create_mock_state(
-            completion="", 
-            metadata={"schema": schema}, 
-            error="API timeout error"  # Simulate API error
+            completion="",
+            metadata={"schema": schema},
+            error="API timeout error",  # Simulate API error
         )
         target = Target(TEST_TARGET)
 
@@ -237,14 +238,22 @@ class TestJSONValidityMetric:
                 sample_id="1",
                 score=Score(
                     value=CORRECT,
-                    metadata={"json_valid": True, "schema_compliant": True, "api_error": False},
+                    metadata={
+                        "json_valid": True,
+                        "schema_compliant": True,
+                        "api_error": False,
+                    },
                 ),
             ),
             SampleScore(
                 sample_id="2",
                 score=Score(
                     value=INCORRECT,
-                    metadata={"json_valid": True, "schema_compliant": False, "api_error": False},
+                    metadata={
+                        "json_valid": True,
+                        "schema_compliant": False,
+                        "api_error": False,
+                    },
                 ),
             ),
         ]
@@ -261,14 +270,22 @@ class TestJSONValidityMetric:
                 sample_id="1",
                 score=Score(
                     value=CORRECT,
-                    metadata={"json_valid": True, "schema_compliant": True, "api_error": False},
+                    metadata={
+                        "json_valid": True,
+                        "schema_compliant": True,
+                        "api_error": False,
+                    },
                 ),
             ),
             SampleScore(
                 sample_id="2",
                 score=Score(
                     value=INCORRECT,
-                    metadata={"json_valid": False, "schema_compliant": False, "api_error": False},
+                    metadata={
+                        "json_valid": False,
+                        "schema_compliant": False,
+                        "api_error": False,
+                    },
                 ),
             ),
         ]
@@ -299,21 +316,33 @@ class TestJSONValidityMetric:
                 sample_id="1",
                 score=Score(
                     value=INCORRECT,
-                    metadata={"json_valid": False, "schema_compliant": False, "api_error": True},
+                    metadata={
+                        "json_valid": False,
+                        "schema_compliant": False,
+                        "api_error": True,
+                    },
                 ),
             ),
             SampleScore(
                 sample_id="2",
                 score=Score(
                     value=CORRECT,
-                    metadata={"json_valid": True, "schema_compliant": True, "api_error": False},
+                    metadata={
+                        "json_valid": True,
+                        "schema_compliant": True,
+                        "api_error": False,
+                    },
                 ),
             ),
             SampleScore(
                 sample_id="3",
                 score=Score(
                     value=INCORRECT,
-                    metadata={"json_valid": False, "schema_compliant": False, "api_error": False},
+                    metadata={
+                        "json_valid": False,
+                        "schema_compliant": False,
+                        "api_error": False,
+                    },
                 ),
             ),
         ]
@@ -321,7 +350,9 @@ class TestJSONValidityMetric:
         metric_fn = json_validity()
         result = metric_fn(scores)
 
-        assert result == 0.5  # 1/2 successful API calls produced valid JSON (API error excluded)
+        assert (
+            result == 0.5
+        )  # 1/2 successful API calls produced valid JSON (API error excluded)
 
     def test_empty_scores(self):
         """Test metric with empty scores list."""
@@ -417,14 +448,22 @@ class TestAPISuccessRateMetric:
                 sample_id="1",
                 score=Score(
                     value=CORRECT,
-                    metadata={"json_valid": True, "schema_compliant": True, "api_error": False},
+                    metadata={
+                        "json_valid": True,
+                        "schema_compliant": True,
+                        "api_error": False,
+                    },
                 ),
             ),
             SampleScore(
                 sample_id="2",
                 score=Score(
                     value=INCORRECT,
-                    metadata={"json_valid": True, "schema_compliant": False, "api_error": False},
+                    metadata={
+                        "json_valid": True,
+                        "schema_compliant": False,
+                        "api_error": False,
+                    },
                 ),
             ),
         ]
@@ -441,21 +480,33 @@ class TestAPISuccessRateMetric:
                 sample_id="1",
                 score=Score(
                     value=INCORRECT,
-                    metadata={"json_valid": False, "schema_compliant": False, "api_error": True},
+                    metadata={
+                        "json_valid": False,
+                        "schema_compliant": False,
+                        "api_error": True,
+                    },
                 ),
             ),
             SampleScore(
                 sample_id="2",
                 score=Score(
                     value=CORRECT,
-                    metadata={"json_valid": True, "schema_compliant": True, "api_error": False},
+                    metadata={
+                        "json_valid": True,
+                        "schema_compliant": True,
+                        "api_error": False,
+                    },
                 ),
             ),
             SampleScore(
                 sample_id="3",
                 score=Score(
                     value=INCORRECT,
-                    metadata={"json_valid": True, "schema_compliant": False, "api_error": False},
+                    metadata={
+                        "json_valid": True,
+                        "schema_compliant": False,
+                        "api_error": False,
+                    },
                 ),
             ),
         ]
@@ -472,14 +523,22 @@ class TestAPISuccessRateMetric:
                 sample_id="1",
                 score=Score(
                     value=INCORRECT,
-                    metadata={"json_valid": False, "schema_compliant": False, "api_error": True},
+                    metadata={
+                        "json_valid": False,
+                        "schema_compliant": False,
+                        "api_error": True,
+                    },
                 ),
             ),
             SampleScore(
                 sample_id="2",
                 score=Score(
                     value=INCORRECT,
-                    metadata={"json_valid": False, "schema_compliant": False, "api_error": True},
+                    metadata={
+                        "json_valid": False,
+                        "schema_compliant": False,
+                        "api_error": True,
+                    },
                 ),
             ),
         ]

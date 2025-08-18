@@ -83,6 +83,7 @@ def schema_compliance() -> Metric:
 @metric
 def api_success_rate() -> Metric:
     """Calculates the percentage of samples that didn't have API errors."""
+
     # TODO: Change this to only check for structured output related errors
     def metric_calculator(scores: list[SampleScore]) -> Value:
         if not scores:
@@ -151,10 +152,14 @@ def json_schema_scorer(strip_markdown: bool = True) -> Callable:
 
         schema_data = state.metadata["schema"]
         # Handle both string (from dataset) and dict (from tests) formats
-        schema = json.loads(schema_data) if isinstance(schema_data, str) else schema_data
+        schema = (
+            json.loads(schema_data) if isinstance(schema_data, str) else schema_data
+        )
         raw_output = state.output.completion
         processed_output = raw_output.strip()
-        processed_output = _strip_markdown(processed_output) if strip_markdown else processed_output
+        processed_output = (
+            _strip_markdown(processed_output) if strip_markdown else processed_output
+        )
 
         # Check if output is valid JSON
         try:
