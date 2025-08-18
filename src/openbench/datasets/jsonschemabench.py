@@ -1,12 +1,13 @@
 from typing import Dict, List, Tuple
 from datasets import load_dataset  # type: ignore[import-untyped]
 from inspect_ai.dataset import Dataset, Sample, MemoryDataset
+from inspect_ai.model import ChatMessageSystem, ChatMessageUser, ChatMessageAssistant, ChatMessageTool
 
 JSONSCHEMABENCH_SYSTEM_PROMPT = (
     "You need to generate a JSON object that matches the schema below."
 )
 
-FEWSHOT_EXAMPLES: Dict[Tuple[str], List[Tuple[str, str]]] = {
+FEWSHOT_EXAMPLES: Dict[Tuple[str, ...], List[Tuple[str, str]]] = {
     ("Snowplow",): [
         (
             '{\n    "additionalProperties": false,\n    "description": "Schema for a JSON Paths file for loading Redshift from JSON or Avro, http://docs.aws.amazon.com/redshift/latest/dg/copy-parameters-data-format.html#copy-json-jsonpaths",\n    "properties": {\n        "jsonpaths": {\n            "items": {\n                "type": "string"\n            },\n            "minItems": 1,\n            "type": "array"\n        }\n    },\n    "required": [\n        "jsonpaths"\n    ],\n    "self": {\n        "format": "jsonschema",\n        "name": "jsonpaths_file",\n        "vendor": "com.amazon.aws.redshift",\n        "version": "1-0-0"\n    },\n    "type": "object"\n}',
@@ -91,20 +92,17 @@ def _get_few_shot_examples(subset: str | None, num_shots: int) -> List[Tuple[str
 
 def _build_messages(
     schema: str, examples: List[Tuple[str, str]]
-) -> List[Dict[str, str]]:
+) -> List[ChatMessageSystem | ChatMessageUser | ChatMessageAssistant | ChatMessageTool]:
     """Build message list with few-shot examples."""
-    messages = [
-        {
-            "role": "system",
-            "content": JSONSCHEMABENCH_SYSTEM_PROMPT,
-        }
+    messages: List[ChatMessageSystem | ChatMessageUser | ChatMessageAssistant | ChatMessageTool] = [
+        ChatMessageSystem(content=JSONSCHEMABENCH_SYSTEM_PROMPT)
     ]
 
     for schema_str, json_str in examples:
-        messages.append({"role": "user", "content": schema_str})
-        messages.append({"role": "assistant", "content": json_str})
+        messages.append(ChatMessageUser(content=schema_str))
+        messages.append(ChatMessageAssistant(content=json_str))
 
-    messages.append({"role": "user", "content": schema})
+    messages.append(ChatMessageUser(content=schema))
     return messages
 
 
