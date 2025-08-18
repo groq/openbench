@@ -276,10 +276,10 @@ This project would not be possible without:
 
 ```bibtex
 @software{openbench,
-  title = {OpenBench: Open-source Evaluation Infrastructure for Language Models},
-  author = {Sah, Aarush and {Groq Team}},
+  title = {OpenBench: Provider-agnostic, open-source evaluation infrastructure for language models},
+  author = {Sah, Aarush},
   year = {2025},
-  url = {https://github.com/groq/openbench}
+  url = {https://openbench.dev}
 }
 ```
 
