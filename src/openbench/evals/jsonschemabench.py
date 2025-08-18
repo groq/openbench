@@ -48,14 +48,18 @@ def jsonschemabench(
     num_shots: int = 0,
     strip_markdown: bool = True,
 ) -> Task:
-    """JSONSchemaBench: JSON Schema generation benchmark.
+    """JSONSchemaBench: A Rigorous Benchmark of Structured Outputs
+    for Language Models.
 
     Evaluates the ability of language models to generate valid JSON
     that conforms to provided JSON schemas. Based on ~10K real-world
     schemas from GitHub, Kubernetes, APIs, and other sources.
 
-    Uses structured output when supported by the provider for API-level schema validation,
-    otherwise falls back to text generation with post-hoc validation.
+    Uses structured output when supported by the provider for API-level
+    schema validation, otherwise falls back to text generation with
+    post-hoc validation.
+
+    See https://doi.org/10.48550/arXiv.2501.10868.
 
     Args:
         subset: Specific subset to evaluate (e.g., "Github_easy", "Kubernetes")
