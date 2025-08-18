@@ -244,9 +244,14 @@ cd openbench
 uv venv && uv sync --dev
 source .venv/bin/activate
 
+# CRITICAL: Install pre-commit hooks (CI will fail without this!)
+pre-commit install
+
 # Run tests
 pytest
 ```
+
+⚠️ **IMPORTANT**: You MUST run `pre-commit install` after setup or CI will fail on your PRs!
 
 ## Contributing
 
