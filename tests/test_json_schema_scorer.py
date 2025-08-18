@@ -8,14 +8,15 @@ from openbench.scorers.json_schema import (
     json_schema_scorer,
     json_validity,
     schema_compliance,
-    overall_success,
+    api_success_rate,
 )
 
 
-def create_mock_state(completion: str, metadata: dict | None = None) -> Mock:
+def create_mock_state(completion: str, metadata: dict | None = None, error: str | None = None) -> Mock:
     """Create a mock TaskState for testing."""
     mock_state = Mock()
     mock_state.output.completion = completion
+    mock_state.output.error = error  # Add error attribute for API error testing
     mock_state.metadata = metadata or {}
     return mock_state
 
@@ -28,7 +29,6 @@ TEST_TARGET = "test_target"
 class TestJSONSchemaScorer:
     """Test the JSON schema scorer function."""
 
-    @pytest.mark.asyncio
     async def test_valid_json_and_schema(self):
         """Test with valid JSON that conforms to schema."""
         schema = {
@@ -52,9 +52,9 @@ class TestJSONSchemaScorer:
         assert result.answer == '{"name": "John", "age": 25}'
         assert result.metadata["json_valid"]
         assert result.metadata["schema_compliant"]
+        assert not result.metadata["api_error"]
         assert result.metadata["error"] is None
 
-    @pytest.mark.asyncio
     async def test_valid_json_invalid_schema(self):
         """Test with valid JSON that doesn't conform to schema."""
         schema = {
@@ -79,9 +79,9 @@ class TestJSONSchemaScorer:
         assert result.answer == '{"name": "John"}'
         assert result.metadata["json_valid"]
         assert not result.metadata["schema_compliant"]
+        assert not result.metadata["api_error"]
         assert "schema_validation_error" in result.metadata["error"]
 
-    @pytest.mark.asyncio
     async def test_invalid_json(self):
         """Test with invalid JSON."""
         schema = {"type": "object"}
@@ -98,9 +98,9 @@ class TestJSONSchemaScorer:
         assert result.answer == '{"name": "John", invalid}'
         assert not result.metadata["json_valid"]
         assert not result.metadata["schema_compliant"]
+        assert not result.metadata["api_error"]
         assert "json_decode_error" in result.metadata["error"]
 
-    @pytest.mark.asyncio
     async def test_no_schema_in_metadata(self):
         """Test when no schema is provided in metadata."""
         state = create_mock_state(
@@ -116,9 +116,9 @@ class TestJSONSchemaScorer:
         assert result.answer == '{"name": "John"}'
         assert not result.metadata["json_valid"]
         assert not result.metadata["schema_compliant"]
+        assert not result.metadata["api_error"]
         assert result.metadata["error"] == "no_schema"
 
-    @pytest.mark.asyncio
     async def test_none_metadata(self):
         """Test when metadata is None."""
         state = create_mock_state(completion='{"name": "John"}', metadata=None)
@@ -131,9 +131,9 @@ class TestJSONSchemaScorer:
         assert result.answer == '{"name": "John"}'
         assert not result.metadata["json_valid"]
         assert not result.metadata["schema_compliant"]
+        assert not result.metadata["api_error"]
         assert result.metadata["error"] == "no_schema"
 
-    @pytest.mark.asyncio
     async def test_empty_completion(self):
         """Test with empty completion."""
         schema = {"type": "object"}
@@ -148,9 +148,9 @@ class TestJSONSchemaScorer:
         assert result.answer == ""
         assert not result.metadata["json_valid"]
         assert not result.metadata["schema_compliant"]
+        assert not result.metadata["api_error"]
         assert "json_decode_error" in result.metadata["error"]
 
-    @pytest.mark.asyncio
     async def test_whitespace_handling(self):
         """Test that whitespace is properly stripped for JSON parsing."""
         schema = {"type": "object", "properties": {"test": {"type": "boolean"}}}
@@ -168,8 +168,8 @@ class TestJSONSchemaScorer:
         assert result.answer == '  {"test": true}  \n'  # Raw output preserved
         assert result.metadata["json_valid"]
         assert result.metadata["schema_compliant"]
+        assert not result.metadata["api_error"]
 
-    @pytest.mark.asyncio
     async def test_complex_schema(self):
         """Test with a more complex JSON schema."""
         schema = {
@@ -202,26 +202,49 @@ class TestJSONSchemaScorer:
         assert result.value == CORRECT
         assert result.metadata["json_valid"]
         assert result.metadata["schema_compliant"]
+        assert not result.metadata["api_error"]
+
+    async def test_api_error_handling(self):
+        """Test scorer handles API errors correctly."""
+        schema = {"type": "object"}
+
+        # Create state that simulates an API error
+        state = create_mock_state(
+            completion="", 
+            metadata={"schema": schema}, 
+            error="API timeout error"  # Simulate API error
+        )
+        target = Target(TEST_TARGET)
+
+        scorer_fn = json_schema_scorer()
+        result = await scorer_fn(state, target)
+
+        assert result.value == INCORRECT
+        assert result.answer == ""
+        assert not result.metadata["json_valid"]
+        assert not result.metadata["schema_compliant"]
+        assert result.metadata["api_error"]
+        assert "api_error: API timeout error" in result.metadata["error"]
 
 
 class TestJSONValidityMetric:
     """Test the JSON validity metric."""
 
     def test_all_valid_json(self):
-        """Test metric with all valid JSON scores."""
+        """Test metric with all valid JSON scores from successful API calls."""
         scores = [
             SampleScore(
                 sample_id="1",
                 score=Score(
                     value=CORRECT,
-                    metadata={"json_valid": True, "schema_compliant": True},
+                    metadata={"json_valid": True, "schema_compliant": True, "api_error": False},
                 ),
             ),
             SampleScore(
                 sample_id="2",
                 score=Score(
                     value=INCORRECT,
-                    metadata={"json_valid": True, "schema_compliant": False},
+                    metadata={"json_valid": True, "schema_compliant": False, "api_error": False},
                 ),
             ),
         ]
@@ -229,23 +252,23 @@ class TestJSONValidityMetric:
         metric_fn = json_validity()
         result = metric_fn(scores)
 
-        assert result == 1.0  # 2/2 valid JSON
+        assert result == 1.0  # 2/2 successful API calls produced valid JSON
 
     def test_mixed_json_validity(self):
-        """Test metric with mixed JSON validity."""
+        """Test metric with mixed JSON validity from successful API calls."""
         scores = [
             SampleScore(
                 sample_id="1",
                 score=Score(
                     value=CORRECT,
-                    metadata={"json_valid": True, "schema_compliant": True},
+                    metadata={"json_valid": True, "schema_compliant": True, "api_error": False},
                 ),
             ),
             SampleScore(
                 sample_id="2",
                 score=Score(
                     value=INCORRECT,
-                    metadata={"json_valid": False, "schema_compliant": False},
+                    metadata={"json_valid": False, "schema_compliant": False, "api_error": False},
                 ),
             ),
         ]
@@ -253,7 +276,7 @@ class TestJSONValidityMetric:
         metric_fn = json_validity()
         result = metric_fn(scores)
 
-        assert result == 0.5  # 1/2 valid JSON
+        assert result == 0.5  # 1/2 successful API calls produced valid JSON
 
     def test_no_metadata_scores(self):
         """Test metric with scores that have no metadata."""
@@ -267,7 +290,38 @@ class TestJSONValidityMetric:
         metric_fn = json_validity()
         result = metric_fn(scores)
 
-        assert result == 0.0  # 0/2 valid JSON
+        assert result == 0.0  # 0/0 successful API calls (no valid denominators)
+
+    def test_with_api_errors(self):
+        """Test metric excludes API errors from denominator (empirical coverage formula)."""
+        scores = [
+            SampleScore(
+                sample_id="1",
+                score=Score(
+                    value=INCORRECT,
+                    metadata={"json_valid": False, "schema_compliant": False, "api_error": True},
+                ),
+            ),
+            SampleScore(
+                sample_id="2",
+                score=Score(
+                    value=CORRECT,
+                    metadata={"json_valid": True, "schema_compliant": True, "api_error": False},
+                ),
+            ),
+            SampleScore(
+                sample_id="3",
+                score=Score(
+                    value=INCORRECT,
+                    metadata={"json_valid": False, "schema_compliant": False, "api_error": False},
+                ),
+            ),
+        ]
+
+        metric_fn = json_validity()
+        result = metric_fn(scores)
+
+        assert result == 0.5  # 1/2 successful API calls produced valid JSON (API error excluded)
 
     def test_empty_scores(self):
         """Test metric with empty scores list."""
@@ -353,60 +407,84 @@ class TestSchemaComplianceMetric:
         assert result == 0.0  # No valid JSON to check compliance
 
 
-class TestOverallSuccessMetric:
-    """Test the overall success metric."""
+class TestAPISuccessRateMetric:
+    """Test the API success rate metric."""
 
-    def test_all_successful(self):
-        """Test metric with all successful (valid JSON + compliant) scores."""
+    def test_all_api_success(self):
+        """Test metric with all successful API calls (no API errors)."""
         scores = [
             SampleScore(
                 sample_id="1",
                 score=Score(
                     value=CORRECT,
-                    metadata={"json_valid": True, "schema_compliant": True},
-                ),
-            ),
-            SampleScore(
-                sample_id="2",
-                score=Score(
-                    value=CORRECT,
-                    metadata={"json_valid": True, "schema_compliant": True},
-                ),
-            ),
-        ]
-
-        metric_fn = overall_success()
-        result = metric_fn(scores)
-
-        assert result == 1.0  # 2/2 successful
-
-    def test_mixed_success(self):
-        """Test metric with mixed success rates."""
-        scores = [
-            SampleScore(
-                sample_id="1",
-                score=Score(
-                    value=CORRECT,
-                    metadata={"json_valid": True, "schema_compliant": True},
+                    metadata={"json_valid": True, "schema_compliant": True, "api_error": False},
                 ),
             ),
             SampleScore(
                 sample_id="2",
                 score=Score(
                     value=INCORRECT,
-                    metadata={"json_valid": True, "schema_compliant": False},
+                    metadata={"json_valid": True, "schema_compliant": False, "api_error": False},
+                ),
+            ),
+        ]
+
+        metric_fn = api_success_rate()
+        result = metric_fn(scores)
+
+        assert result == 1.0  # 2/2 successful API calls
+
+    def test_mixed_api_success(self):
+        """Test metric with mixed API success rates."""
+        scores = [
+            SampleScore(
+                sample_id="1",
+                score=Score(
+                    value=INCORRECT,
+                    metadata={"json_valid": False, "schema_compliant": False, "api_error": True},
+                ),
+            ),
+            SampleScore(
+                sample_id="2",
+                score=Score(
+                    value=CORRECT,
+                    metadata={"json_valid": True, "schema_compliant": True, "api_error": False},
                 ),
             ),
             SampleScore(
                 sample_id="3",
                 score=Score(
                     value=INCORRECT,
-                    metadata={"json_valid": False, "schema_compliant": False},
+                    metadata={"json_valid": True, "schema_compliant": False, "api_error": False},
                 ),
             ),
         ]
 
-        metric_fn = overall_success()
+        metric_fn = api_success_rate()
         result = metric_fn(scores)
 
-        assert result == 1.0 / 3.0  # 1/3 successful
+        assert result == 2.0 / 3.0  # 2/3 successful API calls
+
+    def test_all_api_errors(self):
+        """Test metric when all API calls fail."""
+        scores = [
+            SampleScore(
+                sample_id="1",
+                score=Score(
+                    value=INCORRECT,
+                    metadata={"json_valid": False, "schema_compliant": False, "api_error": True},
+                ),
+            ),
+            SampleScore(
+                sample_id="2",
+                score=Score(
+                    value=INCORRECT,
+                    metadata={"json_valid": False, "schema_compliant": False, "api_error": True},
+                ),
+            ),
+        ]
+
+        metric_fn = api_success_rate()
+        result = metric_fn(scores)
+
+        assert result == 0.0  # 0/2 successful API calls

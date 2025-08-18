@@ -49,6 +49,8 @@ minversion = "8.0"
 addopts = "-ra -q --strict-markers"
 testpaths = ["tests"]
 pythonpath = ["src", "."]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 markers = [
     "integration: marks tests that require external services (deselect with '-m \"not integration\"')",
 ]

@@ -83,7 +83,7 @@ def schema_compliance() -> Metric:
 @metric
 def api_success_rate() -> Metric:
     """Calculates the percentage of samples that didn't have API errors."""
-
+    # TODO: Change this to only check for structured output related errors
     def metric_calculator(scores: list[SampleScore]) -> Value:
         if not scores:
             return 0.0
