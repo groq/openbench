@@ -1,7 +1,12 @@
 from typing import Dict, List, Tuple
 from datasets import load_dataset  # type: ignore[import-untyped]
 from inspect_ai.dataset import Dataset, Sample, MemoryDataset
-from inspect_ai.model import ChatMessageSystem, ChatMessageUser, ChatMessageAssistant, ChatMessageTool
+from inspect_ai.model import (
+    ChatMessageSystem,
+    ChatMessageUser,
+    ChatMessageAssistant,
+    ChatMessageTool,
+)
 
 JSONSCHEMABENCH_SYSTEM_PROMPT = (
     "You need to generate a JSON object that matches the schema below."
@@ -94,9 +99,9 @@ def _build_messages(
     schema: str, examples: List[Tuple[str, str]]
 ) -> List[ChatMessageSystem | ChatMessageUser | ChatMessageAssistant | ChatMessageTool]:
     """Build message list with few-shot examples."""
-    messages: List[ChatMessageSystem | ChatMessageUser | ChatMessageAssistant | ChatMessageTool] = [
-        ChatMessageSystem(content=JSONSCHEMABENCH_SYSTEM_PROMPT)
-    ]
+    messages: List[
+        ChatMessageSystem | ChatMessageUser | ChatMessageAssistant | ChatMessageTool
+    ] = [ChatMessageSystem(content=JSONSCHEMABENCH_SYSTEM_PROMPT)]
 
     for schema_str, json_str in examples:
         messages.append(ChatMessageUser(content=schema_str))
