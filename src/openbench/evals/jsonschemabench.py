@@ -7,12 +7,38 @@ https://arxiv.org/html/2501.10868
 Dataset: https://huggingface.co/datasets/epfl-dlab/JSONSchemaBench
 """
 
+import json
 from inspect_ai import Task, task
-from inspect_ai.solver import generate
-from inspect_ai.model import GenerateConfig
+from inspect_ai.solver import TaskState, Generate, solver
+from inspect_ai.model import GenerateConfig, ResponseSchema
 
 from openbench.datasets.jsonschemabench import get_dataset
 from openbench.scorers.json_schema import json_schema_scorer
+
+
+@solver
+def structured_output_solver():
+    """Apply structured output using JSON schema from sample metadata."""
+    
+    async def solve(state: TaskState, generate: Generate) -> TaskState:
+        if not state.metadata or "schema" not in state.metadata:
+            return await generate(state)
+        
+        try:
+            schema_str = state.metadata["schema"]
+            schema_dict = json.loads(schema_str)
+            
+            return await generate(state, response_schema=ResponseSchema(
+                name="json_schema_output",
+                json_schema=schema_dict,  # Dict gets auto-converted to JSONSchema
+                strict=True
+            ))
+            
+        except (json.JSONDecodeError, KeyError, ValueError, TypeError):
+            # Fall back to standard generation if schema processing fails
+            return await generate(state)
+    
+    return solve
 
 
 @task
@@ -39,7 +65,7 @@ def jsonschemabench(subset: str | None = None, split: str = "all", num_shots: in
     """
     return Task(
         dataset=get_dataset(subset=subset, split=split, num_shots=num_shots),
-        solver=[generate()],
+        solver=[structured_output_solver()],
         scorer=json_schema_scorer(strip_markdown=strip_markdown),
         name="jsonschemabench",
         config=GenerateConfig(
