@@ -195,7 +195,7 @@ src/openbench/
 5. Update provider table in README.md
 
 ### Key Development Tools
-- **UV**: Package manager (not pip) - use `uv add package==version` for dependencies
+- **UV**: Package manager (not pip) - use `uv add "package>=version"` for dependencies (except inspect-ai which should remain pinned)
 - **Ruff**: Linting and formatting - replaces Black, isort, flake8
 - **MyPy**: Type checking - required for all new code
 - **Pre-commit**: Automated code quality checks - must pass before commits
