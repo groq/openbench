@@ -135,6 +135,48 @@ BENCHMARKS = {
         module_path="openbench.evals.musr",
         function_name="musr",
     ),
+    "musr_murder_mysteries": BenchmarkMetadata(
+        name="MuSR Murder Mysteries",
+        description="MuSR murder mystery scenarios - who is the most likely murderer?",
+        category="core",
+        tags=[
+            "multiple-choice",
+            "reasoning",
+            "commonsense",
+            "chain-of-thought",
+            "murder-mysteries",
+        ],
+        module_path="openbench.evals.musr",
+        function_name="musr_murder_mysteries",
+    ),
+    "musr_object_placements": BenchmarkMetadata(
+        name="MuSR Object Placements",
+        description="MuSR object placement reasoning - where would someone look for an object?",
+        category="core",
+        tags=[
+            "multiple-choice",
+            "reasoning",
+            "commonsense",
+            "chain-of-thought",
+            "object-placements",
+        ],
+        module_path="openbench.evals.musr",
+        function_name="musr_object_placements",
+    ),
+    "musr_team_allocation": BenchmarkMetadata(
+        name="MuSR Team Allocation",
+        description="MuSR team allocation problems - how to allocate people to tasks efficiently?",
+        category="core",
+        tags=[
+            "multiple-choice",
+            "reasoning",
+            "commonsense",
+            "chain-of-thought",
+            "team-allocation",
+        ],
+        module_path="openbench.evals.musr",
+        function_name="musr_team_allocation",
+    ),
     "supergpqa": BenchmarkMetadata(
         name="SuperGPQA",
         description="Scaling LLM Evaluation across 285 Graduate Disciplines - 26,529 multiple-choice questions across science, engineering, medicine, economics, and philosophy",
@@ -364,7 +406,6 @@ BENCHMARKS = {
         function_name="scicode",
         is_alpha=True,
     ),
-    # Cybersecurity benchmarks
     "cti_bench": BenchmarkMetadata(
         name="CTI-Bench",
         description="Comprehensive evaluation framework for cyber threat intelligence understanding with 4 tasks: knowledge questions, vulnerability classification, CVSS scoring, and technique extraction",
@@ -404,6 +445,14 @@ BENCHMARKS = {
         tags=["regression", "cybersecurity"],
         module_path="openbench.evals.cti_bench",
         function_name="cti_bench_vsp",
+    ),
+    "jsonschemabench": BenchmarkMetadata(
+        name="JSONSchemaBench",
+        description="JSON Schema generation benchmark with ~10K real-world schemas from GitHub, Kubernetes, and other sources for evaluating constrained decoding",
+        category="core",
+        tags=["json", "jsonschema", "generation", "constrained-decoding"],
+        module_path="openbench.evals.jsonschemabench",
+        function_name="jsonschemabench",
     ),
 }
 
