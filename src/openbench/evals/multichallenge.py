@@ -31,6 +31,6 @@ def multichallenge(
         ),
         solver=generate(),
         scorer=multichallenge_scorer(model=grader_model),
-        name="openai_mrcr",
+        name="multichallenge",
         config=GenerateConfig(temperature=0.0),
     )

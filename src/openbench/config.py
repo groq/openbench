@@ -34,7 +34,6 @@ class BenchmarkMetadata:
 
 # Benchmark metadata - minimal, no duplication
 BENCHMARKS = {
-    # Graphwalks benchmarks (alpha)
     "multichallenge": BenchmarkMetadata(
         name="MultiChallenge",
         description="Multi-turn conversational tasks requiring reasoning, instruction retention, and coherence.",
@@ -44,6 +43,7 @@ BENCHMARKS = {
         function_name="multichallenge",
         is_alpha=False,
     ),
+    # Graphwalks benchmarks (alpha)
     "graphwalks": BenchmarkMetadata(
         name="GraphWalks",
         description="Multi-hop reasoning on graphs - both BFS and parent finding tasks",
