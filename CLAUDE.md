@@ -5,8 +5,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Essential Setup
 - Always source the virtual environment before running Python commands: `source .venv/bin/activate`
 - This project uses UV as the package manager, not pip
-- **Dependencies must be pinned**: When adding dependencies with UV, always pin to specific versions (e.g., `uv add package==1.2.3` not `uv add package`)
-  - Pin to the latest stable version available to keep dependencies healthy and secure
+- **Dependency management**: When adding dependencies with UV, use >= constraints (e.g., `uv add "package>=1.2.3"`)
+  - Exception: `inspect-ai` must remain pinned to a specific version for stability
+  - Use the latest stable version as the minimum to keep dependencies healthy and secure
   - Check latest versions with `uv pip list --outdated` or on PyPI
 
 ## Key Commands

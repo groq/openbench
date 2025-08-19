@@ -8,6 +8,7 @@ from inspect_ai.model import Model
 
 from openbench.config import load_task
 from openbench.monkeypatch.display_results_patch import patch_display_results
+from openbench._cli.utils import parse_cli_args
 
 
 class SandboxType(str, Enum):
@@ -133,6 +134,22 @@ def run_eval(
         typer.Option(
             help="Model role(s). For example, --model-role grader=groq/meta-llama/llama-4-scout-17b-16e-instruct. Can be specified multiple times.",
             envvar="BENCH_MODEL_ROLE",
+        ),
+    ] = [],
+    m: Annotated[
+        List[str],
+        typer.Option(
+            "-M",
+            help="One or more native model arguments (e.g. -M arg=value)",
+            envvar="BENCH_MODEL_ARGS",
+        ),
+    ] = [],
+    t: Annotated[
+        List[str],
+        typer.Option(
+            "-T",
+            help="One or more task arguments (e.g. -T arg=value)",
+            envvar="BENCH_TASK_ARGS",
         ),
     ] = [],
     logfile: Annotated[
@@ -295,10 +312,22 @@ def run_eval(
             envvar="BENCH_HUB_PRIVATE",
         ),
     ] = False,
+    alpha: Annotated[
+        bool,
+        typer.Option(
+            "--alpha",
+            help="Allow running experimental/alpha benchmarks",
+            envvar="BENCH_ALPHA",
+        ),
+    ] = False,
 ) -> None:
     """
     Run a benchmark on a model.
     """
+    # Parse model and task arguments
+    model_args = parse_cli_args(m) if m else {}
+    task_args = parse_cli_args(t) if t else {}
+
     # Validate and aggregate model_role(s) into a dict
     role_models = {}
     for mr in model_role:
@@ -315,14 +344,14 @@ def run_eval(
         )
 
     # Validate model names
-    for m in model:
-        validate_model_name(m)
+    for model_name in model:
+        validate_model_name(model_name)
 
     # Load tasks from registry
     tasks = []
     for benchmark in benchmarks:
         try:
-            task = load_task(benchmark)
+            task = load_task(benchmark, allow_alpha=alpha)
             tasks.append(task)
         except (ValueError, ImportError, AttributeError) as e:
             raise typer.BadParameter(str(e))
@@ -356,7 +385,9 @@ def run_eval(
             model=model,
             max_connections=max_connections,
             model_base_url=model_base_url,
+            model_args=model_args,
             model_roles=role_models if role_models else None,
+            task_args=task_args,
             epochs=epochs,
             limit=parsed_limit,
             fail_on_error=fail_on_error,

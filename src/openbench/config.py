@@ -28,9 +28,40 @@ class BenchmarkMetadata:
     module_path: str
     function_name: str
 
+    # Alpha/experimental flag
+    is_alpha: bool = False  # Whether this benchmark is experimental/alpha
+
 
 # Benchmark metadata - minimal, no duplication
 BENCHMARKS = {
+    # Graphwalks benchmarks (alpha)
+    "graphwalks": BenchmarkMetadata(
+        name="GraphWalks",
+        description="Multi-hop reasoning on graphs - both BFS and parent finding tasks",
+        category="core",
+        tags=["long-context", "graphs", "reasoning", "alpha"],
+        module_path="openbench.evals.graphwalks",
+        function_name="graphwalks",
+        is_alpha=True,
+    ),
+    "graphwalks_bfs": BenchmarkMetadata(
+        name="GraphWalks BFS",
+        description="Multi-hop reasoning on graphs - BFS traversal tasks only",
+        category="core",
+        tags=["long-context", "graphs", "reasoning", "bfs", "alpha"],
+        module_path="openbench.evals.graphwalks",
+        function_name="graphwalks_bfs",
+        is_alpha=True,
+    ),
+    "graphwalks_parents": BenchmarkMetadata(
+        name="GraphWalks Parents",
+        description="Multi-hop reasoning on graphs - parent finding tasks only",
+        category="core",
+        tags=["long-context", "graphs", "reasoning", "parents", "alpha"],
+        module_path="openbench.evals.graphwalks",
+        function_name="graphwalks_parents",
+        is_alpha=True,
+    ),
     # Core benchmarks
     "mmlu": BenchmarkMetadata(
         name="MMLU (cais/mmlu)",
@@ -103,6 +134,48 @@ BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "commonsense", "chain-of-thought"],
         module_path="openbench.evals.musr",
         function_name="musr",
+    ),
+    "musr_murder_mysteries": BenchmarkMetadata(
+        name="MuSR Murder Mysteries",
+        description="MuSR murder mystery scenarios - who is the most likely murderer?",
+        category="core",
+        tags=[
+            "multiple-choice",
+            "reasoning",
+            "commonsense",
+            "chain-of-thought",
+            "murder-mysteries",
+        ],
+        module_path="openbench.evals.musr",
+        function_name="musr_murder_mysteries",
+    ),
+    "musr_object_placements": BenchmarkMetadata(
+        name="MuSR Object Placements",
+        description="MuSR object placement reasoning - where would someone look for an object?",
+        category="core",
+        tags=[
+            "multiple-choice",
+            "reasoning",
+            "commonsense",
+            "chain-of-thought",
+            "object-placements",
+        ],
+        module_path="openbench.evals.musr",
+        function_name="musr_object_placements",
+    ),
+    "musr_team_allocation": BenchmarkMetadata(
+        name="MuSR Team Allocation",
+        description="MuSR team allocation problems - how to allocate people to tasks efficiently?",
+        category="core",
+        tags=[
+            "multiple-choice",
+            "reasoning",
+            "commonsense",
+            "chain-of-thought",
+            "team-allocation",
+        ],
+        module_path="openbench.evals.musr",
+        function_name="musr_team_allocation",
     ),
     "supergpqa": BenchmarkMetadata(
         name="SuperGPQA",
@@ -334,11 +407,60 @@ BENCHMARKS = {
     ),
       "scicode": BenchmarkMetadata(
         name="SCICode",
-        description="SCICode",
+        description="Scientific computing and programming challenges",
         category="core",
-        tags=["code-generation"],
+        tags=["code-generation", "science", "alpha"],
         module_path="openbench.evals.scicode",
         function_name="scicode",
+        is_alpha=True,
+    ),
+    "cti_bench": BenchmarkMetadata(
+        name="CTI-Bench",
+        description="Comprehensive evaluation framework for cyber threat intelligence understanding with 4 tasks: knowledge questions, vulnerability classification, CVSS scoring, and technique extraction",
+        category="cybersecurity",
+        tags=["cybersecurity", "multi-task"],
+        module_path="openbench.evals.cti_bench",
+        function_name="cti_bench",
+    ),
+    "cti_bench_ate": BenchmarkMetadata(
+        name="CTI-Bench ATE",
+        description="Extracting MITRE ATT&CK techniques from malware and threat descriptions",
+        category="cybersecurity",
+        tags=["extraction", "cybersecurity"],
+        module_path="openbench.evals.cti_bench",
+        function_name="cti_bench_ate",
+    ),
+    "cti_bench_mcq": BenchmarkMetadata(
+        name="CTI-Bench MCQ",
+        description="Multiple-choice questions evaluating understanding of CTI standards, threats, detection strategies, and best practices using authoritative sources like NIST and MITRE",
+        category="cybersecurity",
+        tags=["multiple-choice", "cybersecurity", "knowledge"],
+        module_path="openbench.evals.cti_bench",
+        function_name="cti_bench_mcq",
+    ),
+    "cti_bench_rcm": BenchmarkMetadata(
+        name="CTI-Bench RCM",
+        description="Mapping CVE descriptions to CWE categories to evaluate vulnerability classification ability",
+        category="cybersecurity",
+        tags=["classification", "cybersecurity"],
+        module_path="openbench.evals.cti_bench",
+        function_name="cti_bench_rcm",
+    ),
+    "cti_bench_vsp": BenchmarkMetadata(
+        name="CTI-Bench VSP",
+        description="Calculating CVSS scores from vulnerability descriptions to assess severity evaluation skills",
+        category="cybersecurity",
+        tags=["regression", "cybersecurity"],
+        module_path="openbench.evals.cti_bench",
+        function_name="cti_bench_vsp",
+    ),
+    "jsonschemabench": BenchmarkMetadata(
+        name="JSONSchemaBench",
+        description="JSON Schema generation benchmark with ~10K real-world schemas from GitHub, Kubernetes, and other sources for evaluating constrained decoding",
+        category="core",
+        tags=["json", "jsonschema", "generation", "constrained-decoding"],
+        module_path="openbench.evals.jsonschemabench",
+        function_name="jsonschemabench",
     ),
 }
 
@@ -348,16 +470,32 @@ def get_benchmark_metadata(name: str) -> Optional[BenchmarkMetadata]:
     return BENCHMARKS.get(name)
 
 
-def get_all_benchmarks() -> dict[str, BenchmarkMetadata]:
-    """Get all benchmark metadata."""
-    return BENCHMARKS
+def get_all_benchmarks(include_alpha: bool = False) -> dict[str, BenchmarkMetadata]:
+    """Get all benchmark metadata.
+
+    Args:
+        include_alpha: Whether to include alpha/experimental benchmarks
+    """
+    if include_alpha:
+        return BENCHMARKS
+    return {name: meta for name, meta in BENCHMARKS.items() if not meta.is_alpha}
 
 
-def get_benchmarks_by_category(category: str) -> dict[str, BenchmarkMetadata]:
-    """Get all benchmarks in a category."""
-    return {
+def get_benchmarks_by_category(
+    category: str, include_alpha: bool = False
+) -> dict[str, BenchmarkMetadata]:
+    """Get all benchmarks in a category.
+
+    Args:
+        category: Category to filter by
+        include_alpha: Whether to include alpha/experimental benchmarks
+    """
+    results = {
         name: meta for name, meta in BENCHMARKS.items() if meta.category == category
     }
+    if not include_alpha:
+        results = {name: meta for name, meta in results.items() if not meta.is_alpha}
+    return results
 
 
 def get_categories() -> List[str]:
@@ -365,12 +503,21 @@ def get_categories() -> List[str]:
     return sorted(list(set(meta.category for meta in BENCHMARKS.values())))
 
 
-def search_benchmarks(query: str) -> dict[str, BenchmarkMetadata]:
-    """Search benchmarks by name, description, or tags."""
+def search_benchmarks(
+    query: str, include_alpha: bool = False
+) -> dict[str, BenchmarkMetadata]:
+    """Search benchmarks by name, description, or tags.
+
+    Args:
+        query: Search query
+        include_alpha: Whether to include alpha/experimental benchmarks
+    """
     query = query.lower()
     results = {}
 
     for name, meta in BENCHMARKS.items():
+        if not include_alpha and meta.is_alpha:
+            continue
         if (
             query in meta.name.lower()
             or query in meta.description.lower()
@@ -386,15 +533,20 @@ def search_benchmarks(query: str) -> dict[str, BenchmarkMetadata]:
 # ============================================================================
 
 
-def _generate_task_registry():
-    """Generate task registry from config."""
+def _generate_task_registry(include_alpha: bool = True):
+    """Generate task registry from config.
+
+    Args:
+        include_alpha: Whether to include alpha/experimental benchmarks
+    """
     registry = {}
-    for name, metadata in get_all_benchmarks().items():
+    for name, metadata in get_all_benchmarks(include_alpha=include_alpha).items():
         registry[name] = f"{metadata.module_path}.{metadata.function_name}"
     return registry
 
 
-TASK_REGISTRY = _generate_task_registry()
+# Full registry including alpha benchmarks for backward compatibility
+TASK_REGISTRY = _generate_task_registry(include_alpha=True)
 
 
 def _import_module_from_path(path: Path) -> ModuleType:
@@ -440,12 +592,13 @@ def _import_module_from_path(path: Path) -> ModuleType:
 
 
 @lru_cache()
-def load_task(benchmark_name: str) -> Callable:
+def load_task(benchmark_name: str, allow_alpha: bool = False) -> Callable:
     """
     Loads a task by benchmark name using the registry or from a local path.
 
     Args:
         benchmark_name (str): The name of the benchmark or path to a local eval.
+        allow_alpha (bool): Whether to allow loading alpha/experimental benchmarks.
 
     Returns:
         Callable: The imported function object.
@@ -455,6 +608,14 @@ def load_task(benchmark_name: str) -> Callable:
         ImportError: If the module cannot be imported.
         AttributeError: If the function does not exist in the module.
     """
+    # Check if this is an alpha benchmark
+    benchmark_meta = get_benchmark_metadata(benchmark_name)
+    if benchmark_meta and benchmark_meta.is_alpha and not allow_alpha:
+        raise ValueError(
+            f"'{benchmark_name}' is an experimental/alpha benchmark. "
+            f"Use --alpha flag to run it."
+        )
+
     # Try registry first (registry names take precedence)
     import_path = TASK_REGISTRY.get(benchmark_name)
     if import_path:

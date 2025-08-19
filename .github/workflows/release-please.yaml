@@ -18,6 +18,8 @@ concurrency:
 jobs:
   release:
     runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -26,7 +28,39 @@ jobs:
 
       - name: Run Release Please
         uses: googleapis/release-please-action@v4
+        id: release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: release
+    if: ${{ needs.release.outputs.release_created }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install UV
+        uses: astral-sh/setup-uv@v4
+
+      - name: Set up environment
+        run: |
+          uv venv
+          source .venv/bin/activate
+
+      - name: Build package
+        run: |
+          source .venv/bin/activate
+          uv build
+
+      - name: Publish to PyPI
+        run: |
+          source .venv/bin/activate
+          uv publish --token ${{ secrets.PYPI_API_TOKEN }}

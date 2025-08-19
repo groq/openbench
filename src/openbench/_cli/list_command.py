@@ -32,6 +32,9 @@ def list_evals(
     tags: bool = typer.Option(
         False, "--tags", "-t", help="Show tags for each benchmark"
     ),
+    alpha: bool = typer.Option(
+        False, "--alpha", help="Include experimental/alpha benchmarks"
+    ),
 ) -> None:
     """List available benchmark evaluations with enhanced UI."""
     console = Console()
@@ -42,10 +45,10 @@ def list_evals(
             console.print(f"\n❌ [red]Unknown category: {category}[/red]")
             console.print(f"   Available: {', '.join(sorted(get_categories()))}\n")
             return
-        benchmarks = get_benchmarks_by_category(category)
+        benchmarks = get_benchmarks_by_category(category, include_alpha=alpha)
         evals = [benchmark_to_eval_config(meta) for meta in benchmarks.values()]
     else:
-        all_benchmarks = get_all_benchmarks()
+        all_benchmarks = get_all_benchmarks(include_alpha=alpha)
         evals = [benchmark_to_eval_config(meta) for meta in all_benchmarks.values()]
 
     # Apply search filter
@@ -86,7 +89,7 @@ def list_evals(
         # Get task names for this category
         cat_evals_with_keys = [
             (k, v)
-            for k, v in get_all_benchmarks().items()
+            for k, v in get_all_benchmarks(include_alpha=alpha).items()
             if v.name in [e.name for e in categories[cat_name]]
         ]
         cat_evals_with_keys = sorted(cat_evals_with_keys, key=lambda x: x[0])
@@ -125,9 +128,11 @@ def list_evals(
     # Footer with stats and help
     total_count = len(evals)
     console.print("─" * 60)
-    console.print(
-        f"[dim]Total: {total_count} benchmark{'s' if total_count != 1 else ''}[/dim]"
-    )
+    status_msg = f"[dim]Total: {total_count} benchmark{'s' if total_count != 1 else ''}"
+    if not alpha:
+        status_msg += " (use --alpha to see experimental benchmarks)"
+    status_msg += "[/dim]"
+    console.print(status_msg)
     console.print()
     console.print("[dim]Commands:[/dim]")
     console.print("   bench describe <name> - Show detailed information")
