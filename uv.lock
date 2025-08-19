@@ -2090,15 +2090,15 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "datasets", specifier = "==3.6.0" },
-    { name = "groq", specifier = "==0.30.0" },
+    { name = "datasets", specifier = ">=3.6.0" },
+    { name = "groq", specifier = ">=0.30.0" },
     { name = "inspect-ai", specifier = "==0.3.115" },
-    { name = "openai", specifier = "==1.97.1" },
-    { name = "pydantic-settings", specifier = "==2.9.1" },
+    { name = "openai", specifier = ">=1.97.1" },
+    { name = "pydantic-settings", specifier = ">=2.9.1" },
     { name = "scicode", git = "https://github.com/TheFloatingString/SciCode-fork.git?rev=4f20d721ba3e2227196262083b9b7a70484d54f7" },
-    { name = "scipy", specifier = "==1.15.3" },
-    { name = "tiktoken", specifier = "==0.11.0" },
-    { name = "typer", specifier = "==0.15.3" },
+    { name = "scipy", specifier = ">=1.15.3" },
+    { name = "tiktoken", specifier = ">=0.11.0" },
+    { name = "typer", specifier = ">=0.15.3" },
 ]
 
 [package.metadata.requires-dev]
