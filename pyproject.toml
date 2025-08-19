@@ -14,16 +14,16 @@ authors = [
     { name="Groq" }
 ]
 dependencies = [
-    "datasets==3.6.0",
-    "groq==0.30.0",
+    "datasets>=3.6.0",
+    "groq>=0.30.0",
     "inspect-ai==0.3.115",
-    "jsonschema==4.23.0",
-    "openai==1.97.1",
-    "pydantic-settings==2.9.1",
+    "jsonschema>=4.23.0",
+    "openai>=1.97.1",
+    "pydantic-settings>=2.9.1",
     "scicode",
-    "scipy==1.15.3",
-    "tiktoken==0.11.0",
-    "typer==0.15.3",
+    "scipy>=1.15.3",
+    "tiktoken>=0.11.0",
+    "typer>=0.15.3",
 ]
 
 [project.urls]

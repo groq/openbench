@@ -16,3 +16,4 @@ logs/
 .coverage*
 .claude/settings.local.json
 local-prompts.md
+.env

@@ -110,6 +110,7 @@ OpenBench supports 30+ model providers through Inspect AI. Set the appropriate A
 | **Reka** | `REKA_API_KEY` | `reka/model-name` |
 | **SambaNova** | `SAMBANOVA_API_KEY` | `sambanova/model-name` |
 | **Together AI** | `TOGETHER_API_KEY` | `together/model-name` |
+| **Vercel AI Gateway** | `AI_GATEWAY_API_KEY` | `vercel/creator-name/model-name` |
 | **vLLM** | None (local) | `vllm/model-name` |
 
 ## Available Benchmarks
@@ -243,13 +244,26 @@ cd openbench
 uv venv && uv sync --dev
 source .venv/bin/activate
 
+# CRITICAL: Install pre-commit hooks (CI will fail without this!)
+pre-commit install
+
 # Run tests
 pytest
 ```
 
+⚠️ **IMPORTANT**: You MUST run `pre-commit install` after setup or CI will fail on your PRs!
+
 ## Contributing
 
-We welcome contributions! Please open issues and PRs at [github.com/groq/openbench](https://github.com/groq/openbench).
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for detailed instructions on:
+- Setting up the development environment
+- Adding new benchmarks and model providers
+- Code style and testing requirements
+- Submitting issues and pull requests
+
+Quick links:
+- [Report a bug](https://github.com/groq/openbench/issues/new?assignees=&labels=bug&projects=&template=bug_report.yml)
+- [Request a feature](https://github.com/groq/openbench/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.yml)
 
 
 ## Reproducibility Statement
@@ -275,10 +289,10 @@ This project would not be possible without:
 
 ```bibtex
 @software{openbench,
-  title = {OpenBench: Open-source Evaluation Infrastructure for Language Models},
-  author = {Sah, Aarush and {Groq Team}},
+  title = {OpenBench: Provider-agnostic, open-source evaluation infrastructure for language models},
+  author = {Sah, Aarush},
   year = {2025},
-  url = {https://github.com/groq/openbench}
+  url = {https://openbench.dev}
 }
 ```
 

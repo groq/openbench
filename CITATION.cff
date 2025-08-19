@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+- family-names: "Sah"
+  given-names: "Aarush"
+  orcid: "https://orcid.org/0009-0004-6429-8982"
+title: "OpenBench: Provider-agnostic, open-source evaluation infrastructure for language models"
+version: 0.3.0
+date-released: 2025-07-31
+url: "https://openbench.dev"
+repository-code: "https://github.com/groq/openbench"
+keywords:
+  - "machine learning"
+  - "evaluation"
+  - "benchmarking"
+  - "language models"
+  - "LLM"
+  - "artificial intelligence"
+license: MIT
