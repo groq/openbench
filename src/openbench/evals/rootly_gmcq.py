@@ -25,8 +25,8 @@ from inspect_ai import Task, task
 from inspect_ai.solver import TaskState, Generate, solver
 from inspect_ai.model import get_model, GenerateConfig
 
-from openbench.scorers.gmcq import custom_scorer
-from openbench.datasets.gmcq import load_dataset
+from openbench.scorers.rootly_gmcq import custom_scorer
+from openbench.datasets.rootly_gmcq import load_dataset
 
 
 @solver
@@ -42,7 +42,7 @@ def custom_solver():
 
 
 @task
-def gmcq(subtask: str = None) -> Task:  # type: ignore
+def rootly_gmcq(subtask: str = None) -> Task:  # type: ignore
     dataset = load_dataset(subtask)
     return Task(
         dataset=dataset,

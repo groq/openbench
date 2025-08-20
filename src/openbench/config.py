@@ -446,13 +446,13 @@ BENCHMARKS = {
         module_path="openbench.evals.cti_bench",
         function_name="cti_bench_vsp",
     ),
-    "gmcq": BenchmarkMetadata(
+    "rootly_gmcq": BenchmarkMetadata(
         name="GMCQ",
         description="GitHub Multiple Choice Questions",
         category="core",
         tags=["code-understanding"],
-        module_path="openbench.evals.gmcq",
-        function_name="gmcq",
+        module_path="openbench.evals.rootly_gmcq",
+        function_name="rootly_gmcq",
     ),
     "jsonschemabench": BenchmarkMetadata(
         name="JSONSchemaBench",
