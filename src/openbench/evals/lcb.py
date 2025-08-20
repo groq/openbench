@@ -413,7 +413,7 @@ def custom_solver(SCENARIO: str):
 
         return solve
     else:
-        return ValueError(f"Invalid scenario: {SCENARIO}")
+        raise ValueError(f"Invalid scenario: {SCENARIO}")
 
 
 @solver

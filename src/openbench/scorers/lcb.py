@@ -23,7 +23,7 @@ def custom_scorer(SCENARIO: str, VERIFY_TIMEOUT: int = 30):
 
                 return Score(value=0.0)
         else:
-            return ValueError(f"Invalid scenario: {SCENARIO}")
+            raise ValueError(f"Invalid scenario: {SCENARIO}")
 
     return score
 
@@ -44,6 +44,6 @@ def test_output_prediction_scorer(SCENARIO: str):
             else:
                 return Score(value=0.0)
         else:
-            return ValueError(f"Invalid scenario: {SCENARIO}")
+            raise ValueError(f"Invalid scenario: {SCENARIO}")
 
     return score
