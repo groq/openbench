@@ -8,7 +8,7 @@ Koushik Sen, Ion Stoica
 Based on: https://livecodebench.github.io/
 
 # run code generation
-bench eval lcb --model "groq/llama-3.1-8b-instant" --T scenario=code_generation,release_version="release_version"
+bench eval lcb --model "groq/llama-3.1-8b-instant" -T scenario=code_generation -T release_version="release_version"
 
 Please note: due to datasets dependency issues, pleaes keep datasets==4.0.0.
 However, if you do not have the LiveCodeBench dataset cached through the HuggingFace dataset cache,
@@ -482,6 +482,9 @@ def test_output_prediction_solver():
     return solve
 
 
+VERBOSE: bool = False
+
+
 @task
 def lcb(
     scenario: str = "codegeneration",
@@ -493,6 +496,13 @@ def lcb(
     """
     Inspect Task implementation for LCB
     """
+
+    if VERBOSE:
+        print(f"Scenario: {scenario}")
+        print(f"Release version: {release_version}")
+        print(f"Start date: {start_date}")
+        print(f"End date: {end_date}")
+        print(f"Sandbox: {sandbox}")
 
     # TODO: if needed in the future, make scenario required (not optional)
 

@@ -405,7 +405,7 @@ BENCHMARKS = {
         module_path="openbench.evals.lcb",
         function_name="lcb",
     ),
-      "scicode": BenchmarkMetadata(
+    "scicode": BenchmarkMetadata(
         name="SCICode",
         description="Scientific computing and programming challenges",
         category="core",
