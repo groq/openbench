@@ -19,8 +19,6 @@ There are 6 subtasks as of Tuesday, August 19, 2025, and the None option for the
 - mastodon
 - tailscale
 - None
-
-
 """
 
 from inspect_ai import Task, task
