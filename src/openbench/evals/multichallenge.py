@@ -5,11 +5,13 @@ from inspect_ai.solver import generate
 from openbench.datasets.multichallenge import get_dataset
 from openbench.scorers.multichallenge import multichallenge_scorer
 
+
 @task
 def multichallenge(
     grader_model: str = "openai/o3-mini-2025-01-31",
     limit: Optional[int] = None,
-    max_turns: Optional[int] = None) -> Task:
+    max_turns: Optional[int] = None,
+) -> Task:
     """
     MultiChallenge evaluation task.
 
