@@ -34,6 +34,15 @@ class BenchmarkMetadata:
 
 # Benchmark metadata - minimal, no duplication
 BENCHMARKS = {
+    "multichallenge": BenchmarkMetadata(
+        name="MultiChallenge",
+        description="Multi-turn conversational tasks requiring reasoning, instruction retention, and coherence.",
+        category="core",
+        tags=["multi-turn", "reasoning", "chat", "judged", "alpha"],
+        module_path="openbench.evals.multichallenge",
+        function_name="multichallenge",
+        is_alpha=False,
+    ),
     # Graphwalks benchmarks (alpha)
     "graphwalks": BenchmarkMetadata(
         name="GraphWalks",
