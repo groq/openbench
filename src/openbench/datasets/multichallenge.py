@@ -1,18 +1,3 @@
-"""
-MultiChallenge dataset adapter for OpenBench (Inspect).
-
-Expects a JSONL where each line has:
-- QUESTION_ID (str)
-- AXIS (str) – e.g., INFERENCE_MEMORY, SELF_COHERENCE, INSTRUCTION_RETENTION
-- CONVERSATION (list[{"role": "user"|"assistant", "content": str}])
-- TARGET_QUESTION (str)
-- PASS_CRITERIA (str) – "YES" or "NO"
-
-Usage in an eval task:
-    from openbench.datasets.multichallenge import get_dataset
-    ds = get_dataset(jsonl_path="data/benchmark_questions.jsonl", axes=["INFERENCE_MEMORY"])
-"""
-
 from __future__ import annotations
 
 from typing import Any, Callable, Dict, Optional
@@ -28,16 +13,9 @@ def record_to_sample(
     Return a mapping function that converts a MultiChallenge JSONL record
     into an Inspect `Sample`.
 
-    Parameters
-    ----------
-    max_turns : Optional[int]
-        If provided, truncate the conversation to the last `max_turns` messages
-        (useful for quick local runs).
-
-    Returns
-    -------
-    FieldSpec | Callable[[dict], Sample]
-        Mapper suitable for `json_dataset(..., sample_fields=...)`.
+    Args:
+        max_turns : If provided, truncate the conversation to the last
+        `max_turns` messages (for quick local runs).
     """
 
     def _map(record: Dict[str, Any]) -> Sample:
@@ -58,7 +36,7 @@ def record_to_sample(
             elif role == "assistant":
                 messages.append(ChatMessageAssistant(content=content))
             else:
-                # Fallback: treat unknown roles as user prompts
+                # fallback: treat unknown roles as user prompts
                 messages.append(ChatMessageUser(content=content))
 
         meta = {
@@ -68,7 +46,7 @@ def record_to_sample(
             "pass_criteria": record["PASS_CRITERIA"],
         }
 
-        # Target is optional for judge-based scoring; keep pass_criteria for reference
+        # target is optional for judge-based scoring; keep pass_criteria for reference
         return Sample(input=messages, target=record["PASS_CRITERIA"], metadata=meta)
 
     return _map
@@ -81,7 +59,7 @@ def get_dataset(
     """
     Load the MultiChallenge dataset as an Inspect/OpenBench Dataset.
 
-    Args
+    Args:
         limit : Optional[int]: limit the number of samples
         max_turns : Optional[int]: truncate each conversation to the last `max_turns` messages
 

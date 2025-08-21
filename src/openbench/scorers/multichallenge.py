@@ -53,6 +53,16 @@ def _parse_verdict(text: str) -> Dict[str, Any]:
 
 @metric
 def multichallenge_metrics():
+    """
+    Aggregate per-axis pass rates for MultiChallenge tasks.
+
+    Groups scores by (axis, question_id) and marks a question as "passed"
+    on an axis if it passed at least once. Then computes:
+
+      * axis_<axis>: fraction of passed questions for each axis
+      * overall_multichallenge: average across all axes
+    """
+
     def metric_fn(scores: List[Score]) -> Dict[str, float]:
         from collections import defaultdict
 
@@ -86,6 +96,21 @@ def multichallenge_metrics():
 def multichallenge_scorer(
     model: str = "openai/o3-mini-2025-01-31",
 ) -> Callable[[TaskState, Target], Score]:
+    """
+    MultiChallenge scorer.
+
+    Uses a secondary "judge" model to evaluate free-form response to a
+    target question. The judge model produces a structured verdict (PASS/FAIL)
+    along with reasoning, which is parsed and compared against expected criteria.
+
+    Args:
+        model: Model identifier for the judging model used to evaluate responses.
+               Defaults to `openai/o3-mini-2025-01-31`.
+
+    Returns:
+        Scorer function that executes the judge model, parses its verdict,
+        and produces a Score with accuracy and diagnostic metadata.
+    """
     model = get_model(model)
 
     async def score(state: TaskState, target: Target) -> Score:
