@@ -453,7 +453,7 @@ BENCHMARKS = {
         tags=["json", "jsonschema", "generation", "constrained-decoding"],
         module_path="openbench.evals.jsonschemabench",
         function_name="jsonschemabench",
-        is_alpha=True,
+        is_alpha=False,
     ),
 }
 

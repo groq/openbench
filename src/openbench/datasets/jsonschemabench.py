@@ -1,3 +1,5 @@
+import json
+import copy
 from typing import Dict, List, Tuple
 from datasets import load_dataset  # type: ignore[import-untyped]
 from inspect_ai.dataset import Dataset, Sample, MemoryDataset
@@ -7,6 +9,57 @@ from inspect_ai.model import (
     ChatMessageAssistant,
     ChatMessageTool,
 )
+
+
+# Schema adaptation functions (copied from JSONSchemaBench)
+def add_root_type_if_missing(schema: dict) -> None:
+    """Add type: object if missing from schema root."""
+    if "type" not in schema:
+        schema["type"] = "object"
+
+
+def recursively_set_additional_properties_false(schema: dict) -> None:
+    """Recursively add additionalProperties: false to objects with properties."""
+    if not isinstance(schema, dict):
+        return
+    if (
+        "additionalProperties" not in schema or schema["additionalProperties"]
+    ) and schema.get("properties"):
+        schema["additionalProperties"] = False
+    if "properties" in schema:
+        for prop in schema["properties"]:
+            recursively_set_additional_properties_false(schema["properties"][prop])
+    if "items" in schema:
+        recursively_set_additional_properties_false(schema["items"])
+
+
+def set_all_properties_required(schema: dict) -> dict:
+    """Recursively make all properties required in objects."""
+    if not isinstance(schema, dict):
+        return schema
+    if "properties" in schema:
+        schema["required"] = list(schema["properties"].keys())
+    for value in schema.values():
+        if isinstance(value, dict):
+            set_all_properties_required(value)
+        elif isinstance(value, list):
+            for item in value:
+                set_all_properties_required(item)
+    return schema
+
+
+def adapt_schema_for_openai(schema_str: str) -> str:
+    """Adapt schema using JSONSchemaBench-style modifications for OpenAI compatibility."""
+    schema_dict = json.loads(schema_str)
+    adapted_schema = copy.deepcopy(schema_dict)
+
+    # Match exact order from JSONSchemaBench
+    recursively_set_additional_properties_false(adapted_schema)
+    add_root_type_if_missing(adapted_schema)
+    adapted_schema = set_all_properties_required(adapted_schema)
+
+    return json.dumps(adapted_schema)
+
 
 JSONSCHEMABENCH_SYSTEM_PROMPT = (
     "You need to generate a JSON object that matches the schema below."
@@ -112,29 +165,43 @@ def _build_messages(
 
 
 def record_to_sample(
-    record: dict, num_shots: int = 0, subset: str | None = None
+    record: dict,
+    num_shots: int = 0,
+    subset: str | None = None,
+    adapt_schema: bool = False,
 ) -> Sample:
     """Convert HuggingFace dataset record to Inspect Sample with few-shot prompting."""
-    schema = record["json_schema"]
+    original_schema = record["json_schema"]
     unique_id = record["unique_id"]
 
-    # Build few-shot prompt if requested
+    # Apply schema adaptation if requested
+    if adapt_schema:
+        adapted_schema = adapt_schema_for_openai(original_schema)
+    else:
+        adapted_schema = original_schema
+
+    # Build few-shot prompt if requested (use adapted schema for prompt)
     examples = _get_few_shot_examples(subset, num_shots)
-    messages = _build_messages(schema, examples)
+    messages = _build_messages(adapted_schema, examples)
 
     return Sample(
         input=messages,
         target="",
         metadata={
-            "schema": schema,
+            "schema": adapted_schema,  # Use adapted schema for structured output
+            "original_schema": original_schema,  # Keep original for comparison
             "unique_id": unique_id,
             "num_shots": num_shots,
+            "adapted": adapt_schema,
         },
     )
 
 
 def get_dataset(
-    subset: str | None = None, split: str = "all", num_shots: int = 0
+    subset: str | None = None,
+    split: str = "all",
+    num_shots: int = 0,
+    adapt_schema: bool = False,
 ) -> Dataset:
     """Load JSONSchemaBench dataset from HuggingFace with few-shot examples.
 
@@ -142,6 +209,7 @@ def get_dataset(
         subset: Dataset subset (e.g., "Github_easy", "Kubernetes", "Snowplow")
         split: Dataset split ("test", "val", "train", or "all")
         num_shots: Number of few-shot examples (0 for zero-shot, paper used 2)
+        adapt_schema: Whether to apply JSONSchemaBench-style schema adaptation
     """
     split_param = {
         "test": "test",
@@ -155,7 +223,9 @@ def get_dataset(
         "epfl-dlab/JSONSchemaBench", config, split=split_param[split]
     )
     samples = [
-        record_to_sample(record, num_shots=num_shots, subset=subset)
+        record_to_sample(
+            record, num_shots=num_shots, subset=subset, adapt_schema=adapt_schema
+        )
         for record in dataset
     ]
     return MemoryDataset(samples=samples, name=name)
