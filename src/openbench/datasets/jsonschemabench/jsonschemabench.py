@@ -52,7 +52,7 @@ def _filter_records_by_compatibility(
     compatible_ids = COMPATIBILITY_FUNCTIONS[compatibility]()
 
     if not compatible_ids:
-        return records
+        return list(records)
 
     return [record for record in records if record["unique_id"] in compatible_ids]
 
