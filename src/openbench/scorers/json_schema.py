@@ -1,4 +1,5 @@
 import json
+import logging
 from typing import Callable
 from jsonschema import Draft202012Validator, ValidationError, FormatChecker
 from inspect_ai.solver import TaskState
@@ -15,6 +16,9 @@ from inspect_ai.scorer import (
     accuracy,
     stderr,
 )
+
+# Create logger for successful API calls
+logger = logging.getLogger(__name__)
 
 
 def _strip_markdown(text: str) -> str:
@@ -136,6 +140,16 @@ def json_schema_scorer(strip_markdown: bool = True) -> Callable:
                     "error": f"api_error: {state.output.error}",
                 },
             )
+
+        # Log successful API call with unique ID
+        unique_id = (
+            state.metadata.get("unique_id", "unknown") if state.metadata else "unknown"
+        )
+        logger.info(f"Successful API call for record: {unique_id}")
+
+        # Also write to a file for easier extraction
+        with open("successful_api_calls.txt", "a") as f:
+            f.write(f"{unique_id}\n")
 
         # Extract schema from sample metadata
         if not state.metadata or "schema" not in state.metadata:

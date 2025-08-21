@@ -1,6 +1,8 @@
 import json
 import copy
-from typing import Dict, List, Tuple
+from enum import StrEnum
+from pathlib import Path
+from typing import Dict, List, Tuple, Set, Iterable
 from datasets import load_dataset  # type: ignore[import-untyped]
 from inspect_ai.dataset import Dataset, Sample, MemoryDataset
 from inspect_ai.model import (
@@ -9,6 +11,50 @@ from inspect_ai.model import (
     ChatMessageAssistant,
     ChatMessageTool,
 )
+
+
+class Compatibility(StrEnum):
+    """Compatibility modes for filtering records."""
+
+    DEFAULT = "default"
+    OPENAI = "openai"
+
+
+def get_openai_compatible_ids() -> Set[str]:
+    """Load the set of OpenAI-compatible record IDs."""
+    ids_file = Path(__file__).parent / "openai_compatible_ids.txt"
+    with open(ids_file, "r") as f:
+        return {line.strip() for line in f if line.strip()}
+
+
+def get_default_compatible_ids() -> Set[str]:
+    """Return empty set for default compatibility (no filtering)."""
+    return set()
+
+
+COMPATIBILITY_FUNCTIONS = {
+    Compatibility.DEFAULT: get_default_compatible_ids,
+    Compatibility.OPENAI: get_openai_compatible_ids,
+}
+
+
+def filter_records_by_compatibility(
+    records: Iterable[Dict], compatibility: Compatibility
+) -> List[Dict]:
+    """Filter dataset records based on API compatibility."""
+    if compatibility not in COMPATIBILITY_FUNCTIONS:
+        available_modes = list(COMPATIBILITY_FUNCTIONS.keys())
+        raise ValueError(
+            f"Unsupported compatibility mode: {compatibility}. "
+            f"Available modes: {', '.join(str(m) for m in available_modes)}"
+        )
+
+    compatible_ids = COMPATIBILITY_FUNCTIONS[compatibility]()
+
+    if not compatible_ids:
+        return records
+
+    return [record for record in records if record["unique_id"] in compatible_ids]
 
 
 # Schema adaptation functions (copied from JSONSchemaBench)
@@ -202,6 +248,7 @@ def get_dataset(
     split: str = "all",
     num_shots: int = 0,
     adapt_schema: bool = False,
+    compatibility: Compatibility = Compatibility.DEFAULT,
 ) -> Dataset:
     """Load JSONSchemaBench dataset from HuggingFace with few-shot examples.
 
@@ -210,6 +257,7 @@ def get_dataset(
         split: Dataset split ("test", "val", "train", or "all")
         num_shots: Number of few-shot examples (0 for zero-shot, paper used 2)
         adapt_schema: Whether to apply JSONSchemaBench-style schema adaptation
+        compatibility: Filter to records compatible with specific APIs
     """
     split_param = {
         "test": "test",
@@ -222,10 +270,14 @@ def get_dataset(
     dataset = load_dataset(
         "epfl-dlab/JSONSchemaBench", config, split=split_param[split]
     )
+
+    # Filter records by compatibility
+    filtered_records = filter_records_by_compatibility(dataset, compatibility)
+
     samples = [
         record_to_sample(
             record, num_shots=num_shots, subset=subset, adapt_schema=adapt_schema
         )
-        for record in dataset
+        for record in filtered_records
     ]
     return MemoryDataset(samples=samples, name=name)

@@ -13,7 +13,7 @@ from inspect_ai import Task, task
 from inspect_ai.solver import TaskState, Generate, solver
 from inspect_ai.model import GenerateConfig, ResponseSchema, ModelOutput
 
-from openbench.datasets.jsonschemabench import get_dataset
+from openbench.datasets.jsonschemabench import get_dataset, Compatibility
 from openbench.scorers.json_schema import json_schema_scorer
 
 
@@ -64,6 +64,7 @@ def jsonschemabench(
     use_response_schema: bool = False,
     strict: bool = False,
     adapt_schema: bool = True,
+    compatibility: Compatibility = Compatibility.DEFAULT,
 ) -> Task:
     """JSONSchemaBench: A Rigorous Benchmark of Structured Outputs
     for Language Models.
@@ -86,13 +87,18 @@ def jsonschemabench(
         use_response_schema: Whether to use ResponseSchema validation when supported (default False)
         strict: Whether to use strict mode for structured output (default False)
         adapt_schema: Whether to adapt schemas for better provider compatibility (default True)
+        compatibility: Filter to records compatible with specific APIs (default: no filtering)
 
     Returns:
         Task configured for JSONSchemaBench evaluation
     """
     return Task(
         dataset=get_dataset(
-            subset=subset, split=split, num_shots=num_shots, adapt_schema=adapt_schema
+            subset=subset,
+            split=split,
+            num_shots=num_shots,
+            adapt_schema=adapt_schema,
+            compatibility=compatibility,
         ),
         solver=[
             response_schema_solver(
