@@ -84,14 +84,18 @@ def browsecomp_scorer(model: str = "openai/gpt-4.1-2025-04-14") -> Callable:
         # Extract whether the answer is correct
         # Look for "correct: yes" or "correct: no" in the response
         match = re.search(r"correct:\s*(yes|no)", grading_text, re.IGNORECASE)
-        is_correct = match.group(1).lower() == "yes" if match else False
+        is_correct = (
+            (match.group(1).lower() == "yes") if (match and match.group(1)) else False
+        )
 
         # Extract confidence if available
         confidence_match = re.search(
             r"confidence:\s*(\d+)(?:\s*%)?", grading_text, re.IGNORECASE
         )
         confidence = (
-            int(confidence_match.group(1)) if confidence_match else 100
+            int(confidence_match.group(1))
+            if (confidence_match and confidence_match.group(1))
+            else 100
         )  # Default to 100 if not found
 
         # Return score with metadata
