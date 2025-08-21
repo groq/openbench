@@ -193,6 +193,14 @@ BENCHMARKS = {
         module_path="openbench.evals.simpleqa",
         function_name="simpleqa",
     ),
+    "browsecomp": BenchmarkMetadata(
+        name="BrowseComp",
+        description="A Simple Yet Challenging Benchmark for Browsing Agents - evaluates model performance on browsing-related tasks",
+        category="core",
+        tags=["browsing", "web", "reasoning", "graded"],
+        module_path="openbench.evals.browsecomp",
+        function_name="browsecomp",
+    ),
     "hle": BenchmarkMetadata(
         name="Humanity's Last Exam",
         description="Multi-modal benchmark at the frontier of human knowledge - 2,500 questions across mathematics, humanities, and natural sciences designed by subject-matter experts globally",

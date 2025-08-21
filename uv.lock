@@ -2070,6 +2070,7 @@ dependencies = [
     { name = "datasets" },
     { name = "groq" },
     { name = "inspect-ai" },
+    { name = "jsonschema" },
     { name = "openai" },
     { name = "pydantic-settings" },
     { name = "scicode" },
@@ -2083,8 +2084,10 @@ dev = [
     { name = "mypy" },
     { name = "pre-commit" },
     { name = "pytest" },
+    { name = "pytest-asyncio" },
     { name = "pytest-cov" },
     { name = "ruff" },
+    { name = "types-jsonschema" },
     { name = "types-pyyaml" },
 ]
 
@@ -2093,6 +2096,7 @@ requires-dist = [
     { name = "datasets", specifier = ">=3.6.0" },
     { name = "groq", specifier = ">=0.30.0" },
     { name = "inspect-ai", specifier = "==0.3.115" },
+    { name = "jsonschema", specifier = ">=4.23.0" },
     { name = "openai", specifier = ">=1.97.1" },
     { name = "pydantic-settings", specifier = ">=2.9.1" },
     { name = "scicode", git = "https://github.com/TheFloatingString/SciCode-fork.git?rev=4f20d721ba3e2227196262083b9b7a70484d54f7" },
@@ -2106,8 +2110,10 @@ dev = [
     { name = "mypy", specifier = ">=1.15.0" },
     { name = "pre-commit", specifier = ">=4.2.0" },
     { name = "pytest", specifier = ">=8.3.5" },
+    { name = "pytest-asyncio", specifier = "==0.24.0" },
     { name = "pytest-cov", specifier = ">=4.1.0" },
     { name = "ruff", specifier = ">=0.11.9" },
+    { name = "types-jsonschema", specifier = ">=4.0.0" },
     { name = "types-pyyaml", specifier = ">=6.0.12.20250809" },
 ]
 
@@ -2666,6 +2672,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/ae/3c/c9d525a414d506893f0cd8a8d0de7706446213181570cdbd766691164e40/pytest-8.3.5.tar.gz", hash = "sha256:f4efe70cc14e511565ac476b57c279e12a855b11f48f212af1080ef2263d3845", size = 1450891, upload-time = "2025-03-02T12:54:54.503Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/30/3d/64ad57c803f1fa1e963a7946b6e0fea4a70df53c1a7fed304586539c2bac/pytest-8.3.5-py3-none-any.whl", hash = "sha256:c69214aa47deac29fad6c2a4f590b9c4a9fdb16a403176fe154b79c0b4d4d820", size = 343634, upload-time = "2025-03-02T12:54:52.069Z" },
+]
+
+[[package]]
+name = "pytest-asyncio"
+version = "0.24.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/52/6d/c6cf50ce320cf8611df7a1254d86233b3df7cc07f9b5f5cbcb82e08aa534/pytest_asyncio-0.24.0.tar.gz", hash = "sha256:d081d828e576d85f875399194281e92bf8a68d60d72d1a2faf2feddb6c46b276", size = 49855, upload-time = "2024-08-22T08:03:18.145Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/96/31/6607dab48616902f76885dfcf62c08d929796fc3b2d2318faf9fd54dbed9/pytest_asyncio-0.24.0-py3-none-any.whl", hash = "sha256:a811296ed596b69bf0b6f3dc40f83bcaf341b155a269052d82efa2b25ac7037b", size = 18024, upload-time = "2024-08-22T08:03:15.536Z" },
 ]
 
 [[package]]
@@ -3319,6 +3337,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/98/1a/5f36851f439884bcfe8539f6a20ff7516e7b60f319bbaf69a90dc35cc2eb/typer-0.15.3.tar.gz", hash = "sha256:818873625d0569653438316567861899f7e9972f2e6e0c16dab608345ced713c", size = 101641, upload-time = "2025-04-28T21:40:59.204Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/48/20/9d953de6f4367163d23ec823200eb3ecb0050a2609691e512c8b95827a9b/typer-0.15.3-py3-none-any.whl", hash = "sha256:c86a65ad77ca531f03de08d1b9cb67cd09ad02ddddf4b34745b5008f43b239bd", size = 45253, upload-time = "2025-04-28T21:40:56.269Z" },
+]
+
+[[package]]
+name = "types-jsonschema"
+version = "4.25.1.20250821"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "referencing" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ff/7b/bd0a0f942beec6a4540c604a1a9f1c52a82f6fb0d915c6b2f8810bbd5590/types_jsonschema-4.25.1.20250821.tar.gz", hash = "sha256:4a2d744a3dd284d2b13423466d7584917bb050c493ac09e1a361d4feed92aaed", size = 15511, upload-time = "2025-08-21T03:01:52.076Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/96/b8/c92fa726786f503a95b02033f1739404c49db9d2a7b56ff50207a22cdb9a/types_jsonschema-4.25.1.20250821-py3-none-any.whl", hash = "sha256:73e22048556bfd097d58883b203ff298a2dbece0d76b35115dbee0dad9b02bab", size = 15798, upload-time = "2025-08-21T03:01:50.848Z" },
 ]
 
 [[package]]
