@@ -405,6 +405,14 @@ BENCHMARKS = {
         module_path="openbench.evals.matharena.hmmt_feb_2025.hmmt_feb_2025",
         function_name="hmmt_feb_2025",
     ),
+    "boolq": BenchmarkMetadata(
+        name="BoolQ",
+        description="BoolQ: A Question Answering Dataset for Boolean Reasoning",
+        category="core",
+        tags=["boolean-reasoning", "question-answering"],
+        module_path="openbench.evals.boolq",
+        function_name="boolq",
+    ),
     "scicode": BenchmarkMetadata(
         name="SciCode",
         description="Scientific computing and programming challenges",
