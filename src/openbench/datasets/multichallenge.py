@@ -1,7 +1,5 @@
 from __future__ import annotations
-
 from typing import Any, Callable, Dict, Optional
-
 from inspect_ai.dataset import FieldSpec, Sample, json_dataset, Dataset
 from inspect_ai.model import ChatMessageUser, ChatMessageAssistant
 
@@ -14,8 +12,8 @@ def record_to_sample(
     into an Inspect `Sample`.
 
     Args:
-        max_turns : If provided, truncate the conversation to the last
-        `max_turns` messages (for quick local runs).
+        max_turns : If provided, truncate the conversation to the last `max_turns` 
+        messages (for quick local runs).
     """
 
     def _map(record: Dict[str, Any]) -> Sample:
