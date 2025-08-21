@@ -136,7 +136,7 @@ def multichallenge_scorer(
 
         explanation = (
             f"Judge verdict: {verdict} | Expected: {pass_criteria}\n"
-            f"Reasoning: {parsed.get('reasoning','')[:2000]}"
+            f"Reasoning: {parsed.get('reasoning', '')[:2000]}"
         )
 
         return Score(

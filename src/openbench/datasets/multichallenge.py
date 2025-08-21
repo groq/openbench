@@ -12,7 +12,7 @@ def record_to_sample(
     into an Inspect `Sample`.
 
     Args:
-        max_turns : If provided, truncate the conversation to the last `max_turns` 
+        max_turns : If provided, truncate the conversation to the last `max_turns`
         messages (for quick local runs).
     """
 
