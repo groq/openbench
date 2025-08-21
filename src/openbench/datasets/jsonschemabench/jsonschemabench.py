@@ -20,25 +20,25 @@ class Compatibility(StrEnum):
     OPENAI = "openai"
 
 
-def get_openai_compatible_ids() -> Set[str]:
+def _get_openai_compatible_ids() -> Set[str]:
     """Load the set of OpenAI-compatible record IDs."""
     ids_file = Path(__file__).parent / "openai_compatible_ids.txt"
     with open(ids_file, "r") as f:
         return {line.strip() for line in f if line.strip()}
 
 
-def get_default_compatible_ids() -> Set[str]:
+def _get_default_compatible_ids() -> Set[str]:
     """Return empty set for default compatibility (no filtering)."""
     return set()
 
 
 COMPATIBILITY_FUNCTIONS = {
-    Compatibility.DEFAULT: get_default_compatible_ids,
-    Compatibility.OPENAI: get_openai_compatible_ids,
+    Compatibility.DEFAULT: _get_default_compatible_ids,
+    Compatibility.OPENAI: _get_openai_compatible_ids,
 }
 
 
-def filter_records_by_compatibility(
+def _filter_records_by_compatibility(
     records: Iterable[Dict], compatibility: Compatibility
 ) -> List[Dict]:
     """Filter dataset records based on API compatibility."""
@@ -58,13 +58,13 @@ def filter_records_by_compatibility(
 
 
 # Schema adaptation functions (copied from JSONSchemaBench)
-def add_root_type_if_missing(schema: dict) -> None:
+def _add_root_type_if_missing(schema: dict) -> None:
     """Add type: object if missing from schema root."""
     if "type" not in schema:
         schema["type"] = "object"
 
 
-def recursively_set_additional_properties_false(schema: dict) -> None:
+def _recursively_set_additional_properties_false(schema: dict) -> None:
     """Recursively add additionalProperties: false to objects with properties."""
     if not isinstance(schema, dict):
         return
@@ -74,12 +74,12 @@ def recursively_set_additional_properties_false(schema: dict) -> None:
         schema["additionalProperties"] = False
     if "properties" in schema:
         for prop in schema["properties"]:
-            recursively_set_additional_properties_false(schema["properties"][prop])
+            _recursively_set_additional_properties_false(schema["properties"][prop])
     if "items" in schema:
-        recursively_set_additional_properties_false(schema["items"])
+        _recursively_set_additional_properties_false(schema["items"])
 
 
-def set_all_properties_required(schema: dict) -> dict:
+def _set_all_properties_required(schema: dict) -> dict:
     """Recursively make all properties required in objects."""
     if not isinstance(schema, dict):
         return schema
@@ -87,22 +87,22 @@ def set_all_properties_required(schema: dict) -> dict:
         schema["required"] = list(schema["properties"].keys())
     for value in schema.values():
         if isinstance(value, dict):
-            set_all_properties_required(value)
+            _set_all_properties_required(value)
         elif isinstance(value, list):
             for item in value:
-                set_all_properties_required(item)
+                _set_all_properties_required(item)
     return schema
 
 
-def adapt_schema_for_openai(schema_str: str) -> str:
+def _adapt_schema(schema_str: str) -> str:
     """Adapt schema using JSONSchemaBench-style modifications for OpenAI compatibility."""
     schema_dict = json.loads(schema_str)
     adapted_schema = copy.deepcopy(schema_dict)
 
     # Match exact order from JSONSchemaBench
-    recursively_set_additional_properties_false(adapted_schema)
-    add_root_type_if_missing(adapted_schema)
-    adapted_schema = set_all_properties_required(adapted_schema)
+    _recursively_set_additional_properties_false(adapted_schema)
+    _add_root_type_if_missing(adapted_schema)
+    adapted_schema = _set_all_properties_required(adapted_schema)
 
     return json.dumps(adapted_schema)
 
@@ -210,7 +210,7 @@ def _build_messages(
     return messages
 
 
-def record_to_sample(
+def _record_to_sample(
     record: dict,
     num_shots: int = 0,
     subset: str | None = None,
@@ -222,7 +222,7 @@ def record_to_sample(
 
     # Apply schema adaptation if requested
     if adapt_schema:
-        adapted_schema = adapt_schema_for_openai(original_schema)
+        adapted_schema = _adapt_schema(original_schema)
     else:
         adapted_schema = original_schema
 
@@ -272,10 +272,10 @@ def get_dataset(
     )
 
     # Filter records by compatibility
-    filtered_records = filter_records_by_compatibility(dataset, compatibility)
+    filtered_records = _filter_records_by_compatibility(dataset, compatibility)
 
     samples = [
-        record_to_sample(
+        _record_to_sample(
             record, num_shots=num_shots, subset=subset, adapt_schema=adapt_schema
         )
         for record in filtered_records
