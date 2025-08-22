@@ -34,6 +34,15 @@ class BenchmarkMetadata:
 
 # Benchmark metadata - minimal, no duplication
 BENCHMARKS = {
+    "mbpp": BenchmarkMetadata(
+        name="MBPP",
+        description="Mostly Basic Python Problems — code generation tasks with unit test verification",
+        category="core",
+        tags=["code", "generation", "sandbox", "reasoning"],
+        module_path="openbench.evals.mbpp",
+        function_name="mbpp",
+        is_alpha=False,
+    ),
     # Graphwalks benchmarks (alpha)
     "graphwalks": BenchmarkMetadata(
         name="GraphWalks",
