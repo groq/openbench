@@ -405,6 +405,14 @@ BENCHMARKS = {
         module_path="openbench.evals.matharena.hmmt_feb_2025.hmmt_feb_2025",
         function_name="hmmt_feb_2025",
     ),
+    "bbq": BenchmarkMetadata(
+        name="BBQ",
+        description="Bias Benchmark for QA",
+        category="core",
+        tags=["multiple-choice"],
+        module_path="openbench.evals.bbq",
+        function_name="bbq",
+    ),
     "scicode": BenchmarkMetadata(
         name="SciCode",
         description="Scientific computing and programming challenges",
