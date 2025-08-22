@@ -71,6 +71,14 @@ BENCHMARKS = {
         module_path="openbench.evals.mmlu",
         function_name="mmlu",
     ),
+    "mmlu-pro": BenchmarkMetadata(
+        name="MMLU Pro (TIGER-Lab)",
+        description="Enhanced version of MMLU with more challenging, reasoning-focused questions.",
+        category="core",
+        tags=["multiple-choice", "knowledge", "reasoning", "multitask"],
+        module_path="openbench.evals.mmlu_pro",
+        function_name="mmlu_pro",
+    ),
     "openai_mrcr": BenchmarkMetadata(
         name="OpenAI MRCR (Full)",
         description="Memory-Recall with Contextual Retrieval - long-context evaluation that measures recall of 2, 4, and 8 needles across million-token contexts",
