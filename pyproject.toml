@@ -14,8 +14,8 @@ authors = [
     { name="Groq" }
 ]
 dependencies = [
-    "datasets>=3.6.0",
-    "groq>=0.30.0",
+    "datasets==4.0.0",
+    "groq==0.30.0",
     "inspect-ai==0.3.115",
     "jsonschema>=4.23.0",
     "openai>=1.97.1",
