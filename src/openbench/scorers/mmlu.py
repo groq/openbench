@@ -113,11 +113,6 @@ def category_accuracy_metrics() -> Metric:
                 # Get the float value of the score (e.g., 1.0 for correct, 0.0 for incorrect)
                 float_val = sample_score.score.as_float()
             except ValueError:
-                # Log or handle if a score can't be converted, then skip it for these metrics
-                print(
-                    f"Warning: Could not convert score value '{sample_score.score.value}' "
-                    f"to float for sample {sample_score.sample_id}. Skipping for category metrics."
-                )
                 continue  # Skip this sample_score for category calculations
 
             # Get subject and map to category
