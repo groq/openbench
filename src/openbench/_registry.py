@@ -180,6 +180,39 @@ from .evals.musr import musr  # noqa: F401, E402
 from .evals.openbookqa import openbookqa  # noqa: F401, E402
 from .evals.simpleqa import simpleqa  # noqa: F401, E402
 from .evals.supergpqa import supergpqa  # noqa: F401, E402
+from .evals.mmmu import (  # noqa: F401, E402
+    mmmu,
+    mmmu_accounting,
+    mmmu_agriculture,
+    mmmu_architecture_and_engineering,
+    mmmu_art,
+    mmmu_art_theory,
+    mmmu_basic_medical_science,
+    mmmu_biology,
+    mmmu_chemistry,
+    mmmu_clinical_medicine,
+    mmmu_computer_science,
+    mmmu_design,
+    mmmu_diagnostics_and_laboratory_medicine,
+    mmmu_economics,
+    mmmu_electronics,
+    mmmu_energy_and_power,
+    mmmu_finance,
+    mmmu_geography,
+    mmmu_history,
+    mmmu_literature,
+    mmmu_manage,
+    mmmu_marketing,
+    mmmu_materials,
+    mmmu_math,
+    mmmu_mechanical_engineering,
+    mmmu_music,
+    mmmu_pharmacy,
+    mmmu_physics,
+    mmmu_psychology,
+    mmmu_public_health,
+    mmmu_sociology,
+)
 
 # MathArena benchmarks
 from .evals.matharena.aime_2023_I.aime_2023_I import aime_2023_I  # noqa: F401, E402
