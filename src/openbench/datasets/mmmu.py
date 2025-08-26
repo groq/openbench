@@ -7,9 +7,25 @@ from PIL import Image
 import os
 import io
 import tempfile
+import atexit
+import shutil
 
-# TODO(LUCAS): handle local clean up of images
+# Global temp directory for MMMU images
 TEMP_IMAGE_DIR = tempfile.mkdtemp()
+
+
+def _cleanup_temp_images():
+    """Clean up temporary images directory when process exits."""
+    try:
+        if os.path.exists(TEMP_IMAGE_DIR):
+            shutil.rmtree(TEMP_IMAGE_DIR)
+    except Exception:
+        # Silently ignore cleanup failures to avoid interfering with process exit
+        pass
+
+
+# Register cleanup function to run when process exits
+atexit.register(_cleanup_temp_images)
 
 
 def record_to_sample(record: Dict[str, Any]) -> Sample:
