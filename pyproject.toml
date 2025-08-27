@@ -17,10 +17,8 @@ dependencies = [
     "datasets>=3.6.0",
     "groq>=0.30.0",
     "inspect-ai==0.3.125",
-    "jsonschema>=4.23.0",
     "openai>=1.97.1",
     "pydantic-settings>=2.9.1",
-    "scicode",
     "scipy>=1.15.3",
     "tiktoken>=0.11.0",
     "typer>=0.15.3",
@@ -84,4 +82,10 @@ dev = [
     "ruff>=0.11.9",
     "types-jsonschema>=4.0.0",
     "types-pyyaml>=6.0.12.20250809",
+]
+scicode = [
+    "scicode",
+]
+jsonschemabench = [
+    "jsonschema>=4.23.0",
 ]

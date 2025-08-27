@@ -26,6 +26,21 @@ pytest
 
 ⚠️ **IMPORTANT**: You MUST install pre-commit hooks after `uv sync --dev`. CI will fail if you skip this step!
 
+### Installing Optional Dependencies
+Some benchmarks require additional dependencies that are not included in the core package:
+
+```bash
+# Install core dependencies only (runs most benchmarks)
+uv sync
+
+# Install specific benchmark dependencies
+uv sync --group scicode         # For SciCode benchmark
+uv sync --group jsonschemabench  # For JSONSchemaBench
+
+# Install everything including dev tools
+uv sync --all-groups
+```
+
 ## 🎯 Core Principles
 
 ### Single Responsibility
@@ -172,8 +187,7 @@ Closes #123
 2. Add dataset loader in `src/openbench/datasets/` if needed
 3. Add custom scorer in `src/openbench/scorers/` if needed
 4. Register benchmark metadata in `src/openbench/config.py`
-5. Use existing utilities from `src/openbench/utils/`
-6. Add comprehensive tests
+5. **Import your task in `src/openbench/_registry.py`**:
 
 Example structure:
 ```
@@ -185,7 +199,14 @@ src/openbench/
 ├── scorers/
 │   └── my_benchmark.py      # Custom scorer (if needed)
 └── config.py                # Add benchmark metadata here
+└── _registry.py                # Add benchmark import here
 ```
+
+#### Dependency Architecture
+OpenBench uses a tightly coupled architecture where benchmarks share common infrastructure:
+- **Core dependencies** (inspect-ai, datasets, scipy, numpy): Required by multiple benchmarks
+- **Optional dependencies**: Specific to individual benchmarks (e.g., scicode, jsonschema)
+- Most benchmarks (17/19) can run with just core dependencies
 
 ### Adding a New Model Provider
 1. Create provider file in `src/openbench/model/_providers/`
