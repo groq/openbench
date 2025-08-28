@@ -1,5 +1,51 @@
 # Changelog
 
+## [0.4.0](https://github.com/groq/openbench/compare/v0.3.0...v0.4.0) (2025-08-28)
+
+
+### Features
+
+* add boolq ([#70](https://github.com/groq/openbench/issues/70)) ([edbd1cc](https://github.com/groq/openbench/commit/edbd1cc1227e83a4de2d1c383acbc2c914063018))
+* add BrowseComp ([#118](https://github.com/groq/openbench/issues/118)) ([498c706](https://github.com/groq/openbench/commit/498c7063f67f1ae5f2b68420269ad939e4a684ab))
+* add CITATION.cff for software citation ([#102](https://github.com/groq/openbench/issues/102)) ([16960de](https://github.com/groq/openbench/commit/16960dec7b75d55de8f60d78cee99a691a85d083))
+* add CTI-Bench cybersecurity benchmark suite ([#96](https://github.com/groq/openbench/issues/96)) ([8465075](https://github.com/groq/openbench/commit/84650753e3b7b2cbe35b150d6b6466985d07e01d))
+* add GitHub issue and PR templates ([#103](https://github.com/groq/openbench/issues/103)) ([68f0ef0](https://github.com/groq/openbench/commit/68f0ef0a514cabaa165ba343ca38d87edebe4452))
+* add gmcq ([#114](https://github.com/groq/openbench/issues/114)) ([bb3c89d](https://github.com/groq/openbench/commit/bb3c89d03a6baf1dcc5e608a7438068e7f2f3d35))
+* add MuSR variants and grouped metrics ([#107](https://github.com/groq/openbench/issues/107)) ([10ae935](https://github.com/groq/openbench/commit/10ae935254531813b3dc087a7f127c08fad3422e))
+* add robust answer extraction scorers from gpt-oss to MathArena benchmarks and gpqa_diamond ([#97](https://github.com/groq/openbench/issues/97)) ([251ba66](https://github.com/groq/openbench/commit/251ba66b5e65cb30f1bd0afaaf1ac4a96e75a0ad))
+* add Vercel AI Gateway inference provider ([#98](https://github.com/groq/openbench/issues/98)) ([38e211a](https://github.com/groq/openbench/commit/38e211ab0cfa042b80d7bc62e02b529a816eb090))
+* jsonschemabench ([#95](https://github.com/groq/openbench/issues/95)) ([e3d842d](https://github.com/groq/openbench/commit/e3d842d10ee824baa882d8cb9e1f7c3e4adf28e2))
+* **mmmu:** added support for mmmu benchmark and all of its subdomains ([#121](https://github.com/groq/openbench/issues/121)) ([801bceb](https://github.com/groq/openbench/commit/801bcebe9e92b71022440a5c5788ac8b377a762e))
+
+
+### Bug Fixes
+
+* format mmlu_pro.py dataset file ([2a9ee65](https://github.com/groq/openbench/commit/2a9ee651f680da10c3e5a2403d9103821e9e52bc))
+* handle skipped integration tests in CI ([#120](https://github.com/groq/openbench/issues/120)) ([dae9378](https://github.com/groq/openbench/commit/dae937838b90ba39fb134daf694ea4bc3563508c))
+* **hle:** added multimodal support for hle ([#128](https://github.com/groq/openbench/issues/128)) ([8c3f212](https://github.com/groq/openbench/commit/8c3f212b7cba8650a47f4bb297213265b4fac660))
+* **jsonschemaeval:** match paper methodology and add openai subset ([#113](https://github.com/groq/openbench/issues/113)) ([1b6470b](https://github.com/groq/openbench/commit/1b6470b3671f76eb809b8af55593ad9529179546))
+* make claude-code-review job optional to prevent PR blocking ([#100](https://github.com/groq/openbench/issues/100)) ([6aad080](https://github.com/groq/openbench/commit/6aad080efc7fb2033e760248342d8f18e8f0709e))
+
+
+### Documentation
+
+* emphasize pre-commit hooks installation requirement ([#106](https://github.com/groq/openbench/issues/106)) ([e765464](https://github.com/groq/openbench/commit/e7654641274eb60f07fd74e5db211bd7a3cca429))
+* refresh CONTRIBUTING.md and update README references ([#105](https://github.com/groq/openbench/issues/105)) ([bf66747](https://github.com/groq/openbench/commit/bf66747481681ebd4f3615b96e9af46a16106836))
+* update installation instructions and clarify dependency architecture in CLAUDE.md and CONTRIBUTING.md ([#126](https://github.com/groq/openbench/issues/126)) ([cd962fd](https://github.com/groq/openbench/commit/cd962fd19ee06c2b4a9c1f0e163c55c439567f7a))
+* update README citation to match CITATION.cff ([#104](https://github.com/groq/openbench/issues/104)) ([6219e8c](https://github.com/groq/openbench/commit/6219e8c795ebddffd7a8086db009e6085e2ffe22))
+
+
+### Chores
+
+* bump Inspect-AI to 0.3.125 ([#124](https://github.com/groq/openbench/issues/124)) ([d728cbb](https://github.com/groq/openbench/commit/d728cbb6e777a64f923dfe910e0a5ca2d00a67d2))
+* unpin dependencies except inspect-ai ([#108](https://github.com/groq/openbench/issues/108)) ([50cf90f](https://github.com/groq/openbench/commit/50cf90ff96bbc163a4040aaf632b729f4aaed7c0))
+* update uv.lock package version ([3583d71](https://github.com/groq/openbench/commit/3583d71fee81d681861e0015383f8471459b4002))
+
+
+### CI
+
+* add automated PyPI publishing to release workflow ([#99](https://github.com/groq/openbench/issues/99)) ([eddbf70](https://github.com/groq/openbench/commit/eddbf70bbf13383abf6de633989a0a2a6ac8b593))
+
 ## [0.3.0](https://github.com/groq/openbench/compare/v0.2.0...v0.3.0) (2025-08-14)
 
 
