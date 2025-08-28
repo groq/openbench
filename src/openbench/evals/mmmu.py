@@ -1,21 +1,11 @@
 """MMMU (Massive Multi-discipline Multimodal Understanding) evaluation."""
 
 from inspect_ai import task, Task
-from inspect_ai.solver import generate, system_message
+from inspect_ai.solver import generate
 from inspect_ai.model import GenerateConfig
 from openbench.datasets.mmmu import get_dataset
 from openbench.scorers.mmmu import mmmu_scorer
 from typing import Optional
-
-
-# MMMU system prompt to guide the model's response format
-MMMU_SYSTEM_PROMPT = """You are an expert in multiple academic disciplines. You will be given questions that may include images, diagrams, charts, or other visual elements. 
-
-Analyze the question and any provided images carefully. Then select the best answer from the given multiple choice options.
-
-Provide your response in the following format:
-Analysis: [Your reasoning and analysis]
-Answer: [Your chosen option letter (A, B, C, or D)]"""
 
 
 @task
@@ -49,7 +39,6 @@ def mmmu(
     return Task(
         dataset=dataset,
         solver=[
-            system_message(MMMU_SYSTEM_PROMPT),
             generate(),
         ],
         scorer=mmmu_scorer(),

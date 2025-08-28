@@ -66,7 +66,10 @@ def record_to_sample(record: Dict[str, Any]) -> Sample:
         # Fallback: convert to string
         option_text = str(options)
 
-    full_question = f"{question}\n\n{option_text}"
+    # Add zero-shot chain of though reasoning to task prompt
+    chain_of_thought_reasoning = "The final answer is: "
+
+    full_question = f"{question}\n\n{option_text}\n\n{chain_of_thought_reasoning}"
 
     input_content: List[Union[ContentText, ContentImage]] = [
         ContentText(text=full_question)
