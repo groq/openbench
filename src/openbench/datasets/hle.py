@@ -2,6 +2,7 @@ from inspect_ai.dataset import Dataset, Sample, MemoryDataset, hf_dataset
 from inspect_ai.model import ChatMessageUser, ContentText, ContentImage
 from typing import List, Union, cast, Any
 import base64
+from openbench.utils.image import detect_image_mime_type
 
 
 def record_to_sample(record: dict) -> Sample:
@@ -35,9 +36,10 @@ def record_to_sample(record: dict) -> Sample:
             image_bytes = None
 
         if image_bytes:
-            # Convert to base64 data URI
+            # Convert to base64 data URI with proper MIME type detection
             base64_image = base64.b64encode(image_bytes).decode("utf-8")
-            data_uri = f"data:image/png;base64,{base64_image}"
+            mime_type = detect_image_mime_type(image_bytes)
+            data_uri = f"data:{mime_type};base64,{base64_image}"
 
             # Add the image to the input content using data URI
             input_content.append(ContentImage(image=data_uri))
@@ -51,7 +53,7 @@ def record_to_sample(record: dict) -> Sample:
     )
 
 
-def get_dataset(text_only: bool) -> Dataset:
+def get_dataset(text_only: bool = False) -> Dataset:
     """Load the HLE (Humanity's Last Exam) dataset.
 
     Args:
