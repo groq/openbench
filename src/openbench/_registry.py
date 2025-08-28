@@ -172,6 +172,7 @@ from .evals.graphwalks import graphwalks  # noqa: F401, E402
 from .evals.healthbench import healthbench, healthbench_hard, healthbench_consensus  # noqa: F401, E402
 from .evals.hle import hle, hle_text  # noqa: F401, E402
 from .evals.humaneval import humaneval  # noqa: F401, E402
+from .evals.livemcpbench import livemcpbench  # noqa: F401, E402
 from .evals.math import math, math_500  # noqa: F401, E402
 from .evals.mgsm import mgsm, mgsm_en, mgsm_latin, mgsm_non_latin  # noqa: F401, E402
 from .evals.mmlu import mmlu  # noqa: F401, E402
