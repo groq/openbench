@@ -1014,6 +1014,15 @@ BENCHMARKS = {
         function_name="mmmu_pro_vision",
         is_alpha=False,
     ),
+    "livemcpbench": BenchmarkMetadata(
+        name="LiveMCPBench",
+        description="Benchmark for evaluating LLM agents on real-world tasks using the Model Context Protocol (MCP) - 95 tasks across different categories",
+        category="core",
+        tags=["mcp", "agents", "real-world", "tools", "graded"],
+        module_path="openbench.evals.livemcpbench",
+        function_name="livemcpbench",
+        is_alpha=False,
+    ),
 }
 
 

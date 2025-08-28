@@ -226,6 +226,7 @@ from .evals.exercism.exercism import (  # noqa: F401, E402
     exercism_java,
     exercism_rust,
 )
+from .evals.livemcpbench import livemcpbench  # noqa: F401, E402
 from .evals.math import math, math_500  # noqa: F401, E402
 from .evals.mbpp import mbpp  # noqa: F401, E402
 from .evals.mgsm import mgsm, mgsm_en, mgsm_latin, mgsm_non_latin  # noqa: F401, E402
