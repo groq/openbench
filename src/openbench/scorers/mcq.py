@@ -1,20 +1,25 @@
-"""Robust multiple choice answer extraction scorer."""
+"""Unified multiple-choice question scorer for all MCQ benchmarks."""
 
 import re
-from typing import Optional
-
+from typing import Callable, Optional, List, Any
+from inspect_ai.solver import TaskState
 from inspect_ai.scorer import (
     Score,
-    Scorer,
+    Target,
     scorer,
+    accuracy,
+    stderr,
+    std,
     CORRECT,
     INCORRECT,
-    Target,
-    accuracy,
-    std,
-    stderr,
 )
-from inspect_ai.solver import TaskState
+from openbench.metrics.grouped import grouped
+from openbench.utils.text import (
+    strip_md_latex,
+    normalize_mcq_answer,
+    MULTILINGUAL_ANSWER_PATTERN_TEMPLATE,
+    MULTILINGUAL_ANSWER_REGEXES,
+)
 
 
 # Adapted from https://github.com/openai/gpt-oss
@@ -93,32 +98,50 @@ MCQ_PATTERNS = [
     ),
 ]
 
+# Add multilingual patterns after the English ones
+MULTILINGUAL_PATTERNS = []
+for answer_regex in MULTILINGUAL_ANSWER_REGEXES:
+    pattern = MULTILINGUAL_ANSWER_PATTERN_TEMPLATE.format(answer_regex)
+    MULTILINGUAL_PATTERNS.append(re.compile(pattern))
+
 
 def extract_mcq_answer(text: str) -> Optional[str]:
     """
-    Extract multiple choice answer (A, B, C, or D) from text using comprehensive patterns.
+    Extract multiple choice answer (A, B, C, D, etc.) from model output.
 
-    Searches through multiple regex patterns to find answer declarations in various
-    formats including markdown, LaTeX, and plain text. Patterns are ordered by
-    specificity and reliability.
-
+    Combines comprehensive English patterns with multilingual support.
+    Uses priority-based matching to find the most reliable answer.
 
     Args:
-        text: The text to search for an answer
+        text: Model output text
 
     Returns:
-        Single letter A, B, C, or D if found, otherwise the first character
-        of the text (after removing markdown) as a fallback
+        Extracted answer letter or None if not found
     """
+    if not text:
+        return None
+
+    # Clean the text of markdown/latex formatting for some patterns
+    cleaned_text = strip_md_latex(text)
+
     matches = []
 
-    # Try all patterns and collect matches with priority
+    # Try comprehensive English patterns first (highest priority)
     for priority, pattern in enumerate(MCQ_PATTERNS):
         match = pattern.search(text)
         if match:
             letter = match.group(1).upper()
             if letter in "ABCD":
                 matches.append((priority, match, letter))
+
+    # Try multilingual patterns (lower priority)
+    for idx, pattern in enumerate(MULTILINGUAL_PATTERNS):
+        match = pattern.search(cleaned_text)
+        if match:
+            normalized = normalize_mcq_answer(match.group(1))
+            if normalized and normalized in "ABCD":
+                # Add with priority after English patterns
+                matches.append((len(MCQ_PATTERNS) + idx, match, normalized))
 
     # Sort by priority (lower is better) and match length (longer is better)
     matches.sort(key=lambda triple: (triple[0], -len(triple[1].group(0))))
@@ -135,38 +158,85 @@ def extract_mcq_answer(text: str) -> Optional[str]:
     return None
 
 
-@scorer(metrics=[accuracy(), std(), stderr()])
-def robust_mcq_scorer() -> Scorer:
+def create_mcq_scorer(
+    group_keys: Optional[List[str]] = None,
+    additional_metrics: Optional[List[Any]] = None,
+) -> Callable:
     """
-    A robust scorer for multiple choice questions with comprehensive pattern matching.
+    Create a generic multiple-choice question scorer.
 
-    This scorer uses multiple regex patterns to extract MCQ answers from various
-    formats including markdown, LaTeX, and plain text. It's more robust than
-    simple pattern matching and handles edge cases better.
+    This is a factory function that creates scorers for MCQ benchmarks like MMLU, MMMU, GPQA, etc.
+
+    Args:
+        group_keys: Optional list of metadata keys to group metrics by (e.g., ["category", "subject"])
+        additional_metrics: Optional list of additional metrics to include beyond accuracy/stderr
 
     Returns:
-        Scorer: A scoring function that returns a Score with:
-            - value: CORRECT if extracted answer matches target, INCORRECT otherwise
-            - answer: The extracted answer if found
-            - explanation: Details about the extraction method used
+        A scorer function that can be used with Inspect AI tasks
     """
+    # Build metrics list
+    metrics: List[Any] = []
 
-    async def score(state: TaskState, target: Target) -> Score:
-        extracted = extract_mcq_answer(state.output.completion)
+    # Add grouped metrics if specified
+    if group_keys:
+        for key in group_keys:
+            metrics.append(grouped(group_key=key, metric=[accuracy(), stderr(), std()]))
 
-        if extracted is None:
-            return Score(
-                value=INCORRECT,
-                answer=None,
-                explanation="No multiple choice answer found in response",
+    # Add any additional metrics
+    if additional_metrics:
+        metrics.extend(additional_metrics)
+
+    # If no metrics specified, use default accuracy and stderr
+    if not metrics:
+        metrics = [accuracy(), stderr(), std()]
+
+    @scorer(metrics=metrics)
+    def mcq_scorer() -> Callable:
+        async def score(state: TaskState, target: Target) -> Score:
+            extracted_answer = extract_mcq_answer(state.output.completion)
+
+            # Handle both single-letter and full text targets
+            target_answer = target.text.strip().upper() if target.text else ""
+
+            # Check if extracted answer matches target
+            is_correct = (
+                extracted_answer == target_answer if extracted_answer else False
             )
 
-        is_correct = extracted == target.text.strip().upper()
+            # Always use CORRECT/INCORRECT for clarity
+            return Score(
+                value=CORRECT if is_correct else INCORRECT,
+                answer=extracted_answer,  # Keep None if no answer found
+                explanation=f"Extracted '{extracted_answer}' from response, target was '{target_answer}'"
+                if extracted_answer
+                else "No answer found",
+            )
 
-        return Score(
-            value=CORRECT if is_correct else INCORRECT,
-            answer=extracted,
-            explanation=f"Extracted '{extracted}' from response, target was '{target.text}'",
-        )
+        return score
 
-    return score
+    return mcq_scorer
+
+
+# Pre-configured scorers for common use cases
+def simple_mcq_scorer() -> Callable:
+    """Simple MCQ scorer with just accuracy, stderr, and std metrics."""
+    return create_mcq_scorer()()
+
+
+def grouped_mcq_scorer(group_key: str) -> Callable:
+    """MCQ scorer with grouping by a single metadata key."""
+    return create_mcq_scorer(group_keys=[group_key])()
+
+
+def robust_mcq_scorer() -> Callable:
+    """
+    Backward-compatible robust MCQ scorer.
+
+    This is now just an alias for the enhanced generic MCQ scorer.
+    Kept for compatibility with existing code.
+    """
+    return create_mcq_scorer()()
+
+
+# MMLU-specific scorer with category grouping
+mmlu_simple_eval_scorer = create_mcq_scorer(group_keys=["category"])

@@ -3,29 +3,8 @@
 from inspect_ai.dataset import Dataset, hf_dataset, Sample, MemoryDataset
 from inspect_ai.model import ChatMessageUser, ContentText, ContentImage
 from typing import Dict, Any, List, Optional, Union, cast
-from PIL import Image
-import os
-import io
-import tempfile
-import atexit
-import shutil
-
-# Global temp directory for MMMU images
-TEMP_IMAGE_DIR = tempfile.mkdtemp()
-
-
-def _cleanup_temp_images():
-    """Clean up temporary images directory when process exits."""
-    try:
-        if os.path.exists(TEMP_IMAGE_DIR):
-            shutil.rmtree(TEMP_IMAGE_DIR)
-    except Exception:
-        # Silently ignore cleanup failures to avoid interfering with process exit
-        pass
-
-
-# Register cleanup function to run when process exits
-atexit.register(_cleanup_temp_images)
+import base64
+from openbench.utils.text import MULTIPLE_CHOICE_PROMPT_TEMPLATE
 
 
 def record_to_sample(record: Dict[str, Any]) -> Sample:
@@ -45,55 +24,55 @@ def record_to_sample(record: Dict[str, Any]) -> Sample:
                 parsed_options = ast.literal_eval(options)
                 if isinstance(parsed_options, list):
                     options = parsed_options
-                else:
-                    option_text = options
             except (ValueError, SyntaxError):
-                option_text = options
-        else:
-            option_text = options
+                pass
 
+    # Extract individual options
     if isinstance(options, list):
-        # Standard case: options is a list of strings
-        option_text = ""
-        for i, option in enumerate(options):
-            letter = chr(ord("A") + i)
+        # Ensure we have exactly 4 options (pad with empty if needed)
+        while len(options) < 4:
+            options.append("")
+
+        # Get option text
+        option_texts = []
+        for option in options[:4]:  # Only use first 4 options
             if isinstance(option, dict):
-                option_str = option.get("text", str(option))
+                option_texts.append(option.get("text", str(option)))
             else:
-                option_str = str(option)
-            option_text += f"{letter}. {option_str}\n"
-    elif not isinstance(options, str):
-        # Fallback: convert to string
-        option_text = str(options)
+                option_texts.append(str(option))
 
-    # Add zero-shot chain of though reasoning to task prompt
-    chain_of_thought_reasoning = "The final answer is: "
-
-    full_question = f"{question}\n\n{option_text}\n\n{chain_of_thought_reasoning}"
+        # Use the standard multiple choice template
+        full_question = MULTIPLE_CHOICE_PROMPT_TEMPLATE.format(
+            prompt=question,
+            option_a=option_texts[0],
+            option_b=option_texts[1],
+            option_c=option_texts[2],
+            option_d=option_texts[3],
+        )
+    else:
+        # Fallback if options aren't in expected format
+        full_question = f"{question}\n\nOptions: {options}\n\nAnswer the following multiple choice question. The last line of your response should be of the following format: 'Answer: $LETTER' (without quotes) where LETTER is one of ABCD."
 
     input_content: List[Union[ContentText, ContentImage]] = [
         ContentText(text=full_question)
     ]
 
-    image_paths = []
     # Handle Multimodal Questions by adding images to the input content via ContentImage
+    num_images = 0
     for i in range(1, 8):
         image_key = f"image_{i}"
-        if record.get(image_key) and record[image_key].get("bytes"):
-            image_bytes = record[image_key]["bytes"]
+        if image_key in record and record[image_key] is not None:
+            image_data = record[image_key]
 
-            # Load bytes into a PIL Image object to validate it's a valid image
-            pil_image = Image.open(io.BytesIO(image_bytes))
+            image_bytes = image_data["bytes"]
 
-            # Create a unique path in our session's temp directory
-            temp_file_path = os.path.join(TEMP_IMAGE_DIR, f"{record_id}_img_{i}.png")
+            # Convert to base64 data URI
+            base64_image = base64.b64encode(image_bytes).decode("utf-8")
+            data_uri = f"data:image/png;base64,{base64_image}"
 
-            # Save the image and get its path
-            pil_image.save(temp_file_path)
-            image_paths.append(temp_file_path)
-
-            # Add the image to the input content
-            input_content.append(ContentImage(image=temp_file_path))
+            # Add the image to the input content using data URI
+            input_content.append(ContentImage(image=data_uri))
+            num_images += 1
 
     metadata = {
         "question_id": record_id,
@@ -103,8 +82,7 @@ def record_to_sample(record: Dict[str, Any]) -> Sample:
         "question_type": record.get("question_type", "multiple-choice"),
         "subfield": record.get("subfield", ""),
         "explanation": record.get("explanation", ""),
-        "image_paths": image_paths,
-        "num_images": len(image_paths),
+        "num_images": num_images,
     }
 
     return Sample(
@@ -118,7 +96,6 @@ def record_to_sample(record: Dict[str, Any]) -> Sample:
 def get_dataset(
     subset: Optional[str] = None,
     split: str = "validation",
-    num_examples: Optional[int] = None,
 ) -> Dataset:
     """Load the MMMU dataset.
 
@@ -147,24 +124,17 @@ def get_dataset(
         available_subsets = get_available_subsets()
 
         for subset_name in available_subsets:
-            try:
-                subset_dataset = hf_dataset(
-                    path="MMMU/MMMU",
-                    name=subset_name,
-                    split=split,
-                    sample_fields=record_to_sample,
-                )
-                subset_samples = list(subset_dataset)
-                all_samples.extend(subset_samples)
-            except Exception:
-                continue
+            subset_dataset = hf_dataset(
+                path="MMMU/MMMU",
+                name=subset_name,
+                split=split,
+                sample_fields=record_to_sample,
+            )
+            subset_samples = list(subset_dataset)
+            all_samples.extend(subset_samples)
 
         samples = all_samples
         dataset_name = "mmmu"
-
-    # Limit number of examples if specified
-    if num_examples is not None:
-        samples = samples[:num_examples]
 
     return MemoryDataset(samples=samples, name=dataset_name)
 

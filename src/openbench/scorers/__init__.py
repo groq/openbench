@@ -13,7 +13,7 @@ and should be imported directly from their respective modules when needed.
 from .score_last_number import score_last_integer, score_last_number
 from .score_boxed import score_boxed
 from .fallback_scorer import fallback_scorer
-from .robust_mcq import robust_mcq_scorer, extract_mcq_answer
+from .mcq import robust_mcq_scorer, extract_mcq_answer
 from .robust_boxed import robust_boxed_scorer, aime_scorer, extract_boxed_answer
 
 __all__ = [
