@@ -865,6 +865,14 @@ BENCHMARKS = {
         function_name="mmmu_sociology",
         is_alpha=False,
     ),
+    "slidevqa": BenchmarkMetadata(
+        name="SlideVQA",
+        description="SlideVQA: A Dataset for Document Visual Question Answering on Multiple Images",
+        category="core",
+        tags=["multi-modal", "document-visual-question-answering"],
+        module_path="openbench.evals.slidevqa",
+        function_name="slidevqa",
+    ),
 }
 
 
