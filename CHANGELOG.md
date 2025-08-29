@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/groq/openbench/compare/v0.4.0...v0.4.1) (2025-08-29)
+
+
+### Bug Fixes
+
+* **rootly_gmcq:** handle both string and list content types in scorer ([#129](https://github.com/groq/openbench/issues/129)) ([376624d](https://github.com/groq/openbench/commit/376624d1c24ce876dc6bbd1a3c09b566e7b303b5))
+
 ## [0.4.0](https://github.com/groq/openbench/compare/v0.3.0...v0.4.0) (2025-08-28)
 
 
