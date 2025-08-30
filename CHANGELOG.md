@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.2](https://github.com/groq/openbench/compare/v0.4.1...v0.4.2) (2025-08-30)
+
+
+### Features
+
+* add local openbench implementation of groq provider in inspect ([#131](https://github.com/groq/openbench/issues/131)) ([52aea35](https://github.com/groq/openbench/commit/52aea3510f03cd49d0fb66c3e6789f61939a7ee0))
+* configure release-please for pre-v1.0 version bumping ([#133](https://github.com/groq/openbench/issues/133)) ([c432934](https://github.com/groq/openbench/commit/c4329343e059f6dd8c9a664a67431aba8d8fb853))
+
 ## [0.4.1](https://github.com/groq/openbench/compare/v0.4.0...v0.4.1) (2025-08-29)
 
 
