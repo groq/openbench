@@ -865,6 +865,14 @@ BENCHMARKS = {
         function_name="mmmu_sociology",
         is_alpha=False,
     ),
+    "chartqa": BenchmarkMetadata(
+        name="ChartQA",
+        description="A Benchmark for Question Answering about Charts with Visual and Logical Reasoning",
+        category="core",
+        tags=["multiple-choice", "reasoning", "multi-modal"],
+        module_path="openbench.evals.chartqa",
+        function_name="chartqa",
+    ),
 }
 
 
