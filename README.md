@@ -117,6 +117,9 @@ OpenBench supports 30+ model providers through Inspect AI. Set the appropriate A
 
 Here are the currently available benchmarks. For an up-to-date list use `bench list`.
 
+> [!NOTE]
+> Benchmark names are case-sensitive in the CLI.
+
 | Category          | Benchmarks                                                                                                                                                                                                                                                                 |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Knowledge**     | MMLU (57 subjects), GPQA (graduate-level), SuperGPQA (285 disciplines), OpenBookQA, HLE (Humanity's Last Exam - 2,500 questions from 1,000+ experts), HLE_text (text-only version)                                                                                         |
@@ -173,6 +176,19 @@ For a complete list of all commands and options, run: `bench --help`
 | `--reasoning-effort` | `BENCH_REASONING_EFFORT` | `None`          | Reasoning effort level (low/medium/high)                         |
 | `--json`             | None                     | `False`         | Output results in JSON format                                    |
 | `--hub-repo`         | `BENCH_HUB_REPO`         | `None`          | Push results to a Hugging Face Hub dataset                       |
+
+## Grader Information
+
+Some benchmarks, like `HealthBench`, use a "judge" model to score the model's performance. This requires an additional API key for the grader model.
+
+- **Default Grader**: `openai/gpt-4.1-2025-04-14`
+- **Required Key**: `OPENAI_API_KEY`
+
+To run these benchmarks, you'll need to export your OpenAI API key:
+
+```bash
+export OPENAI_API_KEY=your_openai_key
+```
 
 ## Building Your Own Evals
 
