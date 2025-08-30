@@ -9,14 +9,18 @@ from openbench.utils.image import detect_image_mime_type
 
 
 def record_to_sample(record: Dict[str, Any]) -> Sample:
-    """Convert an MMMU record to an Inspect Sample."""
+    """Convert an MMMU record to an Inspect Sample.
+
+    Builds the input differently for multiple-choice vs open questions.
+    """
 
     question = record["question"]
     options = record["options"]
     record_id = record["id"]
     answer = record["answer"]
+    question_type = str(record.get("question_type", "multiple-choice")).lower()
 
-    # Handle different possible formats for options
+    # Normalize options if present (may be a JSON-like string in some shards)
     if isinstance(options, str):
         if options.strip().startswith("[") and options.strip().endswith("]"):
             try:
@@ -28,31 +32,41 @@ def record_to_sample(record: Dict[str, Any]) -> Sample:
             except (ValueError, SyntaxError):
                 pass
 
-    # Extract individual options
-    if isinstance(options, list):
-        # Ensure we have exactly 4 options (pad with empty if needed)
-        while len(options) < 4:
-            options.append("")
+    # Build the input content depending on question type
+    if question_type == "multiple-choice":
+        # Extract individual options
+        if isinstance(options, list):
+            # Ensure we have exactly 4 options (pad with empty if needed)
+            while len(options) < 4:
+                options.append("")
 
-        # Get option text
-        option_texts = []
-        for option in options[:4]:  # Only use first 4 options
-            if isinstance(option, dict):
-                option_texts.append(option.get("text", str(option)))
-            else:
-                option_texts.append(str(option))
+            # Get option text
+            option_texts = []
+            for option in options[:4]:  # Only use first 4 options
+                if isinstance(option, dict):
+                    option_texts.append(option.get("text", str(option)))
+                else:
+                    option_texts.append(str(option))
 
-        # Use the standard multiple choice template
-        full_question = MULTIPLE_CHOICE_PROMPT_TEMPLATE.format(
-            prompt=question,
-            option_a=option_texts[0],
-            option_b=option_texts[1],
-            option_c=option_texts[2],
-            option_d=option_texts[3],
-        )
+            # Use the standard multiple choice template
+            full_question = MULTIPLE_CHOICE_PROMPT_TEMPLATE.format(
+                prompt=question,
+                option_a=option_texts[0],
+                option_b=option_texts[1],
+                option_c=option_texts[2],
+                option_d=option_texts[3],
+            )
+        else:
+            # Fallback if options aren't in expected format
+            full_question = (
+                f"{question}\n\nOptions: {options}\n\n"
+                "Answer the following multiple choice question. The last line of your response "
+                "should be of the following format: 'Answer: $LETTER' (without quotes) where "
+                "LETTER is one of ABCD."
+            )
     else:
-        # Fallback if options aren't in expected format
-        full_question = f"{question}\n\nOptions: {options}\n\nAnswer the following multiple choice question. The last line of your response should be of the following format: 'Answer: $LETTER' (without quotes) where LETTER is one of ABCD."
+        # Open-ended question: present the plain question without MCQ instructions
+        full_question = f"{question}\n\nAnswer succinctly."
 
     input_content: List[Union[ContentText, ContentImage]] = [
         ContentText(text=full_question)
@@ -85,6 +99,8 @@ def record_to_sample(record: Dict[str, Any]) -> Sample:
         "subfield": record.get("subfield", ""),
         "explanation": record.get("explanation", ""),
         "num_images": num_images,
+        "question": question,
+        "answer": answer,
     }
 
     return Sample(
@@ -98,6 +114,7 @@ def record_to_sample(record: Dict[str, Any]) -> Sample:
 def get_dataset(
     subset: Optional[str] = None,
     split: str = "validation",
+    question_type: Optional[str] = None,
 ) -> Dataset:
     """Load the MMMU dataset.
 
@@ -105,7 +122,7 @@ def get_dataset(
         subset: Optional subset name (e.g., "Accounting", "Art", "Biology", etc.)
                If None, loads all subsets combined
         split: Dataset split to use ("dev", "validation", "test")
-        num_examples: Optional limit on number of examples to load
+        question_type: If provided, filter to a specific type: "multiple-choice" or "open"
 
     Returns:
         Dataset configured for MMMU evaluation
@@ -137,6 +154,18 @@ def get_dataset(
 
         samples = all_samples
         dataset_name = "mmmu"
+
+    # Optional filter by question_type
+    if question_type is not None:
+        desired = str(question_type).lower()
+        samples = [
+            sample
+            for sample in samples
+            if str(
+                (sample.metadata or {}).get("question_type", "multiple-choice")
+            ).lower()
+            == desired
+        ]
 
     return MemoryDataset(samples=samples, name=dataset_name)
 

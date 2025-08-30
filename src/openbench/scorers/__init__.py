@@ -15,6 +15,7 @@ from .score_boxed import score_boxed
 from .fallback_scorer import fallback_scorer
 from .mcq import robust_mcq_scorer, extract_mcq_answer
 from .robust_boxed import robust_boxed_scorer, aime_scorer, extract_boxed_answer
+from .mmmu import mmmu_mixed_scorer
 
 __all__ = [
     # Number scoring functions
@@ -31,4 +32,6 @@ __all__ = [
     "extract_boxed_answer",
     # Meta-scoring
     "fallback_scorer",
+    # Mixed scoring for mcq and open-answer
+    "mmmu_mixed_scorer",
 ]

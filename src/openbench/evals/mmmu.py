@@ -5,6 +5,7 @@ from inspect_ai.solver import generate
 from inspect_ai.model import GenerateConfig
 from openbench.datasets.mmmu import get_dataset
 from openbench.scorers.mcq import create_mcq_scorer
+from openbench.scorers.mmmu import mmmu_mixed_scorer
 from typing import Optional
 
 
@@ -26,7 +27,6 @@ def mmmu(
         subset: Optional subject subset (e.g., "Art", "Biology", "Physics").
                 If None, uses all subjects
         split: Dataset split to use ("dev", "validation", "test")
-        num_examples: Optional limit on number of examples to evaluate
 
     Returns:
         Task configured for MMMU evaluation
@@ -40,7 +40,7 @@ def mmmu(
         solver=[
             generate(),
         ],
-        scorer=create_mcq_scorer(group_keys=["subfield", "topic_difficulty"])(),
+        scorer=mmmu_mixed_scorer(group_keys=["subfield", "topic_difficulty"])(),
         name=task_name,
         config=GenerateConfig(
             max_tokens=1024,
@@ -136,3 +136,47 @@ mmmu_physics = globals()["mmmu_physics"]
 mmmu_psychology = globals()["mmmu_psychology"]
 mmmu_public_health = globals()["mmmu_public_health"]
 mmmu_sociology = globals()["mmmu_sociology"]
+
+
+@task
+def mmmu_mcq(
+    subset: Optional[str] = None,
+    split: str = "validation",
+) -> Task:
+    """MMMU Multiple-Choice only evaluation.
+
+    Filters to multiple-choice questions and uses MCQ scoring.
+    """
+    dataset = get_dataset(subset=subset, split=split, question_type="multiple-choice")
+    task_name = f"mmmu_mcq_{subset.lower()}" if subset else "mmmu_mcq"
+    return Task(
+        dataset=dataset,
+        solver=[generate()],
+        scorer=create_mcq_scorer(group_keys=["subfield", "topic_difficulty"])(),
+        name=task_name,
+        config=GenerateConfig(
+            max_tokens=1024,
+        ),
+    )
+
+
+@task
+def mmmu_open(
+    subset: Optional[str] = None,
+    split: str = "validation",
+) -> Task:
+    """MMMU Open-answer only evaluation.
+
+    Filters to open questions and scores via MMMU-style parser matching.
+    """
+    dataset = get_dataset(subset=subset, split=split, question_type="open")
+    task_name = f"mmmu_open_{subset.lower()}" if subset else "mmmu_open"
+    return Task(
+        dataset=dataset,
+        solver=[generate()],
+        scorer=mmmu_mixed_scorer(group_keys=["subfield", "topic_difficulty"])(),
+        name=task_name,
+        config=GenerateConfig(
+            max_tokens=1024,
+        ),
+    )

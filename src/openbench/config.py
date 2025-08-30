@@ -865,6 +865,48 @@ BENCHMARKS = {
         function_name="mmmu_sociology",
         is_alpha=False,
     ),
+    "mmmu_mcq": BenchmarkMetadata(
+        name="MMMU MCQ",
+        description="MMMU MCQ subset focusing on multiple choice questions",
+        category="core",
+        tags=["multimodal", "multiple-choice", "images"],
+        module_path="openbench.evals.mmmu",
+        function_name="mmmu_mcq",
+        is_alpha=False,
+    ),
+    "mmmu_open": BenchmarkMetadata(
+        name="MMMU Open",
+        description="MMMU Open subset focusing on open-ended questions",
+        category="core",
+        tags=["multimodal", "open-ended", "images"],
+        module_path="openbench.evals.mmmu",
+        function_name="mmmu_open",
+        is_alpha=False,
+    ),
+    "mmmu_pro": BenchmarkMetadata(
+        name="MMMU-Pro",
+        description="Enhanced multimodal MMMU-Pro benchmark with multiple-choice across many options and images",
+        category="core",
+        tags=[
+            "multimodal",
+            "multiple-choice",
+            "reasoning",
+            "images",
+            "mmmu-pro",
+        ],
+        module_path="openbench.evals.mmmu_pro",
+        function_name="mmmu_pro",
+        is_alpha=False,
+    ),
+    "mmmu_pro_vision": BenchmarkMetadata(
+        name="MMMU-Pro (Vision)",
+        description="MMMU-Pro vision subset with images and multiple-choice questions",
+        category="core",
+        tags=["multimodal", "vision", "multiple-choice", "images", "mmmu-pro"],
+        module_path="openbench.evals.mmmu_pro",
+        function_name="mmmu_pro_vision",
+        is_alpha=False,
+    ),
 }
 
 
