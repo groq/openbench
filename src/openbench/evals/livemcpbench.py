@@ -24,9 +24,7 @@ def livemcpbench(grader_model: str = "groq/llama-3.3-70b-versatile") -> Task:
     # NOTE: This will work for some models, but some hallucinate the tool names and cause 400s.
     # Try GPT-4o vs llama-3.3-70b-versatile. There are also issues setting up all 70 MCP servers from LiveMCPBench.
     # To see issues, get rid of categories and limit and run livemcpbench.
-    mcp_tool_sources = get_mcp_tool_sources(
-        categories=["Finance", "Discovery"], limit=3
-    )
+    mcp_tool_sources = get_mcp_tool_sources(categories=["Finance", "Discovery"])
 
     return Task(
         dataset=get_dataset(),

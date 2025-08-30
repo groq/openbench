@@ -4,26 +4,24 @@ Generic MCP Tools Integration for OpenBench
 This module provides a generic, reusable framework for integrating MCP (Model Context Protocol)
 tools into OpenBench evaluations using inspect.ai's native MCP support.
 
-This approach can be used for any evaluation that needs MCP tools - just provide:
-1. A tools.json file with tool definitions
-2. An all_config.json file with server configurations
+
 
 Usage:
     from openbench.tools.livemcpbench.mcp_tools import get_mcp_tool_sources
 
-    # Basic usage
-    tool_sources = get_mcp_tool_sources(
-        tools_json_path="path/to/tools.json",
-        config_json_path="path/to/all_config.json"
-    )
+    # Basic usage - fetches all tools from upstream
+    tool_sources = get_mcp_tool_sources()
+
+    # Use specific categories with limits
+    tool_sources = get_mcp_tool_sources(categories=["Finance"], limit=2)
 
     # Use in evaluation
     solver = react(tools=tool_sources)
 """
 
+import copy
 import json
 import logging
-from pathlib import Path
 from typing import Dict, List, Optional, Any, Union, Literal
 from inspect_ai.tool import mcp_tools, mcp_server_stdio, ToolSource
 
@@ -37,28 +35,18 @@ class MCPToolsRegistry:
     Generic registry for MCP tools using inspect.ai's native MCP support.
 
     This class loads MCP server configurations and tool definitions from
-    JSON files and creates ToolSource objects that can be directly used
-    with inspect.ai's react solver.
+    the upstream LiveMCPBench repository and creates ToolSource objects that
+    can be directly used with inspect.ai's react solver.
 
-    Can be used for any MCP-based evaluation by providing the appropriate
-    tools.json and config.json files.
+    Always fetches data from the upstream repository for the latest tool definitions.
     """
 
-    def __init__(
-        self,
-        tools_json_path: Optional[Path] = None,
-        config_json_path: Optional[Path] = None,
-    ):
+    def __init__(self) -> None:
         """
         Initialize the MCP tools registry.
 
-        Args:
-            tools_json_path: Path to tools.json file with tool definitions (optional, uses dynamic fetching if None)
-            config_json_path: Path to config.json file with server configurations (optional, uses dynamic fetching if None)
+        Always fetches data from upstream LiveMCPBench repository.
         """
-        self.tools_json_path = tools_json_path
-        self.config_json_path = config_json_path
-
         # Storage for configurations
         self._tools_data: List[Dict[str, Any]] = []
         self._server_configs: List[Dict[str, Any]] = []
@@ -70,60 +58,43 @@ class MCPToolsRegistry:
             "okppt",  # requires pycairo which needs Cairo graphics library
             "chess",  # requires cairosvg/cairocffi which can't find Cairo in uvx environment
             "filesystem",  # has directory path configuration issues (empty path)
-            "drawing",  # server crashes/disconnects causing BrokenResourceError
         ]
 
-        # Load configurations
+        # Load configurations from upstream
         self._load_configurations()
         self._categorize_tools()
 
     def _load_configurations(self) -> None:
-        """Load tool and server configurations from JSON files or dynamic fetching."""
+        """Load tool and server configurations from upstream repository."""
         try:
-            # Load tools configuration
-            if self.tools_json_path is not None:
-                # Use provided file path
-                if self.tools_json_path.exists():
-                    with open(self.tools_json_path, "r", encoding="utf-8") as f:
-                        self._tools_data = json.load(f)
-                    logger.info(
-                        f"Loaded {len(self._tools_data)} tool definitions from {self.tools_json_path}"
-                    )
-                else:
-                    logger.error(f"Tools JSON file not found: {self.tools_json_path}")
-                    raise FileNotFoundError(
-                        f"Tools JSON file not found: {self.tools_json_path}"
-                    )
-            else:
-                # Use dynamic fetching
-                self._tools_data = get_tools_data()
-                logger.info(
-                    f"Loaded {len(self._tools_data)} tool definitions from dynamic fetch"
-                )
+            # Always use dynamic fetching from upstream
+            raw_tools_data = get_tools_data()
 
-            # Load server configuration
-            if self.config_json_path is not None:
-                # Use provided file path
-                if self.config_json_path.exists():
-                    with open(self.config_json_path, "r", encoding="utf-8") as f:
-                        self._server_configs = json.load(f)
-                    logger.info(
-                        f"Loaded {len(self._server_configs)} server configurations from {self.config_json_path}"
-                    )
+            # Validate and filter tools data - exclude tools with missing descriptions
+            self._tools_data = []
+            excluded_count = 0
+            for tool_data in raw_tools_data:
+                validated_tool_data = self._validate_and_filter_tool_data(tool_data)
+                if validated_tool_data is not None:
+                    self._tools_data.append(validated_tool_data)
                 else:
-                    logger.error(f"Config JSON file not found: {self.config_json_path}")
-                    raise FileNotFoundError(
-                        f"Config JSON file not found: {self.config_json_path}"
-                    )
-            else:
-                # Use dynamic fetching
-                self._server_configs = get_config_data()
-                logger.info(
-                    f"Loaded {len(self._server_configs)} server configurations from dynamic fetch"
-                )
+                    excluded_count += 1
 
+            logger.info(
+                f"Loaded {len(self._tools_data)} tool definitions from upstream repository "
+                f"({excluded_count} tools excluded due to missing descriptions)"
+            )
+
+            self._server_configs = get_config_data()
+            logger.info(
+                f"Loaded {len(self._server_configs)} server configurations from upstream repository"
+            )
+
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON data received from upstream: {e}")
+            raise ValueError(f"Failed to parse upstream data: {e}")
         except Exception as e:
-            logger.error(f"Error loading configurations: {e}")
+            logger.error(f"Error loading configurations from upstream: {e}")
             raise
 
     def _categorize_tools(self) -> None:
@@ -139,6 +110,71 @@ class MCPToolsRegistry:
         logger.info(
             f"Categorized tools into {len(self._tools_by_category)} categories: {list(self._tools_by_category.keys())}"
         )
+
+    def _validate_and_filter_tool_data(
+        self, tool_data: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Validate tool data and exclude tools/servers with missing descriptions.
+
+        Args:
+            tool_data: Raw tool data from upstream
+
+        Returns:
+            Tool data if valid, None if it should be excluded
+        """
+        # Create a deep copy to avoid modifying the original
+        validated_data = copy.deepcopy(tool_data)
+
+        # Check for missing or empty description at the top level
+        if (
+            "description" not in validated_data
+            or not validated_data["description"]
+            or validated_data["description"].strip() == ""
+        ):
+            logger.warning(
+                f"Excluding tool '{validated_data.get('name', 'unknown')}' - missing top-level description"
+            )
+            return None
+
+        # Validate tools field structure if it exists
+        if "tools" in validated_data:
+            servers_to_remove = []
+
+            for server_name, server_tools in validated_data["tools"].items():
+                if isinstance(server_tools, dict) and "tools" in server_tools:
+                    has_invalid_tools = False
+
+                    for tool in server_tools["tools"]:
+                        if isinstance(tool, dict):
+                            # Check for missing tool descriptions
+                            if (
+                                "description" not in tool
+                                or not tool["description"]
+                                or tool["description"].strip() == ""
+                            ):
+                                tool_name = tool.get("name", "unknown")
+                                logger.warning(
+                                    f"Excluding server '{server_name}' - tool '{tool_name}' has missing description"
+                                )
+                                has_invalid_tools = True
+                                break
+
+                    if has_invalid_tools:
+                        servers_to_remove.append(server_name)
+
+            # Remove servers with invalid tools
+            for server_name in servers_to_remove:
+                del validated_data["tools"][server_name]
+
+            # If no valid servers remain, exclude the entire tool
+            if not validated_data.get("tools"):
+                logger.warning(
+                    f"Excluding tool '{validated_data.get('name', 'unknown')}' - no valid servers remaining"
+                )
+                return None
+
+        return validated_data
 
     def get_categories(self) -> List[str]:
         """Get all available tool categories."""
@@ -187,12 +223,22 @@ class MCPToolsRegistry:
                         continue  # Skip already processed servers
 
                     if server_name in self._problem_servers:
-                        logger.warning(
-                            f"Skipping {server_name} server due to known schema validation issues"
+                        logger.debug(
+                            f"Skipping server '{server_name}' - known to have issues"
                         )
                         continue
 
                     try:
+                        # Validate server configuration before creating server
+                        if (
+                            "command" not in server_config
+                            or not server_config["command"]
+                        ):
+                            logger.warning(
+                                f"Server '{server_name}' has no command - skipping"
+                            )
+                            continue
+
                         # Create MCP server using inspect.ai's native support
                         server_env = (
                             server_config.get("env", {}).copy()
@@ -268,13 +314,29 @@ class MCPToolsRegistry:
         self, tool_spec: Dict[str, Any]
     ) -> Dict[str, Dict[str, Any]]:
         """Extract server configurations from a tool specification."""
-        server_configs = {}
+        server_configs: Dict[str, Dict[str, Any]] = {}
 
         # Get config from the tool spec
         config = tool_spec.get("config", {})
+        if not isinstance(config, dict):
+            logger.warning(
+                f"Tool '{tool_spec.get('name', 'unknown')}' has invalid config - skipping"
+            )
+            return server_configs
+
         mcp_servers = config.get("mcpServers", {})
+        if not isinstance(mcp_servers, dict):
+            logger.warning(
+                f"Tool '{tool_spec.get('name', 'unknown')}' has invalid mcpServers config - skipping"
+            )
+            return server_configs
 
         for server_name, server_config in mcp_servers.items():
+            if not isinstance(server_config, dict):
+                logger.warning(
+                    f"Server '{server_name}' in tool '{tool_spec.get('name', 'unknown')}' has invalid config - skipping"
+                )
+                continue
             server_configs[server_name] = server_config
 
         return server_configs
@@ -296,10 +358,27 @@ class MCPToolsRegistry:
         tools_data = tool_spec.get("tools", {})
         if server_name in tools_data:
             server_tools_data = tools_data[server_name]
-            available_tools = [
-                tool["name"] for tool in server_tools_data.get("tools", [])
-            ]
-            return available_tools
+            if (
+                not isinstance(server_tools_data, dict)
+                or "tools" not in server_tools_data
+            ):
+                logger.warning(
+                    f"Server '{server_name}' in tool '{tool_spec.get('name', 'unknown')}' has invalid tools structure, using 'all'"
+                )
+                return "all"
+
+            try:
+                # Extract tool names
+                available_tools = []
+                for tool in server_tools_data.get("tools", []):
+                    if isinstance(tool, dict) and "name" in tool and tool["name"]:
+                        available_tools.append(tool["name"])
+                return available_tools
+            except (KeyError, TypeError) as e:
+                logger.warning(
+                    f"Error extracting tool names from server '{server_name}': {e}, using 'all'"
+                )
+                return "all"
 
         return "all"  # Fallback
 
@@ -316,8 +395,6 @@ class MCPToolsRegistry:
 
 
 def get_mcp_tool_sources(
-    tools_json_path: Optional[Union[str, Path]] = None,
-    config_json_path: Optional[Union[str, Path]] = None,
     categories: Optional[List[str]] = None,
     limit: Optional[int] = None,
     tools_per_server: Union[str, List[str]] = "all",
@@ -326,8 +403,6 @@ def get_mcp_tool_sources(
     Get MCP tool sources for use in inspect.ai evaluations using native MCP support.
 
     Args:
-        tools_json_path: Path to tools.json file. If None, uses dynamic fetching from upstream
-        config_json_path: Path to config.json file. If None, uses dynamic fetching from upstream
         categories: List of tool categories to include (e.g., ["Finance", "Discovery"])
         limit: Maximum number of servers per category to load (reduces installation logs)
         tools_per_server: Either "all" or list of specific tool names to include per server
@@ -336,60 +411,27 @@ def get_mcp_tool_sources(
         List of ToolSource objects ready for use in inspect.ai evaluations
 
     Example:
-        # Use dynamic fetching (recommended)
+        # Use specific categories with limits
         tool_sources = get_mcp_tool_sources(categories=["Finance"], limit=2)
-
-        # Use custom tool definitions
-        tool_sources = get_mcp_tool_sources(
-            tools_json_path="my_eval/tools.json",
-            config_json_path="my_eval/servers.json",
-            categories=["Custom"]
-        )
 
         # Use in a task
         solver = react(tools=tool_sources)
     """
-    # Convert to Path objects if provided
-    tools_path = Path(tools_json_path) if tools_json_path is not None else None
-    config_path = Path(config_json_path) if config_json_path is not None else None
-
     # Create registry and get tool sources
-    registry = MCPToolsRegistry(
-        tools_json_path=tools_path, config_json_path=config_path
-    )
+    registry = MCPToolsRegistry()
 
     return registry.create_tool_sources(
         categories=categories, limit=limit, tools_per_server=tools_per_server
     )
 
 
-def get_tool_categories(
-    tools_json_path: Optional[Union[str, Path]] = None,
-    config_json_path: Optional[Union[str, Path]] = None,
-) -> List[str]:
-    """Get all available tool categories from the specified configuration files or dynamic fetching."""
-    # Convert to Path objects if provided
-    tools_path = Path(tools_json_path) if tools_json_path is not None else None
-    config_path = Path(config_json_path) if config_json_path is not None else None
-
-    registry = MCPToolsRegistry(
-        tools_json_path=tools_path, config_json_path=config_path
-    )
-
+def get_tool_categories() -> List[str]:
+    """Get all available tool categories from the upstream repository."""
+    registry = MCPToolsRegistry()
     return registry.get_categories()
 
 
-def get_registry_stats(
-    tools_json_path: Optional[Union[str, Path]] = None,
-    config_json_path: Optional[Union[str, Path]] = None,
-) -> Dict[str, Any]:
-    """Get statistics about the tool registry using dynamic fetching or specified files."""
-    # Convert to Path objects if provided
-    tools_path = Path(tools_json_path) if tools_json_path is not None else None
-    config_path = Path(config_json_path) if config_json_path is not None else None
-
-    registry = MCPToolsRegistry(
-        tools_json_path=tools_path, config_json_path=config_path
-    )
-
+def get_registry_stats() -> Dict[str, Any]:
+    """Get statistics about the tool registry from the upstream repository."""
+    registry = MCPToolsRegistry()
     return registry.get_stats()

@@ -34,7 +34,5 @@ __all__ = [
     "MCPToolsRegistry",
     "get_tools_data",
     "get_config_data",
-    "clear_cache",
-    "get_cache_info",
     "LiveMCPDataFetcher",
 ]

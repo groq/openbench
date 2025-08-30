@@ -16,6 +16,9 @@ class LiveMCPDataFetcher:
     """
     Fetches LiveMCPBench tools data from the upstream repository.
 
+    This class handles downloading tool and server configuration data
+    from the upstream LiveMCPBench GitHub repository to ensure we
+    always have the latest tool definitions.
     """
 
     def __init__(
