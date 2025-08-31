@@ -78,7 +78,7 @@ jobs:
 
       - name: Run unit tests with coverage
         run: |
-          uv run pytest -m "not integration" --cov=bench --cov-report=term-missing
+          uv run pytest -m "not integration" --cov=openbench --cov-report=term-missing
 
   integration-test:
     name: Integration Tests
@@ -143,10 +143,19 @@ jobs:
     steps:
       - name: Verify all checks passed
         run: |
+          # Quality checks and test must always pass
           if [[ "${{ needs.quality-checks.result }}" != "success" || 
-                "${{ needs.test.result }}" != "success" || 
-                "${{ needs.integration-test.result }}" != "success" ]]; then
+                "${{ needs.test.result }}" != "success" ]]; then
             echo "One or more required checks failed"
             exit 1
           fi
-          echo "All checks passed!"
+          
+          # Integration test can be skipped (for external PRs) or must succeed
+          if [[ "${{ needs.integration-test.result }}" != "success" && 
+                "${{ needs.integration-test.result }}" != "skipped" ]]; then
+            echo "Integration tests failed"
+            exit 1
+          fi
+          
+          # Security is continue-on-error, so we don't check it
+          echo "All required checks passed!"

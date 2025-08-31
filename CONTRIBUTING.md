@@ -2,6 +2,45 @@
 
 Thank you for your interest in contributing to OpenBench! We welcome contributions from the community and are grateful for your support in making language model evaluation more accessible and reliable.
 
+## 🚀 Quick Start
+
+### Prerequisites
+- Python 3.10+
+- [UV package manager](https://docs.astral.sh/uv/getting-started/installation/)
+- Git
+
+### Setup
+```bash
+# Clone and setup
+git clone https://github.com/groq/openbench.git
+cd openbench
+uv venv && uv sync --dev
+source .venv/bin/activate
+
+# CRITICAL: Install pre-commit hooks (CI will fail without this!)
+pre-commit install
+
+# Run tests to verify setup
+pytest
+```
+
+⚠️ **IMPORTANT**: You MUST install pre-commit hooks after `uv sync --dev`. CI will fail if you skip this step!
+
+### Installing Optional Dependencies
+Some benchmarks require additional dependencies that are not included in the core package:
+
+```bash
+# Install core dependencies only (runs most benchmarks)
+uv sync
+
+# Install specific benchmark dependencies
+uv sync --group scicode         # For SciCode benchmark
+uv sync --group jsonschemabench  # For JSONSchemaBench
+
+# Install everything including dev tools
+uv sync --all-groups
+```
+
 ## 🎯 Core Principles
 
 ### Single Responsibility
@@ -97,12 +136,14 @@ Closes #123
 
 3. **Test your changes**
    ```bash
-   # Run tests
+   # Run all tests
    pytest
    
-   # Run linting
-   ruff check .
-   ruff format .
+   # Run integration tests (requires API keys)
+   pytest -m integration
+   
+   # Run pre-commit hooks (REQUIRED)
+   pre-commit run --all-files
    
    # Test your specific changes
    bench eval <your-benchmark> --limit 5
@@ -142,22 +183,44 @@ Closes #123
 ## 🏗️ Architecture Guidelines
 
 ### Adding a New Benchmark
-1. Create a new module in `src/bench/evals/<benchmark_name>/`
-2. Implement the evaluation following existing patterns
-3. Use shared utilities from `src/bench/common/` where possible
-4. Add comprehensive tests
-5. Update the CLI to include your benchmark
-6. Document usage in the README
+1. Create a new evaluation file in `src/openbench/evals/`
+2. Add dataset loader in `src/openbench/datasets/` if needed
+3. Add custom scorer in `src/openbench/scorers/` if needed
+4. Register benchmark metadata in `src/openbench/config.py`
+5. **Import your task in `src/openbench/_registry.py`**:
 
 Example structure:
 ```
-src/bench/evals/my_benchmark/
-├── __init__.py
-├── my_benchmark.py    # Main evaluation logic
-├── dataset.py         # Dataset loading
-├── scorer.py          # Custom scoring if needed
-└── README.md          # Benchmark documentation
+src/openbench/
+├── evals/
+│   └── my_benchmark.py      # Main evaluation logic
+├── datasets/
+│   └── my_benchmark.py      # Dataset loader
+├── scorers/
+│   └── my_benchmark.py      # Custom scorer (if needed)
+└── config.py                # Add benchmark metadata here
+└── _registry.py                # Add benchmark import here
 ```
+
+#### Dependency Architecture
+OpenBench uses a tightly coupled architecture where benchmarks share common infrastructure:
+- **Core dependencies** (inspect-ai, datasets, scipy, numpy): Required by multiple benchmarks
+- **Optional dependencies**: Specific to individual benchmarks (e.g., scicode, jsonschema)
+- Most benchmarks (17/19) can run with just core dependencies
+
+### Adding a New Model Provider
+1. Create provider file in `src/openbench/model/_providers/`
+2. Follow existing provider patterns (see `ai21.py`, `cerebras.py`, etc.)
+3. Add environment variable documentation
+4. Test with multiple benchmarks
+5. Update provider table in README.md
+
+### Key Development Tools
+- **UV**: Package manager (not pip) - use `uv add "package>=version"` for dependencies (except inspect-ai which should remain pinned)
+- **Ruff**: Linting and formatting - replaces Black, isort, flake8
+- **MyPy**: Type checking - required for all new code
+- **Pre-commit**: Automated code quality checks - must pass before commits
+- **Pytest**: Testing framework with integration test markers
 
 ### Code Style
 - Follow PEP 8 with a line length of 88 characters (Black default)
@@ -174,20 +237,23 @@ src/bench/evals/my_benchmark/
 
 ## 🐛 Reporting Issues
 
-When reporting issues, please include:
-1. OpenBench version (`uv pip show openbench`)
-2. Python version
-3. Operating system
-4. Minimal reproducible example
-5. Full error output with traceback
+We have structured issue templates to help you report problems effectively:
 
-## 💡 Feature Requests
+### Bug Reports
+Use our [bug report template](https://github.com/groq/openbench/issues/new?assignees=&labels=bug&projects=&template=bug_report.yml) which includes:
+- OpenBench version and environment details
+- Exact command that failed
+- Expected vs actual behavior
+- Error logs and reproduction steps
 
-We love hearing ideas for improvements! When proposing features:
-1. Explain the use case
-2. Describe the desired behavior
-3. Consider backward compatibility
-4. Be open to alternative solutions
+### Feature Requests
+Use our [feature request template](https://github.com/groq/openbench/issues/new?assignees=&labels=enhancement&projects=&template=feature_request.yml) for:
+- New benchmarks/evaluations
+- New model providers
+- CLI enhancements
+- Performance improvements
+- API/SDK features
+- Integration requests
 
 ## 📚 Resources
 

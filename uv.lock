@@ -9,8 +9,21 @@ resolution-markers = [
 ]
 
 [[package]]
+name = "aioboto3"
+version = "15.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "aiobotocore", extra = ["boto3"] },
+    { name = "aiofiles" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/5c/b1/b0331786c50f6ef881f9a71c3441ccf7b64c7eed210297d882c37ce31713/aioboto3-15.1.0.tar.gz", hash = "sha256:37763bbc6321ceb479106dc63bc84c8fdb59dd02540034a12941aebef2057c5c", size = 234664, upload-time = "2025-08-14T19:49:15.35Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/93/b0/28e3ac89e7119b1cb4e6830664060b96a2b5761291e92a10fb3044b5a11d/aioboto3-15.1.0-py3-none-any.whl", hash = "sha256:66006142a2ccc7d6d07aa260ba291c4922b6767d270ba42f95c59e85d8b3e645", size = 35791, upload-time = "2025-08-14T19:49:14.14Z" },
+]
+
+[[package]]
 name = "aiobotocore"
-version = "2.21.1"
+version = "2.24.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -21,9 +34,23 @@ dependencies = [
     { name = "python-dateutil" },
     { name = "wrapt" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d2/dc/f5f872fb01ce37c09525cedc7ecfad7002ffe2a8a23f77d7d2c234399b51/aiobotocore-2.21.1.tar.gz", hash = "sha256:010357f43004413e92a9d066bb0db1f241aeb29ffed306e9197061ffc94e6577", size = 108900, upload-time = "2025-03-04T18:30:58.945Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b2/ca/ac82c0c699815b6d5b4017f3d8fb2c2d49537f4937f4a0bdf58b4c75d321/aiobotocore-2.24.0.tar.gz", hash = "sha256:b32c0c45d38c22a18ce395a0b5448606c5260603296a152895b5bdb40ab3139d", size = 119597, upload-time = "2025-08-08T18:26:50.373Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/95/67/026598918f92145156f2feb7957f57daefda20375cc2ac1a0692a9b8010b/aiobotocore-2.21.1-py3-none-any.whl", hash = "sha256:bd7c49a6d6f8a3d9444b0a94417c8da13813b5c7eec1c4f0ec2db7e8ce8f23e7", size = 78313, upload-time = "2025-03-04T18:30:56.493Z" },
+    { url = "https://files.pythonhosted.org/packages/e2/68/b29577197aa2e54b50d6f214524790cc1cb27d289585ad7c7bdfe5125285/aiobotocore-2.24.0-py3-none-any.whl", hash = "sha256:72bb1f8eb1b962779a95e1bcc9cf35bc33196ad763b622a40ae7fa9d2e95c87c", size = 84971, upload-time = "2025-08-08T18:26:48.777Z" },
+]
+
+[package.optional-dependencies]
+boto3 = [
+    { name = "boto3" },
+]
+
+[[package]]
+name = "aiofiles"
+version = "24.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/0b/03/a88171e277e8caa88a4c77808c20ebb04ba74cc4681bf1e9416c862de237/aiofiles-24.1.0.tar.gz", hash = "sha256:22a075c9e5a3810f0c2e48f3008c94d68c65d763b9b03857924c99e57355166c", size = 30247, upload-time = "2024-06-24T11:02:03.584Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a5/45/30bb92d442636f570cb5651bc661f52b610e2eec3f891a5dc3a4c3667db0/aiofiles-24.1.0-py3-none-any.whl", hash = "sha256:b4ec55f4195e3eb5d7abd1bf7e061763e864dd4954231fb8539a0ef8bb8260e5", size = 15896, upload-time = "2024-06-24T11:02:01.529Z" },
 ]
 
 [[package]]
@@ -212,17 +239,31 @@ wheels = [
 ]
 
 [[package]]
+name = "boto3"
+version = "1.39.11"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "botocore" },
+    { name = "jmespath" },
+    { name = "s3transfer" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b6/2e/ed75ea3ee0fd1afacc3379bc2b7457c67a6b0f0e554e1f7ccbdbaed2351b/boto3-1.39.11.tar.gz", hash = "sha256:3027edf20642fe1d5f9dc50a420d0fe2733073ed6a9f0f047b60fe08c3682132", size = 111869, upload-time = "2025-07-22T19:26:50.867Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/72/66/88566a6484e746c0b075f7c9bb248e8548eda0a486de4460d150a41e2d57/boto3-1.39.11-py3-none-any.whl", hash = "sha256:af8f1dad35eceff7658fab43b39b0f55892b6e3dd12308733521cc24dd2c9a02", size = 139900, upload-time = "2025-07-22T19:26:48.706Z" },
+]
+
+[[package]]
 name = "botocore"
-version = "1.37.1"
+version = "1.39.11"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jmespath" },
     { name = "python-dateutil" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e5/01/3083bff25fd91193162298920cb093b9095609408416526d52b2826965b7/botocore-1.37.1.tar.gz", hash = "sha256:b194db8fb2a0ffba53568c364ae26166e7eec0445496b2ac86a6e142f3dd982f", size = 13578835, upload-time = "2025-02-25T20:32:56.63Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/6d/d0/9d64261186cff650fe63168441edb4f4cd33f085a74c0c54455630a71f91/botocore-1.39.11.tar.gz", hash = "sha256:953b12909d6799350e346ab038e55b6efe622c616f80aef74d7a6683ffdd972c", size = 14217749, upload-time = "2025-07-22T19:26:40.723Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3d/20/352b2bf99f93ba18986615841786cbd0d38f7856bd49d4e154a540f04afe/botocore-1.37.1-py3-none-any.whl", hash = "sha256:c1db1bfc5d8c6b3b6d1ca6794f605294b4264e82a7e727b88e0fef9c2b9fbb9c", size = 13359164, upload-time = "2025-02-25T20:32:52.347Z" },
+    { url = "https://files.pythonhosted.org/packages/1c/2c/8a0b02d60a1dbbae7faa5af30484b016aa3023f9833dfc0d19b0b770dd6a/botocore-1.39.11-py3-none-any.whl", hash = "sha256:1545352931a8a186f3e977b1e1a4542d7d434796e274c3c62efd0210b5ea76dc", size = 13876276, upload-time = "2025-07-22T19:26:35.164Z" },
 ]
 
 [[package]]
@@ -1220,9 +1261,10 @@ wheels = [
 
 [[package]]
 name = "inspect-ai"
-version = "0.3.115"
+version = "0.3.125"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "aioboto3" },
     { name = "aiohttp" },
     { name = "anyio" },
     { name = "beautifulsoup4" },
@@ -1256,9 +1298,9 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "zipp" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a8/bf/88703238e9c5728c9471a558613fc39bd07670887ab44a117dd6d1cfa480/inspect_ai-0.3.115.tar.gz", hash = "sha256:0af6b5902fcb9f3de48f80c466626dee5769b08512e5fe8bcf503789712dd256", size = 11784552, upload-time = "2025-07-26T18:14:53.729Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ff/9a/1a72dddd91503a87a64049b0f2b0012759624e6a1435b65e03803f265813/inspect_ai-0.3.125.tar.gz", hash = "sha256:2aeb491dc8cf03689e3080b642016d10aa5431867e1b8dbedcfe439a8f256fe8", size = 11900429, upload-time = "2025-08-25T13:32:36.35Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/33/a9/a2ae7e7d91f4c215ff8cb5c2cc3b59eb238959a523d8f5e47a8b9e3febc2/inspect_ai-0.3.115-py3-none-any.whl", hash = "sha256:419511265094f2681c22a8094c91d1adafbedab3d759870c5f6cc3c134e0f33e", size = 3237638, upload-time = "2025-07-26T18:14:48.627Z" },
+    { url = "https://files.pythonhosted.org/packages/a9/d8/dc509a17c29db0132e9ad96072a1052eec30d0f3f8f89ccbbf100cddabb0/inspect_ai-0.3.125-py3-none-any.whl", hash = "sha256:ac1113744b63a5b74364160446a5a9671ca4b393113ba4fcc4fee09380e38cca", size = 3290751, upload-time = "2025-08-25T13:32:31.31Z" },
 ]
 
 [[package]]
@@ -2064,7 +2106,7 @@ wheels = [
 
 [[package]]
 name = "openbench"
-version = "0.2.0"
+version = "0.3.0"
 source = { editable = "." }
 dependencies = [
     { name = "datasets" },
@@ -2072,7 +2114,6 @@ dependencies = [
     { name = "inspect-ai" },
     { name = "openai" },
     { name = "pydantic-settings" },
-    { name = "scicode" },
     { name = "scipy" },
     { name = "tiktoken" },
     { name = "typer" },
@@ -2083,22 +2124,29 @@ dev = [
     { name = "mypy" },
     { name = "pre-commit" },
     { name = "pytest" },
+    { name = "pytest-asyncio" },
     { name = "pytest-cov" },
     { name = "ruff" },
+    { name = "types-jsonschema" },
     { name = "types-pyyaml" },
+]
+jsonschemabench = [
+    { name = "jsonschema" },
+]
+scicode = [
+    { name = "scicode" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "datasets", specifier = "==3.6.0" },
-    { name = "groq", specifier = "==0.30.0" },
-    { name = "inspect-ai", specifier = "==0.3.115" },
-    { name = "openai", specifier = "==1.97.1" },
-    { name = "pydantic-settings", specifier = "==2.9.1" },
-    { name = "scicode", git = "https://github.com/TheFloatingString/SciCode-fork.git?rev=4f20d721ba3e2227196262083b9b7a70484d54f7" },
-    { name = "scipy", specifier = "==1.15.3" },
-    { name = "tiktoken", specifier = "==0.11.0" },
-    { name = "typer", specifier = "==0.15.3" },
+    { name = "datasets", specifier = ">=3.6.0" },
+    { name = "groq", specifier = ">=0.30.0" },
+    { name = "inspect-ai", specifier = "==0.3.125" },
+    { name = "openai", specifier = ">=1.97.1" },
+    { name = "pydantic-settings", specifier = ">=2.9.1" },
+    { name = "scipy", specifier = ">=1.15.3" },
+    { name = "tiktoken", specifier = ">=0.11.0" },
+    { name = "typer", specifier = ">=0.15.3" },
 ]
 
 [package.metadata.requires-dev]
@@ -2106,10 +2154,14 @@ dev = [
     { name = "mypy", specifier = ">=1.15.0" },
     { name = "pre-commit", specifier = ">=4.2.0" },
     { name = "pytest", specifier = ">=8.3.5" },
+    { name = "pytest-asyncio", specifier = "==0.24.0" },
     { name = "pytest-cov", specifier = ">=4.1.0" },
     { name = "ruff", specifier = ">=0.11.9" },
+    { name = "types-jsonschema", specifier = ">=4.0.0" },
     { name = "types-pyyaml", specifier = ">=6.0.12.20250809" },
 ]
+jsonschemabench = [{ name = "jsonschema", specifier = ">=4.23.0" }]
+scicode = [{ name = "scicode", git = "https://github.com/TheFloatingString/SciCode-fork.git?rev=4f20d721ba3e2227196262083b9b7a70484d54f7" }]
 
 [[package]]
 name = "packaging"
@@ -2669,6 +2721,18 @@ wheels = [
 ]
 
 [[package]]
+name = "pytest-asyncio"
+version = "0.24.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/52/6d/c6cf50ce320cf8611df7a1254d86233b3df7cc07f9b5f5cbcb82e08aa534/pytest_asyncio-0.24.0.tar.gz", hash = "sha256:d081d828e576d85f875399194281e92bf8a68d60d72d1a2faf2feddb6c46b276", size = 49855, upload-time = "2024-08-22T08:03:18.145Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/96/31/6607dab48616902f76885dfcf62c08d929796fc3b2d2318faf9fd54dbed9/pytest_asyncio-0.24.0-py3-none-any.whl", hash = "sha256:a811296ed596b69bf0b6f3dc40f83bcaf341b155a269052d82efa2b25ac7037b", size = 18024, upload-time = "2024-08-22T08:03:15.536Z" },
+]
+
+[[package]]
 name = "pytest-cov"
 version = "6.2.1"
 source = { registry = "https://pypi.org/simple" }
@@ -3026,6 +3090,18 @@ wheels = [
 ]
 
 [[package]]
+name = "s3transfer"
+version = "0.13.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "botocore" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6d/05/d52bf1e65044b4e5e27d4e63e8d1579dbdec54fce685908ae09bc3720030/s3transfer-0.13.1.tar.gz", hash = "sha256:c3fdba22ba1bd367922f27ec8032d6a1cf5f10c934fb5d68cf60fd5a23d936cf", size = 150589, upload-time = "2025-07-18T19:22:42.31Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/6d/4f/d073e09df851cfa251ef7840007d04db3293a0482ce607d2b993926089be/s3transfer-0.13.1-py3-none-any.whl", hash = "sha256:a981aa7429be23fe6dfc13e80e4020057cbab622b08c0315288758d67cabc724", size = 85308, upload-time = "2025-07-18T19:22:40.947Z" },
+]
+
+[[package]]
 name = "scicode"
 version = "1.0.0"
 source = { git = "https://github.com/TheFloatingString/SciCode-fork.git?rev=4f20d721ba3e2227196262083b9b7a70484d54f7#4f20d721ba3e2227196262083b9b7a70484d54f7" }
@@ -3319,6 +3395,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/98/1a/5f36851f439884bcfe8539f6a20ff7516e7b60f319bbaf69a90dc35cc2eb/typer-0.15.3.tar.gz", hash = "sha256:818873625d0569653438316567861899f7e9972f2e6e0c16dab608345ced713c", size = 101641, upload-time = "2025-04-28T21:40:59.204Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/48/20/9d953de6f4367163d23ec823200eb3ecb0050a2609691e512c8b95827a9b/typer-0.15.3-py3-none-any.whl", hash = "sha256:c86a65ad77ca531f03de08d1b9cb67cd09ad02ddddf4b34745b5008f43b239bd", size = 45253, upload-time = "2025-04-28T21:40:56.269Z" },
+]
+
+[[package]]
+name = "types-jsonschema"
+version = "4.25.1.20250821"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "referencing" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ff/7b/bd0a0f942beec6a4540c604a1a9f1c52a82f6fb0d915c6b2f8810bbd5590/types_jsonschema-4.25.1.20250821.tar.gz", hash = "sha256:4a2d744a3dd284d2b13423466d7584917bb050c493ac09e1a361d4feed92aaed", size = 15511, upload-time = "2025-08-21T03:01:52.076Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/96/b8/c92fa726786f503a95b02033f1739404c49db9d2a7b56ff50207a22cdb9a/types_jsonschema-4.25.1.20250821-py3-none-any.whl", hash = "sha256:73e22048556bfd097d58883b203ff298a2dbece0d76b35115dbee0dad9b02bab", size = 15798, upload-time = "2025-08-21T03:01:50.848Z" },
 ]
 
 [[package]]

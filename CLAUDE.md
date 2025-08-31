@@ -5,8 +5,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Essential Setup
 - Always source the virtual environment before running Python commands: `source .venv/bin/activate`
 - This project uses UV as the package manager, not pip
-- **Dependencies must be pinned**: When adding dependencies with UV, always pin to specific versions (e.g., `uv add package==1.2.3` not `uv add package`)
-  - Pin to the latest stable version available to keep dependencies healthy and secure
+- **Dependency management**: When adding dependencies with UV, use >= constraints (e.g., `uv add "package>=1.2.3"`)
+  - Exception: `inspect-ai` must remain pinned to a specific version for stability
+  - Use the latest stable version as the minimum to keep dependencies healthy and secure
   - Check latest versions with `uv pip list --outdated` or on PyPI
 
 ## Key Commands
@@ -63,6 +64,22 @@ bench eval mmlu --model groq/llama-3.1-70b --limit 10
 bench view
 ```
 
+### Installing Dependencies
+```bash
+# Install core dependencies only (runs most benchmarks)
+uv sync
+
+# Install with specific benchmark dependencies
+uv sync --group scicode       # For SciCode benchmark
+uv sync --group jsonschemabench # For JSONSchemaBench
+
+# Install with development tools
+uv sync --dev
+
+# Install everything
+uv sync --all-groups
+```
+
 ### Publishing to PyPI
 ```bash
 # Build the package
@@ -90,6 +107,27 @@ uv publish
 2. **Inspect AI framework**: All evaluations extend Inspect AI's task/solver pattern
 3. **Provider-agnostic**: Uses Inspect AI's model abstraction for 15+ providers
 4. **Shared components**: Common scorers and utilities reduce code duplication
+
+### Dependency Architecture
+OpenBench uses a tightly coupled architecture where benchmarks share common infrastructure:
+
+```
+┌─────────────┐      ┌──────────────┐      ┌──────────────┐
+│   EVALS     │ ---> │   DATASETS   │ <--> │   SCORERS    │
+│  (19 files) │      │  (shared)    │      │  (shared)    │
+└─────────────┘      └──────────────┘      └──────────────┘
+```
+
+**Core Dependencies** (in main `dependencies`):
+- `inspect-ai`: Required by all benchmarks
+- `scipy`, `numpy`: Used by multiple scorers (DROP, MMLU, HealthBench)
+- `datasets`, `typer`, `groq`, `openai`: Core infrastructure
+
+**Optional Dependencies** (in `dependency-groups`):
+- `scicode`: Only needed for SciCode benchmark
+- `jsonschemabench`: Only needed for JSONSchemaBench
+
+Most benchmarks (17/19) can run with just core dependencies. Only specialized benchmarks require their specific dependency group.
 
 ### Adding New Benchmarks
 1. Create evaluation file in `src/openbench/evals/`

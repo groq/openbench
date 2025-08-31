@@ -1,27 +1,12 @@
-import re
-from inspect_ai.solver import TaskState
 from collections import defaultdict
 import numpy as np
-from typing import Callable
 from inspect_ai.scorer import (
-    accuracy,
-    scorer,
-    std,
-    stderr,
     Metric,
     Value,
     SampleScore,
-    Target,
-    Score,
     metric,
 )
-from openbench.metrics.grouped import grouped
-from openbench.utils.text import (
-    strip_md_latex,
-    normalize_mcq_answer,
-    MULTILINGUAL_ANSWER_PATTERN_TEMPLATE,
-    MULTILINGUAL_ANSWER_REGEXES,
-)
+from openbench.scorers.mcq import mmlu_simple_eval_scorer
 
 # Adapted from https://github.com/openai/simple-evals
 SUBJECT_TO_CATEGORY = {
@@ -145,21 +130,10 @@ def category_accuracy_metrics() -> Metric:
     return metric_calculator
 
 
-@scorer(metrics=[grouped(group_key="category", metric=[accuracy(), stderr(), std()])])
-def mmlu_simple_eval_scorer() -> Callable:
-    async def score(state: TaskState, target: Target) -> Score:
-        response_text = strip_md_latex(state.output.completion)
-        extracted_answer = None
-        for answer_regex in MULTILINGUAL_ANSWER_REGEXES:
-            regex = MULTILINGUAL_ANSWER_PATTERN_TEMPLATE.format(answer_regex)
-            match = re.search(regex, response_text)
-            if match:
-                extracted_answer = normalize_mcq_answer(match.group(1))
-                break
-        return (
-            Score(value="C", answer=extracted_answer)
-            if extracted_answer == target.text
-            else Score(value="I", answer=extracted_answer)
-        )
-
-    return score
+# Re-export the scorer from mcq.py
+# This keeps backward compatibility while using the unified scorer
+__all__ = [
+    "mmlu_simple_eval_scorer",
+    "category_accuracy_metrics",
+    "SUBJECT_TO_CATEGORY",
+]
