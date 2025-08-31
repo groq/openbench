@@ -66,11 +66,24 @@ bench eval simpleqa --model anthropic/claude-sonnet-4-20250514
 # Google
 bench eval mmlu --model google/gemini-2.5-pro
 
-# Local models with Ollama
-bench eval musr --model ollama/llama3.1:70b
+# Local Models (Ollama, vLLM, etc.)
+bench eval mmlu --model ollama/llama3-70b
 
 # Hugging Face Inference Providers
 bench eval mmlu --model huggingface/gpt-oss-120b:groq
+
+### Ollama
+```bash
+# Make sure your Ollama server is running
+bench eval mmlu --model ollama/llama3-8b
+```
+
+### vLLM (and other OpenAI-Compatible Endpoints)
+```bash
+# Make sure your vLLM server is running
+export OPENAI_COMPATIBLE_BASE_URL="http://localhost:8000/v1"
+bench eval mmlu --model openai-compatible/meta-llama-3-70b-instruct
+```
 
 # 30+ providers supported - see full list below
 ```
@@ -103,6 +116,7 @@ OpenBench supports 30+ model providers through Inspect AI. Set the appropriate A
 | **Nous Research**     | `NOUS_API_KEY`         | `nous/model-name`                |
 | **Novita AI**         | `NOVITA_API_KEY`       | `novita/model-name`              |
 | **Ollama**            | None (local)           | `ollama/model-name`              |
+| **OpenAI-Compatible** | `OPENAI_COMPATIBLE_API_KEY` | `openai-compatible/model-name`   |
 | **OpenAI**            | `OPENAI_API_KEY`       | `openai/model-name`              |
 | **OpenRouter**        | `OPENROUTER_API_KEY`   | `openrouter/model-name`          |
 | **Parasail**          | `PARASAIL_API_KEY`     | `parasail/model-name`            |
@@ -111,7 +125,6 @@ OpenBench supports 30+ model providers through Inspect AI. Set the appropriate A
 | **SambaNova**         | `SAMBANOVA_API_KEY`    | `sambanova/model-name`           |
 | **Together AI**       | `TOGETHER_API_KEY`     | `together/model-name`            |
 | **Vercel AI Gateway** | `AI_GATEWAY_API_KEY`   | `vercel/creator-name/model-name` |
-| **vLLM**              | None (local)           | `vllm/model-name`                |
 
 ## Available Benchmarks
 
