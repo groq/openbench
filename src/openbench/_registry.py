@@ -163,6 +163,14 @@ def vercel() -> Type[ModelAPI]:
     return VercelAPI
 
 
+@modelapi(name="openai_compatible")
+def openai_compatible() -> Type[ModelAPI]:
+    """Register OpenAI-compatible provider."""
+    from .model._providers.openai_compatible import OpenAICompatibleProviderAPI
+
+    return OpenAICompatibleProviderAPI
+
+
 # Task Registration
 
 # Core benchmarks
