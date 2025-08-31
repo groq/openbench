@@ -139,7 +139,7 @@ export HF_TOKEN=your_key
 export OPENAI_API_KEY=your_key  # Optional
 
 # Set default model
-export BENCH_MODEL=groq/llama-3.1-70b
+export BENCH_MODEL=groq/openai/gpt-oss-20b
 ```
 
 ## Commands and Options
@@ -161,7 +161,7 @@ For a complete list of all commands and options, run: `bench --help`
 | -------------------- | ------------------------ | --------------- | ---------------------------------------------------------------- |
 | `-M <args>`          | None                     | None            | Pass model-specific arguments (e.g., `-M reasoning_effort=high`) |
 | `-T <args>`          | None                     | None            | Pass task-specific arguments to the benchmark                    |
-| `--model`            | `BENCH_MODEL`            | None (required) | Model(s) to evaluate                                             |
+| `--model`            | `BENCH_MODEL`            | `groq/openai/gpt-oss-20b` | Model(s) to evaluate                                             |
 | `--epochs`           | `BENCH_EPOCHS`           | `1`             | Number of epochs to run each evaluation                          |
 | `--max-connections`  | `BENCH_MAX_CONNECTIONS`  | `10`            | Maximum parallel requests to model                               |
 | `--temperature`      | `BENCH_TEMPERATURE`      | `0.6`           | Model temperature                                                |

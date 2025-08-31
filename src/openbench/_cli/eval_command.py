@@ -124,7 +124,7 @@ def run_eval(
             help="Model(s) to evaluate. Equivalent to --model-role candidate=<model>",
             envvar="BENCH_MODEL",
         ),
-    ] = ["groq/meta-llama/llama-4-scout-17b-16e-instruct"],
+    ] = ["groq/openai/gpt-oss-20b"],
     max_connections: Annotated[
         Optional[int],
         typer.Option(
