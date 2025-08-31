@@ -5,6 +5,7 @@ from inspect_ai.model import ChatMessageUser, ContentText, ContentImage
 from typing import Dict, Any, List, Optional, Union, cast
 import base64
 from openbench.utils.text import MULTIPLE_CHOICE_PROMPT_TEMPLATE
+from openbench.utils.image import detect_image_mime_type
 
 
 def record_to_sample(record: Dict[str, Any]) -> Sample:
@@ -66,9 +67,10 @@ def record_to_sample(record: Dict[str, Any]) -> Sample:
 
             image_bytes = image_data["bytes"]
 
-            # Convert to base64 data URI
+            # Convert to base64 data URI with proper MIME type detection
             base64_image = base64.b64encode(image_bytes).decode("utf-8")
-            data_uri = f"data:image/png;base64,{base64_image}"
+            mime_type = detect_image_mime_type(image_bytes)
+            data_uri = f"data:{mime_type};base64,{base64_image}"
 
             # Add the image to the input content using data URI
             input_content.append(ContentImage(image=data_uri))

@@ -179,16 +179,25 @@ For a complete list of all commands and options, run: `bench --help`
 
 ## Grader Information
 
-Some benchmarks, like `HealthBench`, use a "judge" model to score the model's performance. This requires an additional API key for the grader model.
+Some benchmarks use a grader model to score the model's performance. This requires an additional API key for the grader model.
 
-- **Default Grader**: `openai/gpt-4.1-2025-04-14`
-- **Required Key**: `OPENAI_API_KEY`
-
-To run these benchmarks, you'll need to export your OpenAI API key:
+To run these benchmarks, you'll need to export your `OPENAI_API_key`:
 
 ```bash
 export OPENAI_API_KEY=your_openai_key
 ```
+
+The following benchmarks use a grader model:
+
+| Benchmark | Default Grader Model |
+| :--- | :--- |
+| `simpleqa` | `openai/gpt-4.1-2025-04-14` |
+| `hle` | `openai/o3-mini-2025-01-31` |
+| `hle_text` | `openai/o3-mini-2025-01-31` |
+| `browsecomp` | `openai/gpt-4.1-2025-04-14` |
+| `healthbench` | `openai/gpt-4.1-2025-04-14` |
+| `math` | `openai/gpt-4-turbo-preview` |
+| `math_500` | `openai/gpt-4-turbo-preview` |
 
 ## Building Your Own Evals
 
