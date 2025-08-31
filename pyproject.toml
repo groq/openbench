@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "openbench"
-version = "0.3.0"
+version = "0.4.1"
 requires-python = ">=3.10"
 description = "OpenBench - open source, replicable, and standardized evaluation infrastructure"
 readme = "README.md"
@@ -17,7 +17,7 @@ dependencies = [
     "datasets>=3.6.0",
     "groq>=0.30.0",
     "inspect-ai==0.3.125",
-    "openai>=1.97.1",
+    "openai>=1.100.0",
     "pydantic-settings>=2.9.1",
     "scipy>=1.15.3",
     "tiktoken>=0.11.0",

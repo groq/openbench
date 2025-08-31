@@ -171,6 +171,14 @@ def openai_compatible() -> Type[ModelAPI]:
     return OpenAICompatibleProviderAPI
 
 
+@modelapi(name="groq")
+def groq() -> Type[ModelAPI]:
+    """Register Groq provider (OpenBench implementation overriding Inspect)."""
+    from .model._providers.groq import GroqAPI
+
+    return GroqAPI
+
+
 # Task Registration
 
 # Core benchmarks
