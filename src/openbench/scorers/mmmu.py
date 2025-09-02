@@ -4,13 +4,14 @@ Uses MCQ scoring for multiple-choice items and open-answer scorer for open items
 Supports grouped metrics across both types.
 """
 
-from typing import Callable, Optional, List
+from typing import Callable, Optional, List, Any
 
 from inspect_ai.scorer import scorer, accuracy, stderr, std, Score, Target
 from inspect_ai.solver import TaskState
 
 from openbench.scorers.mcq import create_mcq_scorer
 from openbench.scorers.open_answer import create_open_answer_scorer
+from openbench.metrics.grouped import grouped
 
 
 def mmmu_mixed_scorer(
@@ -22,11 +23,16 @@ def mmmu_mixed_scorer(
         group_keys: Optional metadata keys to group metrics by.
     """
 
-    # Instantiate underlying scorers
-    mcq_scorer = create_mcq_scorer(group_keys=None)()
-    open_scorer = create_open_answer_scorer(group_keys=None)()
+    mcq_scorer = create_mcq_scorer(group_keys=group_keys)()
+    open_scorer = create_open_answer_scorer(group_keys=group_keys)()
 
-    @scorer(metrics=[accuracy(), stderr(), std()])
+    metrics: List[Any] = [accuracy(), stderr(), std()]
+
+    if group_keys:
+        for key in group_keys:
+            metrics.append(grouped(group_key=key, metric=[accuracy(), stderr(), std()]))
+
+    @scorer(metrics=metrics)
     def mixed() -> Callable:
         async def score(state: TaskState, target: Target) -> Score:
             qtype = str(state.metadata.get("question_type", "multiple-choice")).lower()
