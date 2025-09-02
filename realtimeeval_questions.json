@@ -1,0 +1,52 @@
+[
+  {
+    "problem": "What is the capital of France?",
+    "answer": "Paris",
+    "metadata": "geography"
+  },
+  {
+    "problem": "Who wrote the novel '1984'?",
+    "answer": "George Orwell",
+    "metadata": "literature"
+  },
+  {
+    "problem": "What is the chemical symbol for gold?",
+    "answer": "Au",
+    "metadata": "chemistry"
+  },
+  {
+    "problem": "In what year did the Berlin Wall fall?",
+    "answer": "1989",
+    "metadata": "history"
+  },
+  {
+    "problem": "What is the largest planet in our solar system?",
+    "answer": "Jupiter",
+    "metadata": "astronomy"
+  },
+  {
+    "problem": "Who painted the Mona Lisa?",
+    "answer": "Leonardo da Vinci",
+    "metadata": "art"
+  },
+  {
+    "problem": "What is the square root of 144?",
+    "answer": "12",
+    "metadata": "mathematics"
+  },
+  {
+    "problem": "What programming language was created by Guido van Rossum?",
+    "answer": "Python",
+    "metadata": "technology"
+  },
+  {
+    "problem": "What is the smallest country in the world?",
+    "answer": "Vatican City",
+    "metadata": "geography"
+  },
+  {
+    "problem": "What does 'HTTP' stand for?",
+    "answer": "HyperText Transfer Protocol",
+    "metadata": "technology"
+  }
+]
