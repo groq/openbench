@@ -89,3 +89,6 @@ scicode = [
 jsonschemabench = [
     "jsonschema>=4.23.0",
 ]
+repeated-words = [
+    "python-levenshtein>=0.27.1",
+]

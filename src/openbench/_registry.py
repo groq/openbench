@@ -185,6 +185,9 @@ from .evals.mgsm import mgsm, mgsm_en, mgsm_latin, mgsm_non_latin  # noqa: F401,
 from .evals.mmlu import mmlu  # noqa: F401, E402
 from .evals.mmlu_pro import mmlu_pro  # noqa: F401, E402
 from .evals.mrcr import openai_mrcr, openai_mrcr_2n, openai_mrcr_4n, openai_mrcr_8n  # noqa: F401, E402
+from .evals.longmemeval import longmemeval, longmemeval_focused  # noqa: F401, E402
+from .evals.niah_distractors import niah_distractors  # noqa: F401, E402
+from .evals.repeated_words import repeated_words  # noqa: F401, E402
 from .evals.musr import musr  # noqa: F401, E402
 from .evals.openbookqa import openbookqa  # noqa: F401, E402
 from .evals.simpleqa import simpleqa  # noqa: F401, E402
