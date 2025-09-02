@@ -95,6 +95,39 @@ C) {option_c}
 D) {option_d}
 """.strip()
 
+
+def create_dynamic_multiple_choice_prompt(question: str, options: list[str]) -> str:
+    """
+    Create a multiple choice prompt with dynamic number of options.
+
+    Args:
+        question: The question text
+        options: List of option strings
+
+    Returns:
+        Formatted multiple choice prompt string
+    """
+    if not options:
+        return question
+
+    # Create the option letters (A, B, C, ...)
+    option_letters = [chr(65 + i) for i in range(len(options))]
+
+    # Build the prompt
+    prompt_parts = [
+        f"Answer the following multiple choice question. The last line of your response should be of the following format: 'Answer: $LETTER' (without quotes) where LETTER is one of {', '.join(option_letters)}:",
+        "",
+        question,
+        "",
+    ]
+
+    # Add the options
+    for letter, option in zip(option_letters, options):
+        prompt_parts.append(f"{letter}) {option}")
+
+    return "\n".join(prompt_parts)
+
+
 # Adapted from https://github.com/openai/simple-evals
 MULTILINGUAL_ANSWER_PATTERN_TEMPLATE = (
     "(?i){}[ \t]*([A-D]|[أ-د]|[অ]|[ব]|[ড]|[ঢ]|[Ａ]|[Ｂ]|[Ｃ]|[Ｄ])"

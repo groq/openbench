@@ -2,38 +2,20 @@ from inspect_ai.dataset import Dataset, hf_dataset, Sample
 from inspect_ai.model import ChatMessageUser, ContentText, ContentImage
 from typing import Dict, Any, List, Optional, Union, cast
 import base64
-import string
-from openbench.utils.image import detect_image_mime_type
+import ast
+from openbench.utils.image import detect_image_mime_type, compress_image
+from openbench.utils.text import create_dynamic_multiple_choice_prompt
 
 
-# Need for dynamic prompt building b/c MMMU Pro has multiple choice questions with many options
-def _build_dynamic_mcq_prompt(prompt: str, options: List[str]) -> str:
-    letters = string.ascii_uppercase[: len(options)]
-    letters_str = "".join(letters)
-    lines = [
-        "Answer the following multiple choice question. The last line of your response should be of the following format: 'Answer: $LETTER' (without quotes) where LETTER is one of {}.".format(
-            letters_str
-        ),
-        "",
-        prompt,
-        "",
-    ]
-    for idx, text in enumerate(options):
-        lines.append(f"{letters[idx]}) {text}")
-    return "\n".join(lines).strip()
-
-
-def _extract_option_texts(options_obj: Any) -> List[str]:
-    texts: List[str] = []
-    if isinstance(options_obj, list):
-        for opt in options_obj:
-            if isinstance(opt, dict):
-                texts.append(str(opt.get("text", opt.get("value", "")).strip()))
-            else:
-                texts.append(str(opt).strip())
-    else:
-        texts.append(str(options_obj).strip())
-    return texts
+def _parse_options_string(options_string: str) -> List[str]:
+    """Parse options from string representation of a list."""
+    try:
+        # Use ast.literal_eval for safe evaluation of string representations
+        parsed_list = ast.literal_eval(options_string.strip())
+        return [str(option).strip() for option in parsed_list]
+    except (ValueError, SyntaxError):
+        # If parsing fails, return empty list
+        return []
 
 
 def record_to_sample(record: Dict[str, Any]) -> Sample:
@@ -45,16 +27,14 @@ def record_to_sample(record: Dict[str, Any]) -> Sample:
         else "Use the image to answer the question. Choose the best option."
     )
 
-    options = record.get("options", [])
+    options_string = record.get("options", "")
     answer = record.get("answer", "")
 
-    # Normalize options
-    option_texts = _extract_option_texts(options) if options else []
+    # Parse options from string format
+    options = _parse_options_string(options_string)
 
-    # Build prompt
-    full_question = (
-        _build_dynamic_mcq_prompt(question, option_texts) if option_texts else question
-    )
+    # Build prompt dynamically based on available options
+    full_question = create_dynamic_multiple_choice_prompt(question, options)
 
     input_content: List[Union[ContentText, ContentImage]] = [
         ContentText(text=full_question)
@@ -71,8 +51,11 @@ def record_to_sample(record: Dict[str, Any]) -> Sample:
         elif isinstance(image_val, (bytes, bytearray)):
             image_bytes = bytes(image_val)
         if image_bytes:
-            base64_image = base64.b64encode(image_bytes).decode("utf-8")
-            mime_type = detect_image_mime_type(image_bytes)
+            compressed_bytes = compress_image(
+                image_bytes, max_size_mb=5.0, quality=75, max_dimension=1536
+            )
+            base64_image = base64.b64encode(compressed_bytes).decode("utf-8")
+            mime_type = detect_image_mime_type(compressed_bytes)
             data_uri = f"data:{mime_type};base64,{base64_image}"
             input_content.append(ContentImage(image=data_uri))
             num_images += 1
@@ -86,15 +69,20 @@ def record_to_sample(record: Dict[str, Any]) -> Sample:
                 image_bytes2 = image_data["bytes"]
             except Exception:
                 continue
-            base64_image2 = base64.b64encode(image_bytes2).decode("utf-8")
-            mime_type2 = detect_image_mime_type(image_bytes2)
+            # Compress image if too large to avoid 413 errors
+            compressed_bytes2 = compress_image(
+                image_bytes2, max_size_mb=5.0, quality=75, max_dimension=1536
+            )
+            base64_image2 = base64.b64encode(compressed_bytes2).decode("utf-8")
+            mime_type2 = detect_image_mime_type(compressed_bytes2)
             data_uri2 = f"data:{mime_type2};base64,{base64_image2}"
             input_content.append(ContentImage(image=data_uri2))
             num_images += 1
 
     metadata = {
         "question_id": record.get("id", ""),
-        "options": options,
+        "options": options,  # Parsed list of options
+        "options_string": options_string,  # Original string for reference
         "num_images": num_images,
         "question": question,
         "answer": answer,
