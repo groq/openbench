@@ -87,7 +87,7 @@ def record_to_sample(record: Dict[str, Any]) -> Sample:
                 image_bytes, max_size_mb=5.0, quality=75, max_dimension=1536
             )
             base64_image = base64.b64encode(compressed_bytes).decode("utf-8")
-            mime_type = detect_image_mime_type(image_bytes)
+            mime_type = detect_image_mime_type(compressed_bytes)
             data_uri = f"data:{mime_type};base64,{base64_image}"
 
             # Add the image to the input content using data URI

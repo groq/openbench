@@ -58,10 +58,6 @@ def create_open_answer_scorer(
             # Evaluate if the response is correct
             is_correct = _eval_open(answer, parsed_predictions)
 
-            print(f"Parsed predictions: {parsed_predictions}")
-            print(f"Answer: {answer}")
-            print(f"Is correct: {is_correct}")
-
             return Score(
                 value=1.0 if is_correct else 0.0,
                 answer=state.output.completion,
