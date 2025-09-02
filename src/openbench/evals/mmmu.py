@@ -48,94 +48,185 @@ def mmmu(
     )
 
 
-# Dynamically create subject-specific tasks
-def _create_subject_task(subject_name: str):
-    """Create a task function for a specific MMMU subject."""
-
-    @task
-    def subject_task() -> Task:
-        return mmmu(subset=subject_name)
-
-    # Set a proper name for the function
-    subject_task.__name__ = f"mmmu_{subject_name.lower()}"
-    subject_task.__doc__ = (
-        f"MMMU {subject_name.replace('_', ' ').title()} subset evaluation."
-    )
-
-    return subject_task
+# Individual subject-specific tasks
+@task
+def mmmu_accounting() -> Task:
+    """MMMU Accounting subset evaluation."""
+    return mmmu(subset="Accounting")
 
 
-# Create all subject-specific tasks dynamically
-_SUBJECT_MAPPINGS = {
-    "accounting": "Accounting",
-    "agriculture": "Agriculture",
-    "architecture_and_engineering": "Architecture_and_Engineering",
-    "art": "Art",
-    "art_theory": "Art_Theory",
-    "basic_medical_science": "Basic_Medical_Science",
-    "biology": "Biology",
-    "chemistry": "Chemistry",
-    "clinical_medicine": "Clinical_Medicine",
-    "computer_science": "Computer_Science",
-    "design": "Design",
-    "diagnostics_and_laboratory_medicine": "Diagnostics_and_Laboratory_Medicine",
-    "economics": "Economics",
-    "electronics": "Electronics",
-    "energy_and_power": "Energy_and_Power",
-    "finance": "Finance",
-    "geography": "Geography",
-    "history": "History",
-    "literature": "Literature",
-    "manage": "Manage",
-    "marketing": "Marketing",
-    "materials": "Materials",
-    "math": "Math",
-    "mechanical_engineering": "Mechanical_Engineering",
-    "music": "Music",
-    "pharmacy": "Pharmacy",
-    "physics": "Physics",
-    "psychology": "Psychology",
-    "public_health": "Public_Health",
-    "sociology": "Sociology",
-}
+@task
+def mmmu_agriculture() -> Task:
+    """MMMU Agriculture subset evaluation."""
+    return mmmu(subset="Agriculture")
 
-# Create and export the subject-specific functions
-for func_name, subject in _SUBJECT_MAPPINGS.items():
-    globals()[f"mmmu_{func_name}"] = _create_subject_task(subject)
 
-# Explicitly define exports for mypy
-mmmu_accounting = globals()["mmmu_accounting"]
-mmmu_agriculture = globals()["mmmu_agriculture"]
-mmmu_architecture_and_engineering = globals()["mmmu_architecture_and_engineering"]
-mmmu_art = globals()["mmmu_art"]
-mmmu_art_theory = globals()["mmmu_art_theory"]
-mmmu_basic_medical_science = globals()["mmmu_basic_medical_science"]
-mmmu_biology = globals()["mmmu_biology"]
-mmmu_chemistry = globals()["mmmu_chemistry"]
-mmmu_clinical_medicine = globals()["mmmu_clinical_medicine"]
-mmmu_computer_science = globals()["mmmu_computer_science"]
-mmmu_design = globals()["mmmu_design"]
-mmmu_diagnostics_and_laboratory_medicine = globals()[
-    "mmmu_diagnostics_and_laboratory_medicine"
-]
-mmmu_economics = globals()["mmmu_economics"]
-mmmu_electronics = globals()["mmmu_electronics"]
-mmmu_energy_and_power = globals()["mmmu_energy_and_power"]
-mmmu_finance = globals()["mmmu_finance"]
-mmmu_geography = globals()["mmmu_geography"]
-mmmu_history = globals()["mmmu_history"]
-mmmu_literature = globals()["mmmu_literature"]
-mmmu_manage = globals()["mmmu_manage"]
-mmmu_marketing = globals()["mmmu_marketing"]
-mmmu_materials = globals()["mmmu_materials"]
-mmmu_math = globals()["mmmu_math"]
-mmmu_mechanical_engineering = globals()["mmmu_mechanical_engineering"]
-mmmu_music = globals()["mmmu_music"]
-mmmu_pharmacy = globals()["mmmu_pharmacy"]
-mmmu_physics = globals()["mmmu_physics"]
-mmmu_psychology = globals()["mmmu_psychology"]
-mmmu_public_health = globals()["mmmu_public_health"]
-mmmu_sociology = globals()["mmmu_sociology"]
+@task
+def mmmu_architecture_and_engineering() -> Task:
+    """MMMU Architecture and Engineering subset evaluation."""
+    return mmmu(subset="Architecture_and_Engineering")
+
+
+@task
+def mmmu_art() -> Task:
+    """MMMU Art subset evaluation."""
+    return mmmu(subset="Art")
+
+
+@task
+def mmmu_art_theory() -> Task:
+    """MMMU Art Theory subset evaluation."""
+    return mmmu(subset="Art_Theory")
+
+
+@task
+def mmmu_basic_medical_science() -> Task:
+    """MMMU Basic Medical Science subset evaluation."""
+    return mmmu(subset="Basic_Medical_Science")
+
+
+@task
+def mmmu_biology() -> Task:
+    """MMMU Biology subset evaluation."""
+    return mmmu(subset="Biology")
+
+
+@task
+def mmmu_chemistry() -> Task:
+    """MMMU Chemistry subset evaluation."""
+    return mmmu(subset="Chemistry")
+
+
+@task
+def mmmu_clinical_medicine() -> Task:
+    """MMMU Clinical Medicine subset evaluation."""
+    return mmmu(subset="Clinical_Medicine")
+
+
+@task
+def mmmu_computer_science() -> Task:
+    """MMMU Computer Science subset evaluation."""
+    return mmmu(subset="Computer_Science")
+
+
+@task
+def mmmu_design() -> Task:
+    """MMMU Design subset evaluation."""
+    return mmmu(subset="Design")
+
+
+@task
+def mmmu_diagnostics_and_laboratory_medicine() -> Task:
+    """MMMU Diagnostics and Laboratory Medicine subset evaluation."""
+    return mmmu(subset="Diagnostics_and_Laboratory_Medicine")
+
+
+@task
+def mmmu_economics() -> Task:
+    """MMMU Economics subset evaluation."""
+    return mmmu(subset="Economics")
+
+
+@task
+def mmmu_electronics() -> Task:
+    """MMMU Electronics subset evaluation."""
+    return mmmu(subset="Electronics")
+
+
+@task
+def mmmu_energy_and_power() -> Task:
+    """MMMU Energy and Power subset evaluation."""
+    return mmmu(subset="Energy_and_Power")
+
+
+@task
+def mmmu_finance() -> Task:
+    """MMMU Finance subset evaluation."""
+    return mmmu(subset="Finance")
+
+
+@task
+def mmmu_geography() -> Task:
+    """MMMU Geography subset evaluation."""
+    return mmmu(subset="Geography")
+
+
+@task
+def mmmu_history() -> Task:
+    """MMMU History subset evaluation."""
+    return mmmu(subset="History")
+
+
+@task
+def mmmu_literature() -> Task:
+    """MMMU Literature subset evaluation."""
+    return mmmu(subset="Literature")
+
+
+@task
+def mmmu_manage() -> Task:
+    """MMMU Manage subset evaluation."""
+    return mmmu(subset="Manage")
+
+
+@task
+def mmmu_marketing() -> Task:
+    """MMMU Marketing subset evaluation."""
+    return mmmu(subset="Marketing")
+
+
+@task
+def mmmu_materials() -> Task:
+    """MMMU Materials subset evaluation."""
+    return mmmu(subset="Materials")
+
+
+@task
+def mmmu_math() -> Task:
+    """MMMU Math subset evaluation."""
+    return mmmu(subset="Math")
+
+
+@task
+def mmmu_mechanical_engineering() -> Task:
+    """MMMU Mechanical Engineering subset evaluation."""
+    return mmmu(subset="Mechanical_Engineering")
+
+
+@task
+def mmmu_music() -> Task:
+    """MMMU Music subset evaluation."""
+    return mmmu(subset="Music")
+
+
+@task
+def mmmu_pharmacy() -> Task:
+    """MMMU Pharmacy subset evaluation."""
+    return mmmu(subset="Pharmacy")
+
+
+@task
+def mmmu_physics() -> Task:
+    """MMMU Physics subset evaluation."""
+    return mmmu(subset="Physics")
+
+
+@task
+def mmmu_psychology() -> Task:
+    """MMMU Psychology subset evaluation."""
+    return mmmu(subset="Psychology")
+
+
+@task
+def mmmu_public_health() -> Task:
+    """MMMU Public Health subset evaluation."""
+    return mmmu(subset="Public_Health")
+
+
+@task
+def mmmu_sociology() -> Task:
+    """MMMU Sociology subset evaluation."""
+    return mmmu(subset="Sociology")
 
 
 @task
