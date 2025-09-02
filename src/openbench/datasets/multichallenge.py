@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict, Optional, Sequence
 from inspect_ai.dataset import FieldSpec, Sample, json_dataset, Dataset
 from inspect_ai.model import ChatMessageUser, ChatMessageAssistant
 
@@ -24,7 +24,7 @@ def record_to_sample(
             convo_raw = convo_raw[-max_turns:]
 
         # convert to Inspect chat messages
-        messages = []
+        messages: list[Any] = []
 
         for msg in convo_raw:
             role = msg.get("role", "").lower()

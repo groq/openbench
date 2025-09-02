@@ -5,8 +5,18 @@ from typing import Any, Dict, List, Callable
 
 from inspect_ai.model import get_model, ChatMessageUser
 from inspect_ai.solver import TaskState
-from inspect_ai.scorer import scorer, Score, Target, accuracy, stderr, metric
+from inspect_ai.scorer import (
+    scorer,
+    Score,
+    Target,
+    accuracy,
+    stderr,
+    metric,
+    SampleScore,
+    Scorer,
+)
 
+MIN_SCORE = 0.5
 
 JUDGE_TEMPLATE = """
 You are evaluating whether an assistant's response correctly answers a target question.
@@ -63,22 +73,33 @@ def multichallenge_metrics():
       * overall_multichallenge: average across all axes
     """
 
-    def metric_fn(scores: List[Score]) -> Dict[str, float]:
+    def metric_fn(scores: List[SampleScore]) -> Dict[str, float]:
         from collections import defaultdict
 
-        grouped: Dict[str, Dict[str, bool]] = defaultdict(dict)
+        # use defaultdict for auto creating keys upon accessing, initialize with empty dict
+        # structure: {axis: {qid: passed, ...}, ...}
+        grouped_by_axis: Dict[str, Dict[str, bool]] = defaultdict(dict)
 
-        for s in scores:
-            md = s.metadata or {}
-            axis = md.get("axis")
-            qid = md.get("question_id")
-            passed = bool(md.get("passed", s.value >= 0.5))
+        for sample_score in scores:
+            metadata = sample_score.score.metadata or {}
+            axis = metadata.get("axis")
+            qid = metadata.get("question_id")
+            try:
+                float_val = sample_score.score.as_float()
+            except ValueError:
+                # Log or handle if a score can't be converted, then skip it for these metrics
+                print(
+                    f"Warning: Could not convert score value '{sample_score.score.value}' "
+                    f"to float for sample {sample_score.sample_id}. Skipping for category metrics."
+                )
+                continue
+            passed = bool(metadata.get("passed", float_val >= MIN_SCORE))
             if not axis or not qid:
                 continue
-            grouped[axis][qid] = grouped[axis].get(qid, False) or passed
+            grouped_by_axis[axis][qid] = grouped_by_axis[axis].get(qid, False) or passed
 
         axis_rates: Dict[str, float] = {}
-        for axis, per_q in grouped.items():
+        for axis, per_q in grouped_by_axis.items():
             if not per_q:
                 continue
             wins = sum(1 for ok in per_q.values() if ok)
@@ -95,7 +116,7 @@ def multichallenge_metrics():
 @scorer(metrics=[accuracy(), stderr(), multichallenge_metrics()])
 def multichallenge_scorer(
     model: str = "openai/o3-mini-2025-01-31",
-) -> Callable[[TaskState, Target], Score]:
+) -> Scorer:
     """
     MultiChallenge scorer.
 
@@ -111,7 +132,7 @@ def multichallenge_scorer(
         Scorer function that executes the judge model, parses its verdict,
         and produces a Score with accuracy and diagnostic metadata.
     """
-    model = get_model(model)
+    model_instance = get_model(model)
 
     async def score(state: TaskState, target: Target) -> Score:
         md = state.metadata or {}
@@ -126,7 +147,7 @@ def multichallenge_scorer(
             model_response=candidate,
             target_question=target_question,
         )
-        judge = await model.generate([ChatMessageUser(content=judge_prompt)])
+        judge = await model_instance.generate([ChatMessageUser(content=judge_prompt)])
         judge_text = (judge.completion or "").strip()
 
         parsed = _parse_verdict(judge_text)
