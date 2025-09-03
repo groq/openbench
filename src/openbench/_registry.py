@@ -163,6 +163,14 @@ def vercel() -> Type[ModelAPI]:
     return VercelAPI
 
 
+@modelapi(name="openrouter")
+def openrouter() -> Type[ModelAPI]:
+    """Register OpenRouter provider."""
+    from .model._providers.openrouter import OpenRouterAPI
+
+    return OpenRouterAPI
+
+
 def _override_builtin_groq_provider():
     """Replace Inspect AI's built-in groq provider with enhanced OpenBench version."""
     from inspect_ai._util.registry import _registry
