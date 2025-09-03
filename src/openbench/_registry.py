@@ -187,8 +187,25 @@ def _override_builtin_groq_provider():
     return openbench_groq_override
 
 
-# Execute the override
+def _override_builtin_openrouter_provider():
+    """Replace Inspect AI's built-in openrouter provider with enhanced OpenBench version."""
+    from inspect_ai._util.registry import _registry
+    from .model._providers.openrouter import OpenRouterAPI
+    from inspect_ai.model._registry import modelapi
+
+    @modelapi(name="openrouter")
+    def openbench_openrouter_override():
+        return OpenRouterAPI
+
+    # Force override the inspect_ai/openrouter entry with OpenBench implementation
+    _registry["modelapi:inspect_ai/openrouter"] = openbench_openrouter_override
+
+    return openbench_openrouter_override
+
+
+# Execute the overrides
 _override_builtin_groq_provider()
+_override_builtin_openrouter_provider()
 
 
 # Task Registration
