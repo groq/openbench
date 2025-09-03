@@ -115,7 +115,7 @@ def multichallenge_metrics():
 
 @scorer(metrics=[accuracy(), stderr(), multichallenge_metrics()])
 def multichallenge_scorer(
-    model: str = "openai/o3-mini-2025-01-31",
+    model: str = "openai/gpt-4.1-2025-04-14",
 ) -> Scorer:
     """
     MultiChallenge scorer.
@@ -126,7 +126,7 @@ def multichallenge_scorer(
 
     Args:
         model: Model identifier for the judging model used to evaluate responses.
-               Defaults to `openai/o3-mini-2025-01-31`.
+               Defaults to `openai/gpt-4.1-2025-04-14`.
 
     Returns:
         Scorer function that executes the judge model, parses its verdict,
