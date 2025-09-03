@@ -865,7 +865,7 @@ BENCHMARKS = {
         function_name="mmmu_sociology",
         is_alpha=False,
     ),
-    "longmemeval": BenchmarkMetadata(
+    "chroma_longmemeval": BenchmarkMetadata(
         name="LongMemEval (Full Input)",
         description="Benchmarking Chat Assistants on Long-Term Interactive Memory - full version with ~113k token inputs",
         category="core",
@@ -873,7 +873,7 @@ BENCHMARKS = {
         module_path="openbench.evals.longmemeval",
         function_name="longmemeval",
     ),
-    "longmemeval_focused": BenchmarkMetadata(
+    "chroma_longmemeval_focused": BenchmarkMetadata(
         name="LongMemEval (Focused Input)",
         description="Benchmarking Chat Assistants on Long-Term Interactive Memory - focused version with ~300 token inputs",
         category="core",
@@ -881,7 +881,7 @@ BENCHMARKS = {
         module_path="openbench.evals.longmemeval",
         function_name="longmemeval_focused",
     ),
-    "niah_distractors": BenchmarkMetadata(
+    "chroma_niah_distractors": BenchmarkMetadata(
         name="NIAH Distractors",
         description="Needle in a Haystack with Distractors - extends the original NIAH benchmark with 4 distractors alongside the needle",
         category="core",
@@ -889,7 +889,7 @@ BENCHMARKS = {
         module_path="openbench.evals.niah_distractors",
         function_name="niah_distractors",
     ),
-    "repeated_words": BenchmarkMetadata(
+    "chroma_repeated_words": BenchmarkMetadata(
         name="Repeated Words",
         description="Replication task - one of the experiments from Chroma's Context Rot paper",
         category="core",

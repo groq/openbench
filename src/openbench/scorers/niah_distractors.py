@@ -18,7 +18,7 @@ NIAH_DISTRACTORS_GRADER_TEMPLATE = """
 Given this question and the CORRECT answer, determine whether the response is correct (meaning it factually aligns with the correct answer). 
 You must only respond with "true" or "false".
 If the response is partially incorrect, such as a typo, respond with "false".
-If the repsonse contains a snippet of text or additional supporting information, while still maintaining the correct answer without changing the meaning, respond with "true".
+If the response contains a snippet of text or additional supporting information, while still maintaining the correct answer without changing the meaning, respond with "true".
 If the response starts with anything like "here is the most relevant information in the documents: ", respond with "true". This is fine as long as the following content aligns with the correct answer.
 
 Question: {question}

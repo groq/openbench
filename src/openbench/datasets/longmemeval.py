@@ -9,7 +9,7 @@ def record_to_sample(
     """Convert a LongMemEval record to an Inspect Sample.
 
     Args:
-        input_version: input version to use (full ~113k tokens or focused ~300k tokens). Defaults to "full".
+        input_version: input version to use (full ~113k tokens or focused ~300 tokens). Defaults to "full".
     Returns:
         FieldSpec or callable to convert a record to a Sample.
     """
@@ -36,7 +36,7 @@ def get_dataset(input_version: str = "full") -> Dataset:
     """Load the LongMemEval dataset.
 
     Args:
-        input_version: input version to use (full ~113k tokens or focused ~300k tokens). Defaults to "full".
+        input_version: input version to use (full ~113k tokens or focused ~300 tokens). Defaults to "full".
     Returns:
         Dataset corresponding to the input version.
     """
