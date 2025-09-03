@@ -1,6 +1,6 @@
 """OpenRouter provider implementation.
 
-OpenRouter is a unified API that provides access to 400+ language models from
+OpenRouter is a unified API that provides access to 500+ language models from
 multiple providers including OpenAI, Anthropic, Google, Meta, and others. It offers
 intelligent routing, cost optimization, and provider fallbacks.
 
@@ -10,7 +10,7 @@ Environment variables:
 Model naming follows the standard format, e.g.:
   - openai/gpt-5
   - anthropic/claude-sonnet-4.1
-  - grok/code-fast-1
+  - deepseek/deepseek-chat-v3.1
 
 Website: https://openrouter.ai
 All Models: https://openrouter.ai/models
@@ -45,7 +45,7 @@ class OpenRouterAPI(OpenAICompatibleAPI):
         if not api_key:
             raise ValueError(
                 "OpenRouter API key not found. Set the OPENROUTER_API_KEY environment variable. "
-                "Get your API key at https://openrouter.ai/keys"
+                "Get your API key at https://openrouter.ai/settings/keys"
             )
 
         super().__init__(
