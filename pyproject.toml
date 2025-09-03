@@ -17,7 +17,7 @@ dependencies = [
     "datasets>=3.6.0",
     "groq>=0.30.0",
     "inspect-ai==0.3.125",
-    "openai>=1.97.1",
+    "openai>=1.99.7",
     "pydantic-settings>=2.9.1",
     "scipy>=1.15.3",
     "tiktoken>=0.11.0",
@@ -88,4 +88,7 @@ scicode = [
 ]
 jsonschemabench = [
     "jsonschema>=4.23.0",
+]
+repeated-words = [
+    "python-levenshtein>=0.27.1",
 ]

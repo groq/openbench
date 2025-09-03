@@ -36,6 +36,7 @@ uv sync
 # Install specific benchmark dependencies
 uv sync --group scicode         # For SciCode benchmark
 uv sync --group jsonschemabench  # For JSONSchemaBench
+uv sync --group repeated-words   # For Repeated Words benchmark
 
 # Install everything including dev tools
 uv sync --all-groups
