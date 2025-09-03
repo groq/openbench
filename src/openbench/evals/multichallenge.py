@@ -8,7 +8,7 @@ from openbench.scorers.multichallenge import multichallenge_scorer
 
 @task
 def multichallenge(
-    grader_model: str = "openai/o3-mini-2025-01-31",
+    grader_model: str = "openai/gpt-4.1-2025-04-14",
     limit: Optional[int] = None,
     max_turns: Optional[int] = None,
 ) -> Task:

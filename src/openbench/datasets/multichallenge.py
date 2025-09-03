@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import Any, Callable, Dict, Optional, Sequence
-from inspect_ai.dataset import FieldSpec, Sample, json_dataset, Dataset
+from inspect_ai.dataset import FieldSpec, Sample, hf_dataset, Dataset
 from inspect_ai.model import ChatMessageUser, ChatMessageAssistant
 
 
@@ -64,11 +64,10 @@ def get_dataset(
     Returns:
         Configure Dataset ready to be consumed by an OpenBench task.
     """
-    ds = json_dataset(
-        json_file="data/multichallenge.jsonl",
+    dataset = hf_dataset(
+        path="nmayorga7/multichallenge",
+        split="train",  # multichallenge dataset only has train split
         sample_fields=record_to_sample(max_turns=max_turns),
         limit=limit,
-        name="multichallenge",
     )
-
-    return ds
+    return dataset
