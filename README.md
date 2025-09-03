@@ -72,9 +72,7 @@ bench eval musr --model ollama/llama3.1:70b
 # Hugging Face Inference Providers
 bench eval mmlu --model huggingface/gpt-oss-120b:groq
 
-# OpenRouter (access to 500+ models from 60+ providers)
-bench eval mmlu --model openrouter/openai/gpt-5
-bench eval humaneval --model openrouter/anthropic/claude-sonnet-4.1
+# OpenRouter
 bench eval gpqa_diamond --model openrouter/deepseek/deepseek-chat-v3.1
 
 # 30+ providers supported - see full list below
