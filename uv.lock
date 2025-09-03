@@ -2087,7 +2087,7 @@ wheels = [
 
 [[package]]
 name = "openai"
-version = "1.105.0"
+version = "1.97.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -2099,14 +2099,14 @@ dependencies = [
     { name = "tqdm" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6f/a9/c8c2dea8066a8f3079f69c242f7d0d75aaad4c4c3431da5b0df22a24e75d/openai-1.105.0.tar.gz", hash = "sha256:a68a47adce0506d34def22dd78a42cbb6cfecae1cf6a5fe37f38776d32bbb514", size = 557265, upload-time = "2025-09-03T14:14:08.586Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a6/57/1c471f6b3efb879d26686d31582997615e969f3bb4458111c9705e56332e/openai-1.97.1.tar.gz", hash = "sha256:a744b27ae624e3d4135225da9b1c89c107a2a7e5bc4c93e5b7b5214772ce7a4e", size = 494267, upload-time = "2025-07-22T13:10:12.607Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/51/01/186845829d3a3609bb5b474067959076244dd62540d3e336797319b13924/openai-1.105.0-py3-none-any.whl", hash = "sha256:3ad7635132b0705769ccae31ca7319f59ec0c7d09e94e5e713ce2d130e5b021f", size = 928203, upload-time = "2025-09-03T14:14:06.842Z" },
+    { url = "https://files.pythonhosted.org/packages/ee/35/412a0e9c3f0d37c94ed764b8ac7adae2d834dbd20e69f6aca582118e0f55/openai-1.97.1-py3-none-any.whl", hash = "sha256:4e96bbdf672ec3d44968c9ea39d2c375891db1acc1794668d8149d5fa6000606", size = 764380, upload-time = "2025-07-22T13:10:10.689Z" },
 ]
 
 [[package]]
 name = "openbench"
-version = "0.4.1"
+version = "0.3.0"
 source = { editable = "." }
 dependencies = [
     { name = "datasets" },
@@ -2142,7 +2142,7 @@ requires-dist = [
     { name = "datasets", specifier = ">=3.6.0" },
     { name = "groq", specifier = ">=0.30.0" },
     { name = "inspect-ai", specifier = "==0.3.125" },
-    { name = "openai", specifier = ">=1.99.7" },
+    { name = "openai", specifier = ">=1.97.1" },
     { name = "pydantic-settings", specifier = ">=2.9.1" },
     { name = "scipy", specifier = ">=1.15.3" },
     { name = "tiktoken", specifier = ">=0.11.0" },
