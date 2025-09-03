@@ -51,11 +51,13 @@ class OpenRouterAPI(OpenAICompatibleAPI):
         # Add custom headers for OpenBench identification
         if "default_headers" not in model_args:
             model_args["default_headers"] = {}
-        
-        model_args["default_headers"].update({
-            "HTTP-Referer": "https://github.com/groq/openbench",
-            "X-Title": "OpenBench"
-        })
+
+        model_args["default_headers"].update(
+            {
+                "HTTP-Referer": "https://github.com/groq/openbench",
+                "X-Title": "OpenBench",
+            }
+        )
 
         super().__init__(
             model_name=model_name_clean,
