@@ -72,6 +72,9 @@ bench eval musr --model ollama/llama3.1:70b
 # Hugging Face Inference Providers
 bench eval mmlu --model huggingface/gpt-oss-120b:groq
 
+# OpenRouter
+bench eval gpqa_diamond --model openrouter/deepseek/deepseek-chat-v3.1
+
 # 30+ providers supported - see full list below
 ```
 
@@ -137,6 +140,7 @@ Here are the currently available benchmarks. For an up-to-date list use `bench l
 export GROQ_API_KEY=your_key
 export HF_TOKEN=your_key
 export OPENAI_API_KEY=your_key  # Optional
+export OPENROUTER_API_KEY=your_key  # For OpenRouter
 
 # Set default model
 export BENCH_MODEL=groq/openai/gpt-oss-20b
