@@ -1,31 +1,34 @@
 """
-Generic MCP Tools Integration for OpenBench
+MCP Tools Integration for OpenBench with Semantic Search
 
-This module provides a generic, reusable framework for integrating MCP (Model Context Protocol)
-tools into OpenBench evaluations using inspect.ai's native MCP support.
-
-
+This module provides a framework for integrating MCP (Model Context Protocol)
+tools into OpenBench evaluations using semantic search to find the most
+relevant tools for each task.
 
 Usage:
-    from openbench.tools.livemcpbench.mcp_tools import get_mcp_tool_sources
+    from openbench.tools.livemcpbench import MCPToolsRegistry
 
-    # Basic usage - fetches all tools from upstream
-    tool_sources = get_mcp_tool_sources()
+    # Create registry and initialize semantic retriever
+    registry = MCPToolsRegistry()
+    registry.init_retriever()
 
-    # Use specific categories with limits
-    tool_sources = get_mcp_tool_sources(categories=["Finance"], limit=2)
-
-    # Use in evaluation
-    solver = react(tools=tool_sources)
+    # Get tools for a specific task using semantic search
+    tools = registry.create_tool_sources_semantic(
+        query="Generate a PDF report with charts",
+        top_k_servers=5,
+        top_k_tools_per_server=3
+    )
 """
 
 import copy
 import json
 import logging
-from typing import Dict, List, Optional, Any, Union, Literal
+import os
+from typing import Dict, List, Optional, Any
 from inspect_ai.tool import mcp_tools, mcp_server_stdio, ToolSource
 
 from .data_fetcher import get_tools_data, get_config_data
+from .tool_retriever import EmbeddingToolRetriever
 
 logger = logging.getLogger(__name__)
 
@@ -50,19 +53,19 @@ class MCPToolsRegistry:
         # Storage for configurations
         self._tools_data: List[Dict[str, Any]] = []
         self._server_configs: List[Dict[str, Any]] = []
-        self._tools_by_category: Dict[str, List[Dict[str, Any]]] = {}
 
         self._problem_servers: List[str] = [
             "text-editor",  # has known schema validation issues
             "searxng",  # File Access category - prone to validation issues
             "okppt",  # requires pycairo which needs Cairo graphics library
             "chess",  # requires cairosvg/cairocffi which can't find Cairo in uvx environment
-            "filesystem",  # has directory path configuration issues (empty path)
         ]
+
+        # Embedding retriever
+        self._retriever: Optional[EmbeddingToolRetriever] = None
 
         # Load configurations from upstream
         self._load_configurations()
-        self._categorize_tools()
 
     def _load_configurations(self) -> None:
         """Load tool and server configurations from upstream repository."""
@@ -96,20 +99,6 @@ class MCPToolsRegistry:
         except Exception as e:
             logger.error(f"Error loading configurations from upstream: {e}")
             raise
-
-    def _categorize_tools(self) -> None:
-        """Categorize tools by their function/category."""
-        self._tools_by_category.clear()
-
-        for tool_data in self._tools_data:
-            category = tool_data.get("category", "Miscellaneous")
-            if category not in self._tools_by_category:
-                self._tools_by_category[category] = []
-            self._tools_by_category[category].append(tool_data)
-
-        logger.info(
-            f"Categorized tools into {len(self._tools_by_category)} categories: {list(self._tools_by_category.keys())}"
-        )
 
     def _validate_and_filter_tool_data(
         self, tool_data: Dict[str, Any]
@@ -176,140 +165,6 @@ class MCPToolsRegistry:
 
         return validated_data
 
-    def get_categories(self) -> List[str]:
-        """Get all available tool categories."""
-        return list(self._tools_by_category.keys())
-
-    def get_tools_by_category(self, category: str) -> List[Dict[str, Any]]:
-        """Get all tools in a specific category."""
-        return self._tools_by_category.get(category, [])
-
-    def create_tool_sources(
-        self,
-        categories: Optional[List[str]] = None,
-        limit: Optional[int] = None,
-        tools_per_server: Union[str, List[str]] = "all",
-    ) -> List[ToolSource]:
-        """
-        Create ToolSource objects for MCP servers using inspect.ai's native support.
-
-        Args:
-            categories: List of tool categories to include (e.g., ["Finance", "Discovery"])
-            limit: Maximum number of servers per category to include
-            tools_per_server: Either "all" to include all tools, or list of specific tool names
-
-        Returns:
-            List of ToolSource objects ready for use with inspect.ai
-        """
-        tool_sources = []
-        processed_servers = set()  # Avoid duplicate servers
-
-        # Determine which categories to process
-        target_categories = categories or self.get_categories()
-
-        for category in target_categories:
-            tools_in_category = self.get_tools_by_category(category)
-
-            # Apply limit if specified
-            if limit:
-                tools_in_category = tools_in_category[:limit]
-
-            for tool_spec in tools_in_category:
-                # Extract server configuration from the tool spec
-                server_configs = self._extract_server_configs(tool_spec)
-
-                for server_name, server_config in server_configs.items():
-                    if server_name in processed_servers:
-                        continue  # Skip already processed servers
-
-                    if server_name in self._problem_servers:
-                        logger.debug(
-                            f"Skipping server '{server_name}' - known to have issues"
-                        )
-                        continue
-
-                    try:
-                        # Validate server configuration before creating server
-                        if (
-                            "command" not in server_config
-                            or not server_config["command"]
-                        ):
-                            logger.warning(
-                                f"Server '{server_name}' has no command - skipping"
-                            )
-                            continue
-
-                        # Create MCP server using inspect.ai's native support
-                        server_env = (
-                            server_config.get("env", {}).copy()
-                            if server_config.get("env")
-                            else {}
-                        )
-
-                        mcp_server = mcp_server_stdio(
-                            command=server_config["command"],
-                            args=server_config.get("args", []),
-                            cwd=server_config.get("cwd"),
-                            env=server_env,
-                        )
-
-                        # Determine which tools to include from this server
-                        server_tools = self._get_tools_for_server(
-                            tool_spec, server_name, tools_per_server
-                        )
-
-                        # Create tool source
-                        tool_source = mcp_tools(mcp_server, tools=server_tools)
-                        tool_sources.append(tool_source)
-                        processed_servers.add(server_name)
-
-                        logger.info(
-                            f"Created tool source for server '{server_name}' with tools: {server_tools}"
-                        )
-
-                    except Exception as e:
-                        # Check if this is a known problematic error type
-                        error_str = str(e)
-                        if any(
-                            keyword in error_str
-                            for keyword in [
-                                "ValidationError",
-                                "literal_error",
-                                "Invalid value",
-                                "union",
-                                "JSON Schema",
-                            ]
-                        ):
-                            logger.warning(
-                                f"Skipping server '{server_name}' due to JSON Schema validation issue: {e}"
-                            )
-                            # Add to problem servers list to skip in future
-                            if server_name not in self._problem_servers:
-                                self._problem_servers.append(server_name)
-                        elif any(
-                            keyword in error_str
-                            for keyword in [
-                                "BrokenResourceError",
-                                "ClosedResourceError",
-                                "ConnectionError",
-                            ]
-                        ):
-                            logger.warning(
-                                f"Skipping server '{server_name}' due to connection/resource issue: {e}"
-                            )
-                            if server_name not in self._problem_servers:
-                                self._problem_servers.append(server_name)
-                        else:
-                            logger.error(
-                                f"Failed to create tool source for server '{server_name}': {e}"
-                            )
-                        continue
-
-        logger.info(
-            f"Created {len(tool_sources)} MCP tool sources from {len(processed_servers)} servers"
-        )
-        return tool_sources
-
     def _extract_server_configs(
         self, tool_spec: Dict[str, Any]
     ) -> Dict[str, Dict[str, Any]]:
@@ -341,94 +196,130 @@ class MCPToolsRegistry:
 
         return server_configs
 
-    def _get_tools_for_server(
+    def init_retriever(
         self,
-        tool_spec: Dict[str, Any],
-        server_name: str,
-        tools_per_server: Union[str, List[str]],
-    ) -> Union[Literal["all"], List[str]]:
-        """Get the list of tools to include for a specific server."""
-        if tools_per_server == "all":
-            return "all"
+        embedding_model: str = "text-embedding-3-small",
+        api_key: Optional[str] = None,
+        base_url: Optional[str] = None,
+    ) -> None:
+        """Initialize the embedding-based retriever."""
+        self._retriever = EmbeddingToolRetriever(
+            embedding_model=embedding_model, api_key=api_key, base_url=base_url
+        )
+        # Index all tools
+        self._retriever.index_tools(self._tools_data, self._server_configs)
+        logger.info("Initialized embedding-based tool retriever")
 
-        if isinstance(tools_per_server, list):
-            return tools_per_server
+    def create_tool_sources_semantic(
+        self,
+        query: str,
+        top_k_servers: int = 6,
+        top_k_tools_per_server: int = 4,
+        category_hint: Optional[str] = None,
+        suppress_server_output: bool = True,
+    ) -> List[ToolSource]:
+        """
+        Create tool sources using semantic search.
 
-        # Extract available tools from the tool spec
-        tools_data = tool_spec.get("tools", {})
-        if server_name in tools_data:
-            server_tools_data = tools_data[server_name]
-            if (
-                not isinstance(server_tools_data, dict)
-                or "tools" not in server_tools_data
-            ):
-                logger.warning(
-                    f"Server '{server_name}' in tool '{tool_spec.get('name', 'unknown')}' has invalid tools structure, using 'all'"
-                )
-                return "all"
+        Args:
+            query: Task description or query
+            top_k_servers: Number of top servers to retrieve
+            top_k_tools_per_server: Max tools per server
+            category_hint: Optional category to boost relevance
+            suppress_server_output: If True, suppress server startup output
+
+        Returns:
+            List of ToolSource objects ready for use with inspect.ai
+        """
+        if not self._retriever:
+            logger.error("Retriever not initialized. Call init_retriever() first.")
+            return []
+
+        # Get relevant tools
+        relevant_tools = self._retriever.retrieve_tools(
+            query, top_k_servers, top_k_tools_per_server, category_hint
+        )
+
+        tool_sources = []
+        processed_servers = set()
+
+        for server_name, tool_names in relevant_tools:
+            if server_name in processed_servers or server_name in self._problem_servers:
+                continue
+
+            # Find the server config
+            server_config = None
+            for tool_spec in self._tools_data:
+                config = tool_spec.get("config", {})
+                mcp_servers = config.get("mcpServers", {})
+                if server_name in mcp_servers:
+                    server_config = mcp_servers[server_name]
+                    break
+
+            if not server_config or "command" not in server_config:
+                continue
 
             try:
-                # Extract tool names
-                available_tools = []
-                for tool in server_tools_data.get("tools", []):
-                    if isinstance(tool, dict) and "name" in tool and tool["name"]:
-                        available_tools.append(tool["name"])
-                return available_tools
-            except (KeyError, TypeError) as e:
-                logger.warning(
-                    f"Error extracting tool names from server '{server_name}': {e}, using 'all'"
+                # Create MCP server
+                server_env = (
+                    server_config.get("env", {}).copy()
+                    if server_config.get("env")
+                    else {}
                 )
-                return "all"
 
-        return "all"  # Fallback
+                # Suppress server output if requested
+                if suppress_server_output:
+                    # Set environment variables to suppress output
+                    server_env.update(
+                        {
+                            "NODE_NO_WARNINGS": "1",  # Suppress Node.js warnings
+                            "PYTHONWARNINGS": "ignore",  # Suppress Python warnings
+                            "SUPPRESS_OUTPUT": "1",  # Generic flag for tools that support it
+                        }
+                    )
+
+                    # Try to detect if we can use output redirection
+                    # Note: This is a workaround since mcp_server_stdio might not expose stdio control
+                    if os.name != "nt":  # Unix-like systems
+                        # Set minimal logging for common tools
+                        server_env.update(
+                            {
+                                "LOG_LEVEL": "error",
+                                "RUST_LOG": "error",
+                                "DEBUG": "0",
+                            }
+                        )
+
+                mcp_server = mcp_server_stdio(
+                    command=server_config["command"],
+                    args=server_config.get("args", []),
+                    cwd=server_config.get("cwd"),
+                    env=server_env,
+                )
+
+                # Create tool source with specific tools
+                tool_source = mcp_tools(mcp_server, tools=tool_names)
+                tool_sources.append(tool_source)
+                processed_servers.add(server_name)
+
+                logger.info(
+                    f"Created semantic tool source for '{server_name}' with tools: {tool_names}"
+                )
+
+            except Exception as e:
+                logger.warning(f"Failed to create tool source for '{server_name}': {e}")
+                continue
+
+        logger.info(f"Created {len(tool_sources)} tool sources via semantic search")
+        return tool_sources
 
     def get_stats(self) -> Dict[str, Any]:
         """Get statistics about the tool registry."""
         return {
             "total_tools": len(self._tools_data),
-            "categories": len(self.get_categories()),
-            "category_breakdown": {
-                category: len(tools)
-                for category, tools in self._tools_by_category.items()
-            },
+            "total_servers": len(self._server_configs),
+            "retriever_initialized": self._retriever is not None,
         }
-
-
-def get_mcp_tool_sources(
-    categories: Optional[List[str]] = None,
-    limit: Optional[int] = None,
-    tools_per_server: Union[str, List[str]] = "all",
-) -> List[ToolSource]:
-    """
-    Get MCP tool sources for use in inspect.ai evaluations using native MCP support.
-
-    Args:
-        categories: List of tool categories to include (e.g., ["Finance", "Discovery"])
-        limit: Maximum number of servers per category to load (reduces installation logs)
-        tools_per_server: Either "all" or list of specific tool names to include per server
-
-    Returns:
-        List of ToolSource objects ready for use in inspect.ai evaluations
-
-    Example:
-        # Use specific categories with limits
-        tool_sources = get_mcp_tool_sources(categories=["Finance"], limit=2)
-
-        # Use in a task
-        solver = react(tools=tool_sources)
-    """
-    # Create registry and get tool sources
-    registry = MCPToolsRegistry()
-
-    return registry.create_tool_sources(
-        categories=categories, limit=limit, tools_per_server=tools_per_server
-    )
-
-
-def get_tool_categories() -> List[str]:
-    """Get all available tool categories from the upstream repository."""
-    registry = MCPToolsRegistry()
-    return registry.get_categories()
 
 
 def get_registry_stats() -> Dict[str, Any]:

@@ -1,22 +1,24 @@
 """
-LiveMCPBench Tool Integration with Dynamic Data Fetching
+LiveMCPBench Tool Integration with Semantic Search
 
-This module provides a generic, reusable framework for integrating MCP tools
-into OpenBench evaluations using inspect.ai's native MCP support.
+This module provides MCP tool integration using embedding-based semantic search
+to find the most relevant tools for each task.
 
 Basic Usage:
-    from openbench.tools.livemcpbench import get_mcp_tool_sources
+    from openbench.tools.livemcpbench import MCPToolsRegistry
 
-    # Get LiveMCPBench tools
-    tool_sources = get_mcp_tool_sources(categories=["Finance", "Discovery"], limit=3)
+    # Create registry and initialize retriever
+    registry = MCPToolsRegistry()
+    registry.init_retriever()
 
-    # Use in evaluation
-    solver = react(tools=tool_sources)
+    # Get tools using semantic search
+    tools = registry.create_tool_sources_semantic(
+        query="Create a financial report",
+        top_k_servers=5
+    )
 """
 
 from .mcp_tools import (
-    get_mcp_tool_sources,
-    get_tool_categories,
     get_registry_stats,
     MCPToolsRegistry,
 )
@@ -25,14 +27,18 @@ from .data_fetcher import (
     get_config_data,
     LiveMCPDataFetcher,
 )
+from .tool_retriever import (
+    EmbeddingToolRetriever,
+    ToolInfo,
+)
 
 
 __all__ = [
-    "get_mcp_tool_sources",
-    "get_tool_categories",
     "get_registry_stats",
     "MCPToolsRegistry",
     "get_tools_data",
     "get_config_data",
     "LiveMCPDataFetcher",
+    "EmbeddingToolRetriever",
+    "ToolInfo",
 ]

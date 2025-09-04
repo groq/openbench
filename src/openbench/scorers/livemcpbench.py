@@ -46,10 +46,8 @@ User Task:
 Agent Response: 
 {response}
 
-Tool call metadata: 
-{tool_call_metadata}
-
-Return only the letter (A, B, or C) with no additional text.
+Tool call history: 
+{tool_call_history}
 """.strip()
 
 
@@ -134,26 +132,23 @@ def livemcpbench_scorer(model: str = "groq/llama-3.3-70b-versatile") -> Callable
         # Get expected answer from target
         expected_answer = target.text
 
-        # Get tool call metadata from the model output
-        tool_calls = []
+        # Get tool call names from the messages list
+        tool_call_names = []
         try:
-            # Try to get tool calls from the message
-            if hasattr(state.output, "message") and hasattr(
-                state.output.message, "tool_calls"
-            ):
-                tool_calls = state.output.message.tool_calls or []
-            elif hasattr(state.output, "choices") and state.output.choices:
-                # Check if tool calls are in the choices
-                for choice in state.output.choices:
-                    if hasattr(choice, "message") and hasattr(
-                        choice.message, "tool_calls"
-                    ):
-                        tool_calls.extend(choice.message.tool_calls or [])
-            else:
-                tool_calls = []
-        except AttributeError:
-            # If tool_calls attribute doesn't exist, set empty list
-            tool_calls = []
+            # Iterate through all messages to find tool calls
+            for message in state.messages:
+                if hasattr(message, "tool_calls") and message.tool_calls:
+                    for tool_call in message.tool_calls:
+                        # Extract the tool name/function name
+                        if hasattr(tool_call, "function") and hasattr(
+                            tool_call.function, "name"
+                        ):
+                            tool_call_names.append(tool_call.function.name)
+                        elif hasattr(tool_call, "name"):
+                            tool_call_names.append(tool_call.name)
+        except (AttributeError, TypeError):
+            # If there's any issue accessing tool calls, use empty list
+            tool_call_names = []
 
         # Get annotator metadata from state metadata
         annotator_metadata = (
@@ -174,7 +169,7 @@ def livemcpbench_scorer(model: str = "groq/llama-3.3-70b-versatile") -> Callable
         grader_prompt = LIVEMCPBENCH_GRADER_TEMPLATE.format(
             task=task,
             response=response,
-            tool_call_metadata=tool_calls,
+            tool_call_history=tool_call_names,
             metadata_context=metadata_context,
         )
 
