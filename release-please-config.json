@@ -9,13 +9,8 @@
         "changelog-path": "CHANGELOG.md",
         "bump-minor-pre-major": false,
         "bump-patch-for-minor-pre-major": true,
-        "extra-files": [
-          {
-            "type": "toml",
-            "path": "uv.lock",
-            "jsonpath": "$.package[?(@.name==\"openbench\")].version"
-          }
-        ],
+        "pull-request-title-pattern": "chore: release ${component} ${version}",
+        "pull-request-header": "### Conventional Commits Only\n\nThis PR includes only changes from conventional commits. Non-conventional commits are automatically excluded.",
         "changelog-sections": [
           { "type": "feat", "section": "Features" },
           { "type": "fix", "section": "Bug Fixes" },
