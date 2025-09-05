@@ -214,6 +214,10 @@ class GroqAPI(ModelAPI):
                     strict=config.response_schema.strict,
                 ),
             )
+
+        # reasoning_effort support
+        if config.reasoning_effort is not None:
+            params["reasoning_effort"] = config.reasoning_effort
         return params
 
     def _chat_choices_from_response(

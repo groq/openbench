@@ -163,12 +163,24 @@ def vercel() -> Type[ModelAPI]:
     return VercelAPI
 
 
-@modelapi(name="groq")
-def groq() -> Type[ModelAPI]:
-    """Register Groq provider (OpenBench implementation overriding Inspect)."""
+def _override_builtin_groq_provider():
+    """Replace Inspect AI's built-in groq provider with enhanced OpenBench version."""
+    from inspect_ai._util.registry import _registry
     from .model._providers.groq import GroqAPI
+    from inspect_ai.model._registry import modelapi
 
-    return GroqAPI
+    @modelapi(name="groq")
+    def openbench_groq_override():
+        return GroqAPI
+
+    # Force override the inspect_ai/groq entry with OpenBench implementation
+    _registry["modelapi:inspect_ai/groq"] = openbench_groq_override
+
+    return openbench_groq_override
+
+
+# Execute the override
+_override_builtin_groq_provider()
 
 
 # Task Registration

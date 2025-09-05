@@ -117,6 +117,9 @@ OpenBench supports 30+ model providers through Inspect AI. Set the appropriate A
 
 Here are the currently available benchmarks. For an up-to-date list use `bench list`.
 
+> [!NOTE]
+> Benchmark names are case-sensitive in the CLI.
+
 | Category          | Benchmarks                                                                                                                                                                                                                                                                                                      |
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Knowledge**     | MMLU (57 subjects), GPQA (graduate-level), SuperGPQA (285 disciplines), OpenBookQA, HLE (Humanity's Last Exam - 2,500 questions from 1,000+ experts), HLE_text (text-only version)                                                                                                                              |
@@ -136,7 +139,7 @@ export HF_TOKEN=your_key
 export OPENAI_API_KEY=your_key  # Optional
 
 # Set default model
-export BENCH_MODEL=groq/llama-3.1-70b
+export BENCH_MODEL=groq/openai/gpt-oss-20b
 ```
 
 ## Commands and Options
@@ -158,7 +161,7 @@ For a complete list of all commands and options, run: `bench --help`
 | -------------------- | ------------------------ | --------------- | ---------------------------------------------------------------- |
 | `-M <args>`          | None                     | None            | Pass model-specific arguments (e.g., `-M reasoning_effort=high`) |
 | `-T <args>`          | None                     | None            | Pass task-specific arguments to the benchmark                    |
-| `--model`            | `BENCH_MODEL`            | None (required) | Model(s) to evaluate                                             |
+| `--model`            | `BENCH_MODEL`            | `groq/openai/gpt-oss-20b` | Model(s) to evaluate                                             |
 | `--epochs`           | `BENCH_EPOCHS`           | `1`             | Number of epochs to run each evaluation                          |
 | `--max-connections`  | `BENCH_MAX_CONNECTIONS`  | `10`            | Maximum parallel requests to model                               |
 | `--temperature`      | `BENCH_TEMPERATURE`      | `0.6`           | Model temperature                                                |
@@ -172,7 +175,30 @@ For a complete list of all commands and options, run: `bench --help`
 | `--display`          | `BENCH_DISPLAY`          | `None`          | Display type (full/conversation/rich/plain/none)                 |
 | `--reasoning-effort` | `BENCH_REASONING_EFFORT` | `None`          | Reasoning effort level (low/medium/high)                         |
 | `--json`             | None                     | `False`         | Output results in JSON format                                    |
+| `--log-format`       | `BENCH_LOG_FORMAT`       | `eval`          | Output logging format (eval/json)                                |
 | `--hub-repo`         | `BENCH_HUB_REPO`         | `None`          | Push results to a Hugging Face Hub dataset                       |
+
+## Grader Information
+
+Some benchmarks use a grader model to score the model's performance. This requires an additional API key for the grader model.
+
+To run these benchmarks, you'll need to export your `OPENAI_API_key`:
+
+```bash
+export OPENAI_API_KEY=your_openai_key
+```
+
+The following benchmarks use a grader model:
+
+| Benchmark | Default Grader Model |
+| :--- | :--- |
+| `simpleqa` | `openai/gpt-4.1-2025-04-14` |
+| `hle` | `openai/o3-mini-2025-01-31` |
+| `hle_text` | `openai/o3-mini-2025-01-31` |
+| `browsecomp` | `openai/gpt-4.1-2025-04-14` |
+| `healthbench` | `openai/gpt-4.1-2025-04-14` |
+| `math` | `openai/gpt-4-turbo-preview` |
+| `math_500` | `openai/gpt-4-turbo-preview` |
 
 ## Building Your Own Evals
 

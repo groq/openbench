@@ -17,3 +17,4 @@ logs/
 .claude/settings.local.json
 local-prompts.md
 .env
+build/
