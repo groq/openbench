@@ -7,6 +7,8 @@ import shutil
 import subprocess
 from typing import Any
 
+from openbench.datasets.scicode import download_h5_file
+
 
 class ScicodeEvaluator:
     def __init__(
@@ -16,7 +18,7 @@ class ScicodeEvaluator:
         log_dir: Path,
         with_background: bool,
     ):
-        self.h5py_file = h5py_file
+        self.h5py_file = download_h5_file(h5py_file)
         self.code_dir = code_dir
         self.log_dir = log_dir
         self.with_background = with_background
@@ -81,6 +83,7 @@ from scicode.parse.parse import process_hdf5_to_tuple
         total_steps = len(sub_steps)
         total_correct = 0
         for idx in range(len(sub_steps)):
+            # Skip these particular substeps
             if (
                 (problem_id == "13" and idx == 5)
                 or (problem_id == "62" and idx == 0)
@@ -140,7 +143,7 @@ def scicode_scorer(**params: dict[str, Any]):
     async def score(state: TaskState, target: Target):
         model_name = str(state.model).replace("/", "-")
         evaluator = ScicodeEvaluator(
-            h5py_file=params["h5py_file"],  # type: ignore
+            h5py_file=params["output_dir"],  # type: ignore
             code_dir=Path(params["output_dir"], model_name),  # type: ignore
             log_dir=Path(params["output_dir"], model_name),  # type: ignore
             with_background=params["with_background"],  # type: ignore

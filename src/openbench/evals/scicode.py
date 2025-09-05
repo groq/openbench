@@ -158,29 +158,50 @@ class ScicodePromptingAssistant:
                         or (prob_id == "62" and prev_step == 0)
                         or (prob_id == "76" and prev_step == 2)
                     ):
-                        prev_file_path = Path(
-                            "../data", f"{prob_id}.{prev_step + 1}.txt"
-                        )
+                        # Fetch reference code from GitHub. The fetched code is used to prompt the next step, since the code was not generated for the above substeps.
+                        import requests
+
+                        github_url = f"https://raw.githubusercontent.com/scicode-bench/SciCode/main/eval/data/{prob_id}.{prev_step + 1}.txt"
+                        try:
+                            response = requests.get(github_url)
+                            response.raise_for_status()
+                            prev_file_content = response.text
+                            func_name = extract_function_name(
+                                prob_data["sub_steps"][prev_step]["function_header"]
+                            )
+                            function_code = get_function_from_code(
+                                prev_file_content, func_name
+                            )
+                            self.previous_llm_code[prev_step] = function_code
+                        except requests.RequestException as e:
+                            print(
+                                f"Failed to fetch reference code for {prob_id}.{prev_step + 1}: {e}"
+                            )
+                            raise Exception(
+                                f"Generating problem {prob_id} step {num_steps} ahead of step {prev_step + 1}."
+                            )
                     else:
                         prev_file_path = Path(
                             self.output_dir,
                             self._get_background_dir(),
                             f"{prob_id}.{prev_step + 1}.py",
                         )
-                    if prev_file_path.is_file():
-                        prev_file_content = prev_file_path.read_text(encoding="utf-8")
-                        func_name = extract_function_name(
-                            prob_data["sub_steps"][prev_step]["function_header"]
-                        )
-                        function_code = get_function_from_code(
-                            prev_file_content, func_name
-                        )
-                        self.previous_llm_code[prev_step] = function_code
-                    else:
-                        # print(f"Generating problem {prob_id} step {num_steps} ahead of step {prev_step + 1}.")
-                        raise Exception(
-                            f"Generating problem {prob_id} step {num_steps} ahead of step {prev_step + 1}."
-                        )
+                        if prev_file_path.is_file():
+                            prev_file_content = prev_file_path.read_text(
+                                encoding="utf-8"
+                            )
+                            func_name = extract_function_name(
+                                prob_data["sub_steps"][prev_step]["function_header"]
+                            )
+                            function_code = get_function_from_code(
+                                prev_file_content, func_name
+                            )
+                            self.previous_llm_code[prev_step] = function_code
+                        else:
+                            # print(f"Generating problem {prob_id} step {num_steps} ahead of step {prev_step + 1}.")
+                            raise Exception(
+                                f"Generating problem {prob_id} step {num_steps} ahead of step {prev_step + 1}."
+                            )
 
         prompt, previous_code = self.generate_prompt_with_steps(
             prob_data,
@@ -259,10 +280,10 @@ def scicode_solver(**params: dict[str, Any]):
 
 @task
 def scicode(
-    split: str = "validation",  # TODO: when 'test' is runnable, revert to 'test'
+    split: str = "test",  # TODO: when 'test' is runnable, revert to 'test'
     output_dir: str = "./tmp",
     with_background: bool = False,
-    h5py_file: str = "../data/test_data.h5",
+    h5py_file: str | None = None,
     mode: str = "normal",
 ):
     print(
