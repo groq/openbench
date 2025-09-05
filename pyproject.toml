@@ -18,6 +18,7 @@ dependencies = [
     "groq>=0.30.0",
     "inspect-ai==0.3.125",
     "openai>=1.97.1",
+    "platformdirs>=4.3.0",
     "pydantic-settings>=2.9.1",
     "scipy>=1.15.3",
     "tiktoken>=0.11.0",
@@ -88,4 +89,9 @@ scicode = [
 ]
 jsonschemabench = [
     "jsonschema>=4.23.0",
+]
+swebench = [
+    "platformdirs>=4.3.0",
+    "jsonlines>=4.0.0",
+    "swebench>=2.1.0",
 ]

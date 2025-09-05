@@ -324,6 +324,23 @@ BENCHMARKS = {
         module_path="openbench.evals.math",
         function_name="math_500",
     ),
+    # SWE-bench benchmarks
+    "swe_bench_verified": BenchmarkMetadata(
+        name="SWE-bench Verified",
+        description="Software engineering benchmark evaluating code generation on real-world GitHub issues with verified solutions",
+        category="core",
+        tags=["coding", "software-engineering", "github", "real-world", "docker"],
+        module_path="openbench.evals.swe_bench",
+        function_name="swe_bench_verified",
+    ),
+    "swe_bench": BenchmarkMetadata(
+        name="SWE-bench",
+        description="Full SWE-bench dataset for evaluating code generation on real-world GitHub issues",
+        category="core",
+        tags=["coding", "software-engineering", "github", "real-world", "docker"],
+        module_path="openbench.evals.swe_bench",
+        function_name="swe_bench",
+    ),
     # Math competitions
     "aime_2023_I": BenchmarkMetadata(
         name="AIME 2023 I",
