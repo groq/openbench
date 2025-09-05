@@ -7,6 +7,8 @@ import shutil
 import subprocess
 from typing import Any
 
+from openbench.datasets.scicode import download_h5_file
+
 
 class ScicodeEvaluator:
     def __init__(
@@ -16,7 +18,8 @@ class ScicodeEvaluator:
         log_dir: Path,
         with_background: bool,
     ):
-        self.h5py_file = h5py_file
+        # Ensure h5py_file path is absolute for consistent access
+        self.h5py_file = download_h5_file(h5py_file)
         self.code_dir = code_dir
         self.log_dir = log_dir
         self.with_background = with_background
@@ -140,7 +143,7 @@ def scicode_scorer(**params: dict[str, Any]):
     async def score(state: TaskState, target: Target):
         model_name = str(state.model).replace("/", "-")
         evaluator = ScicodeEvaluator(
-            h5py_file=params["h5py_file"],  # type: ignore
+            h5py_file=params["output_dir"],  # type: ignore
             code_dir=Path(params["output_dir"], model_name),  # type: ignore
             log_dir=Path(params["output_dir"], model_name),  # type: ignore
             with_background=params["with_background"],  # type: ignore
