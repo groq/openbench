@@ -18,7 +18,6 @@ class ScicodeEvaluator:
         log_dir: Path,
         with_background: bool,
     ):
-        # Ensure h5py_file path is absolute for consistent access
         self.h5py_file = download_h5_file(h5py_file)
         self.code_dir = code_dir
         self.log_dir = log_dir
@@ -84,6 +83,7 @@ from scicode.parse.parse import process_hdf5_to_tuple
         total_steps = len(sub_steps)
         total_correct = 0
         for idx in range(len(sub_steps)):
+            # Skip these particular substeps
             if (
                 (problem_id == "13" and idx == 5)
                 or (problem_id == "62" and idx == 0)

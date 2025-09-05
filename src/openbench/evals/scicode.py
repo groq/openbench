@@ -158,7 +158,7 @@ class ScicodePromptingAssistant:
                         or (prob_id == "62" and prev_step == 0)
                         or (prob_id == "76" and prev_step == 2)
                     ):
-                        # Fetch reference code from GitHub
+                        # Fetch reference code from GitHub. The fetched code is used to prompt the next step, since the code was not generated for the above substeps.
                         import requests
 
                         github_url = f"https://raw.githubusercontent.com/scicode-bench/SciCode/main/eval/data/{prob_id}.{prev_step + 1}.txt"
