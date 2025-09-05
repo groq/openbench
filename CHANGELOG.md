@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.4.2](https://github.com/groq/openbench/compare/v0.4.1...v0.4.2) (2025-09-05)
+
+
+### Features
+
+* add local openbench implementation of groq provider in inspect ([#131](https://github.com/groq/openbench/issues/131)) ([52aea35](https://github.com/groq/openbench/commit/52aea3510f03cd49d0fb66c3e6789f61939a7ee0))
+* change default model to groq/openai/gpt-oss-20b ([#138](https://github.com/groq/openbench/issues/138)) ([8f7f42f](https://github.com/groq/openbench/commit/8f7f42f1a3faba9dafa535f135a6a1638592ed4f))
+* configure release-please for pre-v1.0 version bumping ([#133](https://github.com/groq/openbench/issues/133)) ([c432934](https://github.com/groq/openbench/commit/c4329343e059f6dd8c9a664a67431aba8d8fb853))
+* **eval:** add support for json output ([#14](https://github.com/groq/openbench/issues/14)) ([f335418](https://github.com/groq/openbench/commit/f3354188fcbd35067072da8840a444188a3a0221))
+* graphwalks token filter ([#115](https://github.com/groq/openbench/issues/115)) ([e38658c](https://github.com/groq/openbench/commit/e38658c916d987bf8074910dfdefefb88e97faf6))
+* groq reasoning effort + bugfix to override inspect's "groq" ([#142](https://github.com/groq/openbench/issues/142)) ([b919cc7](https://github.com/groq/openbench/commit/b919cc7e6bc748c92393a9a9bbf69db560313495))
+* **mmmu-pro:** added support for mmmu_mcq, mmmu_open, mmmu_pro, mmmu_pro_vision ([#134](https://github.com/groq/openbench/issues/134)) ([a875378](https://github.com/groq/openbench/commit/a875378e62e3bbd3f8050d1a9685d3e05a47a53d))
+
+
+### Documentation
+
+* **readme:** clarify benchmark case-sensitivity and grader requirements ([#135](https://github.com/groq/openbench/issues/135)) ([c34a5a3](https://github.com/groq/openbench/commit/c34a5a362ec6764909258350f383ec561274b5bb))
+
+
+### Chores
+
+* GitHub Terraform: Create/Update .github/workflows/stale.yaml [skip ci] ([d0018d1](https://github.com/groq/openbench/commit/d0018d1cac7b024844b530117b31a09088882728))
+* update Claude workflows to enhance permissions and streamline triggers ([#136](https://github.com/groq/openbench/issues/136)) ([effb7da](https://github.com/groq/openbench/commit/effb7da7ce12ba11da311bfb52493fb8b40dac24))
+* update release-please configuration and add lockfile update workflow ([#146](https://github.com/groq/openbench/issues/146)) ([2d6ad9b](https://github.com/groq/openbench/commit/2d6ad9b529e7092c554dabee9f479d6555a698c7))
+
 ## [0.4.1](https://github.com/groq/openbench/compare/v0.4.0...v0.4.1) (2025-08-29)
 
 
