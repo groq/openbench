@@ -95,3 +95,51 @@ def test_model_and_model_role_conflict():
         ],
     )
     assert result.exit_code != 0
+
+
+def test_basic_swebench_lite():
+    """Test basic SWE-bench Lite evaluation."""
+    result = runner.invoke(
+        app,
+        [
+            "eval",
+            "swebench_lite",
+            "--limit",
+            "1",
+            "--model",
+            "groq/llama-3.1-8b-instant",
+        ],
+    )
+    assert result.exit_code == 0
+
+
+def test_basic_swebench_verified():
+    """Test basic SWE-bench Verified evaluation."""
+    result = runner.invoke(
+        app,
+        [
+            "eval",
+            "swebench_verified",
+            "--limit",
+            "1",
+            "--model",
+            "groq/llama-3.1-8b-instant",
+        ],
+    )
+    assert result.exit_code == 0
+
+
+def test_basic_swebench_full():
+    """Test basic SWE-bench evaluation."""
+    result = runner.invoke(
+        app,
+        [
+            "eval",
+            "swebench",
+            "--limit",
+            "1",
+            "--model",
+            "groq/llama-3.1-8b-instant",
+        ],
+    )
+    assert result.exit_code == 0
