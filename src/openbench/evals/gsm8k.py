@@ -22,9 +22,6 @@ def gsm8k() -> Task:
     Based on the paper by Cobbe et al. (2021).
     Tests mathematical problem-solving at grade school level.
 
-    Args:
-        grader_model: Model to use for checking answer equality (defaults to gpt-4-turbo-preview)
-
     Returns:
         Task configured for GSM8K evaluation
     """
