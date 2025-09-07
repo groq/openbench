@@ -1,0 +1,28 @@
+# compose.yaml
+services:
+  default:
+    build: .
+    init: true
+    command: tail -f /dev/null
+    # Resource controls (tune as needed)
+    cpus: 2.0
+    mem_limit: 4g
+    pids_limit: 4096
+    networks:
+      - eval_net
+    environment:
+      # If you use git over HTTPS with PAT:
+      GIT_TERMINAL_PROMPT: "0"
+    # Mount caches to avoid re-downloading
+    volumes:
+      - hf_cache:/root/.cache/huggingface
+      - pip_cache:/root/.cache/pip
+
+networks:
+  eval_net:
+    driver: bridge
+    internal: false # crucial: false => has internet
+
+volumes:
+  hf_cache:
+  pip_cache:
