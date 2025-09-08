@@ -201,6 +201,14 @@ BENCHMARKS = {
         module_path="openbench.evals.simpleqa",
         function_name="simpleqa",
     ),
+    "detailbench": BenchmarkMetadata(
+        name="DetailBench",
+        description="Tests whether LLMs notify users about wrong facts in a text while they are tasked to translate said text",
+        category="community",
+        tags=["knowledge", "graded", "instruction-following"],
+        module_path="openbench.evals.detailbench",
+        function_name="detailbench",
+    ),
     "browsecomp": BenchmarkMetadata(
         name="BrowseComp",
         description="A Simple Yet Challenging Benchmark for Browsing Agents - evaluates model performance on browsing-related tasks",

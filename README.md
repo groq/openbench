@@ -129,6 +129,7 @@ Here are the currently available benchmarks. For an up-to-date list use `bench l
 | **Long Context**  | OpenAI MRCR (multiple needle retrieval), OpenAI MRCR_2n (2 needle), OpenAI MRCR_4 (4 needle), OpenAI MRCR_8n (8 needle)                                                                                                                                                                                         |
 | **Healthcare**    | HealthBench (open-ended healthcare eval), HealthBench_hard (challenging variant), HealthBench_consensus (consensus variant)                                                                                                                                                                                     |
 | **Cybersecurity** | CTI-Bench (complete cyber threat intelligence suite), CTI-Bench ATE (MITRE ATT&CK technique extraction), CTI-Bench MCQ (knowledge questions on CTI standards and best practices), CTI-Bench RCM (CVE to CWE vulnerability mapping), CTI-Bench VSP (CVSS score calculation)                                      |
+| **Community** | DetailBench                                     |
 
 ## Configuration
 
@@ -199,6 +200,7 @@ The following benchmarks use a grader model:
 | `healthbench` | `openai/gpt-4.1-2025-04-14` |
 | `math` | `openai/gpt-4-turbo-preview` |
 | `math_500` | `openai/gpt-4-turbo-preview` |
+| `detailbench` | `gpt-5-mini-2025-08-07` |
 
 ## Building Your Own Evals
 
