@@ -201,6 +201,14 @@ BENCHMARKS = {
         module_path="openbench.evals.simpleqa",
         function_name="simpleqa",
     ),
+    "tumlu": BenchmarkMetadata(
+        name="TUMLU",
+        description="TUMLU is a comprehensive, multilingual, and natively developed language understanding benchmark specifically designed for Turkic languages.",
+        category="community",
+        tags=["factuality", "question-answering", "multiple-choice", "reasoning"],
+        module_path="openbench.evals.tumlu",
+        function_name="tumlu",
+    ),
     "detailbench": BenchmarkMetadata(
         name="DetailBench",
         description="Tests whether LLMs notify users about wrong facts in a text while they are tasked to translate said text",
