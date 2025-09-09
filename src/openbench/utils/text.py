@@ -176,7 +176,6 @@ MULTILINGUAL_ANSWER_REGEXES = [
     r"Жауап\s*:",
     r"Jawap\s*:",
     r"Juwap\s*:",
-    r"Cevap\s*:",
     r"جاۋاب\:",
     r"Cavab\s*:",  # TURKIC LANGUAGES END
     r"Réponse\s*:",
