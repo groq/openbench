@@ -325,6 +325,14 @@ def run_eval(
             envvar="BENCH_ALPHA",
         ),
     ] = False,
+    harness: Annotated[
+        Optional[str],
+        typer.Option(
+            "--harness",
+            help="CLI harness to use for code evaluation. Options: aider (default), opencode, roo",
+            envvar="BENCH_HARNESS",
+        ),
+    ] = None,
 ) -> None:
     """
     Run a benchmark on a model.
@@ -332,6 +340,19 @@ def run_eval(
     # Parse model and task arguments
     model_args = parse_cli_args(m) if m else {}
     task_args = parse_cli_args(t) if t else {}
+
+    # Add harness to task arguments if specified
+    if harness:
+        valid_harnesses = ["aider", "opencode", "roo", "claude"]
+        if harness not in valid_harnesses:
+            raise typer.BadParameter(
+                f"Invalid harness: {harness}. Valid options: {', '.join(valid_harnesses)}"
+            )
+        task_args["harness"] = harness
+
+        # Override default model for claude harness if still using default
+        if harness == "claude" and model == ["groq/openai/gpt-oss-20b"]:
+            model = ["anthropic/claude-sonnet-4-20250514"]
 
     # Validate and aggregate model_role(s) into a dict
     role_models = {}

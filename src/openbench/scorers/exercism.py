@@ -1,7 +1,7 @@
 """
-Scorer for Roo-Code-Evals tasks.
+Scorer for Exercism tasks.
 
-This scorer evaluates the results of code execution from the roocode_solver,
+This scorer evaluates the results of code execution from the exercism_solver,
 parsing test results to determine task success/failure and providing detailed feedback.
 """
 
@@ -28,13 +28,14 @@ def extract_execution_results(completion: str) -> Optional[Dict[str, Any]]:
     Extract execution results from the solver's completion output.
 
     Args:
-        completion: The full completion text from the roocode_agent_solver
+        completion: The full completion text from the exercism_solver
 
     Returns:
         Dictionary containing parsed execution results, or None if not found
     """
     # Look for the final test results section added by the agent solver
-    results_pattern = r"\[FINAL_TEST_RESULTS\]\s*\n(.*?)(?:\n\n|\Z)"
+    # Extract everything from [FINAL_TEST_RESULTS] to the end or next major section
+    results_pattern = r"\[FINAL_TEST_RESULTS\]\s*\n(.*?)(?:\n\[|$)"
     match = re.search(results_pattern, completion, re.DOTALL)
 
     if not match:
@@ -101,11 +102,11 @@ def analyze_test_results(
         "test_details": [],
     }
 
-    # Check for basic execution success
-    if not execution_results["success"] or execution_results["exit_code"] != 0:
-        analysis["overall_success"] = False
-    else:
-        analysis["overall_success"] = True
+    # Check for basic execution success - default to False unless explicitly successful
+    analysis["overall_success"] = (
+        execution_results.get("success") is True
+        and execution_results.get("exit_code") == 0
+    )
 
     stdout = execution_results["stdout"]
     stderr = execution_results["stderr"]
@@ -127,14 +128,17 @@ def analyze_test_results(
     elif language == "rust":
         analysis.update(_analyze_rust_tests(stdout, stderr))
 
-    # If we couldn't parse specific test results, use general success/failure
+    # If we couldn't parse specific test results, default to failure
+    # Only count as success if we have explicit evidence of success
     if analysis["tests_total"] == 0:
-        if analysis["overall_success"]:
+        if analysis["overall_success"] and execution_results.get("success") is True:
             analysis["tests_passed"] = 1
             analysis["tests_total"] = 1
         else:
+            # Default to failure if we can't determine test results
             analysis["tests_failed"] = 1
             analysis["tests_total"] = 1
+            analysis["overall_success"] = False
 
     return analysis
 
@@ -148,7 +152,7 @@ def _analyze_python_tests(stdout: str, stderr: str) -> Dict[str, Any]:
         "tests_failed": 0,
         "tests_total": 0,
         "error_details": [],
-        "overall_success": True,
+        "overall_success": False,  # Default to failure
     }
 
     # Check for compilation/syntax errors
@@ -165,9 +169,12 @@ def _analyze_python_tests(stdout: str, stderr: str) -> Dict[str, Any]:
         if test_summary.group(1):  # Has failures
             analysis["tests_failed"] = int(test_summary.group(1))
             analysis["tests_passed"] = int(test_summary.group(2))
+            analysis["overall_success"] = False
         else:  # Only passes
             analysis["tests_passed"] = int(test_summary.group(3))
             analysis["tests_failed"] = 0
+            # Only mark as successful if we have clear evidence of passed tests
+            analysis["overall_success"] = analysis["tests_passed"] > 0
         analysis["tests_total"] = analysis["tests_passed"] + analysis["tests_failed"]
 
     return analysis
@@ -182,7 +189,7 @@ def _analyze_go_tests(stdout: str, stderr: str) -> Dict[str, Any]:
         "tests_failed": 0,
         "tests_total": 0,
         "error_details": [],
-        "overall_success": True,
+        "overall_success": False,  # Default to failure
     }
 
     # Check for compilation errors
@@ -194,6 +201,7 @@ def _analyze_go_tests(stdout: str, stderr: str) -> Dict[str, Any]:
     if "PASS" in stdout and "FAIL" not in stdout:
         analysis["tests_passed"] = 1
         analysis["tests_total"] = 1
+        analysis["overall_success"] = True  # Only mark successful if we see PASS
     elif "FAIL" in stdout:
         analysis["tests_failed"] = 1
         analysis["tests_total"] = 1
@@ -211,7 +219,7 @@ def _analyze_javascript_tests(stdout: str, stderr: str) -> Dict[str, Any]:
         "tests_failed": 0,
         "tests_total": 0,
         "error_details": [],
-        "overall_success": True,
+        "overall_success": False,  # Default to failure
     }
 
     # Check for syntax/import errors
@@ -230,6 +238,9 @@ def _analyze_javascript_tests(stdout: str, stderr: str) -> Dict[str, Any]:
         if passed_match:
             analysis["tests_passed"] = int(passed_match.group(1))
             analysis["tests_total"] = analysis["tests_passed"]
+            analysis["overall_success"] = (
+                analysis["tests_passed"] > 0
+            )  # Only successful if tests actually passed
     elif "failed" in stdout.lower():
         analysis["overall_success"] = False
         analysis["tests_failed"] = 1
@@ -247,7 +258,7 @@ def _analyze_java_tests(stdout: str, stderr: str) -> Dict[str, Any]:
         "tests_failed": 0,
         "tests_total": 0,
         "error_details": [],
-        "overall_success": True,
+        "overall_success": False,  # Default to failure
     }
 
     # Check for compilation errors
@@ -259,6 +270,7 @@ def _analyze_java_tests(stdout: str, stderr: str) -> Dict[str, Any]:
     if "BUILD SUCCESSFUL" in stdout:
         analysis["tests_passed"] = 1
         analysis["tests_total"] = 1
+        analysis["overall_success"] = True  # Only successful if BUILD SUCCESSFUL
     elif "BUILD FAILED" in stdout:
         analysis["tests_failed"] = 1
         analysis["tests_total"] = 1
@@ -276,7 +288,7 @@ def _analyze_rust_tests(stdout: str, stderr: str) -> Dict[str, Any]:
         "tests_failed": 0,
         "tests_total": 0,
         "error_details": [],
-        "overall_success": True,
+        "overall_success": False,  # Default to failure
     }
 
     # Check for compilation errors
@@ -295,7 +307,11 @@ def _analyze_rust_tests(stdout: str, stderr: str) -> Dict[str, Any]:
         analysis["tests_failed"] = failed
         analysis["tests_total"] = passed + failed
 
-        if result_type != "ok" or failed > 0:
+        if result_type == "ok" and failed == 0 and passed > 0:
+            analysis["overall_success"] = (
+                True  # Only successful if explicit "ok" with no failures
+            )
+        else:
             analysis["overall_success"] = False
 
     return analysis
@@ -309,20 +325,20 @@ def _analyze_rust_tests(stdout: str, stderr: str) -> Dict[str, Any]:
         grouped(group_key="language", metric=[accuracy(), stderr(), std()]),
     ]
 )
-def roocode_scorer() -> Scorer:
+def exercism_scorer() -> Scorer:
     """
-    Scorer for Roo-Code-Evals tasks.
+    Scorer for Exercism tasks.
 
-    This scorer parses the execution results from the roocode_solver to determine
+    This scorer parses the execution results from the exercism_solver to determine
     if the coding task was completed successfully by analyzing test results.
 
     Returns:
-        Scorer function for Roo-Code tasks
+        Scorer function for Exercism tasks
     """
 
     async def score(state: TaskState, target: Target) -> Score:
         """
-        Score a Roo-Code task based on test execution results.
+        Score an exercism task based on test execution results.
 
         Args:
             state: Task state containing completion with execution results
@@ -335,22 +351,32 @@ def roocode_scorer() -> Scorer:
         language = state.metadata.get("language", "unknown")
         task_name = state.metadata.get("task_name", "unknown")
 
-        # Check for execution error in the completion
-        if "ERROR:" in completion and "[FINAL_TEST_RESULTS]" not in completion:
-            error_match = re.search(r"ERROR: (.*?)(?:\n|$)", completion)
-            error_msg = (
-                error_match.group(1) if error_match else "Unknown execution error"
-            )
-
+        # Check for various types of errors in the completion
+        # Tool call validation errors
+        if "tool call validation failed" in completion.lower():
             return Score(
                 value=INCORRECT,
                 answer=None,
-                explanation=f"Execution failed for {language}/{task_name}: {error_msg}",
+                explanation=f"Tool call validation failed for {language}/{task_name}. Model made invalid tool calls.",
                 metadata={
                     "language": language,
                     "task_name": task_name,
-                    "error_type": "execution_error",
-                    "error_message": error_msg,
+                    "error_type": "tool_call_validation_error",
+                    "error_message": "Tool call validation failed",
+                },
+            )
+
+        # General API/request errors
+        if "invalid_request_error" in completion.lower():
+            return Score(
+                value=INCORRECT,
+                answer=None,
+                explanation=f"Invalid request error for {language}/{task_name}. Model made malformed API requests.",
+                metadata={
+                    "language": language,
+                    "task_name": task_name,
+                    "error_type": "invalid_request_error",
+                    "error_message": "Invalid request error",
                 },
             )
 
@@ -358,10 +384,34 @@ def roocode_scorer() -> Scorer:
         execution_results = extract_execution_results(completion)
 
         if not execution_results:
+            # Fallback: check if there's any indication of success in the raw completion
+            # This handles cases where the solver output format is unexpected
+            if (
+                "PASS" in completion
+                and "FAIL" not in completion
+                and language == "go"
+                and "ok " in completion
+            ):
+                return Score(
+                    value=CORRECT,
+                    answer="PASS",
+                    explanation=f"Found Go test success indicators (PASS and 'ok') in completion for {language}/{task_name}. Using fallback parsing due to unexpected output format.",
+                    metadata={
+                        "language": language,
+                        "task_name": task_name,
+                        "exit_code": 0,
+                        "execution_success": True,
+                        "fallback_parsing": True,
+                        "raw_completion_sample": completion[:500] + "..."
+                        if len(completion) > 500
+                        else completion,
+                    },
+                )
+
             return Score(
                 value=INCORRECT,
                 answer=None,
-                explanation=f"No final test results found for {language}/{task_name}. Agent may not have completed the task.",
+                explanation=f"No final test results found for {language}/{task_name}. Agent may not have completed the task or encountered errors.",
                 metadata={
                     "language": language,
                     "task_name": task_name,
@@ -369,34 +419,42 @@ def roocode_scorer() -> Scorer:
                 },
             )
 
-        # Analyze the test results
+        # Analyze the test results for additional details
         analysis = analyze_test_results(execution_results, language)
 
-        # Determine overall success
+        # PRIMARY SUCCESS DETERMINATION: Use the Success field from the solver
+        # This is the most reliable indicator as it's computed by the solver based on exit code
         task_success = (
-            analysis["overall_success"]
-            and analysis["tests_passed"] > 0
-            and analysis["tests_failed"] == 0
-            and not analysis["compilation_error"]
-            and not analysis["timeout_error"]
+            execution_results["success"] is True and execution_results["exit_code"] == 0
         )
+
+        # Additional safety checks - if these fail, still mark as failure
+        if analysis["compilation_error"] or analysis["timeout_error"]:
+            task_success = False
 
         # Build explanation
         explanation_parts = [f"Task: {language}/{task_name}"]
 
         if task_success:
-            explanation_parts.append(
-                f"All tests passed ({analysis['tests_passed']}/{analysis['tests_total']})"
-            )
+            # Success based on exit code and Success field
+            if analysis.get("tests_passed", 0) > 0:
+                explanation_parts.append(
+                    f"Tests passed (Success: True, Exit Code: {execution_results['exit_code']})"
+                )
+            else:
+                explanation_parts.append(
+                    f"Execution successful (Success: True, Exit Code: {execution_results['exit_code']})"
+                )
         else:
-            if analysis["compilation_error"]:
+            # Explain why it failed
+            if execution_results["success"] is False:
+                explanation_parts.append(
+                    f"Execution failed (Success: False, Exit Code: {execution_results['exit_code']})"
+                )
+            elif analysis["compilation_error"]:
                 explanation_parts.append("Compilation/syntax error occurred")
             elif analysis["timeout_error"]:
                 explanation_parts.append("Execution timed out")
-            elif analysis["tests_failed"] > 0:
-                explanation_parts.append(
-                    f"Tests failed ({analysis['tests_failed']}/{analysis['tests_total']})"
-                )
             else:
                 explanation_parts.append("Task execution failed")
 
@@ -420,18 +478,20 @@ def roocode_scorer() -> Scorer:
 
         return Score(
             value=CORRECT if task_success else INCORRECT,
-            answer=f"{'PASS' if task_success else 'FAIL'}: {analysis['tests_passed']}/{analysis['tests_total']} tests passed",
+            answer=f"{'PASS' if task_success else 'FAIL'}: Success={execution_results['success']}, Exit Code={execution_results['exit_code']}",
             explanation="\n".join(explanation_parts),
             metadata={
                 "language": language,
                 "task_name": task_name,
-                "tests_passed": analysis["tests_passed"],
-                "tests_failed": analysis["tests_failed"],
-                "tests_total": analysis["tests_total"],
-                "compilation_error": analysis["compilation_error"],
-                "timeout_error": analysis["timeout_error"],
                 "exit_code": execution_results["exit_code"],
                 "execution_success": execution_results["success"],
+                "success_field_used": True,  # Indicate we used the Success field as primary indicator
+                # Keep test analysis for debugging but not for primary scoring
+                "tests_passed": analysis.get("tests_passed", 0),
+                "tests_failed": analysis.get("tests_failed", 0),
+                "tests_total": analysis.get("tests_total", 0),
+                "compilation_error": analysis.get("compilation_error", False),
+                "timeout_error": analysis.get("timeout_error", False),
             },
         )
 

@@ -192,13 +192,13 @@ from .evals.graphwalks import graphwalks  # noqa: F401, E402
 from .evals.healthbench import healthbench, healthbench_hard, healthbench_consensus  # noqa: F401, E402
 from .evals.hle import hle, hle_text  # noqa: F401, E402
 from .evals.humaneval import humaneval  # noqa: F401, E402
-from .evals.roocode.roocode import (  # noqa: F401, E402
-    roocode,
-    roocode_python,
-    roocode_javascript,
-    roocode_go,
-    roocode_java,
-    roocode_rust,
+from .evals.exercism.exercism import (  # noqa: F401, E402
+    exercism,
+    exercism_python,
+    exercism_javascript,
+    exercism_go,
+    exercism_java,
+    exercism_rust,
 )
 from .evals.math import math, math_500  # noqa: F401, E402
 from .evals.mgsm import mgsm, mgsm_en, mgsm_latin, mgsm_non_latin  # noqa: F401, E402
