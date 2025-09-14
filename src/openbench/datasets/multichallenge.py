@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Any, Callable, Dict, Optional, Sequence
+from typing import Any, Callable, Dict, Optional
 from inspect_ai.dataset import FieldSpec, Sample, hf_dataset, Dataset
 from inspect_ai.model import ChatMessageUser, ChatMessageAssistant
 
