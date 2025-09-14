@@ -4330,6 +4330,15 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.cybench",
         function_name="cybench",
     ),
+    "multichallenge": BenchmarkMetadata(
+        name="MultiChallenge",
+        description="Multi-turn conversational tasks requiring reasoning, instruction retention, and coherence.",
+        category="core",
+        tags=["multi-turn", "reasoning", "chat", "judged"],
+        module_path="openbench.evals.multichallenge",
+        function_name="multichallenge",
+        is_alpha=False,
+    ),
 }
 
 def _normalize_benchmark_key(name: str) -> str:
