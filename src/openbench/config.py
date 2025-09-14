@@ -899,6 +899,14 @@ BENCHMARKS = {
         function_name="mmmu_sociology",
         is_alpha=False,
     ),
+    "gsm8k": BenchmarkMetadata(
+        name="GSM8K",
+        description="GSM8K (Grade School Math 8K) is a dataset of 8.5K high quality linguistically diverse grade school math word problems. The dataset was created to support the task of question answering on basic mathematical problems that require multi-step reasoning.",
+        category="core",
+        tags=["math", "problem-solving", "reasoning"],
+        module_path="openbench.evals.gsm8k",
+        function_name="gsm8k",
+    ),
     "mmmu_mcq": BenchmarkMetadata(
         name="MMMU MCQ",
         description="MMMU MCQ subset focusing on multiple choice questions",
