@@ -3,6 +3,9 @@ title: Benchmarks Catalog
 description: Complete catalog of all available benchmarks with evaluation commands
 ---
 
+import { useEffect, useMemo, useState } from 'react'
+import { benchmarksData } from "/snippets/benchmarks.data.mdx"
+
 ## Featured
 
 <CardGroup cols={3}>
@@ -69,92 +72,162 @@ description: Complete catalog of all available benchmarks with evaluation comman
 
 ## Complete Benchmark Catalog
 
-| Benchmark | Description | Command |
-|-----------|-------------|---------|
-| AIME 2023 I | American Invitational Mathematics Examination 2023 (First) | `bench eval aime_2023_I` |
-| AIME 2023 II | American Invitational Mathematics Examination 2023 (Second) | `bench eval aime_2023_II` |
-| AIME 2024 | American Invitational Mathematics Examination 2024 (Combined I & II) | `bench eval aime_2024` |
-| AIME 2024 I | American Invitational Mathematics Examination 2024 (First) | `bench eval aime_2024_I` |
-| AIME 2024 II | American Invitational Mathematics Examination 2024 (Second) | `bench eval aime_2024_II` |
-| AIME 2025 | American Invitational Mathematics Examination 2025 | `bench eval aime_2025` |
-| AIME 2025 II | American Invitational Mathematics Examination 2025 (Second) | `bench eval aime_2025_II` |
-| BoolQ | BoolQ: A Question Answering Dataset for Boolean Reasoning | `bench eval boolq` |
-| BrowseComp | A Simple Yet Challenging Benchmark for Browsing Agents - evaluates model performance on browsing-related tasks | `bench eval browsecomp` |
-| BRUMO 2025 | Bruno Mathematical Olympiad 2025 | `bench eval brumo_2025` |
-| ClockBench | Clock benchmark - time-based reasoning tasks | `bench eval clockbench` |
-| CTI-Bench | Comprehensive evaluation framework for cyber threat intelligence understanding with 4 tasks: knowledge questions, vulnerability classification, CVSS scoring, and technique extraction | `bench eval cti_bench` |
-| CTI-Bench ATE | Extracting MITRE ATT&CK techniques from malware and threat descriptions | `bench eval cti_bench_ate` |
-| CTI-Bench MCQ | Multiple-choice questions evaluating understanding of CTI standards, threats, detection strategies, and best practices using authoritative sources like NIST and MITRE | `bench eval cti_bench_mcq` |
-| CTI-Bench RCM | Mapping CVE descriptions to CWE categories to evaluate vulnerability classification ability | `bench eval cti_bench_rcm` |
-| CTI-Bench VSP | Calculating CVSS scores from vulnerability descriptions to assess severity evaluation skills | `bench eval cti_bench_vsp` |
-| DetailBench | Tests whether LLMs notify users about wrong facts in a text while they are tasked to translate said text | `bench eval detailbench` |
-| DROP | Reading comprehension benchmark requiring discrete reasoning over paragraphs (arithmetic, counting, sorting) | `bench eval drop` |
-| GMCQ | GitHub Multiple Choice Questions | `bench eval rootly_gmcq` |
-| GPQA Diamond | Graduate-level Google-Proof Q&A in biology, chemistry, and physics | `bench eval gpqa_diamond` |
-| GraphWalks | Multi-hop reasoning on graphs - both BFS and parent finding tasks | `bench eval graphwalks` |
-| GraphWalks BFS | Multi-hop reasoning on graphs - BFS traversal tasks only | `bench eval graphwalks_bfs` |
-| GraphWalks Parents | Multi-hop reasoning on graphs - parent finding tasks only | `bench eval graphwalks_parents` |
-| HealthBench | Medical dialogue evaluation using physician-created rubrics for assessing healthcare conversations | `bench eval healthbench` |
-| HealthBench Consensus | Medical dialogue cases with strong physician consensus on appropriate responses | `bench eval healthbench_consensus` |
-| HealthBench Hard | Most challenging medical dialogue cases from HealthBench requiring nuanced medical knowledge | `bench eval healthbench_hard` |
-| HMMT Feb 2023 | Harvard-MIT Mathematics Tournament February 2023 | `bench eval hmmt_feb_2023` |
-| HMMT Feb 2024 | Harvard-MIT Mathematics Tournament February 2024 | `bench eval hmmt_feb_2024` |
-| HMMT Feb 2025 | Harvard-MIT Mathematics Tournament February 2025 | `bench eval hmmt_feb_2025` |
-| HumanEval | Code generation benchmark with 164 programming problems | `bench eval humaneval` |
-| Humanity's Last Exam | Multi-modal benchmark at the frontier of human knowledge - 2,500 questions across mathematics, humanities, and natural sciences designed by subject-matter experts globally | `bench eval hle` |
-| Humanity's Last Exam (Text-Only) | Text-only variant of HLE with multi-modal questions filtered out - evaluates models without vision capabilities on text-based questions from the frontier of human knowledge | `bench eval hle_text` |
-| JSONSchemaBench | JSON Schema generation benchmark with ~10K real-world schemas from GitHub, Kubernetes, and other sources for evaluating constrained decoding | `bench eval jsonschemabench` |
-| MATH | Measuring Mathematical Problem Solving - 5000 competition math problems across 7 subjects and 5 difficulty levels | `bench eval math` |
-| MATH-500 | 500-problem subset of MATH dataset for faster evaluation of mathematical problem solving | `bench eval math_500` |
-| MBPP | Mostly Basic Python Problems — code generation tasks with unit test verification | `bench eval mbpp` |
-| MGSM | Multilingual Grade School Math benchmark across 11 languages for testing mathematical reasoning | `bench eval mgsm` |
-| MGSM English | Grade school math problems in English for testing mathematical reasoning | `bench eval mgsm_en` |
-| MGSM Latin Script | Grade school math problems in Latin script languages (German, English, Spanish, French, Swahili) | `bench eval mgsm_latin` |
-| MGSM Non-Latin Script | Grade school math problems in non-Latin script languages (Bengali, Japanese, Russian, Telugu, Thai, Chinese) | `bench eval mgsm_non_latin` |
-| MMLU (cais/mmlu) | Massive Multitask Language Understanding - 57 academic subjects from the cais/mmlu dataset | `bench eval mmlu` |
-| MMLU Pro (TIGER-Lab) | Enhanced version of MMLU with more challenging, reasoning-focused questions | `bench eval mmlu-pro` |
-| MMMU | Massive Multi-discipline Multimodal Understanding and Reasoning Benchmark with 11.5K questions across 30 subjects from college exams, quizzes, and textbooks | `bench eval mmmu` |
-| MMMU Accounting | MMMU Accounting subset focusing on accounting principles and practices | `bench eval mmmu_accounting` |
-| MMMU Agriculture | MMMU Agriculture subset focusing on agricultural sciences and practices | `bench eval mmmu_agriculture` |
-| MMMU Architecture and Engineering | MMMU Architecture and Engineering subset focusing on engineering design and architecture | `bench eval mmmu_architecture_and_engineering` |
-| MMMU Art | MMMU Art subset focusing on art and visual design questions | `bench eval mmmu_art` |
-| MMMU Art Theory | MMMU Art Theory subset focusing on art history and theoretical concepts | `bench eval mmmu_art_theory` |
-| MMMU Basic Medical Science | MMMU Basic Medical Science subset focusing on fundamental medical knowledge | `bench eval mmmu_basic_medical_science` |
-| MMMU Biology | MMMU Biology subset focusing on biological sciences | `bench eval mmmu_biology` |
-| MMMU Chemistry | MMMU Chemistry subset focusing on chemical sciences | `bench eval mmmu_chemistry` |
-| MMMU Clinical Medicine | MMMU Clinical Medicine subset focusing on clinical medical practice | `bench eval mmmu_clinical_medicine` |
-| MMMU Design | MMMU Design subset focusing on design principles and practices | `bench eval mmmu_design` |
-| MMMU Diagnostics and Laboratory Medicine | MMMU Diagnostics and Laboratory Medicine subset focusing on medical diagnostics | `bench eval mmmu_diagnostics_and_laboratory_medicine` |
-| MMMU Electronics | MMMU Electronics subset focusing on electronic systems and circuits | `bench eval mmmu_electronics` |
-| MMMU Energy and Power | MMMU Energy and Power subset focusing on energy systems and power generation | `bench eval mmmu_energy_and_power` |
-| MMMU Finance | MMMU Finance subset focusing on financial concepts and analysis | `bench eval mmmu_finance` |
-| MMMU Geography | MMMU Geography subset focusing on geographical knowledge and analysis | `bench eval mmmu_geography` |
-| MMMU History | MMMU History subset focusing on historical knowledge and analysis | `bench eval mmmu_history` |
-| MMMU Literature | MMMU Literature subset focusing on literary analysis and knowledge | `bench eval mmmu_literature` |
-| MMMU Management | MMMU Management subset focusing on management principles and practices | `bench eval mmmu_manage` |
-| MMMU Marketing | MMMU Marketing subset focusing on marketing strategies and concepts | `bench eval mmmu_marketing` |
-| MMMU Materials | MMMU Materials subset focusing on materials science and engineering | `bench eval mmmu_materials` |
-| MMMU Math | MMMU Mathematics subset focusing on mathematical reasoning | `bench eval mmmu_math` |
-| MMMU MCQ | MMMU MCQ subset focusing on multiple choice questions | `bench eval mmmu_mcq` |
-| MMMU Mechanical Engineering | MMMU Mechanical Engineering subset focusing on mechanical systems and design | `bench eval mmmu_mechanical_engineering` |
-| MMMU Music | MMMU Music subset focusing on music theory and analysis | `bench eval mmmu_music` |
-| MMMU Open | MMMU Open subset focusing on open-ended questions | `bench eval mmmu_open` |
-| MMMU Pharmacy | MMMU Pharmacy subset focusing on pharmaceutical sciences and practice | `bench eval mmmu_pharmacy` |
-| MMMU Physics | MMMU Physics subset focusing on physics and physical sciences | `bench eval mmmu_physics` |
-| MMMU Public Health | MMMU Public Health subset focusing on public health concepts and practices | `bench eval mmmu_public_health` |
-| MMMU Sociology | MMMU Sociology subset focusing on sociological concepts and analysis | `bench eval mmmu_sociology` |
-| MMMU-Pro | Enhanced multimodal MMMU-Pro benchmark with multiple-choice across many options and images | `bench eval mmmu_pro` |
-| MMMU-Pro (Vision) | MMMU-Pro vision subset with images and multiple-choice questions | `bench eval mmmu_pro_vision` |
-| MuSR | Testing the Limits of Chain-of-thought with Multistep Soft Reasoning - includes murder mysteries, object placements, and team allocation tasks | `bench eval musr` |
-| MuSR Murder Mysteries | MuSR murder mystery scenarios - who is the most likely murderer? | `bench eval musr_murder_mysteries` |
-| MuSR Object Placements | MuSR object placement reasoning - where would someone look for an object? | `bench eval musr_object_placements` |
-| MuSR Team Allocation | MuSR team allocation problems - how to allocate people to tasks efficiently? | `bench eval musr_team_allocation` |
-| OpenAI MRCR (2 Needles) | Memory-Recall with Contextual Retrieval - long-context evaluation that measures recall of 2 needles across million-token contexts | `bench eval openai_mrcr_2n` |
-| OpenAI MRCR (4 Needles) | Memory-Recall with Contextual Retrieval - long-context evaluation that measures recall of 4 needles across million-token contexts | `bench eval openai_mrcr_4n` |
-| OpenAI MRCR (8 Needles) | Memory-Recall with Contextual Retrieval - long-context evaluation that measures recall of 8 needles across million-token contexts | `bench eval openai_mrcr_8n` |
-| OpenAI MRCR (Full) | Memory-Recall with Contextual Retrieval - long-context evaluation that measures recall of 2, 4, and 8 needles across million-token contexts | `bench eval openai_mrcr` |
-| OpenBookQA | Elementary-level science questions probing understanding of core facts | `bench eval openbookqa` |
-| SciCode | Scientific computing and programming challenges | `bench eval scicode` |
-| SimpleQA | Measuring short-form factuality in large language models with simple Q&A pairs | `bench eval simpleqa` |
-| SuperGPQA | Scaling LLM Evaluation across 285 Graduate Disciplines - 26,529 multiple-choice questions across science, engineering, medicine, economics, and philosophy | `bench eval supergpqa` |
-| TUMLU | TUMLU is a comprehensive, multilingual, and natively developed language understanding benchmark specifically designed for Turkic languages. | `bench eval tumlu`
+export const CatalogTable = () => {
+  const [query, setQuery] = useState("")
+  const [category, setCategory] = useState("all")
+  const [tag, setTag] = useState("all")
+  const [includeAlpha, setIncludeAlpha] = useState(false)
+  const [sortKey, setSortKey] = useState("name")
+  const [sortDir, setSortDir] = useState("asc")
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(20)
+
+  const data = useMemo(() => {
+    return (benchmarksData || []).map((r) => ({
+      name: String(r?.name ?? "").trim(),
+      description: String(r?.description ?? "").trim(),
+      category: String(r?.category ?? "").trim(),
+      tags: Array.isArray(r?.tags) ? r.tags.map((t) => String(t).trim()).filter(Boolean) : [],
+      function_name: String(r?.function_name ?? "").trim(),
+      is_alpha: Boolean(r?.is_alpha),
+    }))
+  }, [])
+
+  const categories = useMemo(() => {
+    const set = new Set()
+    data.forEach((r) => set.add(r.category))
+    return Array.from(set).sort((a, b) => a.localeCompare(b))
+  }, [data])
+
+  const tags = useMemo(() => {
+    const set = new Set()
+    data.forEach((r) => r.tags.forEach((t) => set.add(t)))
+    return Array.from(set).sort((a, b) => a.localeCompare(b))
+  }, [data])
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    const byQuery = (r) => (!q ? true : (
+      r.name.toLowerCase().includes(q) ||
+      r.description.toLowerCase().includes(q) ||
+      r.tags.some((t) => t.toLowerCase().includes(q)) ||
+      r.function_name.toLowerCase().includes(q)
+    ))
+    const byCategory = (r) => (category === "all" ? true : r.category === category)
+    const byTag = (r) => (tag === "all" ? true : r.tags.includes(tag))
+    const byAlpha = (r) => (includeAlpha ? true : !r.is_alpha)
+    return data.filter((r) => byQuery(r) && byCategory(r) && byTag(r) && byAlpha(r))
+  }, [data, query, category, tag, includeAlpha])
+
+  const sorted = useMemo(() => {
+    const s = [...filtered]
+    s.sort((a, b) => {
+      const av = a[sortKey]
+      const bv = b[sortKey]
+      const cmp = String(av).localeCompare(String(bv))
+      return sortDir === "asc" ? cmp : -cmp
+    })
+    return s
+  }, [filtered, sortKey, sortDir])
+
+  const total = sorted.length
+  const totalPages = Math.max(1, Math.ceil(total / pageSize))
+  const currentPage = Math.min(page, totalPages)
+  const startIdx = (currentPage - 1) * pageSize
+  const pageRows = sorted.slice(startIdx, startIdx + pageSize)
+
+  useEffect(() => { setPage(1) }, [query, category, tag, includeAlpha, pageSize])
+
+  const toggleSort = (key) => {
+    if (key === sortKey) setSortDir((d) => (d === "asc" ? "desc" : "asc"))
+    else { setSortKey(key); setSortDir("asc") }
+  }
+
+  const icon = (active) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={active ? "h-3 w-3 opacity-100" : "h-3 w-3 opacity-40"} aria-hidden="true"><path d={sortDir === "asc" ? "M7 14l5-5 5 5H7z" : "M7 10l5 5 5-5H7z"} /></svg>
+  )
+
+  return (
+    <div>
+      <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <label htmlFor="benchmarks-search" className="flex flex-col gap-1">
+          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">Search</span>
+          <input id="benchmarks-search" name="search" type="search" autoComplete="off" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search name, description, tags…" aria-label="Global search" className="w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm" />
+        </label>
+
+        <label htmlFor="benchmarks-category" className="flex flex-col gap-1">
+          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">Category</span>
+          <select id="benchmarks-category" name="category" value={category} onChange={(e) => setCategory(e.target.value)} aria-label="Filter by category" className="w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm">
+            <option value="all">All categories</option>
+            {categories.map((c) => (<option key={c} value={c}>{c}</option>))}
+          </select>
+        </label>
+
+        <label htmlFor="benchmarks-tag" className="flex flex-col gap-1">
+          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">Tag</span>
+          <select id="benchmarks-tag" name="tag" value={tag} onChange={(e) => setTag(e.target.value)} aria-label="Filter by tag" className="w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm">
+            <option value="all">All tags</option>
+            {tags.map((t) => (<option key={t} value={t}>{t}</option>))}
+          </select>
+        </label>
+
+        <label htmlFor="benchmarks-include-alpha" className="flex items-center gap-2 mt-2 sm:mt-0">
+          <input id="benchmarks-include-alpha" name="includeAlpha" type="checkbox" checked={includeAlpha} onChange={(e) => setIncludeAlpha(e.target.checked)} aria-label="Include alpha benchmarks" className="h-4 w-4" />
+          <span className="text-sm text-zinc-800 dark:text-zinc-200">Include alpha</span>
+        </label>
+      </div>
+
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <div className="text-sm text-zinc-600 dark:text-zinc-300">{filtered.length} results</div>
+        <label htmlFor="benchmarks-rows-per-page" className="flex items-center gap-2">
+          <span className="text-xs text-zinc-600 dark:text-zinc-300">Rows per page</span>
+          <select id="benchmarks-rows-per-page" name="rowsPerPage" value={pageSize} onChange={(e) => setPageSize(Number(e.target.value))} aria-label="Rows per page" className="rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-2 py-1 text-sm">
+            {[10,20,50].map((n) => (<option key={n} value={n}>{n}</option>))}
+          </select>
+        </label>
+      </div>
+
+      <div className="relative overflow-x-auto rounded-md border border-zinc-200 dark:border-zinc-800">
+        <table className="min-w-full text-left text-sm" role="table" aria-label="Benchmarks catalog">
+          <thead className="bg-zinc-50 dark:bg-zinc-900/50 text-zinc-700 dark:text-zinc-200">
+            <tr>
+              <th scope="col" className="px-4 py-3 w-[28%]"><button type="button" onClick={() => toggleSort("name")} aria-sort={sortKey === "name" ? (sortDir === "asc" ? "ascending" : "descending") : "none"} className="flex items-center gap-1 font-semibold">Name {icon(sortKey === "name")}</button></th>
+              <th scope="col" className="px-4 py-3">Description</th>
+              <th scope="col" className="px-4 py-3 w-[14%]"><button type="button" onClick={() => toggleSort("category")} aria-sort={sortKey === "category" ? (sortDir === "asc" ? "ascending" : "descending") : "none"} className="flex items-center gap-1 font-semibold">Category {icon(sortKey === "category")}</button></th>
+              <th scope="col" className="px-4 py-3 w-[18%]">Tags</th>
+              <th scope="col" className="px-4 py-3 w-[14%]">Command</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pageRows.length === 0 ? (
+              <tr><td colSpan={5} className="px-4 py-8 text-center text-zinc-600 dark:text-zinc-300">No results match your filters.</td></tr>
+            ) : (
+              pageRows.map((r) => (
+                <tr key={r.function_name} className="border-t border-zinc-200 dark:border-zinc-800 align-top">
+                  <td className="px-4 py-3"><div className="flex items-center gap-2"><span className="font-medium text-zinc-900 dark:text-zinc-100">{r.name}</span>{r.is_alpha && (<span className="inline-flex items-center rounded bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">alpha</span>)}</div></td>
+                  <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{r.description}</td>
+                  <td className="px-4 py-3"><span className="inline-flex rounded-md bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-xs text-zinc-700 dark:text-zinc-300">{r.category}</span></td>
+                  <td className="px-4 py-3"><div className="flex flex-wrap gap-1.5">{r.tags.map((t) => (<span key={t} className="inline-flex rounded-md bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-xs text-zinc-700 dark:text-zinc-300">{t}</span>))}</div></td>
+                  <td className="px-4 py-3"><code className="rounded bg-zinc-100 dark:bg-zinc-900 px-2 py-1 text-xs text-zinc-800 dark:text-zinc-200">bench eval {r.function_name}</code></td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="mt-3 flex items-center justify-between gap-3">
+        <div className="text-sm text-zinc-600 dark:text-zinc-300">Page {currentPage} of {totalPages}</div>
+        <div className="flex items-center gap-2">
+          <button type="button" className={currentPage === 1 ? "rounded-md border px-3 py-1.5 text-sm cursor-not-allowed opacity-50 border-zinc-200 dark:border-zinc-800" : "rounded-md border px-3 py-1.5 text-sm border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"} onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} aria-label="Previous page">Prev</button>
+          <button type="button" className={currentPage === totalPages ? "rounded-md border px-3 py-1.5 text-sm cursor-not-allowed opacity-50 border-zinc-200 dark:border-zinc-800" : "rounded-md border px-3 py-1.5 text-sm border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"} onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} aria-label="Next page">Next</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+<div className="not-prose">
+  <CatalogTable />
+  <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Source: <code>docs/data/benchmarks.json</code>. Generated from <code>src/openbench/config.py</code>.</p>
+</div>
