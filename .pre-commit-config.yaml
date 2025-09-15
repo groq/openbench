@@ -19,3 +19,10 @@ repos:
         args: [src]
         pass_filenames: false
         files: ^src/
+      - id: export-benchmarks
+        name: export benchmarks
+        entry: .venv/bin/python scripts/export_benchmarks.py
+        language: system
+        pass_filenames: false
+        # run when benchmark config or snippet file changes
+        files: ^(src/openbench/config.py|docs/snippets/benchmarks\.data\.mdx)$
