@@ -263,7 +263,7 @@ BENCHMARKS = {
         name="MMStar",
         description="MMStar benchmark for measuring multi-modal gain and leakage via coordinated vision and text ablations",
         category="core",
-        tags=["vision", "multi-modal", "ablation", "fairness"],
+        tags=["vision", "multi-modal", "leakage", "perception", "reasoning"],
         module_path="openbench.evals.mmstar",
         function_name="mmstar",
     ),
