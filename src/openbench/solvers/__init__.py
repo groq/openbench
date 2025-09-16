@@ -1,0 +1,1 @@
+"""Solver for exercism evaluation."""
