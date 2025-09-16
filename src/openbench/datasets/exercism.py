@@ -1,4 +1,4 @@
-"""Exercism subset from Roo-Code-Evals dataset loader."""
+"""Exercism subset dataset loader."""
 
 from typing import Any, Dict, List, Optional
 from inspect_ai.dataset import Dataset, hf_dataset, Sample, MemoryDataset
@@ -36,7 +36,7 @@ def record_to_sample(record: Dict[str, Any]) -> Sample:
 def get_exercism_dataset(
     languages: Optional[List[str]] = None, split: str = "train"
 ) -> Dataset:
-    """Load the subset of Exercism tasks from Roo-Code-Evals dataset.
+    """Load the subset of Exercism tasks.
 
     Args:
         languages: Optional list of languages to include (filters).
@@ -46,7 +46,7 @@ def get_exercism_dataset(
         MemoryDataset with filtered samples.
     """
     dataset = hf_dataset(
-        path="lvogel123/roocode-evals",
+        path="lvogel123/exercism",
         split=split,
         sample_fields=record_to_sample,
     )

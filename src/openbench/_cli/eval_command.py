@@ -9,6 +9,8 @@ from inspect_ai.model import Model
 from openbench.config import load_task
 from openbench.monkeypatch.display_results_patch import patch_display_results
 from openbench._cli.utils import parse_cli_args
+from openbench.agents import AgentManager
+from openbench.provider_config import ProviderManager
 
 
 class SandboxType(str, Enum):
@@ -79,10 +81,17 @@ def validate_model_name(model: str, context: str = "") -> None:
     Raises:
         typer.BadParameter: If model name format is invalid
     """
-    if not model or "/" not in model:
-        raise typer.BadParameter(
-            f"Invalid model name format{context}: {model}. Expected format: provider/model-name"
-        )
+    if not ProviderManager.validate_model_string(model):
+        provider = ProviderManager.extract_provider_from_model(model)
+        if not provider:
+            raise typer.BadParameter(
+                f"Invalid model name format{context}: {model}. Expected format: provider/model-name"
+            )
+        else:
+            valid_providers = ProviderManager.get_valid_providers()
+            raise typer.BadParameter(
+                f"{provider}. Valid providers: {', '.join(valid_providers)}"
+            )
 
 
 def validate_model_role(model_role: Optional[str]) -> Dict[str, str | Model]:
@@ -325,12 +334,12 @@ def run_eval(
             envvar="BENCH_ALPHA",
         ),
     ] = False,
-    harness: Annotated[
+    code_agent: Annotated[
         Optional[str],
         typer.Option(
-            "--harness",
-            help="CLI harness to use for code evaluation. Options: aider (default), opencode, roo",
-            envvar="BENCH_HARNESS",
+            "--code-agent",
+            help=AgentManager.get_help_text(),
+            envvar="BENCH_CODE_AGENT",
         ),
     ] = None,
 ) -> None:
@@ -341,18 +350,19 @@ def run_eval(
     model_args = parse_cli_args(m) if m else {}
     task_args = parse_cli_args(t) if t else {}
 
-    # Add harness to task arguments if specified
-    if harness:
-        valid_harnesses = ["aider", "opencode", "roo", "claude"]
-        if harness not in valid_harnesses:
+    # Add code agent to task arguments if specified
+    if code_agent:
+        if not AgentManager.validate_code_agent(code_agent):
+            valid_agents = AgentManager.get_valid_code_agents()
             raise typer.BadParameter(
-                f"Invalid harness: {harness}. Valid options: {', '.join(valid_harnesses)}"
+                f"Invalid code agent: {code_agent}. Valid options: {', '.join(valid_agents)}"
             )
-        task_args["harness"] = harness
+        task_args["code_agent"] = code_agent
 
-        # Override default model for claude harness if still using default
-        if harness == "claude" and model == ["groq/openai/gpt-oss-20b"]:
-            model = ["anthropic/claude-sonnet-4-20250514"]
+        # Override default model for code agent if still using default
+        if model == ["groq/openai/gpt-oss-20b"]:
+            default_model = AgentManager.get_default_model(code_agent)
+            model = [default_model]
 
     # Validate and aggregate model_role(s) into a dict
     role_models = {}

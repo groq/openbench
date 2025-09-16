@@ -1,16 +1,18 @@
 """
 Utility functions for CLI-based solvers that run tasks inside Docker sandboxes.
 
-This module provides common functionality for different CLI harnesses (aider, opencode, roo)
+This module provides common functionality for different CLI code agents (aider, opencode, roo)
 including repository management, environment setup, and command execution.
 """
 
 from __future__ import annotations
 
-import os
-from typing import Dict, List, Optional
+import re
+from typing import Any, Dict, List, Optional
 
 from inspect_ai.util import sandbox
+
+from openbench.provider_config import ProviderManager
 
 
 # =============================================================================
@@ -19,7 +21,7 @@ from inspect_ai.util import sandbox
 
 
 async def ensure_repo_and_task(language: str, task_name: str) -> bool:
-    """Clone Roo-Code-Evals into /workspace if needed and verify task exists.
+    """Clone exercism tasks into /workspace if needed and verify task exists.
 
     Args:
         language: Programming language (e.g., 'python', 'javascript')
@@ -88,14 +90,29 @@ async def run_final_test(test_command: str, workdir: str) -> str:
         Formatted output string with test results
     """
     try:
+        # Fix Python test commands
+        fixed_test_command = test_command
+        if "python" in workdir.lower():
+            fixed_test_command = re.sub(
+                r"([a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)*)-test\.py",
+                lambda m: m.group(0).replace("-", "_"),
+                test_command,
+            )
+            fixed_test_command = re.sub(
+                r"([a-zA-Z0-9]+(?:-[a-zA-Z0-9]+)+)(_test\.py)",
+                lambda m: m.group(1).replace("-", "_") + m.group(2),
+                fixed_test_command,
+            )
+
         result = await sandbox().exec(
-            cmd=["bash", "-lc", f"cd {workdir} && {test_command}"],
+            cmd=["bash", "-lc", f"cd {workdir} && {fixed_test_command}"],
             timeout=600,
         )
         parts: List[str] = [
             f"Exit Code: {result.returncode}",
             f"Success: {result.returncode == 0}",
         ]
+
         if result.stdout:
             parts.extend(["", "--- STDOUT ---", result.stdout])
         if result.stderr:
@@ -111,46 +128,7 @@ def get_provider_env_keys() -> List[str]:
     Returns:
         List of environment variable names for all supported providers
     """
-    return [
-        # Core providers
-        "OPENAI_API_KEY",
-        "ANTHROPIC_API_KEY",
-        "GOOGLE_API_KEY",
-        "GROQ_API_KEY",
-        # OpenBench supported providers
-        "AI21_API_KEY",
-        "AZURE_OPENAI_API_KEY",
-        "BASETEN_API_KEY",
-        "CEREBRAS_API_KEY",
-        "COHERE_API_KEY",
-        "CRUSOE_API_KEY",
-        "DEEPINFRA_API_KEY",
-        "FRIENDLI_TOKEN",  # Note: Friendli uses TOKEN not API_KEY
-        "HF_TOKEN",  # Hugging Face
-        "HYPERBOLIC_API_KEY",
-        "LAMBDA_API_KEY",
-        "MINIMAX_API_KEY",
-        "MOONSHOT_API_KEY",
-        "NEBIUS_API_KEY",
-        "NOUS_API_KEY",
-        "NOVITA_API_KEY",
-        "PARASAIL_API_KEY",
-        "REKA_API_KEY",
-        "SAMBANOVA_API_KEY",
-        "AI_GATEWAY_API_KEY",  # Vercel
-        # Other common providers
-        "OPENROUTER_API_KEY",
-        "MISTRAL_API_KEY",
-        "TOGETHER_API_KEY",
-        "FIREWORKS_API_KEY",
-        "DEEPSEEK_API_KEY",
-        "PERPLEXITY_API_KEY",
-        "XAI_API_KEY",
-        # AWS credentials
-        "AWS_ACCESS_KEY_ID",
-        "AWS_SECRET_ACCESS_KEY",
-        "AWS_SESSION_TOKEN",
-    ]
+    return ProviderManager.get_all_env_vars()
 
 
 def collect_provider_env() -> Dict[str, str]:
@@ -162,11 +140,7 @@ def collect_provider_env() -> Dict[str, str]:
     Returns:
         Dictionary mapping environment variable names to their values
     """
-    keys = get_provider_env_keys()
-    env: Dict[str, str] = {}
-    for key in keys:
-        env[key] = os.getenv(key, "")
-    return env
+    return ProviderManager.get_env_vars_dict()
 
 
 def generate_env_setup_script() -> str:
@@ -187,46 +161,179 @@ def generate_env_setup_script() -> str:
     return "\n".join(lines)
 
 
-# =============================================================================
-# Harness-Specific Command Builders
-# =============================================================================
-
-
-async def build_aider_command(workdir: str, prompt_text: str, model: str) -> str:
-    """Build and execute aider CLI command with comprehensive environment setup.
+async def write_prompt_to_file(prompt_text: str, filename: str) -> bool:
+    """Write prompt to a temporary file to avoid shell quoting issues.
 
     Args:
-        workdir: Working directory path for the task
-        prompt_text: The prompt to send to aider
-        model: Model string to use with aider
+        prompt_text: The prompt text to write
+        filename: The filename to write to (in /tmp)
 
     Returns:
-        Formatted output string with aider execution results
+        True if successful, False otherwise
     """
     try:
-        # Write prompt to a temp file to avoid shell quoting issues
         write_prompt = await sandbox().exec(
             cmd=[
                 "bash",
                 "-lc",
-                "cat > /tmp/aider_prompt.txt <<'EOF'\n" + prompt_text + "\nEOF",
+                f"cat > /tmp/{filename} <<'EOF'\n{prompt_text}\nEOF",
             ],
             timeout=15,
         )
-        if write_prompt.returncode != 0:
-            return f"ERROR: failed to write prompt: {write_prompt.stderr}"
+        return write_prompt.returncode == 0
+    except Exception:
+        return False
 
-        # Initialize git repository if not already present (Aider requires git)
-        await sandbox().exec(
-            cmd=["bash", "-lc", f"cd {workdir} || true"],
-            timeout=60,
+
+async def write_and_execute_script(
+    script_content: str,
+    script_name: str,
+    timeout: int = 1800,
+    env: Optional[Dict[str, str]] = None,
+) -> Dict[str, Any]:
+    """Write a script to file and execute it.
+
+    Args:
+        script_content: The script content to write
+        script_name: Name of the script file (in /tmp)
+        timeout: Execution timeout in seconds
+        env: Environment variables to pass
+
+    Returns:
+        Dictionary with 'returncode', 'stdout', 'stderr', and 'success' keys
+    """
+    try:
+        # Write the script
+        script_write = await sandbox().exec(
+            cmd=[
+                "bash",
+                "-c",
+                f"cat > /tmp/{script_name} <<'SCRIPT_EOF'\n{script_content}\nSCRIPT_EOF",
+            ],
+            timeout=30,
+        )
+        if script_write.returncode != 0:
+            return {
+                "returncode": script_write.returncode,
+                "stdout": "",
+                "stderr": f"Failed to write script: {script_write.stderr}",
+                "success": False,
+            }
+
+        # Make script executable
+        chmod_result = await sandbox().exec(
+            cmd=["chmod", "+x", f"/tmp/{script_name}"],
+            timeout=30,
+        )
+        if chmod_result.returncode != 0:
+            return {
+                "returncode": chmod_result.returncode,
+                "stdout": "",
+                "stderr": f"Failed to make script executable: {chmod_result.stderr}",
+                "success": False,
+            }
+
+        # Execute the script
+        result = await sandbox().exec(
+            cmd=[f"/tmp/{script_name}"],
+            timeout=timeout,
+            env=env or collect_provider_env(),
         )
 
-        # Get environment setup script
-        env_setup = generate_env_setup_script()
+        return {
+            "returncode": result.returncode,
+            "stdout": result.stdout or "",
+            "stderr": result.stderr or "",
+            "success": result.returncode == 0,
+        }
 
-        # Create aider execution script
-        script_content = f"""#!/bin/bash
+    except Exception as e:
+        return {
+            "returncode": -1,
+            "stdout": "",
+            "stderr": f"Script execution failed: {str(e)}",
+            "success": False,
+        }
+
+
+async def read_log_file(
+    log_path: str, log_name: str, tail_lines: Optional[int] = None
+) -> str:
+    """Read a log file from the sandbox.
+
+    Args:
+        log_path: Path to the log file
+        log_name: Name for the log section
+        tail_lines: Number of lines to tail (if specified)
+
+    Returns:
+        Formatted log output
+    """
+    try:
+        cmd_parts = ["bash", "-lc"]
+        if tail_lines:
+            cmd_parts.append(
+                f"tail -n {tail_lines} {log_path} || echo 'No {log_name.lower()} log found'"
+            )
+        else:
+            cmd_parts.append(
+                f"cat {log_path} || echo 'No {log_name.lower()} log found'"
+            )
+
+        log_read = await sandbox().exec(
+            cmd=cmd_parts,
+            timeout=10,
+        )
+        if log_read.stdout:
+            return f"--- {log_name.upper()} LOG{' (tail)' if tail_lines else ''} ---\n{log_read.stdout}"
+        else:
+            return f"--- {log_name.upper()} LOG ---\nNo log content found"
+    except Exception:
+        return f"--- {log_name.upper()} LOG ---\nFailed to read log file"
+
+
+def format_execution_output(
+    result: Dict[str, Any], additional_logs: Optional[List[str]] = None
+) -> str:
+    """Format execution output consistently.
+
+    Args:
+        result: Result dictionary from execute_script
+        additional_logs: List of additional log content to append
+
+    Returns:
+        Formatted output string
+    """
+    parts: List[str] = [
+        f"Exit Code: {result['returncode']}",
+        f"Success: {result['success']}",
+    ]
+
+    if result["stdout"]:
+        parts.extend(["", "--- STDOUT ---", result["stdout"]])
+    if result["stderr"]:
+        parts.extend(["", "--- STDERR ---", result["stderr"]])
+
+    if additional_logs:
+        for log_content in additional_logs:
+            if log_content:
+                parts.extend(["", log_content])
+
+    return "\n".join(parts)
+
+
+# =============================================================================
+# Script Templates for Code Agents
+# =============================================================================
+
+
+def get_aider_script_template() -> str:
+    """Get the Aider execution script template.
+
+    Returns:
+        Aider script template with placeholders
+    """
+    return """#!/bin/bash
 set +e
 
 cd {workdir}
@@ -260,222 +367,65 @@ else
 fi
 """
 
-        # Write the script
-        script_write = await sandbox().exec(
-            cmd=[
-                "bash",
-                "-c",
-                f"cat > /tmp/aider_script.sh <<'SCRIPT_EOF'\n{script_content}\nSCRIPT_EOF",
-            ],
-            timeout=30,
-        )
-        if script_write.returncode != 0:
-            return f"ERROR: failed to write aider script: {script_write.stderr}"
 
-        # Make script executable
-        chmod_result = await sandbox().exec(
-            cmd=["chmod", "+x", "/tmp/aider_script.sh"],
-            timeout=30,
-        )
-        if chmod_result.returncode != 0:
-            return f"ERROR: failed to make script executable: {chmod_result.stderr}"
-
-        # Execute the aider script
-        result = await sandbox().exec(
-            cmd=["/tmp/aider_script.sh"],
-            timeout=1800,  # 30 minutes timeout
-            env=collect_provider_env(),
-        )
-
-        parts: List[str] = [
-            f"Exit Code: {result.returncode}",
-            f"Success: {result.returncode == 0}",
-        ]
-        if result.stdout:
-            parts.extend(["", "--- STDOUT ---", result.stdout])
-        if result.stderr:
-            parts.extend(["", "--- STDERR ---", result.stderr])
-
-        # Append the captured aider log if present
-        try:
-            log_read = await sandbox().exec(
-                cmd=[
-                    "bash",
-                    "-lc",
-                    "cat /tmp/aider-output.log || echo 'No aider output log found'",
-                ],
-                timeout=10,
-            )
-            if log_read.stdout:
-                parts.extend(["", "--- AIDER LOG ---", log_read.stdout])
-        except Exception:
-            parts.append("--- AIDER LOG ---\nFailed to read aider output log")
-
-        return "\n".join(parts)
-
-    except Exception as e:
-        return f"ERROR: Failed to run aider: {str(e)}"
-
-
-async def build_opencode_command(workdir: str, prompt_text: str, model: str) -> str:
-    """Build and execute opencode CLI command.
-
-    Args:
-        workdir: Working directory path for the task
-        prompt_text: The prompt to send to opencode
-        model: Model string to use with opencode
+def get_opencode_script_template() -> str:
+    """Get the OpenCode execution script template.
 
     Returns:
-        Formatted output string with opencode execution results
+        OpenCode script template with placeholders
     """
-    try:
-        # Write prompt to a temp file to avoid shell quoting issues
-        write_prompt = await sandbox().exec(
-            cmd=[
-                "bash",
-                "-lc",
-                "cat > /tmp/opencode_prompt.txt <<'EOF'\n" + prompt_text + "\nEOF",
-            ],
-            timeout=15,
-        )
-        if write_prompt.returncode != 0:
-            return f"ERROR: failed to write prompt: {write_prompt.stderr}"
+    return """#!/bin/bash
+set +e
 
-        # Run opencode directly
-        command = (
-            f"cd /workspace && cd {workdir} && "
-            f"PROMPT=$(cat /tmp/opencode_prompt.txt) && "
-            f'opencode run -m {model} "$PROMPT" 2>&1 | tee /tmp/opencode-output.log'
-        )
+cd {workdir}
 
-        result = await sandbox().exec(
-            cmd=["bash", "-lc", command],
-            timeout=1800,
-            env=collect_provider_env(),
-        )
+# Read the prompt from file  
+PROMPT=$(cat /tmp/opencode_prompt.txt)
 
-        parts: List[str] = [
-            f"Exit Code: {result.returncode}",
-            f"Success: {result.returncode == 0}",
-        ]
-        if result.stdout:
-            parts.extend(["", "--- STDOUT ---", result.stdout])
-        if result.stderr:
-            parts.extend(["", "--- STDERR ---", result.stderr])
+{env_setup}
 
-        # Append the captured log if present
-        try:
-            log_read = await sandbox().exec(
-                cmd=["bash", "-lc", "tail -n 200 /tmp/opencode-output.log || true"],
-                timeout=10,
-            )
-            if log_read.stdout:
-                parts.extend(["", "--- OPENCODE LOG (tail) ---", log_read.stdout])
-        except Exception:
-            pass
+echo "Running OpenCode with prompt: $PROMPT"
+echo "Model: {model}"
+echo "Working directory: $(pwd)"
 
-        return "\n".join(parts)
-
-    except Exception as e:
-        return f"ERROR: Failed to run opencode: {str(e)}"
+opencode run -m {model} "$PROMPT" 2>&1 | tee /tmp/opencode-output.log
+"""
 
 
-async def build_claude_code_command(workdir: str, prompt_text: str, model: str) -> str:
-    """Build and execute claude code CLI command.
-
-    Args:
-        workdir: Working directory path for the task
-        prompt_text: The prompt to send to claude code
-        model: Model string to use with claude code
+def get_claude_script_template() -> str:
+    """Get the Claude Code execution script template.
 
     Returns:
-        Formatted output string with claude code execution results
+        Claude Code script template with placeholders
     """
-    try:
-        # Write prompt to a temp file to avoid shell quoting issues
-        write_prompt = await sandbox().exec(
-            cmd=[
-                "bash",
-                "-lc",
-                "cat > /tmp/claude_code_prompt.txt <<'EOF'\n" + prompt_text + "\nEOF",
-            ],
-            timeout=15,
-        )
-        if write_prompt.returncode != 0:
-            return f"ERROR: failed to write prompt: {write_prompt.stderr}"
+    return """#!/bin/bash
+set +e
 
-        # Check for ANTHROPIC_API_KEY
-        anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
-        if not anthropic_api_key:
-            return "ERROR: ANTHROPIC_API_KEY is not set"
+cd {workdir}
 
-        command = (
-            f'export ANTHROPIC_API_KEY="{anthropic_api_key}" && '
-            f"cd /workspace && cd {workdir} && "
-            f'cat /tmp/claude_code_prompt.txt | claude -p --model "{model}" '
-            f"--permission-mode acceptEdits "
-            f'--allowedTools "Bash(*)" "Read" "Edit" '
-            f"2>&1 | tee /tmp/claude-code-output.log"
-        )
+# Read the prompt from file
+PROMPT=$(cat /tmp/claude_code_prompt.txt)
 
-        result = await sandbox().exec(
-            cmd=["bash", "-lc", command],
-            timeout=1800,
-            env=collect_provider_env(),
-        )
+{env_setup}
 
-        parts: List[str] = [
-            f"Exit Code: {result.returncode}",
-            f"Success: {result.returncode == 0}",
-        ]
-        if result.stdout:
-            parts.extend(["", "--- STDOUT ---", result.stdout])
-        if result.stderr:
-            parts.extend(["", "--- STDERR ---", result.stderr])
+echo "Running Claude Code with prompt: $PROMPT"  
+echo "Model: {model}"
+echo "Working directory: $(pwd)"
 
-        # Append the captured log if present
-        try:
-            log_read = await sandbox().exec(
-                cmd=["bash", "-lc", "tail -n 200 /tmp/claude-code-output.log || true"],
-                timeout=10,
-            )
-            if log_read.stdout:
-                parts.extend(["", "--- CLAUDE CODE LOG (tail) ---", log_read.stdout])
-        except Exception:
-            pass
-
-        return "\n".join(parts)
-
-    except Exception as e:
-        return f"ERROR: Failed to run claude code: {str(e)}"
+echo "$PROMPT" | claude -p --model "{model}" \
+    --permission-mode acceptEdits \
+    --allowedTools "Bash(*)" "Read" "Edit" \
+    2>&1 | tee /tmp/claude-code-output.log
+"""
 
 
-async def build_roo_command(
-    workdir: str, prompt_text: str, model: Optional[str] = None
-) -> str:
-    """Build and execute roo CLI command with VS Code headless mode.
-
-    Args:
-        workdir: Working directory path for the task
-        prompt_text: The prompt to send to roo-cli
-        model: Model string (ignored for roo, uses fixed OpenRouter config)
+def get_roo_script_template() -> str:
+    """Get the Roo CLI execution script template.
 
     Returns:
-        Formatted output string with roo execution results
+        Roo script template with placeholders
     """
-    # Get environment setup script
-    env_setup = generate_env_setup_script()
-
-    # Add completion instruction to the prompt
-    enhanced_prompt = f"""{prompt_text}
-
-IMPORTANT: When you have completed the task, please run this exact command to signal completion:
-echo "Task completed at $(date)" > /tmp/roo-finish.log
-
-This will allow the evaluation system to know when you're done."""
-
-    # Create the roo-cli execution script content
-    script_content = f"""#!/bin/bash
+    return """#!/bin/bash
 set -eo pipefail
 
 # ========= Environment Setup =========
@@ -548,6 +498,20 @@ else
     echo "OPENAI_MODEL=anthropic/claude-3.5-sonnet" >> .env
 fi
 
+# ========= Inject Model ID into roo-cli index.ts =========
+if [ -f "src/index.ts" ]; then
+    # Create backup of original file
+    cp src/index.ts src/index.ts.backup
+    
+    # Replace the hardcoded model ID with the one passed from the evaluation
+    sed -i 's|openRouterModelId: "[^"]*"|openRouterModelId: "{model}"|g' src/index.ts
+    
+    echo "Model ID injection complete. Verifying change..."
+    grep -n "openRouterModelId" src/index.ts || echo "Warning: openRouterModelId not found in src/index.ts"
+else
+    echo "Warning: src/index.ts not found, model injection skipped"
+fi
+
 # ========= Run roo-cli =========
 echo "Starting roo-cli with task..."
 TASK_PROMPT_FROM_FILE=$(cat /tmp/task_prompt.txt)
@@ -558,7 +522,7 @@ echo "Current working directory: $(pwd)"
 echo "Directory contents:"
 ls -la
 
-dotenvx run -f /opt/roo-cli/.env -- pnpm --prefix /opt/roo-cli dev --model {model} "$TASK_PROMPT_FROM_FILE" > /tmp/roo-cli-output.log 2>&1 &
+dotenvx run -f /opt/roo-cli/.env -- pnpm --prefix /opt/roo-cli dev "$TASK_PROMPT_FROM_FILE" > /tmp/roo-cli-output.log 2>&1 &
 PNPM_PID=$!
 
 echo "[INFO] Waiting 5 minutes for VS Code extension to complete task..."
@@ -605,143 +569,6 @@ while true; do
 done
 """
 
-    try:
-        # First, write the script to a file in the container
-        script_write_result = await sandbox().exec(
-            cmd=[
-                "bash",
-                "-c",
-                f"cat > /tmp/roo_cli_script.sh << 'SCRIPT_EOF'\n{script_content}\nSCRIPT_EOF",
-            ],
-            timeout=30,
-        )
-
-        if script_write_result.returncode != 0:
-            return f"ERROR: Failed to write script file: {script_write_result.stderr}"
-
-        # Make the script executable
-        chmod_result = await sandbox().exec(
-            cmd=["chmod", "+x", "/tmp/roo_cli_script.sh"],
-            timeout=30,
-        )
-
-        if chmod_result.returncode != 0:
-            return f"ERROR: Failed to make script executable: {chmod_result.stderr}"
-
-        # Execute the script
-        result = await sandbox().exec(
-            cmd=["/tmp/roo_cli_script.sh"],
-            timeout=1800,
-            env={
-                "WORKDIR": workdir,
-                "TASK_PROMPT": prompt_text,
-                "ROO_CODE_IPC_SOCKET_PATH": "/tmp/roo-code.sock",
-                "VSCODE_EXT_DIR": "/opt/vscode-extensions",
-                "VSCODE_USER_DIR": "/opt/vscode-user",
-                "OPENROUTER_API_KEY": os.getenv("OPENROUTER_API_KEY", ""),
-            },
-        )
-
-        output_parts = [
-            f"Exit Code: {result.returncode}",
-            f"Success: {result.returncode == 0}",
-        ]
-
-        if result.stdout:
-            output_parts.extend(["", "--- STDOUT ---", result.stdout])
-
-        if result.stderr:
-            output_parts.extend(["", "--- STDERR ---", result.stderr])
-
-        # Capture roo-cli specific logs
-        try:
-            roo_output_result = await sandbox().exec(
-                cmd=[
-                    "bash",
-                    "-c",
-                    "cat /tmp/roo-cli-output.log || echo 'No roo-cli output found'",
-                ],
-                timeout=10,
-            )
-            if roo_output_result.stdout:
-                output_parts.extend(
-                    ["", "--- ROO-CLI OUTPUT ---", roo_output_result.stdout]
-                )
-        except Exception:
-            output_parts.append("--- ROO-CLI OUTPUT ---\nFailed to read roo-cli output")
-
-        # Capture VS Code logs
-        try:
-            vscode_log_result = await sandbox().exec(
-                cmd=[
-                    "bash",
-                    "-c",
-                    "cat /tmp/code.log || echo 'No VS Code log found'",
-                ],
-                timeout=10,
-            )
-            if vscode_log_result.stdout:
-                output_parts.extend(
-                    ["", "--- VSCODE LOG ---", vscode_log_result.stdout]
-                )
-        except Exception:
-            output_parts.append("--- VSCODE LOG ---\nFailed to read VS Code log")
-
-        return "\n".join(output_parts)
-
-    except Exception as e:
-        return f"ERROR: Failed to run roo-cli: {str(e)}"
-
-
-# =============================================================================
-# Model Parameter Handling
-# =============================================================================
-
-
-def resolve_model_for_harness(harness: str, state_model: str, task_args: Dict) -> str:
-    """Resolve the appropriate model string based on harness requirements.
-
-    Args:
-        harness: The CLI harness being used ('aider', 'opencode', 'claude', 'roo')
-        state_model: Model from TaskState.model
-        task_args: Task arguments that may contain overrides
-
-    Returns:
-        Resolved model string for the harness
-    """
-    if harness == "aider":
-        # Aider uses model directly from state
-        return str(state_model) if state_model else "openai/gpt-4o-mini"
-
-    elif harness == "opencode":
-        # OpenCode supports environment override with fallback
-        selected_model = os.getenv("OPEN_CODE_MODEL")
-        if not selected_model:
-            selected_model = str(state_model) if state_model else None
-        return selected_model or "openai/gpt-4o-mini"
-
-    elif harness == "claude":
-        # Claude CLI uses Anthropic models directly
-        if state_model:
-            model_str = str(state_model)
-            # Remove anthropic/ prefix if present
-            if model_str.startswith("anthropic/"):
-                return model_str[len("anthropic/") :]
-            return model_str
-        else:
-            return "claude-sonnet-4-20250514"
-
-    elif harness == "roo":
-        # Roo uses fixed OpenRouter configuration
-        if state_model:
-            return str(state_model)
-        else:
-            return "anthropic/claude-sonnet-4-20250514"  # Fixed for roo harness
-
-    else:
-        # Unknown harness, default to state model
-        return str(state_model) if state_model else "openai/gpt-4o-mini"
-
 
 # =============================================================================
 # Output Formatting
@@ -749,35 +576,37 @@ def resolve_model_for_harness(harness: str, state_model: str, task_args: Dict) -
 
 
 def format_solver_output(
-    harness: str, setup_out: str, harness_out: str, test_out: str
+    code_agent: str, setup_out: str, code_agent_out: str, test_out: str
 ) -> str:
-    """Format the final solver output consistently across harnesses.
+    """Format the final solver output consistently across code agents.
 
     Args:
-        harness: The CLI harness that was used
+        code_agent: The CLI code agent that was used
         setup_out: Output from setup commands
-        harness_out: Output from the CLI harness execution
+        code_agent_out: Output from the CLI code agent execution
         test_out: Output from final test execution
 
     Returns:
         Formatted completion string
     """
-    harness_section_map = {
+    code_agent_section_map = {
         "aider": "AIDER_OUTPUT",
         "opencode": "OPENCODE_OUTPUT",
         "claude": "CLAUDE_CODE_OUTPUT",
         "roo": "ROO_CLI_EXECUTION",
     }
 
-    harness_section = harness_section_map.get(harness, f"{harness.upper()}_OUTPUT")
+    code_agent_section = code_agent_section_map.get(
+        code_agent, f"{code_agent.upper()}_OUTPUT"
+    )
 
     return "\n".join(
         [
             "[SETUP_OUTPUT]",
             setup_out,
             "",
-            f"[{harness_section}]",
-            harness_out,
+            f"[{code_agent_section}]",
+            code_agent_out,
             "",
             "[FINAL_TEST_RESULTS]",
             test_out,

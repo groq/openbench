@@ -1,53 +1,68 @@
 services:
   default:
-    build: .
+    build: 
+      context: .
+      tags:
+        - openbench-roo:a8e8935a
     init: true
     command: tail -f /dev/null
-    networks: [eval_net] # normal bridge => internet OK
+    networks: [eval_net]
     environment:
-      ROO_CODE_IPC_SOCKET_PATH: /tmp/roo-code.sock
-      # Core providers
-      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
-      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
-      GROQ_API_KEY: ${GROQ_API_KEY:-}
       AI21_API_KEY: ${AI21_API_KEY:-}
+      AI_GATEWAY_API_KEY: ${AI_GATEWAY_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
       AZURE_OPENAI_API_KEY: ${AZURE_OPENAI_API_KEY:-}
+      AZURE_OPENAI_ENDPOINT: ${AZURE_OPENAI_ENDPOINT:-}
+      AZURE_OPENAI_VERSION: ${AZURE_OPENAI_VERSION:-}
       BASETEN_API_KEY: ${BASETEN_API_KEY:-}
       CEREBRAS_API_KEY: ${CEREBRAS_API_KEY:-}
       COHERE_API_KEY: ${COHERE_API_KEY:-}
       CRUSOE_API_KEY: ${CRUSOE_API_KEY:-}
       DEEPINFRA_API_KEY: ${DEEPINFRA_API_KEY:-}
+      DEEPINFRA_BASE_URL: ${DEEPINFRA_BASE_URL:-}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      FIREWORKS_API_KEY: ${FIREWORKS_API_KEY:-}
       FRIENDLI_TOKEN: ${FRIENDLI_TOKEN:-}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
       HF_TOKEN: ${HF_TOKEN:-}
       HYPERBOLIC_API_KEY: ${HYPERBOLIC_API_KEY:-}
       LAMBDA_API_KEY: ${LAMBDA_API_KEY:-}
       MINIMAX_API_KEY: ${MINIMAX_API_KEY:-}
+      MINIMAX_BASE_URL: ${MINIMAX_BASE_URL:-}
       MISTRAL_API_KEY: ${MISTRAL_API_KEY:-}
       MOONSHOT_API_KEY: ${MOONSHOT_API_KEY:-}
+      MOONSHOT_BASE_URL: ${MOONSHOT_BASE_URL:-}
       NEBIUS_API_KEY: ${NEBIUS_API_KEY:-}
+      NEBIUS_BASE_URL: ${NEBIUS_BASE_URL:-}
       NOUS_API_KEY: ${NOUS_API_KEY:-}
+      NOUS_BASE_URL: ${NOUS_BASE_URL:-}
       NOVITA_API_KEY: ${NOVITA_API_KEY:-}
+      NOVITA_BASE_URL: ${NOVITA_BASE_URL:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
       PARASAIL_API_KEY: ${PARASAIL_API_KEY:-}
+      PARASAIL_BASE_URL: ${PARASAIL_BASE_URL:-}
       PERPLEXITY_API_KEY: ${PERPLEXITY_API_KEY:-}
       REKA_API_KEY: ${REKA_API_KEY:-}
+      REKA_BASE_URL: ${REKA_BASE_URL:-}
       SAMBANOVA_API_KEY: ${SAMBANOVA_API_KEY:-}
+      SAMBANOVA_BASE_URL: ${SAMBANOVA_BASE_URL:-}
       TOGETHER_API_KEY: ${TOGETHER_API_KEY:-}
-      AI_GATEWAY_API_KEY: ${AI_GATEWAY_API_KEY:-}
-      FIREWORKS_API_KEY: ${FIREWORKS_API_KEY:-}
-      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
       XAI_API_KEY: ${XAI_API_KEY:-}
-      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
-      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
+      ROO_CODE_IPC_SOCKET_PATH: ${ROO_CODE_IPC_SOCKET_PATH:-}
     volumes:
-      - node_cache:/root/.npm
       - vscode_exts:/opt/vscode-extensions
       - vscode_user:/opt/vscode-user
+      - node_cache:/root/.npm
+
 networks:
   eval_net: { driver: bridge, internal: false }
+
 volumes:
-  node_cache:
   vscode_exts:
   vscode_user:
+  node_cache:
