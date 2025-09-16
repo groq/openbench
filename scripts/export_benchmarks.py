@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Export OpenBench benchmark metadata for the docs catalog.
- 
+
 Outputs (fixed paths):
 - docs/data/benchmarks.json
 - docs/snippets/benchmarks.data.mdx (benchmarksData export)
@@ -23,7 +23,9 @@ def normalize_benchmark(record: Any) -> Dict[str, Any]:
     def clean_str(field: str) -> str:
         val = getattr(record, field, None)
         if not isinstance(val, str) or not val.strip():
-            raise ValueError(f"Missing or invalid {field} in benchmark {getattr(record, 'name', '<unknown>')}")
+            raise ValueError(
+                f"Missing or invalid {field} in benchmark {getattr(record, 'name', '<unknown>')}"
+            )
         return val.strip()
 
     name = clean_str("name")
@@ -32,8 +34,14 @@ def normalize_benchmark(record: Any) -> Dict[str, Any]:
     function_name = clean_str("function_name")
 
     tags = getattr(record, "tags", None)
-    if not isinstance(tags, list) or not tags or not all(isinstance(t, str) and t.strip() for t in tags):
-        raise ValueError(f"Tags must be a non-empty list of strings in benchmark {name}")
+    if (
+        not isinstance(tags, list)
+        or not tags
+        or not all(isinstance(t, str) and t.strip() for t in tags)
+    ):
+        raise ValueError(
+            f"Tags must be a non-empty list of strings in benchmark {name}"
+        )
 
     is_alpha = getattr(record, "is_alpha", None)
     if not isinstance(is_alpha, bool):
@@ -67,9 +75,7 @@ def export_benchmarks(snippet_mdx_path: Path) -> List[Dict[str, Any]]:
     # write to MDX snippet for docs to source benchmarks info
     snippet_mdx_path.parent.mkdir(parents=True, exist_ok=True)
     snippet_mdx_path.write_text(
-        "export const benchmarksData = "
-        + json.dumps(rows, ensure_ascii=False)
-        + ";\n",
+        "export const benchmarksData = " + json.dumps(rows, ensure_ascii=False) + ";\n",
         encoding="utf-8",
     )
 
