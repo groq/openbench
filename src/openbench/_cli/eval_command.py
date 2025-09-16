@@ -379,7 +379,7 @@ def run_eval(
     start_time = time.time()
 
     try:
-        eval(
+        eval_logs = eval(
             tasks=tasks,
             model=model,
             max_connections=max_connections,
@@ -418,6 +418,7 @@ def run_eval(
                 hub_repo=hub_repo,
                 hub_private=hub_private,
             )
+        return eval_logs
     except Exception as e:
         if debug:
             # In debug mode, let the full stack trace show
