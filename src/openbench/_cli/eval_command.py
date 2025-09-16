@@ -90,7 +90,7 @@ def validate_model_name(model: str, context: str = "") -> None:
         else:
             valid_providers = ProviderManager.get_valid_providers()
             raise typer.BadParameter(
-                f"{provider}. Valid providers: {', '.join(valid_providers)}"
+                f"Invalid provider{context}: {provider}. Valid providers: {', '.join(valid_providers)}"
             )
 
 
