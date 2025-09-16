@@ -259,6 +259,14 @@ BENCHMARKS = {
         module_path="openbench.evals.hle",
         function_name="hle_text",
     ),
+    "mmstar": BenchmarkMetadata(
+        name="MMStar",
+        description="MMStar benchmark for measuring multi-modal gain and leakage via coordinated vision and text ablations",
+        category="core",
+        tags=["vision", "multi-modal", "ablation", "fairness"],
+        module_path="openbench.evals.mmstar",
+        function_name="mmstar",
+    ),
     "healthbench": BenchmarkMetadata(
         name="HealthBench",
         description="Medical dialogue evaluation using physician-created rubrics for assessing healthcare conversations",
