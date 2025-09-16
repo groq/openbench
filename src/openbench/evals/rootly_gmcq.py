@@ -22,31 +22,19 @@ There are 6 subtasks as of Tuesday, August 19, 2025, and the None option for the
 """
 
 from inspect_ai import Task, task
-from inspect_ai.solver import TaskState, Generate, solver
-from inspect_ai.model import get_model, GenerateConfig
+from inspect_ai.model import GenerateConfig
 
-from openbench.scorers.rootly_gmcq import custom_scorer
-from openbench.datasets.rootly_gmcq import load_dataset
-
-
-@solver
-def custom_solver():
-    model = get_model()
-
-    async def solve(state: TaskState, generate: Generate) -> TaskState:
-        resp = await model.generate(input=state.input)
-        state.messages.append(resp.choices[0].message)
-        return state
-
-    return solve
+from openbench.scorers.rootly_gmcq import rootly_gmcq_scorer
+from openbench.datasets.rootly_gmcq import load_rootly_gmcq_dataset
+from openbench.solvers.rootly_gmcq import rootly_gmcq_solver
 
 
 @task
 def rootly_gmcq(subtask: str = None) -> Task:  # type: ignore
-    dataset = load_dataset(subtask)
+    dataset = load_rootly_gmcq_dataset(subtask)
     return Task(
         dataset=dataset,
-        solver=custom_solver(),
-        scorer=custom_scorer(),
+        solver=rootly_gmcq_solver(),
+        scorer=rootly_gmcq_scorer(),
         config=GenerateConfig(),
     )
