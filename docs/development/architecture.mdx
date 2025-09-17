@@ -337,6 +337,10 @@ openbench/
 │   │   ├── choice.py
 │   │   ├── pattern.py
 │   │   └── ...
+│   ├── solvers/        # Solver functions
+│   │   ├── mmlu.py
+│   │   ├── humaneval.py
+│   │   └── ...
 │   ├── utils/          # Utilities
 │   ├── _registry.py    # Task registry
 │   └── config.py       # Configuration
@@ -350,7 +354,7 @@ openbench/
 1. Eval task in `evals/`
 2. Dataset loader in `datasets/`
 3. Scoring logic in `scorers/`
-3. Custom solver in `solvers/` (optional)
-4. Custom metric in `metrics/` (optional)
+3. Custom solver in `solvers/`
+4. Custom metric in `metrics/`
 5. Benchmark metadata in `config.py`
 6. Import eval task into `_registry.py`
