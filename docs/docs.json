@@ -10,6 +10,8 @@
   "fonts": {
     "family": "Neue Regrade",
     "weight": 500,
+    "source": "/fonts/NeueRegrade-Variable.woff2",
+    "format": "woff2",
     "heading": {
       "family": "Neue Regrade",
       "weight": 700
