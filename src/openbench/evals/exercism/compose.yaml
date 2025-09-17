@@ -1,9 +1,8 @@
 services:
   default:
-    build: 
+    build:
       context: .
       tags:
-        - openbench-roo:a8e8935a
     init: true
     command: tail -f /dev/null
     networks: [eval_net]
@@ -53,16 +52,6 @@ services:
       SAMBANOVA_BASE_URL: ${SAMBANOVA_BASE_URL:-}
       TOGETHER_API_KEY: ${TOGETHER_API_KEY:-}
       XAI_API_KEY: ${XAI_API_KEY:-}
-      ROO_CODE_IPC_SOCKET_PATH: ${ROO_CODE_IPC_SOCKET_PATH:-}
-    volumes:
-      - vscode_exts:/opt/vscode-extensions
-      - vscode_user:/opt/vscode-user
-      - node_cache:/root/.npm
 
 networks:
   eval_net: { driver: bridge, internal: false }
-
-volumes:
-  vscode_exts:
-  vscode_user:
-  node_cache:

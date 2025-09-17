@@ -24,16 +24,13 @@ class RooAgent(BaseCodeAgent):
     def __init__(self):
         super().__init__("roo")
 
-    async def execute(
-        self, workdir: str, prompt_text: str, model: str, **kwargs
-    ) -> str:
+    async def execute(self, workdir: str, prompt_text: str, model: str) -> str:
         """Execute Roo CLI command with VS Code headless mode.
 
         Args:
             workdir: Working directory path for the task
             prompt_text: The prompt to send to roo-cli
             model: Model string (used for roo-cli configuration)
-            **kwargs: Additional parameters (unused)
 
         Returns:
             Formatted output string with roo execution results

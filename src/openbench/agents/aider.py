@@ -25,16 +25,13 @@ class AiderAgent(BaseCodeAgent):
     def __init__(self):
         super().__init__("aider")
 
-    async def execute(
-        self, workdir: str, prompt_text: str, model: str, **kwargs
-    ) -> str:
+    async def execute(self, workdir: str, prompt_text: str, model: str) -> str:
         """Execute Aider with comprehensive environment setup.
 
         Args:
             workdir: Working directory path for the task
             prompt_text: The prompt to send to aider
             model: Model string to use with aider
-            **kwargs: Additional parameters (unused)
 
         Returns:
             Formatted output string with aider execution results

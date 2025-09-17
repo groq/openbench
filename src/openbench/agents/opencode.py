@@ -25,16 +25,13 @@ class OpenCodeAgent(BaseCodeAgent):
     def __init__(self):
         super().__init__("opencode")
 
-    async def execute(
-        self, workdir: str, prompt_text: str, model: str, **kwargs
-    ) -> str:
+    async def execute(self, workdir: str, prompt_text: str, model: str) -> str:
         """Execute OpenCode CLI command.
 
         Args:
             workdir: Working directory path for the task
             prompt_text: The prompt to send to opencode
             model: Model string to use with opencode
-            **kwargs: Additional parameters (unused)
 
         Returns:
             Formatted output string with opencode execution results

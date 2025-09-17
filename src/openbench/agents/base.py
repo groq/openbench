@@ -20,16 +20,13 @@ class BaseCodeAgent(ABC):
         self.name = name
 
     @abstractmethod
-    async def execute(
-        self, workdir: str, prompt_text: str, model: str, **kwargs
-    ) -> str:
+    async def execute(self, workdir: str, prompt_text: str, model: str) -> str:
         """Execute the code agent with the given parameters.
 
         Args:
             workdir: Working directory path for the task
             prompt_text: The prompt to send to the code agent
             model: Model string to use with the code agent
-            **kwargs: Additional agent-specific parameters
 
         Returns:
             Formatted output string with execution results

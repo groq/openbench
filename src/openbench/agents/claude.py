@@ -25,16 +25,13 @@ class ClaudeAgent(BaseCodeAgent):
     def __init__(self):
         super().__init__("claude")
 
-    async def execute(
-        self, workdir: str, prompt_text: str, model: str, **kwargs
-    ) -> str:
+    async def execute(self, workdir: str, prompt_text: str, model: str) -> str:
         """Execute Claude Code CLI command.
 
         Args:
             workdir: Working directory path for the task
             prompt_text: The prompt to send to claude code
             model: Model string to use with claude code
-            **kwargs: Additional parameters (unused)
 
         Returns:
             Formatted output string with claude code execution results
