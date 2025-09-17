@@ -27,7 +27,7 @@ pytest
 ⚠️ **IMPORTANT**: You MUST install pre-commit hooks after `uv sync --dev`. CI will fail if you skip this step!
 
 ### Installing Optional Dependencies
-Some benchmarks require additional dependencies that are not included in the core package:
+Some benchmarks require additional dependencies that are not included in the core package. Use UV dependency groups to install them when needed:
 
 ```bash
 # Install core dependencies only (runs most benchmarks)
@@ -37,7 +37,7 @@ uv sync
 uv sync --group scicode         # For SciCode benchmark
 uv sync --group jsonschemabench  # For JSONSchemaBench
 
-# Install everything including dev tools
+# Install everything including dev tools and optional benchmark groups
 uv sync --all-groups
 ```
 
@@ -183,30 +183,56 @@ Closes #123
 ## 🏗️ Architecture Guidelines
 
 ### Adding a New Benchmark
-1. Create a new evaluation file in `src/openbench/evals/`
+1. Create a new evaluation task in `src/openbench/evals/`
 2. Add dataset loader in `src/openbench/datasets/` if needed
 3. Add custom scorer in `src/openbench/scorers/` if needed
+3. Add custom metric in `src/openbench/metrics/` if needed
+3. Add custom solver in `src/openbench/solvers/` if needed
 4. Register benchmark metadata in `src/openbench/config.py`
 5. **Import your task in `src/openbench/_registry.py`**:
 
-Example structure:
+Example File Structure:
 ```
-src/openbench/
-├── evals/
-│   └── my_benchmark.py      # Main evaluation logic
-├── datasets/
-│   └── my_benchmark.py      # Dataset loader
-├── scorers/
-│   └── my_benchmark.py      # Custom scorer (if needed)
-└── config.py                # Add benchmark metadata here
-└── _registry.py                # Add benchmark import here
+openbench/
+├── src/openbench/
+│   ├── _cli/           # CLI commands
+│   │   ├── list.py
+│   │   ├── describe.py
+│   │   ├── eval.py
+│   │   └── view.py
+│   ├── datasets/       # Data loaders
+│   │   ├── mmlu.py
+│   │   ├── humaneval.py
+│   │   └── ...
+│   ├── evals/          # Benchmark tasks
+│   │   ├── mmlu.py
+│   │   ├── humaneval.py
+│   │   └── ...
+│   ├── metrics/        # Custom metrics
+│   │   ├── mmlu.py
+│   │   ├── humaneval.py
+│   │   └── ...
+│   ├── scorers/        # Scoring functions
+│   │   ├── mmlu.py
+│   │   ├── humaneval.py
+│   │   └── ...
+│   ├── solvers/        # Solver functions
+│   │   ├── mmlu.py
+│   │   ├── humaneval.py
+│   │   └── ...
+│   ├── utils/          # Utilities
+│   ├── _registry.py    # Task registry
+│   └── config.py       # Configuration
+├── tests/             # Test suite
+├── pyproject.toml     # Package config
+└── README.md
 ```
 
 #### Dependency Architecture
 OpenBench uses a tightly coupled architecture where benchmarks share common infrastructure:
 - **Core dependencies** (inspect-ai, datasets, scipy, numpy): Required by multiple benchmarks
 - **Optional dependencies**: Specific to individual benchmarks (e.g., scicode, jsonschema)
-- Most benchmarks (17/19) can run with just core dependencies
+- Most benchmarks can run with just core dependencies
 
 ### Adding a New Model Provider
 1. Create provider file in `src/openbench/model/_providers/`
