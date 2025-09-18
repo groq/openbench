@@ -119,17 +119,8 @@ bench view
 
 ### Log Files
 
-Results are saved as JSON in `./logs/`:
+Results are saved as .eval files in `./logs/`. The exact file path is denoted as part of the eval output:
 
-```python
-import json
-
-# Load results
-with open('./logs/2025-01-20_mmlu_groq-llama-3.3-70b.json') as f:
-    results = json.load(f)
-
-# Analyze accuracy by subject
-for subject, score in results['metrics'].items():
-    if subject.endswith('_accuracy'):
-        print(f"{subject}: {score:.3f}")
+```
+Log: logs/2025-09-17T21-39-21-04-00_mmlu_kikHACevKMYey8r5iWEG96.eval  
 ```
