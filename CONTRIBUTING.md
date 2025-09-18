@@ -62,7 +62,6 @@ We value clean, modular code with clear boundaries between components:
 - Each module should have a single, well-defined purpose
 - Avoid tight coupling between components
 - Use dependency injection where appropriate
-- Keep business logic separate from infrastructure concerns
 
 ## 📝 Commit Guidelines
 
