@@ -2,24 +2,15 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "aspen",
   "name": "OpenBench",
-"colors": {
-  "primary": "#C17559",
-  "light": "#4A90E2",
-  "dark": "#2D3748"
-},
+  "colors": {
+    "primary": "#C17559",
+    "light": "#4A90E2",
+    "dark": "#2D3748"
+  },
   "fonts": {
     "family": "Neue Regrade",
-    "weight": 500,
-    "source": "/fonts/NeueRegrade-Variable.woff2",
-    "format": "woff2",
-    "heading": {
-      "family": "Neue Regrade",
-      "weight": 700
-    },
-    "body": {
-      "family": "Neue Regrade",
-      "weight": 500
-    }
+    "source": "https://mintlify-assets.b-cdn.net/fonts/NeueRegrade-Variable.woff2",
+    "format": "woff2"
   },
   "favicon": "/favicon.svg",
   "navigation": {
