@@ -123,7 +123,7 @@ Here are the currently available benchmarks. For an up-to-date list use `bench l
 | Category          | Benchmarks                                                                                                                                                                                                                                                                                                      |
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Knowledge**     | MMLU (57 subjects), GPQA (graduate-level), SuperGPQA (285 disciplines), OpenBookQA, HLE (Humanity's Last Exam - 2,500 questions from 1,000+ experts), HLE_text (text-only version)                                                                                                                              |
-| **Coding**        | HumanEval (164 problems)                                                                                                                                                                                                                                                                                        |
+| **Coding**        | HumanEval (164 problems), Exercism (coding agent eval across 5 languages)                                                                                                                                                                                                                                       |
 | **Math**          | AIME 2023-2025, HMMT Feb 2023-2025, BRUMO 2025, MATH (competition-level problems), MATH-500 (challenging subset), MGSM (multilingual grade school math), MGSM_en (English), MGSM_latin (5 languages), MGSM_non_latin (6 languages)                                                                              |
 | **Reasoning**     | SimpleQA (factuality), MuSR (multi-step reasoning), DROP (discrete reasoning over paragraphs), MMMU (multi-modal reasoning with 30+ subjects), MMMU_MCQ (multiple choice version), MMMU_OPEN (open answer version), MMMU_PRO (more rigorous version of mmmu), MMMU_PRO_VISION (vision only version of mmmu_pro) |
 | **Long Context**  | OpenAI MRCR (multiple needle retrieval), OpenAI MRCR_2n (2 needle), OpenAI MRCR_4 (4 needle), OpenAI MRCR_8n (8 needle)                                                                                                                                                                                         |
@@ -157,26 +157,27 @@ For a complete list of all commands and options, run: `bench --help`
 
 ### Key `eval` Command Options
 
-| Option               | Environment Variable     | Default         | Description                                                      |
-| -------------------- | ------------------------ | --------------- | ---------------------------------------------------------------- |
-| `-M <args>`          | None                     | None            | Pass model-specific arguments (e.g., `-M reasoning_effort=high`) |
-| `-T <args>`          | None                     | None            | Pass task-specific arguments to the benchmark                    |
+| Option               | Environment Variable     | Default                   | Description                                                      |
+| -------------------- | ------------------------ | ------------------------- | ---------------------------------------------------------------- |
+| `-M <args>`          | None                     | None                      | Pass model-specific arguments (e.g., `-M reasoning_effort=high`) |
+| `-T <args>`          | None                     | None                      | Pass task-specific arguments to the benchmark                    |
 | `--model`            | `BENCH_MODEL`            | `groq/openai/gpt-oss-20b` | Model(s) to evaluate                                             |
-| `--epochs`           | `BENCH_EPOCHS`           | `1`             | Number of epochs to run each evaluation                          |
-| `--max-connections`  | `BENCH_MAX_CONNECTIONS`  | `10`            | Maximum parallel requests to model                               |
-| `--temperature`      | `BENCH_TEMPERATURE`      | `0.6`           | Model temperature                                                |
-| `--top-p`            | `BENCH_TOP_P`            | `1.0`           | Model top-p                                                      |
-| `--max-tokens`       | `BENCH_MAX_TOKENS`       | `None`          | Maximum tokens for model response                                |
-| `--seed`             | `BENCH_SEED`             | `None`          | Seed for deterministic generation                                |
-| `--limit`            | `BENCH_LIMIT`            | `None`          | Limit evaluated samples (number or start,end)                    |
-| `--logfile`          | `BENCH_OUTPUT`           | `None`          | Output file for results                                          |
-| `--sandbox`          | `BENCH_SANDBOX`          | `None`          | Environment to run evaluation (local/docker)                     |
-| `--timeout`          | `BENCH_TIMEOUT`          | `10000`         | Timeout for each API request (seconds)                           |
-| `--display`          | `BENCH_DISPLAY`          | `None`          | Display type (full/conversation/rich/plain/none)                 |
-| `--reasoning-effort` | `BENCH_REASONING_EFFORT` | `None`          | Reasoning effort level (low/medium/high)                         |
-| `--json`             | None                     | `False`         | Output results in JSON format                                    |
-| `--log-format`       | `BENCH_LOG_FORMAT`       | `eval`          | Output logging format (eval/json)                                |
-| `--hub-repo`         | `BENCH_HUB_REPO`         | `None`          | Push results to a Hugging Face Hub dataset                       |
+| `--epochs`           | `BENCH_EPOCHS`           | `1`                       | Number of epochs to run each evaluation                          |
+| `--max-connections`  | `BENCH_MAX_CONNECTIONS`  | `10`                      | Maximum parallel requests to model                               |
+| `--temperature`      | `BENCH_TEMPERATURE`      | `0.6`                     | Model temperature                                                |
+| `--top-p`            | `BENCH_TOP_P`            | `1.0`                     | Model top-p                                                      |
+| `--max-tokens`       | `BENCH_MAX_TOKENS`       | `None`                    | Maximum tokens for model response                                |
+| `--seed`             | `BENCH_SEED`             | `None`                    | Seed for deterministic generation                                |
+| `--limit`            | `BENCH_LIMIT`            | `None`                    | Limit evaluated samples (number or start,end)                    |
+| `--logfile`          | `BENCH_OUTPUT`           | `None`                    | Output file for results                                          |
+| `--sandbox`          | `BENCH_SANDBOX`          | `None`                    | Environment to run evaluation (local/docker)                     |
+| `--timeout`          | `BENCH_TIMEOUT`          | `10000`                   | Timeout for each API request (seconds)                           |
+| `--display`          | `BENCH_DISPLAY`          | `None`                    | Display type (full/conversation/rich/plain/none)                 |
+| `--reasoning-effort` | `BENCH_REASONING_EFFORT` | `None`                    | Reasoning effort level (low/medium/high)                         |
+| `--json`             | None                     | `False`                   | Output results in JSON format                                    |
+| `--log-format`       | `BENCH_LOG_FORMAT`       | `eval`                    | Output logging format (eval/json)                                |
+| `--hub-repo`         | `BENCH_HUB_REPO`         | `None`                    | Push results to a Hugging Face Hub dataset                       |
+| `--code-agent`       | None                     | `opencode`                | Select code agent for exercism tasks                             |
 
 ## Grader Information
 
@@ -190,15 +191,15 @@ export OPENAI_API_KEY=your_openai_key
 
 The following benchmarks use a grader model:
 
-| Benchmark | Default Grader Model |
-| :--- | :--- |
-| `simpleqa` | `openai/gpt-4.1-2025-04-14` |
-| `hle` | `openai/o3-mini-2025-01-31` |
-| `hle_text` | `openai/o3-mini-2025-01-31` |
-| `browsecomp` | `openai/gpt-4.1-2025-04-14` |
-| `healthbench` | `openai/gpt-4.1-2025-04-14` |
-| `math` | `openai/gpt-4-turbo-preview` |
-| `math_500` | `openai/gpt-4-turbo-preview` |
+| Benchmark     | Default Grader Model         |
+| :------------ | :--------------------------- |
+| `simpleqa`    | `openai/gpt-4.1-2025-04-14`  |
+| `hle`         | `openai/o3-mini-2025-01-31`  |
+| `hle_text`    | `openai/o3-mini-2025-01-31`  |
+| `browsecomp`  | `openai/gpt-4.1-2025-04-14`  |
+| `healthbench` | `openai/gpt-4.1-2025-04-14`  |
+| `math`        | `openai/gpt-4-turbo-preview` |
+| `math_500`    | `openai/gpt-4-turbo-preview` |
 
 ## Building Your Own Evals
 

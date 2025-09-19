@@ -125,13 +125,11 @@ This will allow the evaluation system to know when you're done."""
         Returns:
             Resolved model string for Roo
         """
-        # Roo-specific model mapping
-        if "claude-sonnet-4" in state_model:
-            return "anthropic/claude-sonnet-4-20250514"
-        elif "openrouter" in state_model:
-            return state_model
+        # Roo expects OpenRouter model IDs
+        if state_model.startswith("openrouter/"):
+            return state_model.split("/", 1)[1]
 
-        # Use the state model as-is for other cases
+        # Otherwise, use the state model as-is (CLI should enforce OpenRouter for --model)
         return state_model
 
     def get_dockerfile_commands(self) -> List[str]:
