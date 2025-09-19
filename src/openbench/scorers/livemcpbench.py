@@ -1,11 +1,11 @@
-"""LiveMCPBench scorer.
+"""LiveMCPBench scorer (LLM-as-Judge, baseline-aligned).
 
-Provides scoring functionality for LiveMCPBench tasks which involve
-evaluating LLM agents on real-world tasks using Model Context Protocol (MCP).
+Implements the same judging approach as LiveMCPBench's baseline evaluator.
 """
 
 import re
-from typing import Callable
+import json
+from typing import Callable, Any, Dict, List, Tuple
 from inspect_ai.scorer import (
     accuracy,
     scorer,
@@ -18,37 +18,167 @@ from inspect_ai.scorer import (
     SampleScore,
 )
 from inspect_ai.solver import TaskState
-from inspect_ai.model import get_model, ChatMessageUser, Model
+from inspect_ai.model import get_model, ChatMessageUser, Model, ChatMessageAssistant
 from openbench.metrics.grouped import grouped
+from openbench.tools.livemcpbench.copilot.upstream_cache import get_tools_json_cached
+from openbench.utils.text import (
+    LIVEMCPBENCH_GRADER_USER_PROMPT,
+    LIVEMCPBENCH_GRADER_SYSTEM_MSG,
+)
 
 
-LIVEMCPBENCH_GRADER_TEMPLATE = """
-You are an expert in evaluating the performance of a tool-use agent. The agent is designed to help a human user use multi-tools to complete a task. Given the user's task, the agent's final response, key points for task completion, and tool call history, your goal is to determine whether the agent has completed the task and achieved all requirements.
+VERDICT_PATTERN = re.compile(r"Thoughts:\s*(.+?)\s*Status:\s*(\w+)", re.DOTALL)
 
-Your response must strictly follow the following evaluation criteria!
 
-*Important Evaluation Criteria*:
-1. You must carefully check whether the information (e.g. the coordinates of the addresses) comes from the tool call, if the agent get it from the internal knowledge, it should be considered failed.
-2: Some tasks require to create files to be considered successful.
+_TOOL_MAP: Dict[str, Dict[str, Dict[str, Any]]] | None = None
 
-*IMPORTANT*
-Format your response into two lines as shown below:
 
-Thoughts: <your thoughts and reasoning process based on double-checking each key points and the evaluation criteria>
-Status: "success" or "failure"
+def _load_tool_map() -> Dict[str, Dict[str, Dict[str, Any]]]:
+    global _TOOL_MAP
+    if _TOOL_MAP is not None:
+        return _TOOL_MAP
 
-Key points of the task:
-{metadata_context}
+    tools_list, _ = get_tools_json_cached()
+    tool_map: Dict[str, Dict[str, Dict[str, Any]]] = {}
+    for tool_server in tools_list:
+        tools_dict = tool_server.get("tools", {})
+        if not isinstance(tools_dict, dict):
+            continue
+        for server_name, server_tools in tools_dict.items():
+            if not isinstance(server_tools, dict):
+                continue
+            tl_list = server_tools.get("tools", [])
+            if not isinstance(tl_list, list):
+                continue
+            for tl in tl_list:
+                if not isinstance(tl, dict):
+                    continue
+                name = tl.get("name")
+                desc = tl.get("description", "")
+                schema = tl.get("inputSchema", {})
+                if not name:
+                    continue
+                tool_map.setdefault(server_name, {})[name] = {
+                    "description": desc,
+                    "inputSchema": schema,
+                }
 
-User Task: 
-{task}
+    _TOOL_MAP = tool_map
+    return tool_map
 
-Agent Response: 
-{response}
 
-Tool call history: 
-{tool_call_history}
-""".strip()
+def _format_tool_description(
+    tool_map: Dict[str, Dict[str, Dict[str, Any]]], server_name: str, tool_name: str
+) -> str:
+    if server_name not in tool_map or tool_name not in tool_map[server_name]:
+        return f"Tool {tool_name} not found in server {server_name}."
+    info = tool_map[server_name][tool_name]
+    return (
+        f"Server: {server_name}\n"
+        f"Tool: {tool_name}\n"
+        f"Description: {info.get('description', '')}"
+    )
+
+
+def _extract_tool_calls_and_descriptions(messages: List[Any]) -> Tuple[List[str], str]:
+    tool_map = _load_tool_map()
+    call_lines: List[str] = []
+    descriptions: List[str] = []
+
+    for message in messages or []:
+        # OpenAI-style tool_calls
+        if (
+            isinstance(message, ChatMessageAssistant)
+            and hasattr(message, "tool_calls")
+            and message.tool_calls
+        ):
+            for tool_call in message.tool_calls:
+                func_name = None
+                args = None
+                # function may be a string or an object with name/arguments
+                if hasattr(tool_call, "function") and tool_call.function is not None:
+                    func = tool_call.function
+                    if isinstance(func, str):
+                        func_name = func
+                        args = getattr(tool_call, "arguments", None)
+                    else:
+                        func_name = getattr(func, "name", None) or getattr(
+                            tool_call, "name", None
+                        )
+                        args = getattr(func, "arguments", None) or getattr(
+                            tool_call, "arguments", None
+                        )
+                else:
+                    func_name = getattr(tool_call, "name", None)
+                    args = getattr(tool_call, "arguments", None)
+
+                if func_name == "execute-tool":
+                    try:
+                        if isinstance(args, str):
+                            call_lines.append(args)
+                            parsed = json.loads(args)
+                        else:
+                            parsed = args if isinstance(args, dict) else {}
+                            call_lines.append(json.dumps(parsed, ensure_ascii=False))
+                    except Exception:
+                        parsed = {}
+                        call_lines.append(str(args))
+
+                    server_name = str(parsed.get("server_name", "not_given"))
+                    tool_name = str(parsed.get("tool_name", "not_given"))
+                    descriptions.append(
+                        _format_tool_description(tool_map, server_name, tool_name)
+                    )
+
+        # Anthropic-style content blocks with type: tool_use
+        content = None
+        if hasattr(message, "content"):
+            content = getattr(message, "content")
+        elif isinstance(message, dict):
+            content = message.get("content")
+
+        if isinstance(content, list):
+            for part in content:
+                # Detect part type and fields in a robust way
+                ptype = (
+                    part.get("type")
+                    if isinstance(part, dict)
+                    else getattr(part, "type", None)
+                )
+                if ptype in {"tool_use", "tool", "tool_call"}:
+                    name = (
+                        part.get("name")
+                        if isinstance(part, dict)
+                        else getattr(part, "name", None)
+                    )
+                    # Anthropic uses 'input'; fallbacks for other shapes
+                    args = (
+                        part.get("input")
+                        if isinstance(part, dict)
+                        else getattr(part, "input", None)
+                    )
+                    if name == "execute-tool":
+                        try:
+                            if isinstance(args, str):
+                                call_lines.append(args)
+                                parsed = json.loads(args)
+                            else:
+                                parsed = args if isinstance(args, dict) else {}
+                                call_lines.append(
+                                    json.dumps(parsed, ensure_ascii=False)
+                                )
+                        except Exception:
+                            parsed = {}
+                            call_lines.append(str(args))
+
+                        server_name = str(parsed.get("server_name", "not_given"))
+                        tool_name = str(parsed.get("tool_name", "not_given"))
+                        descriptions.append(
+                            _format_tool_description(tool_map, server_name, tool_name)
+                        )
+
+    desc_text = "\n\n".join(descriptions).strip() if descriptions else ""
+    return call_lines, desc_text
 
 
 @metric
@@ -111,7 +241,7 @@ def livemcpbench_metrics() -> Metric:
         grouped(group_key="category", metric=[accuracy(), stderr()]),
     ]
 )
-def livemcpbench_scorer(model: str = "groq/llama-3.3-70b-versatile") -> Callable:
+def livemcpbench_scorer(model: str = "openai/gpt-4.1-2025-04-14") -> Callable:
     """LiveMCPBench scorer using model-based grading.
 
     Args:
@@ -123,79 +253,101 @@ def livemcpbench_scorer(model: str = "groq/llama-3.3-70b-versatile") -> Callable
     grader_model: Model = get_model(model)
 
     async def score(state: TaskState, target: Target) -> Score:
-        # Get the task from input
+        # Inputs
         task = state.input_text
+        response = (
+            state.output.completion
+            if state.output and state.output.completion
+            else "No response generated"
+        )
+        expected_answer = target.text if target else "No expected answer provided"
 
-        # Get the response from model output
-        response = state.output.completion
-
-        # Get expected answer from target
-        expected_answer = target.text
-
-        # Get tool call names from the messages list
-        tool_call_names = []
+        # Execution error passthrough
+        execution_error = None
+        error_message = None
+        if state.metadata:
+            execution_error = state.metadata.get("execution_error")
+            error_message = state.metadata.get("error_message")
+        # Tool call history + tool descriptions (baseline uses execute-tool calls)
         try:
-            # Iterate through all messages to find tool calls
-            for message in state.messages:
-                if hasattr(message, "tool_calls") and message.tool_calls:
-                    for tool_call in message.tool_calls:
-                        # Extract the tool name/function name
-                        if hasattr(tool_call, "function") and hasattr(
-                            tool_call.function, "name"
-                        ):
-                            tool_call_names.append(tool_call.function.name)
-                        elif hasattr(tool_call, "name"):
-                            tool_call_names.append(tool_call.name)
-        except (AttributeError, TypeError):
-            # If there's any issue accessing tool calls, use empty list
-            tool_call_names = []
+            tool_calls, tool_descs = _extract_tool_calls_and_descriptions(
+                state.messages or []
+            )
+        except Exception:
+            tool_calls, tool_descs = [], ""
+        tool_call_history_str = (
+            "\n".join(f"{i + 1}. {call}" for i, call in enumerate(tool_calls))
+            if tool_calls
+            else "No tool calls made"
+        )
 
         # Get annotator metadata from state metadata
         annotator_metadata = (
             state.metadata.get("annotator_metadata", {}) if state.metadata else {}
         )
 
-        # Format metadata context for the grader
-        metadata_context = ""
-        if annotator_metadata:
-            metadata_lines = []
-            for key, value in annotator_metadata.items():
-                metadata_lines.append(f"- {key}: {value}")
-            metadata_context = "\n".join(metadata_lines)
+        # Key Points from annotator metadata Steps (assumed present)
+        key_points_obj = annotator_metadata.get("Steps", "")
+        if isinstance(key_points_obj, list):
+            key_points = "\n".join(str(s) for s in key_points_obj)
         else:
-            metadata_context = "No specific task metadata available."
+            key_points = str(key_points_obj)
 
-        # Format the grading prompt
-        grader_prompt = LIVEMCPBENCH_GRADER_TEMPLATE.format(
-            task=task,
-            response=response,
-            tool_call_history=tool_call_names,
-            metadata_context=metadata_context,
-        )
+        # Handle execution errors - score as failure but still run through grader
+        score_value = 0.0
+        grading_text = ""
 
-        # Create message for grading
-        message = ChatMessageUser(content=grader_prompt)
+        if execution_error:
+            # Automatically score as failure for execution errors
+            score_value = 0.0
+            grading_text = f"Task failed due to execution error ({execution_error}): {error_message}"
 
-        # Get grading response
-        grading_response = await grader_model.generate([message])
-        grading_text = grading_response.completion
+            # Add error information to the response context for the grader
+            response_with_error = (
+                f"{response}\n\n[EXECUTION ERROR: {execution_error} - {error_message}]"
+            )
+        else:
+            response_with_error = response
 
-        # Extract grade
-        match = re.search(r"(success|failure)", grading_text)
-        grade_letter = match.group(0) if match else "failure"
+            try:
+                # Build baseline-aligned prompt
+                prompt_text = (
+                    LIVEMCPBENCH_GRADER_SYSTEM_MSG
+                    + "\n\n"
+                    + LIVEMCPBENCH_GRADER_USER_PROMPT.format(
+                        task=task,
+                        key_points=key_points,
+                        response=response_with_error,
+                        tool_calls=tool_call_history_str,
+                        tool_descriptions=tool_descs,
+                    )
+                )
+                grading_response = await grader_model.generate(
+                    [ChatMessageUser(content=prompt_text)]
+                )
+                grading_text = grading_response.completion
 
-        # Map letter to grade and score
-        grade_map = {
-            "success": ("correct", 1.0),
-            "failure": ("incorrect", 0.0),
-        }
+                m = VERDICT_PATTERN.search(grading_text)
+                judge_status = m.group(2).strip() if m else grading_text
+                score_value = 1.0 if "success" in judge_status.lower() else 0.0
 
-        grade_name, score_value = grade_map.get(grade_letter, ("incorrect", 0.0))
+            except Exception as e:
+                # Fall back to automatic failure scoring
+                score_value = 0.0
+                grading_text = f"Grading failed due to error: {str(e)}"
 
         # Get category from metadata
         category = (
             state.metadata.get("category", "unknown") if state.metadata else "unknown"
         )
+
+        # Set grade based on score
+        if score_value >= 1.0:
+            grade_name = "success"
+            grade_letter = "A"
+        else:
+            grade_name = "failure"
+            grade_letter = "F"
 
         return Score(
             value=score_value,
@@ -206,7 +358,11 @@ def livemcpbench_scorer(model: str = "groq/llama-3.3-70b-versatile") -> Callable
                 "grading_response": grading_text,
                 "category": category,
                 "expected_answer": expected_answer,
-                "metadata_context": metadata_context,
+                "key_points": key_points,
+                "tool_calls": tool_call_history_str,
+                "tool_descriptions": tool_descs,
+                "execution_error": execution_error,
+                "error_message": error_message,
             },
         )
 

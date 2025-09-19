@@ -1,107 +1,97 @@
-import logging
-from typing import Optional
 from inspect_ai import task, Task
-from inspect_ai.agent import react, agent, Agent
+from inspect_ai.solver import solver, Solver
+from inspect_ai.agent import react, AgentPrompt
+from inspect_ai.solver._task_state import TaskState
 from inspect_ai.model import GenerateConfig
+from inspect_ai.tool import ToolError
+import asyncio
 from openbench.datasets.livemcpbench import get_dataset
 from openbench.scorers.livemcpbench import livemcpbench_scorer
-from openbench.tools.livemcpbench import MCPToolsRegistry
-
-logger = logging.getLogger(__name__)
-
-# Global registry instance to avoid re-initialization
-_global_registry = None
+from openbench.tools.livemcpbench.copilot.toolsource import copilot_tool_source
+from openbench.utils.text import LIVEMPCBENCH_SYSTEM_MESSAGE
+from pathlib import Path
+import os
 
 
-@agent
-def MCP_copilot_agent(
-    top_k_servers: int = 5,
-    top_k_tools_per_server: int = 3,
-    embedding_model: str = "text-embedding-3-small",
-    api_key: Optional[str] = None,
-    base_url: Optional[str] = None,
-    suppress_server_output: bool = True,
-) -> Agent:
-    """
-    MCP copilot agent from livemcpbench that uses semantic search to select the most relevant tools.
+@solver
+def copilot_solver() -> Solver:
+    """Solver that uses the Copilot MCP server (route + execute-tool)."""
 
-    Args:
-        top_k_servers: Number of most relevant servers to retrieve
-        top_k_tools_per_server: Max tools per server to include
-        embedding_model: OpenAI embedding model to use
-        api_key: Optional OpenAI API key
-        base_url: Optional API base URL
-        suppress_server_output: If True, suppress server startup messages
+    async def solve(state: TaskState, generate) -> TaskState:
+        # Preflight: ensure embeddings file exists unless autogen is enabled
+        mcp_data_path = os.getenv("MCP_DATA_PATH")
+        if not mcp_data_path:
+            embedding_model = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
+            abstract_model = os.getenv("ABSTRACT_MODEL", "gpt-4o-mini")
+            cache_dir = Path(
+                os.path.expanduser("~/.cache/openbench/livemcpbench/copilot/config")
+            )
+            mcp_data_path = str(
+                cache_dir / f"mcp_arg_{embedding_model}_{abstract_model}.json"
+            )
+        if not os.path.exists(mcp_data_path) and os.getenv(
+            "OPENBENCH_COPILOT_AUTOGEN", "0"
+        ) not in {"1", "true", "True"}:
+            msg = (
+                "Copilot embeddings file not found: "
+                + mcp_data_path
+                + ". Run 'openbench mcp-copilot-prepare' first, set MCP_DATA_PATH to an existing file, "
+                + "or set OPENBENCH_COPILOT_AUTOGEN=1 to auto-generate."
+            )
+            state.metadata = state.metadata or {}
+            state.metadata["execution_error"] = "setup_error"
+            state.metadata["error_message"] = msg
+            return state
+        try:
+            tool_source = copilot_tool_source()
+            react_solver = react(
+                prompt=AgentPrompt(
+                    instructions=LIVEMPCBENCH_SYSTEM_MESSAGE,
+                    assistant_prompt=None,
+                    handoff_prompt=None,
+                    submit_prompt=None,
+                ),
+                tools=[tool_source],
+            )
+            return await react_solver(state)  # type: ignore[return-value, arg-type]
+        except asyncio.TimeoutError:
+            state.metadata = state.metadata or {}
+            state.metadata["execution_error"] = "timeout"
+            state.metadata["error_message"] = "Task execution timed out"
+            return state
+        except ToolError as e:
+            state.metadata = state.metadata or {}
+            state.metadata["execution_error"] = "tool_error"
+            state.metadata["error_message"] = str(e)
+            if not state.output.completion:
+                state.output.completion = f"Task failed due to tool error: {str(e)}"
+            return state
+        except Exception as e:
+            state.metadata = state.metadata or {}
+            state.metadata["execution_error"] = "runtime_error"
+            state.metadata["error_message"] = str(e)
+            if not state.output.completion:
+                state.output.completion = f"Task failed due to runtime error: {str(e)}"
+            return state
 
-    Returns:
-        Solver that applies react with semantically selected tools
-    """
-    # Use global registry to avoid re-initialization
-    global _global_registry
-    if _global_registry is None:
-        _global_registry = MCPToolsRegistry()
-        _global_registry.init_retriever(
-            embedding_model=embedding_model, api_key=api_key, base_url=base_url
-        )
-        logger.info("Initialized global MCP tools registry with embeddings")
-
-    registry = _global_registry
-
-    # For now, we'll use a static set of tools based on common needs
-    # In the future, this could be made dynamic per task
-    tool_sources = registry.create_tool_sources_semantic(
-        query="general purpose tools for file operations, web search, and data analysis",
-        top_k_servers=top_k_servers,
-        top_k_tools_per_server=top_k_tools_per_server,
-        category_hint=None,
-        suppress_server_output=suppress_server_output,
-    )
-
-    return react(tools=tool_sources)
+    return solve
 
 
 @task
 def livemcpbench(
-    grader_model: str = "groq/llama-3.3-70b-versatile",
-    top_k_servers: int = 5,
-    top_k_tools_per_server: int = 3,
-    embedding_model: str = "text-embedding-3-small",
-    api_key: Optional[str] = None,
-    base_url: Optional[str] = None,
-    suppress_server_output: bool = True,
+    grader_model: str = "openai/gpt-4.1-2025-04-14",
+    working_limit: int = 600,
 ) -> Task:
-    """LiveMCPBench: Evaluating LLM agents on real-world MCP tasks.
+    """LiveMCPBench using the baseline Copilot agent (route + execute-tool)."""
 
-    This benchmark evaluates language model agents on their ability to complete
-    real-world tasks using the Model Context Protocol (MCP). Uses embedding-based
-    semantic search to find the most relevant tools for each task.
-
-    Args:
-        grader_model: Model to use for grading responses
-        top_k_servers: Number of most relevant servers to retrieve
-        top_k_tools_per_server: Max tools per server to include
-        embedding_model: OpenAI embedding model for semantic search
-        api_key: Optional OpenAI API key (uses env var if not provided)
-        base_url: Optional API base URL
-        suppress_server_output: If True, suppress server startup messages
-
-    Returns:
-        Task configured for LiveMCPBench evaluation with semantic retrieval
-    """
     return Task(
         dataset=get_dataset(),
-        solver=MCP_copilot_agent(
-            top_k_servers=top_k_servers,
-            top_k_tools_per_server=top_k_tools_per_server,
-            embedding_model=embedding_model,
-            api_key=api_key,
-            base_url=base_url,
-            suppress_server_output=suppress_server_output,
-        ),
+        solver=[copilot_solver()],
         scorer=livemcpbench_scorer(model=grader_model),
         name="livemcpbench",
         config=GenerateConfig(
             temperature=0.0,
             max_tokens=6144,
         ),
+        working_limit=working_limit,
     )

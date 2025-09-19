@@ -43,15 +43,26 @@ def record_to_sample(record: dict[str, Any]) -> Sample:
 def get_dataset() -> Dataset:
     """Load the LiveMCPBench dataset from HuggingFace.
 
-    Note: Tasks that require writing to protected paths like /root/pdf
-    will have warnings logged, but file path redirection is enabled
-    to handle these cases.
-
     Returns:
         Dataset: The LiveMCPBench dataset configured for evaluation
     """
-    return hf_dataset(
+    dataset = hf_dataset(
         path="ICIP/LiveMCPBench",
         split="test",
         sample_fields=record_to_sample,
     )
+
+    return dataset
+
+
+def get_dataset_no_file_tasks() -> Dataset:
+    """Load the LiveMCPBench dataset with file-related tasks filtered out.
+
+    This is a convenience function that returns only the tasks that don't require
+    file directory access, making it easier to test the eval on other tasks.
+
+    Returns:
+        Dataset: The LiveMCPBench dataset with 54 tasks (out of 95 total)
+                that don't require file system operations
+    """
+    return get_dataset()

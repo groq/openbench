@@ -119,13 +119,15 @@ Here are the currently available benchmarks. For an up-to-date list use `bench l
 | Category          | Benchmarks                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Knowledge**     | MMLU (57 subjects), MMLU-Pro, GPQA (graduate-level), SuperGPQA (285 disciplines), TUMLU (9 languages), OpenBookQA, HLE (Humanity's Last Exam - 2,500 questions from 1,000+ experts), HLE_text (text-only version)                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| **Coding**        | HumanEval (164 problems), MBPP, SciCode (alpha), GMCQ, JSONSchemaBench, Exercism (code agent eval across 5 languages)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| **Coding**        | HumanEval (164 problems), MBPP, SciCode (alpha), GMCQ, JSONSchemaBench                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | **Math**          | AIME 2023-2025, HMMT Feb 2023-2025, BRUMO 2025, MATH (competition-level problems), MATH-500 (challenging subset), MGSM (multilingual grade school math), MGSM_en (English), MGSM_latin (5 languages), MGSM_non_latin (6 languages)                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | **Reasoning**     | SimpleQA (factuality), MuSR, MuSR murder_mysteries, MuSR object_placements, MuSR team_allocation, DROP (discrete reasoning over paragraphs), GraphWalks (multi-hop reasoning), BrowseComp (browsing agents), MMMU, MMMU_MCQ, MMMU_OPEN, MMMU_PRO, MMMU_PRO_VISION, MMMU subsets: accounting, agriculture, architecture_and_engineering, art, art_theory, basic_medical_science, biology, chemistry, clinical_medicine, design, diagnostics_and_laboratory_medicine, electronics, energy_and_power, finance, geography, history, literature, manage, marketing, materials, math, mechanical_engineering, music, pharmacy, physics, psychology, public_health, sociology |
 | **Long Context**  | OpenAI MRCR (multiple needle retrieval), OpenAI MRCR_2n (2 needle), OpenAI MRCR_4n (4 needle), OpenAI MRCR_8n (8 needle)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| **MCP**           | LiveMCPBench (70 MCP servers and 527 tools)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | **Healthcare**    | HealthBench (open-ended healthcare eval), HealthBench_hard (challenging variant), HealthBench_consensus (consensus variant)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | **Cybersecurity** | CTI-Bench ATE (MITRE ATT&CK technique extraction), CTI-Bench MCQ (knowledge questions on CTI standards and best practices), CTI-Bench RCM (CVE to CWE vulnerability mapping), CTI-Bench VSP (CVSS score calculation)                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | **Community**     | ClockBench, DetailBench                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| **MCP**           | LiveMCPBench (70 MCP servers and 527 tools)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 
 ## Configuration
 
@@ -177,6 +179,8 @@ For a complete list of all commands and options, run: `bench --help`
 | `--hub-repo`         | `BENCH_HUB_REPO`         | `None`                    | Push results to a Hugging Face Hub dataset                       |
 | `--code-agent`       | `BENCH_CODE_AGENT`       | `opencode`                | Select code agent for exercism tasks                             |
 
+> > > > > > > 99bdba1 (feat(livemcpbench): MCP copilot and LLM as judge scoring integrated)
+
 ## Grader Information
 
 Some benchmarks use a grader model to score the model's performance. This requires an additional API key for the grader model.
@@ -189,16 +193,36 @@ export OPENAI_API_KEY=your_openai_key
 
 The following benchmarks use a grader model:
 
-| Benchmark     | Default Grader Model         |
-| :------------ | :--------------------------- |
-| `simpleqa`    | `openai/gpt-4.1-2025-04-14`  |
-| `hle`         | `openai/o3-mini-2025-01-31`  |
-| `hle_text`    | `openai/o3-mini-2025-01-31`  |
-| `browsecomp`  | `openai/gpt-4.1-2025-04-14`  |
-| `healthbench` | `openai/gpt-4.1-2025-04-14`  |
-| `math`        | `openai/gpt-4-turbo-preview` |
-| `math_500`    | `openai/gpt-4-turbo-preview` |
-| `detailbench` | `gpt-5-mini-2025-08-07`      |
+| Benchmark      | Default Grader Model         |
+| :------------- | :--------------------------- |
+| `simpleqa`     | `openai/gpt-4.1-2025-04-14`  |
+| `hle`          | `openai/o3-mini-2025-01-31`  |
+| `hle_text`     | `openai/o3-mini-2025-01-31`  |
+| `browsecomp`   | `openai/gpt-4.1-2025-04-14`  |
+| `healthbench`  | `openai/gpt-4.1-2025-04-14`  |
+| `math`         | `openai/gpt-4-turbo-preview` |
+| `math_500`     | `openai/gpt-4-turbo-preview` |
+| `detailbench`  | `gpt-5-mini-2025-08-07`      |
+| `livemcpbench` | `openai/gpt-4.1-2025-04-14`  |
+
+## LiveMCPBench
+
+LiveMCPBench evaluates how agents can navigate an ocean of 70 MCP servers and 527 Tools. Our integration follows the LiveMCPBench Copilot baseline.
+
+Quick start:
+
+```bash
+# 1) Set API keys
+export OPENAI_API_KEY=your_openai_key   # used for embeddings + grader
+
+# 2) Prepare caches, sandbox data, and browsers
+bench mcp-copilot-prepare --root-data --playwright-install
+
+# 3) Run the eval
+bench eval livemcpbench --max-connections 5
+```
+
+> > > > > > > 99bdba1 (feat(livemcpbench): MCP copilot and LLM as judge scoring integrated)
 
 ## Building Your Own Evals
 

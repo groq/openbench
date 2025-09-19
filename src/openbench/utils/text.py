@@ -95,6 +95,48 @@ C) {option_c}
 D) {option_d}
 """.strip()
 
+# adapted from LiveMCPBench system message
+LIVEMPCBENCH_SYSTEM_MESSAGE = """
+You are an agent designed to assist users with daily tasks by using external tools. 
+You have access to two tools: a retrieval tool and an execution tool. The retrieval tool allows you to search a large toolset for relevant tools, and the execution tool lets you invoke the tools you retrieved.
+Whenever possible, you should use these tools to get accurate, up-to-date information and to perform file operations.\n\nNote that you can only response to user once, so you should try to provide a complete answer in your response.
+
+When you have completed the task and have an answer, call the submit()
+tool to report it.
+'
+
+"""
+
+# adapted from LiveMCPBench grader system message
+LIVEMCPBENCH_GRADER_SYSTEM_MSG = """You are an expert in evaluating the performance of a tool-use agent. The agent is designed to help a human user use multi-tools to complete a task. Given the user's task, the agent's final response, key points for task completion, and tool call history, your goal is to determine whether the agent has completed the task and achieved all requirements.
+
+Your response must strictly follow the following evaluation criteria!
+*Important Evaluation Criteria*:
+1. You must carefully check whether the information (e.g. the coordinates of the addresses) comes from the tool call, if the agent get it from the internal knowledge, it should be considered failed.
+2: Some tasks require to create files to be considered successful.
+
+*IMPORTANT*
+Format your response into two lines as shown below:
+
+Thoughts: <your thoughts and reasoning process based on double-checking each key points and the evaluation criteria>
+Status: "success" or "failure""".strip()
+
+LIVEMCPBENCH_GRADER_USER_PROMPT = """User Task: 
+{task}
+
+Key Points: 
+{key_points}
+
+Final Response: 
+{response}
+
+Tool Call History:
+{tool_calls}
+
+Tool Descriptions:
+{tool_descriptions}
+"""
+
 
 def create_dynamic_multiple_choice_prompt(question: str, options: list[str]) -> str:
     """
