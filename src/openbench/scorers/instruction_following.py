@@ -4,9 +4,7 @@ import json
 import re
 from typing import Dict, Callable
 
-import functools
 import langdetect  # type: ignore[import-untyped]
-import nltk  # type: ignore[import-untyped]
 from inspect_ai.scorer import (
     Score,
     Target,
@@ -111,9 +109,8 @@ class NumberOfWords(InstructionChecker):
         self._num_words = num_words or 100
 
     def check_following(self, response: str) -> bool:
-        # Use proper tokenization like original
-        tokenizer = nltk.tokenize.RegexpTokenizer(r"\w+")
-        tokens = tokenizer.tokenize(response)
+        # Use regex tokenization instead of nltk
+        tokens = re.findall(r"\w+", response)
         word_count = len(tokens)
 
         if self._relation == "at least":
@@ -179,8 +176,7 @@ class CapitalWordFrequencyChecker(InstructionChecker):
         self._frequency = capital_frequency or 1
 
     def check_following(self, response: str) -> bool:
-        words = nltk.word_tokenize(response)
-        capital_words = list(filter(str.isupper, words))
+        capital_words = list(filter(str.isupper, re.findall(r"\w+", response)))
         count = len(capital_words)
 
         if self._relation == "at least":
@@ -201,19 +197,12 @@ class QuotationChecker(InstructionChecker):
 class NumberOfSentences(InstructionChecker):
     """Check sentence count constraints."""
 
-    @staticmethod
-    @functools.lru_cache(maxsize=None)
-    def _get_sentence_tokenizer():
-        return nltk.data.load("nltk:tokenizers/punkt/english.pickle")
-
     def build_description(self, *, relation=None, num_sentences=None, **kwargs):
         self._relation = relation or "at least"
         self._num_sentences = num_sentences or 1
 
     def check_following(self, response: str) -> bool:
-        # Use proper sentence tokenization like original
-        tokenizer = self._get_sentence_tokenizer()
-        sentences = tokenizer.tokenize(response)
+        sentences = list(filter(str.strip, re.split(r"[.!?]+", response)))
         sentence_count = len(sentences)
 
         if self._relation == "at least":

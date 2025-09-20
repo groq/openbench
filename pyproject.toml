@@ -18,7 +18,6 @@ dependencies = [
     "groq>=0.30.0",
     "inspect-ai==0.3.125",
     "langdetect>=1.0.9",
-    "nltk>=3.8",
     "openai>=1.99.7",
     "pillow>=10.0.0",
     "pydantic-settings>=2.9.1",
