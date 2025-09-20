@@ -194,6 +194,22 @@ BENCHMARKS = {
         module_path="openbench.evals.exercism.exercism",
         function_name="exercism_rust",
     ),
+    "instruction_following_strict": BenchmarkMetadata(
+        name="Instruction Following (Strict)",
+        description="Tests ability to follow specific formatting and content constraints - strict evaluation",
+        category="core",
+        tags=["instruction-following", "constraints", "formatting"],
+        module_path="openbench.evals.instruction_following",
+        function_name="instruction_following_strict",
+    ),
+    "instruction_following_loose": BenchmarkMetadata(
+        name="Instruction Following (Loose)",
+        description="Tests ability to follow specific formatting and content constraints - loose evaluation",
+        category="core",
+        tags=["instruction-following", "constraints", "formatting"],
+        module_path="openbench.evals.instruction_following",
+        function_name="instruction_following_loose",
+    ),
     "openbookqa": BenchmarkMetadata(
         name="OpenBookQA",
         description="Elementary-level science questions probing understanding of core facts",
