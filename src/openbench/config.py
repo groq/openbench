@@ -472,14 +472,6 @@ BENCHMARKS = {
         function_name="scicode",
         is_alpha=True,
     ),
-    "cti_bench": BenchmarkMetadata(
-        name="CTI-Bench",
-        description="Comprehensive evaluation framework for cyber threat intelligence understanding with 4 tasks: knowledge questions, vulnerability classification, CVSS scoring, and technique extraction",
-        category="cybersecurity",
-        tags=["cybersecurity", "multi-task"],
-        module_path="openbench.evals.cti_bench",
-        function_name="cti_bench",
-    ),
     "cti_bench_ate": BenchmarkMetadata(
         name="CTI-Bench ATE",
         description="Extracting MITRE ATT&CK techniques from malware and threat descriptions",
