@@ -1,5 +1,5 @@
-from typing import Any, Dict, List, Optional, Union, Annotated
-from pydantic import BaseModel, BeforeValidator
+from typing import Any, List, Optional, Annotated
+from pydantic import BeforeValidator
 from inspect_ai.dataset import Sample, hf_dataset, csv_dataset, json_dataset, Dataset
 from inspect_ai.solver import multiple_choice
 from inspect_ai.scorer import choice
@@ -40,17 +40,15 @@ def validate_target(value: Any) -> str:
 # ----------- MCQ SAMPLE MODEL -----------
 
 
-class MCQSample(BaseModel):
+class MCQSample(Sample):
     """
-    Minimal MCQ sample with Annotated validators.
-    Users expected to provide function: record_to_mcq_sample(record) -> MCQSample.
+    Minimal MCQ sample built on Inspect AI's `Sample`, with validators for MCQ fields.
+    Users are expected to provide: record_to_mcq_sample(record) -> MCQSample.
     """
 
     input: Annotated[str, BeforeValidator(validate_input)]
     choices: Annotated[List[str], BeforeValidator(validate_choices)]
     target: Annotated[str, BeforeValidator(validate_target)]
-    id: Union[str, int, None] = None
-    metadata: Union[Dict[str, Any], None] = None
 
 
 # ----------- DATASET WRAPPER -----------
@@ -63,19 +61,9 @@ def make_dataset(
     auto_id: bool = True,
 ) -> Dataset:
     """
-    Wrap InspectAI dataset constructors.
-    Supports records -> MCQSample -> Sample -> Dataset.
+    Wrap Inspect AI dataset constructors.
+    Supports records -> MCQSample -> Dataset.
     """
-
-    def record_to_sample(record: Dict[str, Any]) -> Sample:
-        s = record_to_mcq_sample(record)
-        return Sample(
-            input=s.input,
-            choices=s.choices,
-            target=s.target,
-            id=s.id,
-            metadata=s.metadata,
-        )
 
     if dataset_type == "hf":
         if split is None:
@@ -83,16 +71,16 @@ def make_dataset(
         return hf_dataset(
             dataset_path,
             split=split,
-            sample_fields=record_to_sample,
+            sample_fields=record_to_mcq_sample,
             auto_id=auto_id,
         )
     elif dataset_type == "csv":
         return csv_dataset(
-            dataset_path, sample_fields=record_to_sample, auto_id=auto_id
+            dataset_path, sample_fields=record_to_mcq_sample, auto_id=auto_id
         )
     elif dataset_type == "json":
         return json_dataset(
-            dataset_path, sample_fields=record_to_sample, auto_id=auto_id
+            dataset_path, sample_fields=record_to_mcq_sample, auto_id=auto_id
         )
     else:
         raise ValueError(f"Unsupported dataset type: {dataset_type}")
