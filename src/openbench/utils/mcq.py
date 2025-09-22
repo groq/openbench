@@ -1,217 +1,134 @@
-"""Universal Multiple Choice Question Evaluation Task."""
-
-from pydantic.dataclasses import dataclass
-from inspect_ai import Task
-from inspect_ai.scorer import choice
+from typing import Any, Dict, List, Optional, Union, Annotated
+from pydantic import BaseModel, BeforeValidator
+from inspect_ai.dataset import Sample, hf_dataset, csv_dataset, json_dataset, Dataset
 from inspect_ai.solver import multiple_choice
-from inspect_ai.dataset import Dataset, Sample, hf_dataset, csv_dataset, json_dataset
-from typing import Any, Callable, Union, List, Optional, Mapping
-import re
+from inspect_ai.scorer import choice
+from inspect_ai import Task
 
 
-# -----------MCQ SCHEMA-----------
-@dataclass
-class MCQSchema:
-    """Schema of fields needed to map raw records into MCQ samples."""
-
-    question_field: str
-    choices_field: Union[str, list[str]]
-    answer_field: str
-    context_field: Optional[str] = None
-    metadata_field: Optional[Union[str, list[str]]] = None
-    id_field: Optional[str] = None
+# ----------- MCQ SAMPLE VALIDATION HELPERS -----------
 
 
-# -----------HELPER FUNCTIONS-----------
-def clean_choice(raw_choice: str) -> str:
-    """Remove common letter prefixes like 'A)', 'A.', 'A:', 'A,' etc."""
-    return re.sub(r"^[A-Z][\)\:\.,]?\s*", "", raw_choice.strip(), flags=re.IGNORECASE)
+def validate_input(value: Any) -> str:
+    """Validate the input field of an MCQSample, must be a non-empty string."""
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError("input must be a non-empty string")
+    return value
 
 
-def parse_choices(
-    record: Mapping[str, Any], choices_field: Union[str, List[str]]
-) -> List[str]:
-    """
-    Parse choices into a list[str] without letter prefixes. Supports:
-        - List of column names
-        - Single string with delimiters or newlines
-        - List of strings
-        - Dict of letter: choice pairs
-    """
-
-    # case 1: list of fields — extract from multiple columns
-    if isinstance(choices_field, list):
-        raw = [record[field] for field in choices_field]
-
-    # case 2: single field name
-    elif isinstance(choices_field, str):
-        raw = record[choices_field]
-
-        # case 2a: it's a dict (ex {"A": "Red", "B": "Blue"})
-        if isinstance(raw, dict):
-            raw = list(raw.values())
-
-        # case 2b: it's a newline-separated string
-        elif isinstance(raw, str) and "\n" in raw:
-            raw = raw.splitlines()
-
-        # TODO: add support for more delimiters
-        # case 2c: it's a delimited string (e.g. "A) Red; B) Blue")
-        elif isinstance(raw, str) and ";" in raw:
-            raw = raw.split(";")
-
-        # case 2d: it's a comma-separated string (less preferred)
-        elif isinstance(raw, str) and "," in raw:
-            raw = raw.split(",")
-
-        # case 2e: already a list of strings
-        elif isinstance(raw, list):
-            pass
-
-        # case 2f: fallback to list with single string
-        else:
-            raw = [raw]
-
-    else:
-        raise ValueError(
-            f"choices_field must be a str or list[str]. Got: {type(choices_field)}"
-        )
-
-    # clean, strip, and validate
-    cleaned_choices = [clean_choice(c) for c in raw if isinstance(c, str) and c.strip()]
-
-    if len(cleaned_choices) == 0:
-        raise ValueError(f"Could not extract any valid choices from: {raw}")
-
-    return cleaned_choices
+def validate_choices(value: Any) -> List[str]:
+    """Validate the choices field of an MCQSample, must be list of strings."""
+    if not isinstance(value, list) or not value:
+        raise ValueError("choices must be a non-empty list")
+    if not all(isinstance(c, str) and c.strip() for c in value):
+        raise ValueError("each choice must be a non-empty string")
+    return value
 
 
-# -----------RECORD TO SAMPLE FUNCTION-----------
-def record_to_sample(
-    schema: MCQSchema,
-) -> Callable[[Mapping[str, Any]], Sample]:
-    """Use MCQ Schema to generate Sample objects from records."""
-
-    def _record_to_sample(record: Mapping[str, Any]) -> Sample:
-        # extract question
-        question = record[schema.question_field]
-
-        # extract context, if given
-        if schema.context_field:
-            context = record.get(schema.context_field, "")
-            question = context.strip() + "\n" + question.strip()
-
-        # extract choices
-        choices = parse_choices(record, schema.choices_field)
-
-        # extract answer
-        answer = record[schema.answer_field].strip().upper()
-        if not re.match(r"^[A-Z]$", answer):
-            raise ValueError(
-                f"Answer must be a single capital letter A-Z. Got: '{answer}'"
-            )
-
-        # extract metadata
-        metadata = {}
-        if schema.metadata_field:
-            if isinstance(schema.metadata_field, list):
-                for field in schema.metadata_field:
-                    metadata[field] = record.get(field)
-            else:
-                metadata = {"meta": record.get(schema.metadata_field)}
-
-        # extract id
-        id = record.get(schema.id_field) if schema.id_field else None
-
-        return Sample(
-            input=question,
-            choices=choices,
-            target=answer,
-            metadata=metadata if metadata else None,
-            id=id if id else None,
-        )
-
-    return _record_to_sample
-
-
-# -----------MCQ EVAL TASK ABSTRACTION-----------
-class MCQEval:
-    """Universal MCQ eval task definition."""
-
-    def __init__(
-        self,
-        dataset_type: str,
-        path: str,
-        split: str = "test",
-        question_field: str = "question",
-        choices_field: Union[str, list[str]] = "choices",
-        answer_field: str = "answer",
-        context_field: Optional[str] = None,
-        metadata_field: Optional[Union[str, list[str]]] = None,
-        id_field: Optional[str] = None,
+def validate_target(value: Any) -> str:
+    """Validate the target field of an MCQSample, must be a single uppercase letter."""
+    if (
+        not isinstance(value, str)
+        or len(value) != 1
+        or not value.isalpha()
+        or not value.isupper()
     ):
-        self.schema = MCQSchema(
-            question_field=question_field,
-            choices_field=choices_field,
-            answer_field=answer_field,
-            context_field=context_field,
-            metadata_field=metadata_field,
-            id_field=id_field,
-        )
-        self.dataset_type = dataset_type
-        self.path = path
-        self.split = split
+        raise ValueError("target must be a single uppercase letter (e.g. 'A')")
+    return value
 
-    def get_dataset(self) -> Dataset:
-        """Load a dataset using the MCQSchema."""
-        auto_id = self.schema.id_field is None
-        sample_fields = record_to_sample(self.schema)
 
-        match self.dataset_type:
-            case "hf":
-                return hf_dataset(
-                    self.path,
-                    split=self.split,
-                    sample_fields=sample_fields,
-                    auto_id=auto_id,
-                )
-            case "csv":
-                return csv_dataset(
-                    self.path,
-                    sample_fields=sample_fields,
-                    auto_id=auto_id,
-                )
-            case "json":
-                return json_dataset(
-                    self.path,
-                    sample_fields=sample_fields,
-                    auto_id=auto_id,
-                )
-            case _:
-                raise ValueError(f"Unsupported dataset type: {self.dataset_type}")
+# ----------- MCQ SAMPLE MODEL -----------
 
-    # treat MCQEval instance as a callable
-    def __call__(self) -> Task:
-        return Task(
-            dataset=self.get_dataset(),
-            solver=multiple_choice(),
-            scorer=choice(),
+
+class MCQSample(BaseModel):
+    """
+    Minimal MCQ sample with Annotated validators.
+    Users expected to provide function: record_to_mcq_sample(record) -> MCQSample.
+    """
+
+    input: Annotated[str, BeforeValidator(validate_input)]
+    choices: Annotated[List[str], BeforeValidator(validate_choices)]
+    target: Annotated[str, BeforeValidator(validate_target)]
+    id: Union[str, int, None] = None
+    metadata: Union[Dict[str, Any], None] = None
+
+
+# ----------- DATASET WRAPPER -----------
+def make_dataset(
+    dataset_type: str,
+    dataset_path: str,
+    record_to_mcq_sample,
+    *,
+    split: Optional[str] = None,
+    auto_id: bool = True,
+) -> Dataset:
+    """
+    Wrap InspectAI dataset constructors.
+    Supports records -> MCQSample -> Sample -> Dataset.
+    """
+
+    def record_to_sample(record: Dict[str, Any]) -> Sample:
+        s = record_to_mcq_sample(record)
+        return Sample(
+            input=s.input,
+            choices=s.choices,
+            target=s.target,
+            id=s.id,
+            metadata=s.metadata,
         )
 
+    if dataset_type == "hf":
+        if split is None:
+            raise ValueError("For dataset_type='hf', you must provide split")
+        return hf_dataset(
+            dataset_path,
+            split=split,
+            sample_fields=record_to_sample,
+            auto_id=auto_id,
+        )
+    elif dataset_type == "csv":
+        return csv_dataset(
+            dataset_path, sample_fields=record_to_sample, auto_id=auto_id
+        )
+    elif dataset_type == "json":
+        return json_dataset(
+            dataset_path, sample_fields=record_to_sample, auto_id=auto_id
+        )
+    else:
+        raise ValueError(f"Unsupported dataset type: {dataset_type}")
 
-# -----------EXAMPLE USAGE-----------
-# Example (for reference only):
-# from inspect_ai import task
-# @task
-# def example_mcq_eval() -> Task:
-#     return MCQEval(
-#         dataset_type="hf",  # or "csv" / "json"
-#         path="my/dataset",
-#         split="test",
-#         question_field="question",
-#         choices_field=["A", "B", "C", "D"],
-#         answer_field="answer",
-#         context_field=None,
-#         metadata_field=None,
-#         id_field=None,
-#     )
+
+# ----------- TASK FACTORY -----------
+def MCQEval(
+    *,
+    dataset_type: str,
+    dataset_path: str,
+    record_to_mcq_sample,
+    split: Optional[str] = None,
+    auto_id: bool = True,
+) -> "Task":
+    """
+    Build a Task using a user-provided record_to_mcq_sample().
+
+    Args:
+        dataset_type: The type of dataset to load ('hf', 'csv', 'json')
+        dataset_path: The path to the dataset
+        record_to_mcq_sample: A function that converts a record to an MCQSample
+        split: The split of the dataset to load (required for 'hf')
+        auto_id: Whether to auto-generate an id for each sample
+
+    Returns:
+        Task: A Task object with the dataset, solver, and scorer
+    """
+    dataset = make_dataset(
+        dataset_type=dataset_type,
+        dataset_path=dataset_path,
+        record_to_mcq_sample=record_to_mcq_sample,
+        split=split,
+        auto_id=auto_id,
+    )
+    return Task(
+        dataset=dataset,
+        solver=multiple_choice(),
+        scorer=choice(),
+    )
