@@ -11,7 +11,6 @@ from openbench.config import load_task
 from openbench.monkeypatch.display_results_patch import patch_display_results
 from openbench._cli.utils import parse_cli_args
 from openbench.agents import AgentManager
-from openbench.provider_config import ProviderManager
 
 
 class SandboxType(str, Enum):
@@ -82,17 +81,16 @@ def validate_model_name(model: str, context: str = "") -> None:
     Raises:
         typer.BadParameter: If model name format is invalid
     """
-    if not ProviderManager.validate_model_string(model):
-        provider = ProviderManager.extract_provider_from_model(model)
-        if not provider:
-            raise typer.BadParameter(
-                f"Invalid model name format{context}: {model}. Expected format: provider/model-name"
-            )
-        else:
-            valid_providers = ProviderManager.get_valid_providers()
-            raise typer.BadParameter(
-                f"Invalid provider{context}: {provider}. Valid providers: {', '.join(valid_providers)}"
-            )
+    if "/" not in model:
+        raise typer.BadParameter(
+            f"Invalid model name format{context}: {model}. Expected format: provider/model-name"
+        )
+
+    provider, remainder = model.split("/", 1)
+    if not provider or not remainder:
+        raise typer.BadParameter(
+            f"Invalid model name format{context}: {model}. Expected format: provider/model-name"
+        )
 
 
 def validate_model_role(model_role: Optional[str]) -> Dict[str, str | Model]:
