@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import subprocess
+import os
 import tempfile
 from pathlib import Path
 from typing import List, Optional
@@ -233,6 +234,7 @@ class DockerManager:
 
         # Format environment variables (provider + agent-specific)
         env_vars = cls._format_environment_variables(agent)
+        environment_section = f"    environment:\n{env_vars}\n" if env_vars else ""
 
         # Format volumes
         volumes_section = cls._format_volumes_section(agent)
@@ -240,7 +242,7 @@ class DockerManager:
 
         compose_content = EVAL_COMPOSE_TEMPLATE.format(
             container_tag=container_tag,
-            env_vars=env_vars,
+            environment_section=environment_section,
             volumes_section=volumes_section,
             volume_definitions=volume_definitions,
         )
@@ -253,6 +255,7 @@ class DockerManager:
         """Generate Docker Compose file content."""
         # Format environment variables
         env_vars = cls._format_environment_variables(agent)
+        environment_section = f"    environment:\n{env_vars}\n" if env_vars else ""
 
         # Format volumes
         volumes_section = cls._format_volumes_section(agent)
@@ -260,7 +263,7 @@ class DockerManager:
 
         compose_content = STANDARD_COMPOSE_TEMPLATE.format(
             container_tag=container_tag,
-            env_vars=env_vars,
+            environment_section=environment_section,
             volumes_section=volumes_section,
             volume_definitions=volume_definitions,
         )
@@ -272,16 +275,21 @@ class DockerManager:
         # Get all provider environment variables
         provider_env_vars = ProviderManager.get_all_env_vars()
 
+        # Include only provider envs that have non-empty values on host
+        host_env_vars = [
+            env for env in provider_env_vars if (os.getenv(env) not in (None, ""))
+        ]
+
         # Get agent-specific environment variables
         agent_env_vars = agent.get_env_requirements()
 
         # Combine and deduplicate
-        all_env_vars = list(dict.fromkeys(provider_env_vars + agent_env_vars))
+        all_env_vars = list(dict.fromkeys(host_env_vars + agent_env_vars))
 
-        env_lines = []
-        for var in all_env_vars:
-            env_lines.append(f"      {var}: ${{{var}:-}}")
+        if not all_env_vars:
+            return ""
 
+        env_lines = [f"      {var}: ${{{var}:-}}" for var in all_env_vars]
         return "\n".join(env_lines)
 
     @classmethod

@@ -205,8 +205,7 @@ EVAL_COMPOSE_TEMPLATE = """services:
     init: true
     command: tail -f /dev/null
     networks: [eval_net]
-    environment:
-{env_vars}
+{environment_section}
 {volumes_section}
 
 networks:
@@ -221,8 +220,7 @@ STANDARD_COMPOSE_TEMPLATE = """services:
     init: true
     command: tail -f /dev/null
     networks: [eval_net]
-    environment:
-{env_vars}
+{environment_section}
 {volumes_section}
 
 networks:

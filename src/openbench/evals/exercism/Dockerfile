@@ -29,12 +29,7 @@ ENV PATH="/root/.cargo/bin:/root/.local/bin:${PATH}"
 # Common setup
 WORKDIR /workspace
 
-# Agent-specific installation
-RUN curl -LsSf https://aider.chat/install.sh | sh
-RUN cp ~/.local/bin/aider /usr/local/bin/aider || cp /root/.local/bin/aider /usr/local/bin/aider
-
-# Runtime setup
-# No runtime setup required
+# Agent-specific and run time installation is handled by DockerManager
 
 # Default command
 CMD ["tail", "-f", "/dev/null"]

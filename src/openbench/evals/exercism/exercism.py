@@ -69,7 +69,7 @@ def exercism(
         config=GenerateConfig(
             max_tokens=4096,
         ),
-        time_limit=300,  # 5 minute time limit
+        time_limit=360,  # 6 minute time limit
     )
 
 

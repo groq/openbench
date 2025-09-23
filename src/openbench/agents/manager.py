@@ -178,7 +178,7 @@ class AgentManager:
             Formatted help text describing all available code agents
         """
         agent_names = cls.get_supported_agents()
-        default_agent = "aider"
+        default_agent = "opencode"
 
         help_text = f"CLI code agent to use for code evaluation. Options: {', '.join(agent_names)} (default: {default_agent})"
         return help_text
