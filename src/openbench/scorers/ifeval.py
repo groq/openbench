@@ -2,19 +2,19 @@
 
 import json
 import re
-from typing import Dict, Callable
+import functools
+import langdetect  # type: ignore[import-untyped,import-not-found]
+import nltk  # type: ignore[import-untyped,import-not-found]
 
-import langdetect  # type: ignore[import-untyped]
+from typing import Dict, Callable
 from inspect_ai.scorer import (
     Score,
     Target,
-    accuracy,
     scorer,
     Scorer,
-    stderr,
 )
 from inspect_ai.solver import TaskState
-from openbench.metrics.instruction_following import instruction_following_metrics
+from openbench.metrics.ifeval import ifeval_metrics
 
 
 class InstructionChecker:
@@ -109,8 +109,9 @@ class NumberOfWords(InstructionChecker):
         self._num_words = num_words or 100
 
     def check_following(self, response: str) -> bool:
-        # Use regex tokenization instead of nltk
-        tokens = re.findall(r"\w+", response)
+        # Use proper tokenization like original
+        tokenizer = nltk.tokenize.RegexpTokenizer(r"\w+")
+        tokens = tokenizer.tokenize(response)
         word_count = len(tokens)
 
         if self._relation == "at least":
@@ -176,7 +177,7 @@ class CapitalWordFrequencyChecker(InstructionChecker):
         self._frequency = capital_frequency or 1
 
     def check_following(self, response: str) -> bool:
-        capital_words = list(filter(str.isupper, re.findall(r"\w+", response)))
+        capital_words = list(filter(str.isupper, nltk.word_tokenize(response)))
         count = len(capital_words)
 
         if self._relation == "at least":
@@ -197,12 +198,19 @@ class QuotationChecker(InstructionChecker):
 class NumberOfSentences(InstructionChecker):
     """Check sentence count constraints."""
 
+    @staticmethod
+    @functools.lru_cache(maxsize=None)
+    def _get_sentence_tokenizer():
+        return nltk.data.load("nltk:tokenizers/punkt/english.pickle")
+
     def build_description(self, *, relation=None, num_sentences=None, **kwargs):
         self._relation = relation or "at least"
         self._num_sentences = num_sentences or 1
 
     def check_following(self, response: str) -> bool:
-        sentences = list(filter(str.strip, re.split(r"[.!?]+", response)))
+        # Use proper sentence tokenization like original
+        tokenizer = self._get_sentence_tokenizer()
+        sentences = tokenizer.tokenize(response)
         sentence_count = len(sentences)
 
         if self._relation == "at least":
@@ -449,12 +457,11 @@ INSTRUCTION_REGISTRY: Dict[str, type] = {
 }
 
 
-@scorer(metrics=[accuracy(), stderr(), instruction_following_metrics()])
-def instruction_following_scorer(mode: str = "strict") -> Scorer:
-    """Score instruction following compliance.
+@scorer(metrics=[ifeval_metrics()])
+def ifeval_combined_scorer() -> Scorer:
+    """Score instruction following compliance with both strict and loose evaluation.
 
-    Args:
-        mode: Either "strict" or "loose" evaluation
+    Returns combined metrics showing both strict and loose performance.
     """
 
     async def score(state: TaskState, target: Target) -> Score:
@@ -466,49 +473,55 @@ def instruction_following_scorer(mode: str = "strict") -> Scorer:
             return Score(value=0.0, explanation="No instructions found")
 
         response = state.output.completion
-        is_following_list = []
+        strict_following_list = []
+        loose_following_list = []
 
-        # Check each instruction
         for idx, instruction_id in enumerate(instruction_list):
             instruction_cls = INSTRUCTION_REGISTRY[instruction_id]
 
             instruction = instruction_cls(instruction_id)
-
             instruction.build_description(**(kwargs_list[idx]))
 
-            if mode == "loose":
-                responses = [
-                    response,
-                    response.replace("*", ""),
-                    "\n".join(response.split("\n")[1:]).strip(),  # Remove first line
-                    "\n".join(response.split("\n")[:-1]).strip(),  # Remove last line
-                    "\n".join(response.split("\n")[1:-1]).strip(),  # Remove both
-                ]
-                # Also try removing asterisks from trimmed versions
-                responses.extend([r.replace("*", "") for r in responses[2:]])
+            # Strict evaluation
+            strict_followed = bool(response.strip()) and instruction.check_following(
+                response
+            )
+            strict_following_list.append(strict_followed)
 
-                followed = any(
-                    instruction.check_following(r) if r.strip() else False
-                    for r in responses
-                )
-            else:
-                followed = bool(response.strip()) and instruction.check_following(
-                    response
-                )
+            # Loose evaluation
+            responses = [
+                response,
+                response.replace("*", ""),
+                "\n".join(response.split("\n")[1:]).strip(),  # Remove first line
+                "\n".join(response.split("\n")[:-1]).strip(),  # Remove last line
+                "\n".join(response.split("\n")[1:-1]).strip(),  # Remove both
+            ]
+            # Also try removing asterisks from trimmed versions
+            responses.extend([r.replace("*", "") for r in responses[2:]])
 
-            is_following_list.append(followed)
+            loose_followed = any(
+                instruction.check_following(r) if r.strip() else False
+                for r in responses
+            )
+            loose_following_list.append(loose_followed)
 
         explanations = [
-            f"[{"✓" if followed else "✗"}] {instruction_id}"
-            for instruction_id, followed in zip(instruction_list, is_following_list)
+            f"[S:{"✓" if strict_followed else "✗"} L:{"✓" if loose_followed else "✗"}] {instruction_id}"
+            for instruction_id, strict_followed, loose_followed in zip(
+                instruction_list,
+                strict_following_list,
+                loose_following_list,
+                strict=True,
+            )
         ]
 
         return Score(
-            value=1.0 if all(is_following_list) else 0.0,
+            value=(1.0 if all(strict_following_list) else 0.0),
             answer=response,
             explanation="\n".join(explanations),
             metadata={
-                "follow_instruction_list": is_following_list,
+                "strict_follow_instruction_list": strict_following_list,
+                "loose_follow_instruction_list": loose_following_list,
                 "instruction_id_list": instruction_list,
             },
         )

@@ -1397,6 +1397,15 @@ wheels = [
 ]
 
 [[package]]
+name = "joblib"
+version = "1.5.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/e8/5d/447af5ea094b9e4c4054f82e223ada074c552335b9b4b2d14bd9b35a67c4/joblib-1.5.2.tar.gz", hash = "sha256:3faa5c39054b2f03ca547da9b2f52fde67c06240c31853f306aea97f13647b55", size = 331077, upload-time = "2025-08-27T12:15:46.575Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1e/e8/685f47e0d754320684db4425a0967f7d3fa70126bffd76110b7009a0090f/joblib-1.5.2-py3-none-any.whl", hash = "sha256:4e1f0bdbb987e6d843c70cf43714cb276623def372df3c22fe5266b2670bc241", size = 308396, upload-time = "2025-08-27T12:15:45.188Z" },
+]
+
+[[package]]
 name = "jsonlines"
 version = "4.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2054,6 +2063,21 @@ wheels = [
 ]
 
 [[package]]
+name = "nltk"
+version = "3.9.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "click" },
+    { name = "joblib" },
+    { name = "regex" },
+    { name = "tqdm" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/3c/87/db8be88ad32c2d042420b6fd9ffd4a149f9a0d7f0e86b3f543be2eeeedd2/nltk-3.9.1.tar.gz", hash = "sha256:87d127bd3de4bd89a4f81265e5fa59cb1b199b27440175370f7417d2bc7ae868", size = 2904691, upload-time = "2024-08-18T19:48:37.769Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/4d/66/7d9e26593edda06e8cb531874633f7c2372279c3b0f46235539fe546df8b/nltk-3.9.1-py3-none-any.whl", hash = "sha256:4fa26829c5b00715afe3061398a8989dc643b92ce7dd93fb4585a70930d168a1", size = 1505442, upload-time = "2024-08-18T19:48:21.909Z" },
+]
+
+[[package]]
 name = "nodeenv"
 version = "1.9.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2121,7 +2145,6 @@ dependencies = [
     { name = "datasets" },
     { name = "groq" },
     { name = "inspect-ai" },
-    { name = "langdetect" },
     { name = "openai" },
     { name = "pillow" },
     { name = "pydantic-settings" },
@@ -2141,6 +2164,10 @@ dev = [
     { name = "types-jsonschema" },
     { name = "types-pyyaml" },
 ]
+ifeval = [
+    { name = "langdetect" },
+    { name = "nltk" },
+]
 jsonschemabench = [
     { name = "jsonschema" },
 ]
@@ -2153,7 +2180,6 @@ requires-dist = [
     { name = "datasets", specifier = ">=3.6.0" },
     { name = "groq", specifier = ">=0.30.0" },
     { name = "inspect-ai", specifier = "==0.3.125" },
-    { name = "langdetect", specifier = ">=1.0.9" },
     { name = "openai", specifier = ">=1.99.7" },
     { name = "pillow", specifier = ">=10.0.0" },
     { name = "pydantic-settings", specifier = ">=2.9.1" },
@@ -2172,6 +2198,10 @@ dev = [
     { name = "ruff", specifier = ">=0.11.9" },
     { name = "types-jsonschema", specifier = ">=4.0.0" },
     { name = "types-pyyaml", specifier = ">=6.0.12.20250809" },
+]
+ifeval = [
+    { name = "langdetect", specifier = ">=1.0.9" },
+    { name = "nltk", specifier = ">=3.9.1" },
 ]
 jsonschemabench = [{ name = "jsonschema", specifier = ">=4.23.0" }]
 scicode = [{ name = "scicode", git = "https://github.com/TheFloatingString/SciCode-fork.git?rev=4f20d721ba3e2227196262083b9b7a70484d54f7" }]
