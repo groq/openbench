@@ -75,7 +75,7 @@ def export_benchmarks(snippet_mdx_path: Path) -> List[Dict[str, Any]]:
     # write to MDX snippet for docs to source benchmarks info
     snippet_mdx_path.parent.mkdir(parents=True, exist_ok=True)
     snippet_mdx_path.write_text(
-        "export const benchmarksData = " + json.dumps(rows, ensure_ascii=False) + ";\n",
+        "export const benchmarksData = " + json.dumps(rows, ensure_ascii=False, indent=2) + ";\n",
         encoding="utf-8",
     )
 
