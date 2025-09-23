@@ -42,14 +42,16 @@ jobs:
       - name: Install dependencies
         run: uv sync --group dev
 
-      - name: Run ruff format check
-        run: uv run ruff format --check .
+      - name: Cache pre-commit
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+          restore-keys: |
+            pre-commit-${{ runner.os }}-
 
-      - name: Run ruff lint
-        run: uv run ruff check .
-
-      - name: Run type checking
-        run: uv run mypy .
+      - name: Run pre-commit hooks (all files)
+        run: uv run pre-commit run --all-files --show-diff-on-failure --color always
 
   test:
     name: Tests (Python ${{ matrix.python-version }})

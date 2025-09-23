@@ -1,0 +1,75 @@
+---
+title: "bench list"
+description: "List all available benchmarks and their descriptions"
+---
+
+## Overview
+
+The `bench list` command displays all available benchmarks in OpenBench, organized by category with brief descriptions.
+
+## Usage
+
+```bash
+bench list [options]
+```
+
+## Options
+
+| Option | Short | Description |
+|--------|-------|-------------|
+| `--category` | `-c` | Filter by category: core, math, etc. |
+| `--search` | `-s` | Search evaluations by name, description, or tags |
+| `--tags` | `-t` | Show tags for each benchmark|
+| `--alpha` |  | Include experimental/alpha benchmarks|
+
+## Example Usage
+
+### Basic Usage
+
+```bash
+bench list
+```
+
+``` x bench list example output
+Core Benchmarks (58)                                                                                 
+────────────────────────────────────────────────────────────
+ boolq               BoolQ                 BoolQ: A Question Answering Dataset for Boolean Reasoning    
+ browsecomp          BrowseComp            A Simple Yet Challenging Benchmark for Browsing Agents ... 
+ drop                DROP                  Reading comprehension benchmark requiring discrete reason... 
+ ...                                                                                              
+Cybersecurity Benchmarks (4)
+────────────────────────────────────────────────────────────
+ cti_bench_ate       CTI-Bench ATE         Extracting MITRE ATT&CK techniques from malware and threa... 
+ cti_bench_mcq       CTI-Bench MCQ         Multiple-choice questions evaluating understanding of CTI... 
+ ...
+ Math Benchmarks (12)
+────────────────────────────────────────────────────────────
+ aime_2023_I         AIME 2023 I           American Invitational Mathematics Examination 2023 (First)   
+ aime_2023_II        AIME 2023 II          American Invitational Mathematics Examination 2023 (Second)  
+ aime_2024           AIME 2024             American Invitational Mathematics Examination 2024 (Combi... 
+ ...
+ ────────────────────────────────────────────────────────────
+Total: 75 benchmarks (use --alpha to see experimental benchmarks)
+```
+
+### Filter by Category
+
+```bash
+# Use full flag name
+bench list --category cybersecurity
+
+# Or abbreviated
+bench list -c cybersecurity
+```
+
+``` x bench list -c example output
+Cybersecurity Benchmarks (4)
+────────────────────────────────────────────────────────────
+ cti_bench_ate       CTI-Bench ATE         Extracting MITRE ATT&CK techniques from malware and threa... 
+ cti_bench_mcq       CTI-Bench MCQ         Multiple-choice questions evaluating understanding of CTI... 
+ cti_bench_rcm       CTI-Bench RCM         Mapping CVE descriptions to CWE categories to evaluate vu... 
+ cti_bench_vsp       CTI-Bench VSP         Calculating CVSS scores from vulnerability descriptions t... 
+
+────────────────────────────────────────────────────────────
+Total: 5 benchmarks (use --alpha to see experimental benchmarks)
+```

@@ -1,0 +1,57 @@
+---
+title: "bench eval"
+description: "Run benchmark evaluations on language models"
+---
+
+## Overview
+
+The `bench eval` command is the core of OpenBench, allowing you to evaluate any supported model on any available benchmark.
+
+## Usage
+
+```bash
+bench eval <benchmark> [options]
+```
+
+## Arguments
+
+| Argument | Description | Required |
+|----------|-------------|----------|
+| `benchmark` | Name of the benchmark to run | Yes |
+
+## Basic Configuration Options
+
+Commonly used configuration options for model selection, evaluation control, performance optimization:
+
+| Option | Description |
+|--------|-------------|
+| `--model` | Model to evaluate
+| `--limit` | Number of questions to evaluate
+| `--epochs` | Number of evaluation rounds
+| `--temperature` | Sampling temperature
+| `--top-p` | Nucleus sampling
+| `--seed` | Random seed for reproducibility
+| `--message-limit` | Max messages per sample
+| `--max-tokens` | Maximum response tokens
+| `--max-connections` | Concurrent API calls
+| `--max-subprocesses` | Parallel subprocesses
+| `--fail-on-error` | Failure threshold for sample errors
+| `--timeout` | Request timeout (seconds)
+| `--sandbox` | Container for running generated code
+
+For full collection of eval congifuration parameters, see [Configuration](/configuration).
+
+## Example Configured Evaluation
+
+### Basic Evaluation
+
+```bash
+bench eval humaneval \
+  --model openai/gpt-4o \
+  --temperature 0.5 \
+  --max-tokens 512 \
+  --epochs 5 \
+  --max-connections 5 \
+  --timeout 120 \
+  --sandbox docker
+```

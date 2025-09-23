@@ -34,7 +34,25 @@ class BenchmarkMetadata:
 
 # Benchmark metadata - minimal, no duplication
 BENCHMARKS = {
+    "mbpp": BenchmarkMetadata(
+        name="MBPP",
+        description="Mostly Basic Python Problems — code generation tasks with unit test verification",
+        category="core",
+        tags=["code", "generation", "sandbox", "reasoning"],
+        module_path="openbench.evals.mbpp",
+        function_name="mbpp",
+        is_alpha=False,
+    ),
     # Graphwalks benchmarks (alpha)
+    "clockbench": BenchmarkMetadata(
+        name="ClockBench",
+        description="Clock benchmark - time-based reasoning tasks",
+        category="community",
+        tags=["time", "analog", "clock", "reasoning"],
+        module_path="openbench.evals.clockbench",
+        function_name="clockbench",
+        is_alpha=False,
+    ),
     "graphwalks": BenchmarkMetadata(
         name="GraphWalks",
         description="Multi-hop reasoning on graphs - both BFS and parent finding tasks",
@@ -250,6 +268,22 @@ BENCHMARKS = {
         module_path="openbench.evals.simpleqa",
         function_name="simpleqa",
     ),
+    "tumlu": BenchmarkMetadata(
+        name="TUMLU",
+        description="TUMLU is a comprehensive, multilingual, and natively developed language understanding benchmark specifically designed for Turkic languages.",
+        category="community",
+        tags=["factuality", "question-answering", "multiple-choice", "reasoning"],
+        module_path="openbench.evals.tumlu",
+        function_name="tumlu",
+    ),
+    "detailbench": BenchmarkMetadata(
+        name="DetailBench",
+        description="Tests whether LLMs notify users about wrong facts in a text while they are tasked to translate said text",
+        category="community",
+        tags=["knowledge", "graded", "instruction-following"],
+        module_path="openbench.evals.detailbench",
+        function_name="detailbench",
+    ),
     "browsecomp": BenchmarkMetadata(
         name="BrowseComp",
         description="A Simple Yet Challenging Benchmark for Browsing Agents - evaluates model performance on browsing-related tasks",
@@ -273,6 +307,14 @@ BENCHMARKS = {
         tags=["knowledge", "reasoning", "text-only", "graded", "frontier"],
         module_path="openbench.evals.hle",
         function_name="hle_text",
+    ),
+    "mmstar": BenchmarkMetadata(
+        name="MMStar",
+        description="MMStar benchmark for measuring multi-modal gain and leakage via coordinated vision and text ablations",
+        category="core",
+        tags=["vision", "multi-modal", "leakage", "perception", "reasoning"],
+        module_path="openbench.evals.mmstar",
+        function_name="mmstar",
     ),
     "healthbench": BenchmarkMetadata(
         name="HealthBench",
@@ -478,14 +520,6 @@ BENCHMARKS = {
         module_path="openbench.evals.scicode",
         function_name="scicode",
         is_alpha=True,
-    ),
-    "cti_bench": BenchmarkMetadata(
-        name="CTI-Bench",
-        description="Comprehensive evaluation framework for cyber threat intelligence understanding with 4 tasks: knowledge questions, vulnerability classification, CVSS scoring, and technique extraction",
-        category="cybersecurity",
-        tags=["cybersecurity", "multi-task"],
-        module_path="openbench.evals.cti_bench",
-        function_name="cti_bench",
     ),
     "cti_bench_ate": BenchmarkMetadata(
         name="CTI-Bench ATE",

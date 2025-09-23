@@ -1,11 +1,14 @@
-from inspect_ai.scorer import Metric, Score, mean, scorer
+from inspect_ai.scorer import Score, mean, scorer
 from inspect_ai.solver import TaskState
-from inspect_ai.scorer import Target, metric
+from inspect_ai.scorer import Target
 from pathlib import Path
 import time
 import shutil
 import subprocess
 from typing import Any
+
+from openbench.datasets.scicode import download_h5_file
+from openbench.metrics.scicode import sub_problem_correctness
 
 
 class ScicodeEvaluator:
@@ -16,7 +19,7 @@ class ScicodeEvaluator:
         log_dir: Path,
         with_background: bool,
     ):
-        self.h5py_file = h5py_file
+        self.h5py_file = download_h5_file(h5py_file)
         self.code_dir = code_dir
         self.log_dir = log_dir
         self.with_background = with_background
@@ -81,6 +84,7 @@ from scicode.parse.parse import process_hdf5_to_tuple
         total_steps = len(sub_steps)
         total_correct = 0
         for idx in range(len(sub_steps)):
+            # Skip these particular substeps
             if (
                 (problem_id == "13" and idx == 5)
                 or (problem_id == "62" and idx == 0)
@@ -115,19 +119,6 @@ from scicode.parse.parse import process_hdf5_to_tuple
         return problem_correct, total_correct, total_steps
 
 
-@metric
-def sub_problem_correctness() -> Metric:
-    def metric(scores: list[Score]) -> int | float:
-        total_correct = 0
-        total_steps = 0
-        for score in scores:
-            total_correct += score.value["Total Correct"]  # type: ignore
-            total_steps += score.value["Total Steps"]  # type: ignore
-        return total_correct / total_steps
-
-    return metric
-
-
 @scorer(
     metrics=[
         {
@@ -140,7 +131,7 @@ def scicode_scorer(**params: dict[str, Any]):
     async def score(state: TaskState, target: Target):
         model_name = str(state.model).replace("/", "-")
         evaluator = ScicodeEvaluator(
-            h5py_file=params["h5py_file"],  # type: ignore
+            h5py_file=params["output_dir"],  # type: ignore
             code_dir=Path(params["output_dir"], model_name),  # type: ignore
             log_dir=Path(params["output_dir"], model_name),  # type: ignore
             with_background=params["with_background"],  # type: ignore

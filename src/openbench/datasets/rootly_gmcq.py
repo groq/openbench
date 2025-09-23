@@ -21,7 +21,7 @@ def record_to_sample_gmcq(record: dict[str, Any]):
             return []
 
 
-def load_dataset(subtask):
+def load_rootly_gmcq_dataset(subtask):
     global SUBTASK
     SUBTASK = subtask
 

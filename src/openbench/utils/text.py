@@ -168,6 +168,16 @@ MULTILINGUAL_ANSWER_REGEXES = [
     r"回答\s*：",
     r"解答\s*:",
     r"Jawaban\s*:",
+    r"Javob\s*:",  # TURKIC LANGUAGES START
+    r"Жавоб\s*:",
+    r"Cevap\s*:",
+    r"Джевап\s*:",
+    r"Җавап\s*:",
+    r"Жауап\s*:",
+    r"Jawap\s*:",
+    r"Juwap\s*:",
+    r"جاۋاب\:",
+    r"Cavab\s*:",  # TURKIC LANGUAGES END
     r"Réponse\s*:",
     r"Resposta\s*:",
     r"Jibu\s*:",

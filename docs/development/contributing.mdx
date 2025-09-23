@@ -1,0 +1,223 @@
+---
+title: "Contributing"
+description: "Guidelines for contributing to OpenBench"
+---
+
+Thank you for your interest in contributing to OpenBench!
+This guide covers everything you need to know to contribute effectively.
+
+### Key Development Tools
+
+**uv**: Package manager - use uv add "package>=version" for dependencies  
+**ruff**: Linting and formatting  
+**mypy**: Type checking - required for all new code  
+**pre-commit**: Automated code quality checks - must pass before commits
+**pytest**: Testing framework with integration test markers
+
+## Getting Started
+
+### 1. Fork and Clone
+
+```bash
+# Fork on GitHub, then clone
+git clone https://github.com/YOUR_USERNAME/openbench.git
+cd openbench
+
+# Add upstream remote
+git remote add upstream https://github.com/lelouvincx/openbench.git
+```
+
+### 2. Set Up Development Environment
+
+```bash
+# Create virtual environment with UV
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install in development mode
+uv sync --dev
+
+# CRITICAL: Install pre-commit hooks
+pre-commit install
+
+# Run tests to verify setup
+pytest
+```
+
+### 3. Create Feature Branch
+
+```bash
+# Update main branch
+git checkout main
+git pull upstream main
+
+# Create feature branch
+git checkout -b feature/your-feature-name
+```
+
+## Make Your Changes
+
+### Core Principles
+
+<AccordionGroup>
+  <Accordion title="Single Responsibility">
+    - Focus on one feature, bug fix, or improvement per pull request
+    - Makes code review easier and reduces merge conflicts
+  </Accordion>
+  
+  <Accordion title="Clear Separation of Concerns (SoC)">
+    - Keep functions small and focused
+    - Use clear interfaces between components
+    - Avoid tight coupling between modules
+  </Accordion>
+  
+  <Accordion title="Documentation and Readability">
+    - Use type hints for clarity and validation
+    - Write docstrings for all public functions and classes
+    - Use descriptive variable and function names
+  </Accordion>
+  
+  <Accordion title="Standardized Structure">
+    - Follow PEP 8 with a line length of 88 characters
+    - Mirror OpenBench/InspectAI conventions
+    - Use consistent formatting and naming patterns
+    - Maintain consistency with existing codebase
+  </Accordion>
+</AccordionGroup>
+
+### Testing
+
+Write unit tests for all new functionality. Aim for high test coverage including edge cases and error conditions.
+
+```python   tests/test_my_feature.py
+import pytest
+from openbench.my_module import my_function
+
+def test_my_function():
+    """Test my_function with valid input"""
+    result = my_function("input")
+    assert result == "expected"
+
+def test_my_function_edge_case():
+    """Test my_function with edge case"""
+    with pytest.raises(ValueError):
+        my_function(None)
+```
+
+```bash
+# Run all tests
+pytest
+
+# Run specific test file
+pytest tests/test_my_feature.py
+```
+
+### Code Quality Checks
+
+```bash
+# Run all pre-commit hooks
+pre-commit run --all-files
+
+# Individual checks
+ruff check .          # Linting
+ruff format .         # Formatting
+mypy .               # Type checking
+```
+
+## Submitting Changes
+
+### Commits
+
+Follow [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) structure:  
+`<type>(<scope>): <subject>`
+
+```
+# Examples
+feat(mmlu): add multilingual support
+fix(scorer): handle empty responses correctly
+docs(readme): update installation instructions
+test(humaneval): add integration tests
+refactor(registry): simplify task loading
+chore(deps): update inspect-ai to 0.3.0
+```
+
+### Pull Requests
+
+#### 1. Before Opening PR
+
+```bash
+# Ensure tests pass
+pytest
+
+# Run pre-commit hooks
+pre-commit run --all-files
+
+# Update from upstream
+git fetch upstream
+git rebase upstream/main
+```
+
+#### 2. PR Description Template
+
+```markdown expandable
+## Summary
+
+<!-- Briefly describe what this PR does -->
+
+## What are you adding?
+
+<!-- Mark with 'x' -->
+- [ ] Bug fix (non-breaking change which fixes an issue)
+- [ ] New benchmark/evaluation
+- [ ] New model provider
+- [ ] CLI enhancement
+- [ ] Performance improvement
+- [ ] Documentation update
+- [ ] API/SDK feature
+- [ ] Integration (CI/CD, tools)
+- [ ] Export/import functionality
+- [ ] Code refactoring
+- [ ] Breaking change
+- [ ] Other
+
+## Changes Made
+
+<!-- List the main changes in bullet points -->
+
+## Testing
+
+<!-- Describe how you tested your changes -->
+- [ ] I have run the existing test suite (`pytest`)
+- [ ] I have added tests for my changes
+- [ ] I have tested with multiple model providers (if applicable)
+- [ ] I have run pre-commit hooks (`pre-commit run --all-files`)
+
+## Checklist
+
+- [ ] My code follows the project's style guidelines
+- [ ] I have performed a self-review of my own code
+- [ ] I have commented my code, particularly in hard-to-understand areas
+- [ ] I have made corresponding changes to the documentation (if applicable)
+- [ ] My changes generate no new warnings
+- [ ] I have added tests that prove my fix is effective or that my feature works
+- [ ] New and existing unit tests pass locally with my changes
+
+## Related Issues
+
+<!-- Link any related issues -->
+
+## Additional Context
+
+<!-- Add any other context about the pull request here -->
+```
+
+#### 3. Review Process
+
+1. Maintainers will review your PR
+2. Address feedback promptly
+3. Once approved, we'll squash and merge your PR
+4. Your contribution will be part of the next release!
+
+<br/>
+Thank you for contributing to OpenBench!
+We are grateful for your support in making language model evaluation more accessible and reliable. 🫶

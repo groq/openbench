@@ -1,0 +1,50 @@
+---
+title: "bench describe"
+description: "Get detailed information about a specific benchmark"
+---
+
+## Overview
+
+The `bench describe` command provides comprehensive information about a specific benchmark, including size, format, metrics, and usage examples.
+
+## Usage
+
+```bash
+bench describe <benchmark_name> 
+```
+
+## Arguments
+
+| Argument | Description | 
+|----------|-------------|
+| `benchmark_name` | Name of the benchmark to describe |
+
+## Example Usage
+
+### Basic Usage
+
+```bash
+bench describe mmlu
+```
+
+``` x bench describe example output
+MMLU (cais/mmlu)
+
+Metadata
+────────────────────────────────────────
+  Description        Massive Multitask Language Understanding - 57 academic subjects from the cais/mmlu dataset  
+  Category           Core Benchmarks                                                                             
+  Command            bench eval mmlu                                                                             
+  Tags               #multiple-choice #knowledge #reasoning #multitask                                           
+
+Configuration
+────────────────────────────────────────
+  Temperature        0.50    
+  Dataset Size       14,042  
+
+Task Arguments
+────────────────────────────────────────
+  Language           EN-US  
+
+Run with: bench eval mmlu
+```

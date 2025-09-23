@@ -1,0 +1,129 @@
+---
+title: "OpenBench"
+description: "Provider-agnostic, open-source evaluation infrastructure for language models"
+---
+
+## Welcome to OpenBench!
+
+OpenBench is [Groq](https://groq.com/)'s open-source framework for standardized, reproducible benchmarking of large language models (LLMs).
+Our goal is to make evaluation both rigorous and accessible:
+
+- Run industry-standard benchmarks easily on any model, wherever it’s hosted.
+- Design and run evaluations tailored to your specific needs.
+- Choose from 30+ evaluation suites spanning knowledge, reasoning, coding, mathematics, and more.
+
+With OpenBench, you can build **trust** in model performance through transparent, reproducible, and domain-relevant evaluation.
+
+## Quick Start
+
+<Card
+  title="Start Using OpenBench Now →"
+  icon="rocket"
+  href="/quickstart"
+  horizontal
+>
+  Install OpenBench and run your first benchmark in < 60 seconds.
+</Card>
+
+## Key Features
+
+<Columns cols={3}>
+  <Card
+    title="Simple CLI"
+    icon="terminal"
+    href="/cli/overview">
+    <div class="flex flex-col h-full">
+      <p>All your eval needs accessible from the command line.</p>
+      <br />
+      <p class="mt-auto">*See more on CLI usage. →*</p>
+    </div>
+  </Card>
+  <Card
+    title="Diverse Benchmarks"
+    icon="grip"
+    href="/benchmarks_catalog"
+  >  
+    <div class="flex flex-col h-full">
+      <p>30+ reproducible evaluation suites, and growing.</p>
+      <br />
+      <p class="mt-auto">*See available benchmarks. →*</p>
+    </div>
+  </Card>
+  <Card
+    title="Extensible Framework"
+    icon="expand"
+    href="/development/architecture"
+  >
+    <div class="flex flex-col h-full">
+      <p>Shared structure and utilities make it easy to add new evals.</p>
+      <br />
+      <p class="mt-auto">*Learn about our eval structure.* →</p>
+    </div>
+  </Card>
+</Columns>
+
+## Works with Any Model Provider
+
+OpenBench supports 15+ model providers out of the box.
+
+<Columns cols={3}>
+  <Card title="Groq" icon="microchip">
+    Blazing fast inference
+    ```bash
+    groq/llama-3.3-70b
+    ```
+  </Card>
+  <Card title="OpenAI" icon="brain">
+    GPT-4, o3, and more
+    ```bash
+    openai/gpt-4o
+    ```
+  </Card>
+  <Card title="Anthropic" icon="robot">
+    Claude Sonnet & Opus
+    ```bash
+    anthropic/claude-3-5-sonnet
+    ```
+  </Card>
+  <Card title="Google" icon="google">
+    Gemini models
+    ```bash
+    google/gemini-2.5-pro
+    ```
+  </Card>
+  <Card title="Local" icon="computer">
+    Ollama & vLLM
+    ```bash
+    ollama/llama3.1:70b
+    ```
+  </Card>
+  <Card
+    title="15+ More"
+    icon="ellipsis"
+    href="/configuration#model-providers"
+  >
+    AWS Bedrock, Azure, Cohere, Together, and more.  
+
+    *See a complete list of supported model providers.*
+  </Card>
+</Columns>
+
+## Join the Community
+
+<Card
+  title="GitHub Repository"
+  icon="github"
+  href="https://github.com/groq/openbench"
+  horizontal
+>
+  Star us on GitHub and contribute to the project!
+</Card>
+
+<Card
+  title="Report Issues"
+  icon="bug"
+  href="https://github.com/groq/openbench/issues"
+  horizontal
+>
+  Found a bug or have a feature request? Let us know!
+</Card>

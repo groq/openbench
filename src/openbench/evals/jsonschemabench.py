@@ -7,52 +7,12 @@ https://arxiv.org/html/2501.10868
 Dataset: https://huggingface.co/datasets/epfl-dlab/JSONSchemaBench
 """
 
-import json
-from jsonschema import Draft202012Validator
 from inspect_ai import Task, task
-from inspect_ai.solver import TaskState, Generate, solver
-from inspect_ai.model import GenerateConfig, ResponseSchema, ModelOutput
+from inspect_ai.model import GenerateConfig
 
 from openbench.datasets.jsonschemabench import get_dataset, Compatibility
 from openbench.scorers.json_schema import json_schema_scorer
-
-
-@solver
-def response_schema_solver(use_response_schema: bool = False, strict: bool = False):
-    """Apply per-sample ResponseSchema for supported providers (OpenAI, Google, Mistral)."""
-
-    async def solve(state: TaskState, generate: Generate) -> TaskState:
-        if not state.metadata or "schema" not in state.metadata:
-            return await generate(state)
-
-        # Skip ResponseSchema if disabled
-        if not use_response_schema:
-            return await generate(state)
-
-        try:
-            schema_str = state.metadata["schema"]
-            schema_dict = json.loads(schema_str)
-
-            # Assert that it's a valid JSON Schema
-            Draft202012Validator.check_schema(schema_dict)
-
-            return await generate(
-                state,
-                response_schema=ResponseSchema(
-                    name="json_schema_output", json_schema=schema_dict, strict=strict
-                ),
-            )
-
-        except Exception as e:
-            # Schema validation failed - mark as API error instead of falling back
-            error_msg = f"schema_validation_error (strict={strict}): {str(e)}"
-
-            state.output = ModelOutput.from_content(
-                model="", content="", error=error_msg
-            )
-            return state
-
-    return solve
+from openbench.solvers.jsonschemabench import response_schema_solver
 
 
 @task

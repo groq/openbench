@@ -1,0 +1,51 @@
+---
+title: "CLI Overview"
+description: "Command-line interface for running OpenBench evaluations"
+---
+
+## Introduction
+
+The OpenBench CLI provides a simple, powerful interface for running benchmark evaluations across 15+ model providers. All commands follow a consistent pattern and provide detailed feedback.
+
+## Command Structure
+
+All OpenBench commands follow this pattern:
+
+```bash
+bench <command> [arguments] [options]
+```
+
+## Available Commands
+
+<CardGroup cols={2}>
+  <Card title="eval" icon="play" href="/cli/eval">
+    Run a benchmark evaluation
+  </Card>
+  
+  <Card title="eval-retry" icon="rotate" href="/cli/eval-retry">
+    Retry a failed evaluation
+  </Card>
+
+  <Card title="list" icon="list" href="/cli/list">
+    List all available benchmarks with descriptions
+  </Card>
+  
+  <Card title="describe" icon="info" href="/cli/describe">
+    Get detailed information about a specific benchmark
+  </Card>
+  
+  <Card title="view" icon="eye" href="/cli/view">
+    View previous evaluation results
+  </Card>
+</CardGroup>
+
+## Getting Help
+
+```bash
+# General help
+bench --help
+
+# Command-specific help
+bench eval --help
+bench describe --help
+```

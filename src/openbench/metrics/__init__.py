@@ -1,4 +1,4 @@
-"""Common, reusable metrics."""
+"""Export global metrics."""
 
 from openbench.metrics.grouped import grouped
 

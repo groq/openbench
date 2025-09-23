@@ -1,0 +1,110 @@
+---
+title: "Installation"
+description: "Get OpenBench up and running in your environment"
+---
+
+## Prerequisites
+
+### System Requirements
+
+- **Python**: 3.10 or higher
+- **Operating System**: macOS, Linux, or Windows
+
+### Install UV (Recommended)
+
+We recommend using [uv](https://docs.astral.sh/uv/) for Python package management. It's significantly faster than pip and handles virtual environments automatically.
+
+<Tabs>
+  <Tab title="macOS/Linux">
+    ```bash
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    ```
+  </Tab>
+  <Tab title="Windows">
+    ```powershell
+    powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+    ```
+  </Tab>
+  <Tab title="Homebrew">
+    ```bash
+    brew install uv
+    ```
+  </Tab>
+</Tabs>
+
+## Install OpenBench
+
+### Quick Install with UV
+
+```bash
+# Create a virtual environment and install OpenBench
+uv venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+uv pip install openbench
+```
+
+### Alternative: Install with pip
+
+```bash
+# Create a virtual environment
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# Install OpenBench
+pip install openbench
+```
+
+### Install from Source
+
+For development or to get the latest features:
+
+```bash
+# Clone the repository
+git clone https://github.com/groq/openbench.git
+cd openbench
+
+# Setup with UV (recommended)
+uv venv && uv sync --dev
+source .venv/bin/activate
+
+# Or setup with pip
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
+```
+
+## Special Installation (Optional)
+
+For safely running code execution benchmarks in a sandboxed environment:
+
+### Install Docker
+
+<Tabs>
+  <Tab title="macOS">
+    Download and install [Docker Desktop for Mac](https://www.docker.com/products/docker-desktop/)
+  </Tab>
+  <Tab title="Linux">
+    ```bash
+    # Ubuntu/Debian
+    sudo apt-get update
+    sudo apt-get install docker.io
+    sudo systemctl start docker
+    sudo usermod -aG docker $USER
+    ```
+  </Tab>
+  <Tab title="Windows">
+    Download and install [Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
+  </Tab>
+</Tabs>
+
+### Verify Docker
+
+```bash
+docker --version
+docker run hello-world
+```
+
+<Warning>
+Code generation benchmarks execute model code. We suggest using dockerized execution to ensure safety.  
+(e.g. `humaneval --model openai/gpt-4o --sandbox docker`).
+</Warning>

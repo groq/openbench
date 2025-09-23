@@ -1,0 +1,50 @@
+---
+title: "bench eval-retry"
+description: "Retry failed or incomplete evaluations"
+---
+
+## Overview
+
+The `bench eval-retry` command allows you to resume or retry evaluations that failed, timed out, or were interrupted. It automatically identifies incomplete samples and reruns only those that need it.
+
+## Usage
+
+```bash
+bench eval-retry <log_file> [options]
+```
+
+## Arguments
+
+| Argument | Description | Required |
+|----------|-------------|----------|
+| `log_file` | Path to the evaluation log file | Yes |
+
+## Options
+
+| Option | Description |
+|--------|-------------|
+| `--max-connections` | Concurrent connections
+| `--max-subprocesses` | Parallel subprocesses
+| `--max-retries` | Maximum retry attempts
+| `--timeout` | Request timeout (seconds)
+| `--score` <br /> `--no_score`| Grade the benchmark, or leave unscored
+| `--fail-on-error` <br /> `--no_fail_on_error` | Stop on first error
+| `--retry_on_error` | Retry samples if they encounter errors (by default, no retries occur). Specify --retry-on-error to retry a single time, or specify e.g. --retry-on-error=3 to retry multiple times.
+| `--sandbox_cleanup` <br /> `--no_sandbox_cleanup` | Cleanup sandbox environments after task completes
+| `--trace` | Trace message interactions with evaluated model to terminal
+| `--log_dir` | Directory for log files
+| `--log_samples` <br /> `--no_log_samples` | Log detailed samples and scores
+| `--log_images` <br /> `--no_log_images` | Log base64 encoded images
+| `--log_buffer` | Number of samples to buffer before writing to log
+| `--debug_errors` | Enable debug mode for errors
+| `--debug` | Enable debug mode with full stack traces
+
+## Example Retry Configuration
+
+```bash
+# Retry with adjusted parameters
+bench eval-retry logs/inspect_eval/failed_eval.json \
+  --max-retries 10 \   # More retry attempts
+  --timeout 180 \   # Increase timeout
+  --max-connections 2   # Reduce concurrent requests
+```

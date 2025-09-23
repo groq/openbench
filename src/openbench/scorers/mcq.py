@@ -240,3 +240,4 @@ def robust_mcq_scorer() -> Callable:
 
 # MMLU-specific scorer with category grouping
 mmlu_simple_eval_scorer = create_mcq_scorer(group_keys=["category"])
+tumlu_simple_eval_scorer = create_mcq_scorer(group_keys=["subject"])

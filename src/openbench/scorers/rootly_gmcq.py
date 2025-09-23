@@ -3,7 +3,7 @@ from inspect_ai.solver import TaskState
 
 
 @scorer(metrics=[accuracy(), stderr()])
-def custom_scorer():
+def rootly_gmcq_scorer():
     async def score(state: TaskState, target: Target) -> Score:
         # Get the text content from the last message
         last_message = state.messages[-1]
