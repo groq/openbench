@@ -7,7 +7,7 @@ https://github.com/icip-cas/LiveMCPBench/blob/main/baseline/mcp_copilot/mcp_conn
 
 import logging
 from contextlib import AsyncExitStack
-from typing import Any
+from typing import Any, TextIO
 
 import mcp.types as types
 from mcp.client.session import ClientSession
@@ -16,6 +16,8 @@ from mcp.client.stdio import StdioServerParameters, stdio_client
 
 from .schemas import Server
 import os
+from pathlib import Path
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +29,18 @@ class MCPConnection:
         self.server = server
         self._session: ClientSession | None = None
         self._exit_stack = AsyncExitStack()
+        self._stderr_fp: TextIO | None = None
+
+    def _stderr_log_path(self) -> Path:
+        """Compute the stderr log file path for the spawned process.
+
+        By default, write to ~/.cache/openbench/livemcpbench/logs/<server>/<ts>.stderr.log
+        """
+        base = Path(os.path.expanduser("~/.cache/openbench/livemcpbench/logs"))
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        path = base / self.server.name / f"{ts}.stderr.log"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        return path
 
     async def connect(self) -> None:
         """Establish connection to the MCP server using STDIO or SSE."""
@@ -40,22 +54,42 @@ class MCPConnection:
                     "http_proxy",
                     "https_proxy",
                     "no_proxy",
-                    # Playwright browsers location passthrough
                     "PLAYWRIGHT_BROWSERS_PATH",
                 ]
-                env = self.server.config.env
+                env = dict(self.server.config.env or {})
                 for proxy_env in PROXY_ENV_LIST:
                     if proxy_env in os.environ:
-                        env = env or {}
                         env[proxy_env] = os.environ[proxy_env]
+                silent_defaults = {
+                    "NODE_NO_WARNINGS": "1",
+                    "PYTHONWARNINGS": "ignore",
+                    "NO_COLOR": "1",
+                    "LOG_LEVEL": "error",
+                    "RUST_LOG": "error",
+                    "DEBUG": "0",
+                    "PWDEBUG": "0",
+                }
+                for k, v in silent_defaults.items():
+                    env.setdefault(k, v)
                 self.server.config.env = env
 
                 # STDIO connection
                 server_params = StdioServerParameters(
                     **self.server.config.model_dump(include={"command", "args", "env"})
                 )
+                # Redirect stderr to file to avoid polluting the eval UI
+                try:
+                    self._stderr_fp = open(
+                        self._stderr_log_path(), "a", encoding="utf-8"
+                    )
+                except Exception:
+                    # Fallback to null device if file can't be opened
+                    self._stderr_fp = open(os.devnull, "w", encoding="utf-8")
+
+                # mypy: ensure non-None before passing to stdio_client
+                assert self._stderr_fp is not None
                 read, write = await self._exit_stack.enter_async_context(
-                    stdio_client(server_params)
+                    stdio_client(server_params, errlog=self._stderr_fp)
                 )
                 session = await self._exit_stack.enter_async_context(
                     ClientSession(read, write)
@@ -79,7 +113,7 @@ class MCPConnection:
             self.server.tools = list_tools_result.tools
             logger.debug(f"Connected to server: {self.server.name}")
         except Exception as e:
-            logging.warning(f"Error initializing server {self.server.name}: {e}")
+            logger.warning(f"Error initializing server {self.server.name}: {e}")
             await self.aclose()
             raise
 
@@ -105,7 +139,16 @@ class MCPConnection:
             await self._exit_stack.aclose()
             self._session = None
         except Exception as e:
-            logging.warning(f"Error during cleanup of server {self.server.name}: {e}")
+            # Suppress noisy cleanup warnings that can occur when child MCP servers
+            logger.debug(
+                "Suppressed cleanup error for server %s: %s", self.server.name, e
+            )
+        finally:
+            try:
+                if self._stderr_fp and not self._stderr_fp.closed:
+                    self._stderr_fp.close()
+            except Exception:
+                pass
 
     async def __aenter__(self):
         await self.connect()

@@ -24,7 +24,7 @@ from shutil import which
 
 def _default_embeddings_path() -> Path:
     embedding_model = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
-    abstract_model = os.getenv("ABSTRACT_MODEL", "gpt-4o-mini")
+    abstract_model = os.getenv("ABSTRACT_MODEL", "gpt-4.1-2025-04-14")
     return (
         _user_cache_dir()
         / "config"

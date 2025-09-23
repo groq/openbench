@@ -3,9 +3,8 @@
 Implements the same judging approach as LiveMCPBench's baseline evaluator.
 """
 
-import re
 import json
-from typing import Callable, Any, Dict, List, Tuple
+from typing import Callable, Any, Dict, List, Tuple, Sequence
 from inspect_ai.scorer import (
     accuracy,
     scorer,
@@ -18,16 +17,45 @@ from inspect_ai.scorer import (
     SampleScore,
 )
 from inspect_ai.solver import TaskState
-from inspect_ai.model import get_model, ChatMessageUser, Model, ChatMessageAssistant
+from inspect_ai.model import (
+    get_model,
+    ChatMessageUser,
+    Model,
+    ChatMessageAssistant,
+    ChatMessageSystem,
+    ChatMessageTool,
+)
 from openbench.metrics.grouped import grouped
 from openbench.tools.livemcpbench.copilot.upstream_cache import get_tools_json_cached
 from openbench.utils.text import (
     LIVEMCPBENCH_GRADER_USER_PROMPT,
     LIVEMCPBENCH_GRADER_SYSTEM_MSG,
+    LIVEMCPBENCH_KEY_POINTS_SYSTEM_MSG,
+    LIVEMCPBENCH_VERDICT_PATTERN,
 )
 
 
-VERDICT_PATTERN = re.compile(r"Thoughts:\s*(.+?)\s*Status:\s*(\w+)", re.DOTALL)
+async def identify_key_points(task: str, model: Model) -> str:
+    """Identify key points from a task using a model call.
+
+    Args:
+        task: The task description to analyze
+        model: The Model to use for identification
+
+    Returns:
+        String containing the identified key points
+    """
+
+    messages: list[
+        ChatMessageSystem | ChatMessageUser | ChatMessageAssistant | ChatMessageTool
+    ] = [
+        ChatMessageUser(
+            content=f"System: {LIVEMCPBENCH_KEY_POINTS_SYSTEM_MSG}\n\nTask: {task}"
+        )
+    ]
+
+    response = await model.generate(messages)
+    return response.completion
 
 
 _TOOL_MAP: Dict[str, Dict[str, Dict[str, Any]]] | None = None
@@ -80,10 +108,13 @@ def _format_tool_description(
     )
 
 
-def _extract_tool_calls_and_descriptions(messages: List[Any]) -> Tuple[List[str], str]:
+def _extract_tool_calls_and_descriptions(
+    messages: Sequence[Any],
+) -> Tuple[List[str], str]:
     tool_map = _load_tool_map()
     call_lines: List[str] = []
     descriptions: List[str] = []
+    unique_descriptions: set[str] = set()  # Track unique descriptions
 
     for message in messages or []:
         # OpenAI-style tool_calls
@@ -126,9 +157,12 @@ def _extract_tool_calls_and_descriptions(messages: List[Any]) -> Tuple[List[str]
 
                     server_name = str(parsed.get("server_name", "not_given"))
                     tool_name = str(parsed.get("tool_name", "not_given"))
-                    descriptions.append(
-                        _format_tool_description(tool_map, server_name, tool_name)
+                    description = _format_tool_description(
+                        tool_map, server_name, tool_name
                     )
+                    if description not in unique_descriptions:
+                        unique_descriptions.add(description)
+                        descriptions.append(description)
 
         # Anthropic-style content blocks with type: tool_use
         content = None
@@ -173,9 +207,12 @@ def _extract_tool_calls_and_descriptions(messages: List[Any]) -> Tuple[List[str]
 
                         server_name = str(parsed.get("server_name", "not_given"))
                         tool_name = str(parsed.get("tool_name", "not_given"))
-                        descriptions.append(
-                            _format_tool_description(tool_map, server_name, tool_name)
+                        description = _format_tool_description(
+                            tool_map, server_name, tool_name
                         )
+                        if description not in unique_descriptions:
+                            unique_descriptions.add(description)
+                            descriptions.append(description)
 
     desc_text = "\n\n".join(descriptions).strip() if descriptions else ""
     return call_lines, desc_text
@@ -186,15 +223,13 @@ def livemcpbench_metrics() -> Metric:
     """Custom metrics for LiveMCPBench including category breakdown."""
 
     def metric_calculator(scores: list[SampleScore]) -> Value:
-        # Calculate overall accuracy
+        # Calculate overall counts (leave overall accuracy to built-in metric)
         correct_count = sum(
             1 for sample_score in scores if sample_score.score.value == 1.0
         )
         total_count = len(scores)
 
-        accuracy = correct_count / total_count if total_count > 0 else 0.0
-
-        # Calculate category-wise metrics
+        # Calculate category-wise metrics (avoid duplicating grouped accuracy)
         category_stats = {}
         for sample_score in scores:
             # Get category from score metadata
@@ -212,19 +247,15 @@ def livemcpbench_metrics() -> Metric:
             elif sample_score.score.value == 0.5:
                 category_stats[category]["partial"] += 1
 
-        # Calculate category accuracies
+        # Calculate category partial accuracies only (grouped() reports accuracy/stderr)
         category_accuracies = {}
         for category, stats in category_stats.items():
             if stats["total"] > 0:
-                category_accuracies[f"{category}_accuracy"] = (
-                    stats["correct"] / stats["total"]
-                )
                 category_accuracies[f"{category}_partial_accuracy"] = (
                     stats["correct"] + stats["partial"]
                 ) / stats["total"]
 
         return {
-            "accuracy": accuracy,
             "correct_count": correct_count,
             "total_count": total_count,
             **category_accuracies,
@@ -238,10 +269,10 @@ def livemcpbench_metrics() -> Metric:
         accuracy(),
         stderr(),
         livemcpbench_metrics(),
-        grouped(group_key="category", metric=[accuracy(), stderr()]),
+        grouped(group_key="category", metric=[accuracy(), stderr()], all=False),
     ]
 )
-def livemcpbench_scorer(model: str = "openai/gpt-4.1-2025-04-14") -> Callable:
+def livemcpbench_scorer(model: str = "openai/gpt-4.1-mini-2025-04-14") -> Callable:
     """LiveMCPBench scorer using model-based grading.
 
     Args:
@@ -253,7 +284,6 @@ def livemcpbench_scorer(model: str = "openai/gpt-4.1-2025-04-14") -> Callable:
     grader_model: Model = get_model(model)
 
     async def score(state: TaskState, target: Target) -> Score:
-        # Inputs
         task = state.input_text
         response = (
             state.output.completion
@@ -268,7 +298,6 @@ def livemcpbench_scorer(model: str = "openai/gpt-4.1-2025-04-14") -> Callable:
         if state.metadata:
             execution_error = state.metadata.get("execution_error")
             error_message = state.metadata.get("error_message")
-        # Tool call history + tool descriptions (baseline uses execute-tool calls)
         try:
             tool_calls, tool_descs = _extract_tool_calls_and_descriptions(
                 state.messages or []
@@ -281,28 +310,28 @@ def livemcpbench_scorer(model: str = "openai/gpt-4.1-2025-04-14") -> Callable:
             else "No tool calls made"
         )
 
-        # Get annotator metadata from state metadata
         annotator_metadata = (
             state.metadata.get("annotator_metadata", {}) if state.metadata else {}
         )
 
-        # Key Points from annotator metadata Steps (assumed present)
-        key_points_obj = annotator_metadata.get("Steps", "")
-        if isinstance(key_points_obj, list):
-            key_points = "\n".join(str(s) for s in key_points_obj)
-        else:
-            key_points = str(key_points_obj)
+        # Use model-based identification, fallback to annotator metadata
+        try:
+            key_points = await identify_key_points(task, grader_model)
+        except Exception:
+            # Fallback to annotator metadata if model call fails
+            key_points_obj = annotator_metadata.get("Steps", "")
+            if isinstance(key_points_obj, list):
+                key_points = "\n".join(str(s) for s in key_points_obj)
+            else:
+                key_points = str(key_points_obj)
 
-        # Handle execution errors - score as failure but still run through grader
         score_value = 0.0
         grading_text = ""
 
         if execution_error:
-            # Automatically score as failure for execution errors
             score_value = 0.0
             grading_text = f"Task failed due to execution error ({execution_error}): {error_message}"
 
-            # Add error information to the response context for the grader
             response_with_error = (
                 f"{response}\n\n[EXECUTION ERROR: {execution_error} - {error_message}]"
             )
@@ -310,7 +339,7 @@ def livemcpbench_scorer(model: str = "openai/gpt-4.1-2025-04-14") -> Callable:
             response_with_error = response
 
             try:
-                # Build baseline-aligned prompt
+                # Build baseline prompt
                 prompt_text = (
                     LIVEMCPBENCH_GRADER_SYSTEM_MSG
                     + "\n\n"
@@ -322,12 +351,16 @@ def livemcpbench_scorer(model: str = "openai/gpt-4.1-2025-04-14") -> Callable:
                         tool_descriptions=tool_descs,
                     )
                 )
-                grading_response = await grader_model.generate(
-                    [ChatMessageUser(content=prompt_text)]
-                )
+                grading_messages: list[
+                    ChatMessageSystem
+                    | ChatMessageUser
+                    | ChatMessageAssistant
+                    | ChatMessageTool
+                ] = [ChatMessageUser(content=prompt_text)]
+                grading_response = await grader_model.generate(grading_messages)
                 grading_text = grading_response.completion
 
-                m = VERDICT_PATTERN.search(grading_text)
+                m = LIVEMCPBENCH_VERDICT_PATTERN.search(grading_text)
                 judge_status = m.group(2).strip() if m else grading_text
                 score_value = 1.0 if "success" in judge_status.lower() else 0.0
 

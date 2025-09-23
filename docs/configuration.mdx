@@ -2,6 +2,7 @@
 title: "Configuration"
 description: "Set OpenBench model and evaluation behavior"
 ---
+
 ## Configuration Methods
 
 OpenBench can be configured through multiple methods, in order of precedence:
@@ -13,8 +14,8 @@ OpenBench can be configured through multiple methods, in order of precedence:
 bench mmlu --max_tokens=10000 --temperature=0.5
 ```
 
-See what else you can do with the [OpenBench CLI.](/cli/overview)  
-  
+See what else you can do with the [OpenBench CLI.](/cli/overview)
+
 2. **Environment Variables**
 
 ```bash
@@ -23,7 +24,7 @@ export BENCH_MAX_TOKENS=10000
 export BENCH_TEMPERATURE=0.5
 ```
 
-3. **Configuration Files** (`.env` files)  
+3. **Configuration Files** (`.env` files)
 
 ```bash .env
 # Write default values to config file
@@ -46,82 +47,82 @@ If not defined through any of the above methods, parameters resort to **default 
 
 ### Model Configuration
 
-| CLI Command        | Environment Variable   | Description                                   |
-|--------------------|------------------------|-----------------------------------------------|
-| `--model`          | `BENCH_MODEL`          | Model(s) to evaluate.                         |
-| `--model-base-url` | `BENCH_MODEL_BASE_URL` | Base URL for model(s).                        |
-| `--model-role`     | `BENCH_MODEL_ROLE`     | Map role(s) to specific models.               |
+| CLI Command        | Environment Variable   | Description                     |
+| ------------------ | ---------------------- | ------------------------------- |
+| `--model`          | `BENCH_MODEL`          | Model(s) to evaluate.           |
+| `--model-base-url` | `BENCH_MODEL_BASE_URL` | Base URL for model(s).          |
+| `--model-role`     | `BENCH_MODEL_ROLE`     | Map role(s) to specific models. |
 
 Use `-M` Flag for Other Model-Specific Arguments  
 (e.g. `bench eval simpleqa --model openai/o3-2025-04-16 -M reasoning_effort=high`)
 
 ### Task Configuration
 
-| CLI Command        | Environment Variable   | Description                                   |
-|--------------------|------------------------|-----------------------------------------------|
-| `--epochs`         | `BENCH_EPOCHS`         | Number of epochs to run each evaluation.      |
-| `--limit`          | `BENCH_LIMIT`          | Limit evaluated samples (single number or range). |
-| `--message-limit`  | `BENCH_MESSAGE_LIMIT`  | Maximum number of messages per sample.        |
-| `--score / --no-score` | `BENCH_SCORE`      | Grade the benchmark, or skip scoring (can score later). |
+| CLI Command            | Environment Variable  | Description                                             |
+| ---------------------- | --------------------- | ------------------------------------------------------- |
+| `--epochs`             | `BENCH_EPOCHS`        | Number of epochs to run each evaluation.                |
+| `--limit`              | `BENCH_LIMIT`         | Limit evaluated samples (single number or range).       |
+| `--message-limit`      | `BENCH_MESSAGE_LIMIT` | Maximum number of messages per sample.                  |
+| `--score / --no-score` | `BENCH_SCORE`         | Grade the benchmark, or skip scoring (can score later). |
 
 Use `-T` Flag for Other Task-Specific Arguments  
 (e.g. `bench eval graphwalks --model ollama/llama3.1:70b -T task=parents`)
 
 ### Generation Settings
 
-| CLI Command        | Environment Variable     | Description                                   |
-|--------------------|--------------------------|-----------------------------------------------|
-| `--temperature`    | `BENCH_TEMPERATURE`      | Model sampling temperature.                   |
-| `--top-p`          | `BENCH_TOP_P`            | Nucleus sampling.                             |
-| `--max-tokens`     | `BENCH_MAX_TOKENS`       | Maximum tokens for model response.            |
-| `--seed`           | `BENCH_SEED`             | Random seed for deterministic generation.     |
+| CLI Command     | Environment Variable | Description                               |
+| --------------- | -------------------- | ----------------------------------------- |
+| `--temperature` | `BENCH_TEMPERATURE`  | Model sampling temperature.               |
+| `--top-p`       | `BENCH_TOP_P`        | Nucleus sampling.                         |
+| `--max-tokens`  | `BENCH_MAX_TOKENS`   | Maximum tokens for model response.        |
+| `--seed`        | `BENCH_SEED`         | Random seed for deterministic generation. |
 
 ### Performance & Concurrency
 
-| CLI Command        | Environment Variable     | Description                                   |
-|--------------------|--------------------------|-----------------------------------------------|
-| `--max-connections` | `BENCH_MAX_CONNECTIONS` | Maximum number of parallel requests.          |
-| `--max-subprocesses`| `BENCH_MAX_SUBPROCESSES`| Maximum number of parallel subprocesses.      |
-| `--timeout`        | `BENCH_TIMEOUT`          | Timeout per model API request (seconds).      |
-| `--max-retries`    | `BENCH_MAX_RETRIES`      | Maximum number of retries for API requests.   |
-| `--retry-on-error` | `BENCH_RETRY_ON_ERROR`   | Retry samples on errors (set number of retries). |
-| `--fail-on-error`  | `BENCH_FAIL_ON_ERROR`    | Failure threshold for sample errors (percentage or count). |
-| `--no-fail-on-error` | `BENCH_NO_FAIL_ON_ERROR` | Do not fail evaluation if errors occur.      |
+| CLI Command          | Environment Variable     | Description                                                |
+| -------------------- | ------------------------ | ---------------------------------------------------------- |
+| `--max-connections`  | `BENCH_MAX_CONNECTIONS`  | Maximum number of parallel requests.                       |
+| `--max-subprocesses` | `BENCH_MAX_SUBPROCESSES` | Maximum number of parallel subprocesses.                   |
+| `--timeout`          | `BENCH_TIMEOUT`          | Timeout per model API request (seconds).                   |
+| `--max-retries`      | `BENCH_MAX_RETRIES`      | Maximum number of retries for API requests.                |
+| `--retry-on-error`   | `BENCH_RETRY_ON_ERROR`   | Retry samples on errors (set number of retries).           |
+| `--fail-on-error`    | `BENCH_FAIL_ON_ERROR`    | Failure threshold for sample errors (percentage or count). |
+| `--no-fail-on-error` | `BENCH_NO_FAIL_ON_ERROR` | Do not fail evaluation if errors occur.                    |
 
 ### Logging & Output
 
-| CLI Flag        | Environment Variable   | Description                                   |
-|--------------------|------------------------|-----------------------------------------------|
-| `--logfile`        | `BENCH_OUTPUT`         | Output file for results.                      |
-| `--log-format`     | `BENCH_LOG_FORMAT`     | Output logging format (`eval` / `json`).      |
-| `--display`        | `BENCH_DISPLAY`        | Display type for evaluation progress.         |
-| `--log-samples / --no-log-samples` | `BENCH_LOG_SAMPLES` | Include or exclude detailed samples in logs. |
-| `--log-images / --no-log-images`   | `BENCH_LOG_IMAGES`  | Include or exclude base64 encoded images in logs. |
-| `--log-buffer`     | `BENCH_LOG_BUFFER`     | Number of samples to buffer before writing logs. |
-| `--log-dir`        | `BENCH_LOG_DIR`        | Directory for log files.                      |
+| CLI Flag                           | Environment Variable | Description                                       |
+| ---------------------------------- | -------------------- | ------------------------------------------------- |
+| `--logfile`                        | `BENCH_OUTPUT`       | Output file for results.                          |
+| `--log-format`                     | `BENCH_LOG_FORMAT`   | Output logging format (`eval` / `json`).          |
+| `--display`                        | `BENCH_DISPLAY`      | Display type for evaluation progress.             |
+| `--log-samples / --no-log-samples` | `BENCH_LOG_SAMPLES`  | Include or exclude detailed samples in logs.      |
+| `--log-images / --no-log-images`   | `BENCH_LOG_IMAGES`   | Include or exclude base64 encoded images in logs. |
+| `--log-buffer`                     | `BENCH_LOG_BUFFER`   | Number of samples to buffer before writing logs.  |
+| `--log-dir`                        | `BENCH_LOG_DIR`      | Directory for log files.                          |
 
 ### Sandbox & Execution
 
-| CLI Flag        | Environment Variable       | Description                                   |
-|--------------------|----------------------------|-----------------------------------------------|
-| `--sandbox`        | `BENCH_SANDBOX`            | Environment to run evaluation (`local` or `docker`). |
+| CLI Flag                                   | Environment Variable    | Description                                                 |
+| ------------------------------------------ | ----------------------- | ----------------------------------------------------------- |
+| `--sandbox`                                | `BENCH_SANDBOX`         | Environment to run evaluation (`local` or `docker`).        |
 | `--sandbox-cleanup / --no-sandbox-cleanup` | `BENCH_SANDBOX_CLEANUP` | Cleanup sandbox environments after tasks (or skip cleanup). |
 
 ### Hub Integration
 
-| CLI Flag        | Environment Variable   | Description                                   |
-|--------------------|------------------------|-----------------------------------------------|
-| `--hub-repo`       | `BENCH_HUB_REPO`       | Target Hub dataset repo for logs.             |
-| `--hub-private`    | `BENCH_HUB_PRIVATE`    | Push Hub dataset as private.                  |
+| CLI Flag        | Environment Variable | Description                       |
+| --------------- | -------------------- | --------------------------------- |
+| `--hub-repo`    | `BENCH_HUB_REPO`     | Target Hub dataset repo for logs. |
+| `--hub-private` | `BENCH_HUB_PRIVATE`  | Push Hub dataset as private.      |
 
 ### Debugging & Inspection
 
-| CLI Flag        | Environment Variable   | Description                                   |
-|--------------------|------------------------|-----------------------------------------------|
-| `--debug`          | `BENCH_DEBUG`          | Enable debug mode with full stack traces.     |
-| `--debug-errors`   | `BENCH_DEBUG_ERRORS`   | Enable debug mode for errors only.            |
-| `--trace`          | `BENCH_TRACE`          | Trace message interactions with model.        |
-| `--alpha`          | `BENCH_ALPHA`          | Allow running experimental/alpha benchmarks.  |
+| CLI Flag         | Environment Variable | Description                                  |
+| ---------------- | -------------------- | -------------------------------------------- |
+| `--debug`        | `BENCH_DEBUG`        | Enable debug mode with full stack traces.    |
+| `--debug-errors` | `BENCH_DEBUG_ERRORS` | Enable debug mode for errors only.           |
+| `--trace`        | `BENCH_TRACE`        | Trace message interactions with model.       |
+| `--alpha`        | `BENCH_ALPHA`        | Allow running experimental/alpha benchmarks. |
 
 ## Configuration Examples
 

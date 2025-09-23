@@ -98,7 +98,7 @@ def serve(config: dict[str, Any] | Path | None = None) -> None:
 
     # Ensure embeddings file exists in user cache based on env models
     embedding_model = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
-    abstract_model = os.getenv("ABSTRACT_MODEL", "gpt-4o-mini")
+    abstract_model = os.getenv("ABSTRACT_MODEL", "gpt-4.1-2025-04-14")
 
     output_dir = _user_cache_dir() / "config"
     _ensure_parent_dir(output_dir)
@@ -107,7 +107,7 @@ def serve(config: dict[str, Any] | Path | None = None) -> None:
     # Point Router to this path
     os.environ.setdefault("MCP_DATA_PATH", str(mcp_arg_path))
 
-    # Generate embeddings file if missing (opt-in to avoid blocking evals)
+    # Generate embeddings file if missing
     if not mcp_arg_path.exists():
         if os.getenv("OPENBENCH_COPILOT_AUTOGEN", "0") in {"1", "true", "True"}:
             if os.getenv("OPENBENCH_COPILOT_SILENT", "1") not in {"1", "true", "True"}:
@@ -146,8 +146,6 @@ def serve(config: dict[str, Any] | Path | None = None) -> None:
             finally:
                 _GLOBAL_ROUTER = None
 
-    if os.getenv("OPENBENCH_COPILOT_SILENT", "1") not in {"1", "true", "True"}:
-        print("Starting MCP Copilot server...")
     server = FastMCP("mcp-copilot", lifespan=copilot_lifespan)
 
     @server.tool(

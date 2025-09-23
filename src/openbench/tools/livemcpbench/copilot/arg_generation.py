@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any, Dict, List
 from dotenv import load_dotenv
 from tqdm import tqdm  # type: ignore[import-untyped]
+from openbench.utils.text import LIVEMCPBENCH_TOOL_SUMMARY_PROMPT
 
 import mcp.types as types
 import openai
@@ -27,8 +28,8 @@ embedding_api_url = os.getenv("EMBEDDING_BASE_URL")  # defaults to OpenAI when N
 embedding_dimensions = int(os.getenv("EMBEDDING_DIMENSIONS", "1536"))
 
 abstract_api_key = os.getenv("ABSTRACT_API_KEY") or os.getenv("OPENAI_API_KEY")
-abstract_model = os.getenv("ABSTRACT_MODEL", "gpt-4o-mini")
-abstract_api_url = os.getenv("ABSTRACT_BASE_URL")  # defaults to OpenAI when None
+abstract_model = os.getenv("ABSTRACT_MODEL", "gpt-4.1-2025-04-14")
+abstract_api_url = os.getenv("ABSTRACT_BASE_URL")
 
 
 # Define default paths for config and output files
@@ -91,18 +92,11 @@ class McpArgGenerator:
             [f"- {tool.name}: {tool.description}" for tool in tools]
         )
 
-        prompt = f"""
-You are an expert AI technical writer. Based on the following information about an MCP server, please generate a concise and accurate summary of its core purpose and capabilities.
-
-**Server Name:** {server_name}
-
-**Server Description:** {server_desc}
-
-**Available Tools:**
-{tool_descriptions}
-
-Please return only the generated summary text, without any additional titles or preambles.
-"""
+        prompt = LIVEMCPBENCH_TOOL_SUMMARY_PROMPT.format(
+            server_name=server_name,
+            server_desc=server_desc,
+            tool_descriptions=tool_descriptions,
+        )
         try:
             response = await self.summary_client.chat.completions.create(
                 model=model,

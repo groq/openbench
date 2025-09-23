@@ -55,12 +55,11 @@ def copilot_tool_source(
         "http_proxy",
         "https_proxy",
         "no_proxy",
-        # Playwright browsers cache path
         "PLAYWRIGHT_BROWSERS_PATH",
     }
     env = {k: v for k, v in os.environ.items() if k in passthrough_keys}
     env.setdefault("OPENBENCH_COPILOT_SILENT", "1")
-    # Common flags to suppress noisy child output (best-effort)
+    # Common flags to suppress noisy child output
     env.setdefault("NODE_NO_WARNINGS", "1")
     env.setdefault("PYTHONWARNINGS", "ignore")
     env.setdefault("LOG_LEVEL", env.get("LOG_LEVEL", "error"))

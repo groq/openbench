@@ -13,6 +13,11 @@ import os
 from pathlib import Path
 from typing import Any
 
+from .matcher import ToolMatcher
+from .schemas import Server, ServerConfig
+from .mcp_connection import MCPConnection
+
+
 import mcp.types as types
 
 try:
@@ -38,7 +43,6 @@ def _rewrite_root_path(value: str) -> str:
 
 
 def _rewrite_params_for_root(obj: Any) -> Any:
-    # Recursively replace '/root/...' with sandbox path
     if isinstance(obj, dict):
         return {k: _rewrite_params_for_root(v) for k, v in obj.items()}
     if isinstance(obj, list):
@@ -73,10 +77,6 @@ class Router:
     _default_config_path = PROJECT_ROOT / "config" / "clean_config.json"
 
     def __init__(self, config: dict[str, Any] | Path = _default_config_path):
-        # Lazy import to avoid circulars / optional deps issues at import time
-        from .matcher import ToolMatcher
-        from .schemas import Server, ServerConfig
-
         self.servers: dict[str, Server] = {}
 
         # Load config
@@ -169,7 +169,6 @@ class Router:
         timeout: int = 300,
     ) -> types.CallToolResult:
         """Execute a tool on a given server with a fresh connection."""
-        from .mcp_connection import MCPConnection
 
         async with self.connection_lock:
             server_config = self.servers.get(server_name)

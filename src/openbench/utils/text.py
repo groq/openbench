@@ -1,5 +1,6 @@
 import json
 import tiktoken
+import re
 from inspect_ai.model import (
     ChatMessageUser,
     ChatMessageAssistant,
@@ -99,7 +100,7 @@ D) {option_d}
 LIVEMPCBENCH_SYSTEM_MESSAGE = """
 You are an agent designed to assist users with daily tasks by using external tools. 
 You have access to two tools: a retrieval tool and an execution tool. The retrieval tool allows you to search a large toolset for relevant tools, and the execution tool lets you invoke the tools you retrieved.
-Whenever possible, you should use these tools to get accurate, up-to-date information and to perform file operations.\n\nNote that you can only response to user once, so you should try to provide a complete answer in your response.
+Whenever possible, you should use these tools to get accurate, up-to-date information and to perform file operations.\n\nNote that you can only respond to user once, so you should try to provide a complete answer in your response.
 
 When you have completed the task and have an answer, call the submit()
 tool to report it.
@@ -123,8 +124,7 @@ Status: "success" or "failure""".strip()
 
 LIVEMCPBENCH_GRADER_USER_PROMPT = """User Task: 
 {task}
-
-Key Points: 
+ 
 {key_points}
 
 Final Response: 
@@ -136,6 +136,36 @@ Tool Call History:
 Tool Descriptions:
 {tool_descriptions}
 """
+
+LIVEMCPBENCH_KEY_POINTS_SYSTEM_MSG = """You are an expert tasked with analyzing a given task to identify the key points explicitly stated in the task description.
+
+**Objective**: Carefully analyze the task description and extract the critical elements explicitly mentioned in the task for achieving its goal.
+
+**Instructions**:
+1. Read the task description carefully.
+2. Identify and extract **key points** directly stated in the task description.
+   - A **key point** is a critical element, condition, or step explicitly mentioned in the task description.
+   - Do not infer or add any unstated elements.
+
+**Respond with**:
+- **Key Points**: A numbered list of the explicit key points for completing this task, one per line, without explanations or additional details."""
+
+LIVEMCPBENCH_TOOL_SUMMARY_PROMPT = """
+You are an expert AI technical writer. Based on the following information about an MCP server, please generate a concise and accurate summary of its core purpose and capabilities.
+
+**Server Name:** {server_name}
+
+**Server Description:** {server_desc}
+
+**Available Tools:**
+{tool_descriptions}
+
+Please return only the generated summary text, without any additional titles or preambles.
+"""
+
+LIVEMCPBENCH_VERDICT_PATTERN = re.compile(
+    r"Thoughts:\s*(.+?)\s*Status:\s*(\w+)", re.DOTALL
+)
 
 
 def create_dynamic_multiple_choice_prompt(question: str, options: list[str]) -> str:

@@ -71,7 +71,6 @@ def get_annotated_data_cached(force_refresh: bool | None = None) -> Path:
     if dest_dir.exists() and any(dest_dir.iterdir()) and not refresh:
         return dest_dir
 
-    # Clean dest if refreshing
     if dest_dir.exists() and refresh:
         shutil.rmtree(dest_dir, ignore_errors=True)
     dest_dir.mkdir(parents=True, exist_ok=True)
@@ -101,7 +100,6 @@ def get_annotated_data_cached(force_refresh: bool | None = None) -> Path:
         if candidate is None:
             raise RuntimeError("annotated_data not found in repo zip")
 
-        # Copy contents (flattened: move children of annotated_data into dest_dir)
         for item in candidate.iterdir():
             target = dest_dir / item.name
             if item.is_dir():

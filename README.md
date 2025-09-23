@@ -207,7 +207,7 @@ The following benchmarks use a grader model:
 
 ## LiveMCPBench
 
-LiveMCPBench evaluates how agents can navigate an ocean of 70 MCP servers and 527 Tools. Our integration follows the LiveMCPBench Copilot baseline.
+LiveMCPBench evaluates how agents can navigate large numbers of MCP servers and tools. Our integration follows the LiveMCPBench Copilot baseline with 70 MCP servers and 527 Tools.
 
 Quick start:
 
