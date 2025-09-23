@@ -63,14 +63,14 @@ def copilot_solver() -> Solver:
             state.metadata = state.metadata or {}
             state.metadata["execution_error"] = "tool_error"
             state.metadata["error_message"] = str(e)
-            if not state.output.completion:
+            if state.output and not state.output.completion:
                 state.output.completion = f"Task failed due to tool error: {str(e)}"
             return state
         except Exception as e:
             state.metadata = state.metadata or {}
             state.metadata["execution_error"] = "runtime_error"
             state.metadata["error_message"] = str(e)
-            if not state.output.completion:
+            if state.output and not state.output.completion:
                 state.output.completion = f"Task failed due to runtime error: {str(e)}"
             return state
 

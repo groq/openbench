@@ -53,16 +53,3 @@ def get_dataset() -> Dataset:
     )
 
     return dataset
-
-
-def get_dataset_no_file_tasks() -> Dataset:
-    """Load the LiveMCPBench dataset with file-related tasks filtered out.
-
-    This is a convenience function that returns only the tasks that don't require
-    file directory access, making it easier to test the eval on other tasks.
-
-    Returns:
-        Dataset: The LiveMCPBench dataset with 54 tasks (out of 95 total)
-                that don't require file system operations
-    """
-    return get_dataset()

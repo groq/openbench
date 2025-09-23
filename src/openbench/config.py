@@ -43,15 +43,6 @@ BENCHMARKS = {
         function_name="mbpp",
         is_alpha=False,
     ),
-    "livemcpbench_copilot": BenchmarkMetadata(
-        name="LiveMCPBench (Copilot)",
-        description="LiveMCPBench using the baseline Copilot agent (route + execute-tool)",
-        category="agents",
-        tags=["mcp", "agents", "copilot", "tools"],
-        module_path="openbench.evals.livemcpbench",
-        function_name="livemcpbench_copilot",
-        is_alpha=True,
-    ),
     # Graphwalks benchmarks (alpha)
     "clockbench": BenchmarkMetadata(
         name="ClockBench",
