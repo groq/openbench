@@ -1,9 +1,10 @@
 from typing import Any, List, Optional, Annotated
+from inspect_ai.model import GenerateConfig
 from pydantic import BeforeValidator
-from inspect_ai.dataset import Sample, hf_dataset, csv_dataset, json_dataset, Dataset
-from inspect_ai.solver import multiple_choice
-from inspect_ai.scorer import choice
-from inspect_ai import Task
+from inspect_ai.dataset import Sample, hf_dataset
+from inspect_ai.solver import generate, system_message
+from inspect_ai import Task, Epochs
+from openbench.scorers.mcq import create_mcq_scorer
 
 
 # ----------- MCQ SAMPLE VALIDATION HELPERS -----------
@@ -26,14 +27,13 @@ def validate_choices(value: Any) -> List[str]:
 
 
 def validate_target(value: Any) -> str:
-    """Validate the target field of an MCQSample, must be a single uppercase letter."""
+    """Validate the target field: one of 'A', 'B', 'C', or 'D'."""
     if (
         not isinstance(value, str)
         or len(value) != 1
-        or not value.isalpha()
-        or not value.isupper()
+        or value not in ("A", "B", "C", "D")
     ):
-        raise ValueError("target must be a single uppercase letter (e.g. 'A')")
+        raise ValueError("target must be one of 'A', 'B', 'C', or 'D'")
     return value
 
 
@@ -51,72 +51,59 @@ class MCQSample(Sample):
     target: Annotated[str, BeforeValidator(validate_target)]
 
 
-# ----------- DATASET WRAPPER -----------
-def make_dataset(
-    dataset_type: str,
-    dataset_path: str,
-    record_to_mcq_sample,
-    *,
-    split: Optional[str] = None,
-    auto_id: bool = True,
-) -> Dataset:
-    """
-    Wrap Inspect AI dataset constructors.
-    Supports records -> MCQSample -> Dataset.
-    """
-
-    if dataset_type == "hf":
-        if split is None:
-            raise ValueError("For dataset_type='hf', you must provide split")
-        return hf_dataset(
-            dataset_path,
-            split=split,
-            sample_fields=record_to_mcq_sample,
-            auto_id=auto_id,
-        )
-    elif dataset_type == "csv":
-        return csv_dataset(
-            dataset_path, sample_fields=record_to_mcq_sample, auto_id=auto_id
-        )
-    elif dataset_type == "json":
-        return json_dataset(
-            dataset_path, sample_fields=record_to_mcq_sample, auto_id=auto_id
-        )
-    else:
-        raise ValueError(f"Unsupported dataset type: {dataset_type}")
-
-
 # ----------- TASK FACTORY -----------
 def MCQEval(
     *,
-    dataset_type: str,
+    name: str,
     dataset_path: str,
     record_to_mcq_sample,
-    split: Optional[str] = None,
+    split: str,
     auto_id: bool = True,
+    group_keys: Optional[List[str]] = None,
+    additional_metrics: Optional[List[Any]] = None,
+    prompt_template: Optional[str] = None,
+    config: Optional[GenerateConfig] = None,
+    epochs: Optional[Epochs] = None,
 ) -> "Task":
     """
     Build a Task using a user-provided record_to_mcq_sample().
 
     Args:
-        dataset_type: The type of dataset to load ('hf', 'csv', 'json')
-        dataset_path: The path to the dataset
-        record_to_mcq_sample: A function that converts a record to an MCQSample
-        split: The split of the dataset to load (required for 'hf')
-        auto_id: Whether to auto-generate an id for each sample
+        name: Task name.
+        dataset_path: Hugging Face dataset path/name.
+        record_to_mcq_sample: Function converting a raw record into an `MCQSample`.
+        split: HF dataset split (e.g., "train", "validation", "test").
+        auto_id: Auto-generate IDs for samples when true.
+        group_keys: Optional metadata keys to group reported metrics by (e.g., ["category"], ["subject"]).
+        additional_metrics: Optional additional metrics to include alongside accuracy/stderr/std.
+        prompt_template: Optional system prompt prepended before `generate()`.
+        config: Optional model `GenerateConfig` for this task (defaults to a new `GenerateConfig()`).
+        epochs: Optional `Epochs` to repeat samples and reduce scores across repeats.
 
     Returns:
-        Task: A Task object with the dataset, solver, and scorer
+        Task: Configured Inspect AI task with dataset, solver, scorer, config, and epochs.
     """
-    dataset = make_dataset(
-        dataset_type=dataset_type,
-        dataset_path=dataset_path,
-        record_to_mcq_sample=record_to_mcq_sample,
+    dataset = hf_dataset(
+        dataset_path,
         split=split,
+        sample_fields=record_to_mcq_sample,
         auto_id=auto_id,
     )
+
+    solver = [generate()]
+    if prompt_template:
+        solver = [system_message(prompt_template), generate()]
+
+    scorer = create_mcq_scorer(
+        group_keys=group_keys,
+        additional_metrics=additional_metrics,
+    )()
+
     return Task(
+        name=name,
         dataset=dataset,
-        solver=multiple_choice(),
-        scorer=choice(),
+        solver=solver,
+        scorer=scorer,
+        config=config if config else GenerateConfig(),
+        epochs=epochs,
     )
