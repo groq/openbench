@@ -506,7 +506,7 @@ def ifeval_combined_scorer() -> Scorer:
             loose_following_list.append(loose_followed)
 
         explanations = [
-            f"[S:{"✓" if strict_followed else "✗"} L:{"✓" if loose_followed else "✗"}] {instruction_id}"
+            f"[S:{'✓' if strict_followed else '✗'} L:{'✓' if loose_followed else '✗'}] {instruction_id}"
             for instruction_id, strict_followed, loose_followed in zip(
                 instruction_list,
                 strict_following_list,

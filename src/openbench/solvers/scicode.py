@@ -6,9 +6,15 @@ import copy
 from typing import Any
 from pathlib import Path
 from inspect_ai.solver import solver, TaskState, Generate
-from scicode.parse.parse import extract_function_name, get_function_from_code  # type: ignore
-from scicode.gen.models import generate_dummy_response, extract_python_script  # type: ignore
 import requests  # type: ignore
+
+
+def _handle_missing_scicode(exc: ModuleNotFoundError) -> None:
+    if getattr(exc, "name", "") == "scicode":
+        raise ModuleNotFoundError(
+            "SciCode optional dependency is not installed. Install with `pip install openbench[scicode]` to enable the SciCode eval."
+        ) from exc
+    raise exc
 
 
 BACKGOUND_PROMPT_TEMPLATE = requests.get(
@@ -41,6 +47,12 @@ class ScicodePromptingAssistant:
         previous_code: str,
         num_steps: int,
     ):
+        try:
+            from scicode.gen.models import extract_python_script  # type: ignore
+        except (
+            ModuleNotFoundError
+        ) as exc:  # pragma: no cover - import happens only when solver runs
+            _handle_missing_scicode(exc)
         self.previous_llm_code[num_steps - 1] = extract_python_script(response)
         self.save_response_with_steps(
             prob_data,
@@ -52,6 +64,12 @@ class ScicodePromptingAssistant:
     def save_response_with_steps(
         self, prob_data: dict, response: str, previous_code: str, num_steps: int
     ) -> None:
+        try:
+            from scicode.gen.models import extract_python_script  # type: ignore
+        except (
+            ModuleNotFoundError
+        ) as exc:  # pragma: no cover - import happens only when solver runs
+            _handle_missing_scicode(exc)
         output_dir = Path(self.output_dir, self._get_background_dir())
         output_dir.mkdir(parents=True, exist_ok=True)
         prob_id = prob_data["problem_id"]
@@ -131,6 +149,15 @@ class ScicodePromptingAssistant:
         *,
         save: bool = True,
     ):
+        try:
+            from scicode.parse.parse import (  # type: ignore
+                extract_function_name,
+                get_function_from_code,
+            )
+        except (
+            ModuleNotFoundError
+        ) as exc:  # pragma: no cover - import happens only when solver runs
+            _handle_missing_scicode(exc)
         prob_id = prob_data["problem_id"]
         if num_steps == 1:
             self.previous_llm_code = [None] * tot_steps
@@ -209,6 +236,13 @@ def generate_gold_response(prob_data: dict, num_steps: int):
 
 @solver
 def scicode_solver(**params: dict[str, Any]):
+    try:
+        from scicode.gen.models import generate_dummy_response  # type: ignore
+    except (
+        ModuleNotFoundError
+    ) as exc:  # pragma: no cover - import happens only when solver runs
+        _handle_missing_scicode(exc)
+
     async def solve(state: TaskState, generate: Generate) -> TaskState:
         model_name = str(state.model).replace("/", "-")
         prompt_assistant = ScicodePromptingAssistant(
