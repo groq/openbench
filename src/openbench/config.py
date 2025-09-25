@@ -12,7 +12,7 @@ import sys
 import uuid
 from pathlib import Path
 from types import ModuleType
-from typing import Callable, List, Optional
+from typing import Callable, Iterable, List, Optional
 
 
 @dataclass
@@ -1001,9 +1001,42 @@ BENCHMARKS = {
 }
 
 
+def _normalize_benchmark_key(name: str) -> str:
+    """Normalize benchmark keys so '-' and '_' are treated the same."""
+
+    return name.replace("-", "_")
+
+
+def _build_normalized_lookup(names: Iterable[str]) -> dict[str, str]:
+    """Build a lookup mapping normalized benchmark keys to canonical names."""
+
+    lookup: dict[str, str] = {}
+    for key in names:
+        normalized = _normalize_benchmark_key(key)
+        existing = lookup.get(normalized)
+        if existing and existing != key:
+            raise ValueError(
+                "Benchmark names cannot differ only by '-' vs '_' ("
+                f"conflict between '{existing}' and '{key}')"
+            )
+        lookup[normalized] = key
+    return lookup
+
+
+_NORMALIZED_BENCHMARK_NAMES = _build_normalized_lookup(BENCHMARKS.keys())
+
+
 def get_benchmark_metadata(name: str) -> Optional[BenchmarkMetadata]:
     """Get benchmark metadata by name."""
-    return BENCHMARKS.get(name)
+    metadata = BENCHMARKS.get(name)
+    if metadata:
+        return metadata
+
+    canonical_name = _NORMALIZED_BENCHMARK_NAMES.get(_normalize_benchmark_key(name))
+    if canonical_name:
+        return BENCHMARKS[canonical_name]
+
+    return None
 
 
 def get_all_benchmarks(include_alpha: bool = False) -> dict[str, BenchmarkMetadata]:
@@ -1084,6 +1117,8 @@ def _generate_task_registry(include_alpha: bool = True):
 # Full registry including alpha benchmarks for backward compatibility
 TASK_REGISTRY = _generate_task_registry(include_alpha=True)
 
+_NORMALIZED_TASK_REGISTRY = _build_normalized_lookup(TASK_REGISTRY.keys())
+
 
 def _import_module_from_path(path: Path) -> ModuleType:
     """
@@ -1154,6 +1189,13 @@ def load_task(benchmark_name: str, allow_alpha: bool = False) -> Callable:
 
     # Try registry first (registry names take precedence)
     import_path = TASK_REGISTRY.get(benchmark_name)
+    if import_path is None:
+        canonical_name = _NORMALIZED_TASK_REGISTRY.get(
+            _normalize_benchmark_key(benchmark_name)
+        )
+        if canonical_name:
+            import_path = TASK_REGISTRY[canonical_name]
+            benchmark_name = canonical_name
     if import_path:
         module_path, func_name = import_path.rsplit(".", 1)
         module = importlib.import_module(module_path)
