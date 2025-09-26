@@ -1,9 +1,8 @@
 """Unit tests for cache utility functions."""
 
 import os
-import shutil
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 
 import pytest
 import typer
@@ -101,7 +100,9 @@ class TestPrepareLivemcpbenchCache:
     @patch("openbench.utils.cache.prepare_copilot_cache")
     @patch("openbench.utils.cache.prepare_root_data")
     @patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"})
-    def test_prepare_copilot_cache_exception(self, mock_prepare_root, mock_prepare_copilot):
+    def test_prepare_copilot_cache_exception(
+        self, mock_prepare_root, mock_prepare_copilot
+    ):
         """Test handling of exceptions from prepare_copilot_cache."""
         mock_prepare_copilot.side_effect = RuntimeError("Copilot cache error")
 
@@ -175,7 +176,9 @@ class TestClearLivemcpbenchRoot:
         clear_livemcpbench_root(quiet=False)
 
         mock_rmtree.assert_called_once_with(mock_root_path)
-        mock_echo.assert_called_once_with("🧹 Cleaned LiveMCPBench root: /test/root/path")
+        mock_echo.assert_called_once_with(
+            "🧹 Cleaned LiveMCPBench root: /test/root/path"
+        )
 
     @patch("openbench.utils.cache._livemcpbench_root_dir")
     @patch("openbench.utils.cache.shutil.rmtree")
@@ -281,7 +284,9 @@ class TestClearLivemcpbenchRoot:
         clear_livemcpbench_root()
 
         mock_rmtree.assert_called_once_with(mock_root_path)
-        mock_echo.assert_called_once_with("🧹 Cleaned LiveMCPBench root: /test/root/path")
+        mock_echo.assert_called_once_with(
+            "🧹 Cleaned LiveMCPBench root: /test/root/path"
+        )
 
     @patch("openbench.utils.cache._livemcpbench_root_dir")
     @patch("openbench.utils.cache.shutil.rmtree")
