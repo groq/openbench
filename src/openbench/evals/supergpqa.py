@@ -4,16 +4,16 @@ SuperGPQA: Scaling LLM Evaluation across 285 Graduate Disciplines
 Implemented by Aarush Sah
 """
 
-from inspect_ai import Task, task
-from inspect_ai.dataset import Sample, hf_dataset
-from inspect_ai.scorer import choice, accuracy, stderr, grouped
-from inspect_ai.solver import multiple_choice
+from inspect_ai import task
+from openbench.utils.mcq import MCQSample, MCQEval
+from openbench.utils.text import create_dynamic_multiple_choice_prompt
 
 
-def record_to_sample(record):
+def record_to_mcq_sample(record) -> MCQSample:
     """Convert a SuperGPQA record to an Inspect Sample."""
-    # Create choices list from options
+    question = record["question"]
     choices = record["options"]
+    prompt = create_dynamic_multiple_choice_prompt(question, choices)
 
     # Create metadata dict with all extra fields
     metadata = {
@@ -26,10 +26,10 @@ def record_to_sample(record):
         "answer_text": record["answer"],  # Store the full answer text
     }
 
-    return Sample(
-        input=record["question"],
-        choices=choices,
-        target=record["answer_letter"],  # Use the letter (A, B, C, etc.) as target
+    return MCQSample(
+        input=prompt,
+        target=record["answer_letter"],
+        id=record["uuid"],
         metadata=metadata,
     )
 
@@ -41,51 +41,27 @@ def supergpqa(
     difficulty: str | None = None,
     discipline: str | None = None,
 ):
-    """SuperGPQA dataset task.
+    """SuperGPQA dataset task (MCQ Abstracted) with optional filtering.
 
-    SuperGPQA is a dataset for evaluating LLMs across 285 graduate disciplines
-    with 26,529 multiple-choice questions spanning various fields including
-    science, engineering, medicine, economics, and philosophy.
-
-    Args:
-        field: Filter by field (e.g., "Mathematics", "Physics", "Computer Science and Technology")
-        subfield: Filter by subfield (e.g., "Mathematical Analysis", "Quantum Mechanics")
-        difficulty: Filter by difficulty level ("easy", "middle", "hard")
-        discipline: Filter by discipline (e.g., "Science", "Engineering", "Medicine")
+    Filters supported: field, subfield, difficulty, discipline.
     """
-    # Load the full dataset
-    dataset = hf_dataset(
-        path="m-a-p/SuperGPQA",
+
+    # Wrap the mapper to apply record-level filtering (return [] to drop non-matching records)
+    def filtered_records_to_mcq_sample(record):
+        if field and record.get("field") != field:
+            return []
+        if subfield and record.get("subfield") != subfield:
+            return []
+        if difficulty and record.get("difficulty") != difficulty:
+            return []
+        if discipline and record.get("discipline") != discipline:
+            return []
+        return record_to_mcq_sample(record)
+
+    return MCQEval(
+        name="supergpqa",
+        dataset_path="m-a-p/SuperGPQA",
+        record_to_mcq_sample=filtered_records_to_mcq_sample,
         split="train",  # Only train split is available
-        sample_fields=record_to_sample,
-    )
-
-    # Apply filters if specified
-    if any([field, subfield, difficulty, discipline]):
-
-        def filter_fn(sample):
-            if field and sample.metadata.get("field") != field:
-                return False
-            if subfield and sample.metadata.get("subfield") != subfield:
-                return False
-            if difficulty and sample.metadata.get("difficulty") != difficulty:
-                return False
-            if discipline and sample.metadata.get("discipline") != discipline:
-                return False
-            return True
-
-        dataset = dataset.filter(filter_fn)
-
-    return Task(
-        dataset=dataset,
-        solver=multiple_choice(),
-        scorer=choice(),
-        metrics=[
-            # Overall metrics
-            accuracy(),
-            stderr(),
-            # Metrics grouped by difficulty
-            grouped(accuracy(), "difficulty"),
-            grouped(stderr(), "difficulty"),
-        ],
+        group_keys=["difficulty"],
     )

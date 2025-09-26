@@ -1,5 +1,12 @@
 from typing import Any, List, Optional, Annotated
-from inspect_ai.model import GenerateConfig
+from inspect_ai.model import (
+    GenerateConfig,
+    ChatMessageSystem,
+    ChatMessageUser,
+    ChatMessageAssistant,
+    ChatMessageTool,
+    ChatMessage,
+)
 from pydantic import BeforeValidator
 from inspect_ai.dataset import Sample, hf_dataset
 from inspect_ai.solver import generate, system_message
@@ -10,30 +17,36 @@ from openbench.scorers.mcq import create_mcq_scorer
 # ----------- MCQ SAMPLE VALIDATION HELPERS -----------
 
 
-def validate_input(value: Any) -> str:
-    """Validate the input field of an MCQSample, must be a non-empty string."""
-    if not isinstance(value, str) or not value.strip():
-        raise ValueError("input must be a non-empty string")
-    return value
-
-
-def validate_choices(value: Any) -> List[str]:
-    """Validate the choices field of an MCQSample, must be list of strings."""
-    if not isinstance(value, list) or not value:
-        raise ValueError("choices must be a non-empty list")
-    if not all(isinstance(c, str) and c.strip() for c in value):
-        raise ValueError("each choice must be a non-empty string")
-    return value
+def validate_input(value: Any) -> str | list[ChatMessage]:
+    """Validate the input field of an MCQSample, must be a non-empty string or list of ChatMessage."""
+    if isinstance(value, str):
+        if not value.strip():
+            raise ValueError("input must be a non-empty string")
+        return value
+    elif isinstance(value, list):
+        # Check if it's a list of ChatMessage-like objects
+        chat_types = (
+            ChatMessageSystem,
+            ChatMessageUser,
+            ChatMessageAssistant,
+            ChatMessageTool,
+        )
+        if all(isinstance(item, chat_types) for item in value):
+            return value
+        else:
+            raise ValueError(
+                "input must be a non-empty string or list of ChatMessage objects"
+            )
+    else:
+        raise ValueError(
+            "input must be a non-empty string or list of ChatMessage objects"
+        )
 
 
 def validate_target(value: Any) -> str:
-    """Validate the target field: one of 'A', 'B', 'C', or 'D'."""
-    if (
-        not isinstance(value, str)
-        or len(value) != 1
-        or value not in ("A", "B", "C", "D")
-    ):
-        raise ValueError("target must be one of 'A', 'B', 'C', or 'D'")
+    """Validate the target field: must be single uppercase letter."""
+    if not (isinstance(value, str) and len(value) == 1 and value.isupper()):
+        raise ValueError("target must be a single uppercase letter.")
     return value
 
 
@@ -46,8 +59,7 @@ class MCQSample(Sample):
     Users are expected to provide: record_to_mcq_sample(record) -> MCQSample.
     """
 
-    input: Annotated[str, BeforeValidator(validate_input)]
-    choices: Annotated[List[str], BeforeValidator(validate_choices)]
+    input: Annotated[str | list[ChatMessage], BeforeValidator(validate_input)]
     target: Annotated[str, BeforeValidator(validate_target)]
 
 
@@ -59,11 +71,13 @@ def MCQEval(
     record_to_mcq_sample,
     split: str,
     auto_id: bool = True,
+    subset_name: Optional[str] = None,
     group_keys: Optional[List[str]] = None,
     additional_metrics: Optional[List[Any]] = None,
     prompt_template: Optional[str] = None,
     config: Optional[GenerateConfig] = None,
     epochs: Optional[Epochs] = None,
+    dataset_kwargs: Optional[dict[str, Any]] = None,
 ) -> "Task":
     """
     Build a Task using a user-provided record_to_mcq_sample().
@@ -88,6 +102,8 @@ def MCQEval(
         split=split,
         sample_fields=record_to_mcq_sample,
         auto_id=auto_id,
+        name=subset_name,  # subset name
+        **(dataset_kwargs or {}),
     )
 
     solver = [generate()]
