@@ -31,7 +31,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[0]
 
 
 def _root_sandbox_dir() -> Path:
-    return Path(os.path.expanduser("~/.cache/openbench/livemcpbench/root")).resolve()
+    return Path(os.path.expanduser("~/.openbench/livemcpbench/root")).resolve()
 
 
 def _rewrite_root_path(value: str) -> str:

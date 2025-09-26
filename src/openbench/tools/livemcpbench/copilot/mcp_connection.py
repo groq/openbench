@@ -34,9 +34,9 @@ class MCPConnection:
     def _stderr_log_path(self) -> Path:
         """Compute the stderr log file path for the spawned process.
 
-        By default, write to ~/.cache/openbench/livemcpbench/logs/<server>/<ts>.stderr.log
+        By default, write to ~/.openbench/livemcpbench/logs/<server>/<ts>.stderr.log
         """
-        base = Path(os.path.expanduser("~/.cache/openbench/livemcpbench/logs"))
+        base = Path(os.path.expanduser("~/.openbench/livemcpbench/logs"))
         ts = datetime.now().strftime("%Y%m%d_%H%M%S")
         path = base / self.server.name / f"{ts}.stderr.log"
         path.parent.mkdir(parents=True, exist_ok=True)

@@ -154,32 +154,53 @@ For a complete list of all commands and options, run: `bench --help`
 | `bench eval-retry`       | Retry a failed evaluation                          |
 | `bench view`             | View logs from previous benchmark runs             |
 | `bench eval <path>`      | Run your local/private evals built with Inspect AI |
+| `bench cache`            | Manage OpenBench caches (info/ls/clear)            |
+
+### Cache Command
+
+The `bench cache` command helps manage OpenBench's caches, particularly for LiveMCPBench. It provides three subcommands:
+
+```bash
+# Show cache information and sizes
+bench cache info
+
+# List cache contents
+bench cache ls
+bench cache ls --tree
+bench cache ls --path some/subdir
+
+# Clear cache data
+bench cache clear --all          # Clear entire cache
+bench cache clear --path subdir  # Clear specific subpath
+bench cache clear -y             # Skip confirmation prompt
+```
+
+All cache data is stored under `~/.openbench`. The cache command helps you monitor and manage this storage.
 
 ### Key `eval` Command Common Configuration Options
 
-| Option               | Environment Variable     | Default                   | Description                                                      |
-| -------------------- | ------------------------ | ------------------------- | ---------------------------------------------------------------- |
-| `-M <args>`          | None                     | None                      | Pass model-specific arguments (e.g., `-M reasoning_effort=high`) |
-| `-T <args>`          | None                     | None                      | Pass task-specific arguments to the benchmark                    |
-| `--model`            | `BENCH_MODEL`            | `groq/openai/gpt-oss-20b` | Model(s) to evaluate                                             |
-| `--epochs`           | `BENCH_EPOCHS`           | `1`                       | Number of epochs to run each evaluation                          |
-| `--max-connections`  | `BENCH_MAX_CONNECTIONS`  | `10`                      | Maximum parallel requests to model                               |
-| `--temperature`      | `BENCH_TEMPERATURE`      | `0.6`                     | Model temperature                                                |
-| `--top-p`            | `BENCH_TOP_P`            | `1.0`                     | Model top-p                                                      |
-| `--max-tokens`       | `BENCH_MAX_TOKENS`       | `None`                    | Maximum tokens for model response                                |
-| `--seed`             | `BENCH_SEED`             | `None`                    | Seed for deterministic generation                                |
-| `--limit`            | `BENCH_LIMIT`            | `None`                    | Limit evaluated samples (number or start,end)                    |
-| `--logfile`          | `BENCH_OUTPUT`           | `None`                    | Output file for results                                          |
-| `--sandbox`          | `BENCH_SANDBOX`          | `None`                    | Environment to run evaluation (local/docker)                     |
-| `--timeout`          | `BENCH_TIMEOUT`          | `10000`                   | Timeout for each API request (seconds)                           |
-| `--display`          | `BENCH_DISPLAY`          | `None`                    | Display type (full/conversation/rich/plain/none)                 |
-| `--reasoning-effort` | `BENCH_REASONING_EFFORT` | `None`                    | Reasoning effort level (low/medium/high)                         |
-| `--json`             | None                     | `False`                   | Output results in JSON format                                    |
-| `--log-format`       | `BENCH_LOG_FORMAT`       | `eval`                    | Output logging format (eval/json)                                |
-| `--hub-repo`         | `BENCH_HUB_REPO`         | `None`                    | Push results to a Hugging Face Hub dataset                       |
-| `--code-agent`       | `BENCH_CODE_AGENT`       | `opencode`                | Select code agent for exercism tasks                             |
-
-> > > > > > > 99bdba1 (feat(livemcpbench): MCP copilot and LLM as judge scoring integrated)
+| Option                | Environment Variable      | Default                   | Description                                                      |
+| --------------------- | ------------------------- | ------------------------- | ---------------------------------------------------------------- |
+| `-M <args>`           | None                      | None                      | Pass model-specific arguments (e.g., `-M reasoning_effort=high`) |
+| `-T <args>`           | None                      | None                      | Pass task-specific arguments to the benchmark                    |
+| `--model`             | `BENCH_MODEL`             | `groq/openai/gpt-oss-20b` | Model(s) to evaluate                                             |
+| `--epochs`            | `BENCH_EPOCHS`            | `1`                       | Number of epochs to run each evaluation                          |
+| `--max-connections`   | `BENCH_MAX_CONNECTIONS`   | `10`                      | Maximum parallel requests to model                               |
+| `--temperature`       | `BENCH_TEMPERATURE`       | `0.6`                     | Model temperature                                                |
+| `--top-p`             | `BENCH_TOP_P`             | `1.0`                     | Model top-p                                                      |
+| `--max-tokens`        | `BENCH_MAX_TOKENS`        | `None`                    | Maximum tokens for model response                                |
+| `--seed`              | `BENCH_SEED`              | `None`                    | Seed for deterministic generation                                |
+| `--limit`             | `BENCH_LIMIT`             | `None`                    | Limit evaluated samples (number or start,end)                    |
+| `--logfile`           | `BENCH_OUTPUT`            | `None`                    | Output file for results                                          |
+| `--sandbox`           | `BENCH_SANDBOX`           | `None`                    | Environment to run evaluation (local/docker)                     |
+| `--timeout`           | `BENCH_TIMEOUT`           | `10000`                   | Timeout for each API request (seconds)                           |
+| `--display`           | `BENCH_DISPLAY`           | `None`                    | Display type (full/conversation/rich/plain/none)                 |
+| `--reasoning-effort`  | `BENCH_REASONING_EFFORT`  | `None`                    | Reasoning effort level (low/medium/high)                         |
+| `--json`              | None                      | `False`                   | Output results in JSON format                                    |
+| `--log-format`        | `BENCH_LOG_FORMAT`        | `eval`                    | Output logging format (eval/json)                                |
+| `--hub-repo`          | `BENCH_HUB_REPO`          | `None`                    | Push results to a Hugging Face Hub dataset                       |
+| `--keep-livemcp-root` | `BENCH_KEEP_LIVEMCP_ROOT` | `False`                   | Allow preservation of root data after livemcpbench eval runs     |
+| `--code-agent`        | `BENCH_CODE_AGENT`        | `opencode`                | Select code agent for exercism tasks                             |
 
 ## Grader Information
 
@@ -204,25 +225,6 @@ The following benchmarks use a grader model:
 | `math_500`     | `openai/gpt-4-turbo-preview` |
 | `detailbench`  | `gpt-5-mini-2025-08-07`      |
 | `livemcpbench` | `openai/gpt-4.1-2025-04-14`  |
-
-## LiveMCPBench
-
-LiveMCPBench evaluates how agents can navigate large numbers of MCP servers and tools. Our integration follows the LiveMCPBench Copilot baseline with 70 MCP servers and 527 Tools.
-
-Quick start:
-
-```bash
-# 1) Set API keys
-export OPENAI_API_KEY=your_openai_key   # used for embeddings + grader
-
-# 2) Prepare caches, sandbox data, and browsers
-bench mcp-copilot-prepare --root-data --playwright-install
-
-# 3) Run the eval
-bench eval livemcpbench --max-connections 5
-```
-
-> > > > > > > 99bdba1 (feat(livemcpbench): MCP copilot and LLM as judge scoring integrated)
 
 ## Building Your Own Evals
 

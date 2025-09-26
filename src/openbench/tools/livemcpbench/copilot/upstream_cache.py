@@ -6,7 +6,7 @@ This module downloads and caches the curated `clean_config.json` and the
 cache directory so subsequent runs can be offline and reproducible.
 
 Defaults:
-- Cache dir: ~/.cache/openbench/livemcpbench/copilot/raw
+- Cache dir: ~/.openbench/livemcpbench/copilot/raw
 - Refresh control: set env OPENBENCH_LIVEMCPBENCH_REFRESH=1 to force refetch
 """
 
@@ -38,9 +38,7 @@ REPO_ZIP_URL = "https://github.com/icip-cas/LiveMCPBench/archive/refs/heads/main
 
 
 def _base_cache_dir() -> Path:
-    return Path(
-        os.path.expanduser("~/.cache/openbench/livemcpbench/copilot/raw")
-    ).resolve()
+    return Path(os.path.expanduser("~/.openbench/livemcpbench/copilot/raw")).resolve()
 
 
 def _write_json(path: Path, data: Any) -> None:

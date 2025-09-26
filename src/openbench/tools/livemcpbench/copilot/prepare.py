@@ -9,6 +9,7 @@ import asyncio
 import os
 from pathlib import Path
 from typing import Optional
+import json as _json
 
 from .server import _user_cache_dir, _ensure_parent_dir, _generate_embeddings_file
 from .upstream_cache import (
@@ -17,9 +18,6 @@ from .upstream_cache import (
     get_annotated_data_cached,
 )
 import shutil
-import subprocess
-import sys
-from shutil import which
 
 
 def _default_embeddings_path() -> Path:
@@ -65,18 +63,35 @@ def prepare_copilot_cache(
             )
         asyncio.run(_generate_embeddings_file(out))
 
+    # Validate generated file structure
+    try:
+        data = _json.loads(out.read_text(encoding="utf-8"))
+        if not isinstance(data, list):
+            raise ValueError("unexpected format (not a list)")
+    except Exception as e:
+        out.unlink(missing_ok=True)
+        raise RuntimeError(f"Invalid embeddings file at {out}: {e}")
+
     return out
 
 
 def _root_sandbox_dir() -> Path:
-    return Path(os.path.expanduser("~/.cache/openbench/livemcpbench/root")).resolve()
+    return Path(os.path.expanduser("~/.openbench/livemcpbench/root")).resolve()
 
 
 def prepare_root_data(force_refresh: bool = False) -> Path:
-    """Populate the sandbox root directory with annotated_data contents."""
+    """Populate the sandbox root directory with annotated_data contents.
+
+    If the root sandbox already appears populated and refresh is False,
+    this function is a no-op.
+    """
     annotated = get_annotated_data_cached(force_refresh)
     root_dir = _root_sandbox_dir()
     root_dir.mkdir(parents=True, exist_ok=True)
+
+    # If already populated (has any files/dirs) and not forcing, skip copy
+    if any(root_dir.iterdir()) and not force_refresh:
+        return root_dir
 
     # Copy contents into root sandbox (flattened)
     for item in annotated.iterdir():
@@ -87,58 +102,3 @@ def prepare_root_data(force_refresh: bool = False) -> Path:
             shutil.copy2(item, target)
 
     return root_dir
-
-
-def _default_playwright_browsers_path() -> Path:
-    # Use platform default locations for Playwright browsers
-    if sys.platform == "darwin":
-        return Path.home() / "Library/Caches/ms-playwright"
-    return Path(os.path.expanduser("~/.cache/ms-playwright")).resolve()
-
-
-def install_playwright_browsers(
-    browsers: Optional[list[str]] = None, browsers_path: Optional[Path] = None
-) -> Path:
-    """Install Playwright browsers using the MCP server's Playwright version.
-
-    This installs @executeautomation/playwright-mcp-server in a local setup dir
-    and runs its Playwright CLI to ensure browser revisions match.
-    """
-    if which("npm") is None:
-        raise RuntimeError(
-            "'npm' not found on PATH. Install Node.js (npm/npx) and retry."
-        )
-
-    setup_dir = Path.home() / ".cache/openbench/pw-setup"
-    setup_dir.mkdir(parents=True, exist_ok=True)
-
-    # Initialize package.json if needed
-    if not (setup_dir / "package.json").exists():
-        subprocess.run(["npm", "init", "-y"], cwd=setup_dir, check=True)
-
-    # Install MCP server package to pin Playwright
-    subprocess.run(
-        ["npm", "i", "@executeautomation/playwright-mcp-server"],
-        cwd=setup_dir,
-        check=True,
-    )
-
-    cli = setup_dir / "node_modules/.bin/playwright"
-    if sys.platform == "win32":
-        cli = setup_dir / "node_modules/.bin/playwright.cmd"
-    if not cli.exists():
-        raise RuntimeError(f"Local Playwright CLI not found at {cli}")
-
-    bp = browsers_path or _default_playwright_browsers_path()
-    bp.mkdir(parents=True, exist_ok=True)
-    env = os.environ.copy()
-    env["PLAYWRIGHT_BROWSERS_PATH"] = str(bp)
-
-    args = [str(cli), "install"]
-    if browsers and len(browsers) > 0:
-        args.extend(browsers)
-    else:
-        args.append("chromium")
-
-    subprocess.run(args, cwd=setup_dir, env=env, check=True)
-    return bp

@@ -59,7 +59,8 @@ _GLOBAL_ROUTER: "Router | None" = None
 
 def _user_cache_dir() -> Path:
     # Avoid introducing a hard dependency on platformdirs
-    return Path(os.path.expanduser("~/.cache/openbench/livemcpbench/copilot")).resolve()
+    # Migrate caches to ~/.openbench
+    return Path(os.path.expanduser("~/.openbench/livemcpbench/copilot")).resolve()
 
 
 def _ensure_parent_dir(path: Path) -> None:
@@ -123,8 +124,8 @@ def serve(config: dict[str, Any] | Path | None = None) -> None:
             asyncio.run(_generate_embeddings_file(mcp_arg_path))
         else:
             raise RuntimeError(
-                "Copilot embeddings file not found. Run 'openbench mcp-copilot-prepare' first, "
-                "or set MCP_DATA_PATH to an existing mcp_arg_*.json, or set OPENBENCH_COPILOT_AUTOGEN=1 to auto-generate."
+                "Copilot embeddings file not found. Ensure the embeddings cache exists (it's auto-prepared by 'openbench eval livemcpbench'), "
+                "or set MCP_DATA_PATH to an existing mcp_arg_*.json. You can validate the cache with 'openbench cache info'."
             )
 
     # Prepare Router config
