@@ -97,7 +97,7 @@ D) {option_d}
 """.strip()
 
 # adapted from LiveMCPBench system message
-LIVEMPCBENCH_SYSTEM_MESSAGE = """
+LIVEMCPBENCH_SYSTEM_MESSAGE = """
 You are an agent designed to assist users with daily tasks by using external tools. 
 You have access to two tools: a retrieval tool and an execution tool. The retrieval tool allows you to search a large toolset for relevant tools, and the execution tool lets you invoke the tools you retrieved.
 Whenever possible, you should use these tools to get accurate, up-to-date information and to perform file operations.\n\nNote that you can only respond to user once, so you should try to provide a complete answer in your response.

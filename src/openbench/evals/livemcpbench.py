@@ -8,7 +8,7 @@ import asyncio
 from openbench.datasets.livemcpbench import get_dataset
 from openbench.scorers.livemcpbench import livemcpbench_scorer
 from openbench.tools.livemcpbench.copilot.toolsource import copilot_tool_source
-from openbench.utils.text import LIVEMPCBENCH_SYSTEM_MESSAGE
+from openbench.utils.text import LIVEMCPBENCH_SYSTEM_MESSAGE
 
 
 @solver
@@ -20,7 +20,7 @@ def copilot_solver() -> Solver:
             tool_source = copilot_tool_source()
             react_solver = react(
                 prompt=AgentPrompt(
-                    instructions=LIVEMPCBENCH_SYSTEM_MESSAGE,
+                    instructions=LIVEMCPBENCH_SYSTEM_MESSAGE,
                     assistant_prompt=None,
                     handoff_prompt=None,
                     submit_prompt=None,
