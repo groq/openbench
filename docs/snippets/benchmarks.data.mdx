@@ -1,40 +1,107 @@
 export const benchmarksData = [
   {
-    "name": "ClockBench",
-    "description": "Clock benchmark - time-based reasoning tasks",
-    "category": "community",
+    "name": "AIME 2023 I",
+    "description": "American Invitational Mathematics Examination 2023 (First)",
+    "category": "math",
     "tags": [
-      "time",
-      "analog",
-      "clock",
-      "reasoning"
+      "math",
+      "competition",
+      "aime",
+      "2023"
     ],
-    "function_name": "clockbench",
+    "function_name": "aime_2023_I",
     "is_alpha": false
   },
   {
-    "name": "DetailBench",
-    "description": "Tests whether LLMs notify users about wrong facts in a text while they are tasked to translate said text",
-    "category": "community",
+    "name": "AIME 2023 II",
+    "description": "American Invitational Mathematics Examination 2023 (Second)",
+    "category": "math",
     "tags": [
-      "knowledge",
-      "graded",
-      "instruction-following"
+      "math",
+      "competition",
+      "aime",
+      "2023"
     ],
-    "function_name": "detailbench",
+    "function_name": "aime_2023_II",
     "is_alpha": false
   },
   {
-    "name": "TUMLU",
-    "description": "TUMLU is a comprehensive, multilingual, and natively developed language understanding benchmark specifically designed for Turkic languages.",
-    "category": "community",
+    "name": "AIME 2024",
+    "description": "American Invitational Mathematics Examination 2024 (Combined I & II)",
+    "category": "math",
     "tags": [
-      "factuality",
-      "question-answering",
-      "multiple-choice",
-      "reasoning"
+      "math",
+      "competition",
+      "aime",
+      "2024",
+      "combined"
     ],
-    "function_name": "tumlu",
+    "function_name": "aime_2024",
+    "is_alpha": false
+  },
+  {
+    "name": "AIME 2024 I",
+    "description": "American Invitational Mathematics Examination 2024 (First)",
+    "category": "math",
+    "tags": [
+      "math",
+      "competition",
+      "aime",
+      "2024"
+    ],
+    "function_name": "aime_2024_I",
+    "is_alpha": false
+  },
+  {
+    "name": "AIME 2024 II",
+    "description": "American Invitational Mathematics Examination 2024 (Second)",
+    "category": "math",
+    "tags": [
+      "math",
+      "competition",
+      "aime",
+      "2024"
+    ],
+    "function_name": "aime_2024_II",
+    "is_alpha": false
+  },
+  {
+    "name": "AIME 2025",
+    "description": "American Invitational Mathematics Examination 2025",
+    "category": "math",
+    "tags": [
+      "math",
+      "competition",
+      "aime",
+      "2025"
+    ],
+    "function_name": "aime_2025",
+    "is_alpha": false
+  },
+  {
+    "name": "AIME 2025 II",
+    "description": "American Invitational Mathematics Examination 2025 (Second)",
+    "category": "math",
+    "tags": [
+      "math",
+      "competition",
+      "aime",
+      "2025"
+    ],
+    "function_name": "aime_2025_II",
+    "is_alpha": false
+  },
+  {
+    "name": "BRUMO 2025",
+    "description": "Bruno Mathematical Olympiad 2025",
+    "category": "math",
+    "tags": [
+      "math",
+      "competition",
+      "olympiad",
+      "2025"
+    ],
+    "function_name": "brumo_2025",
     "is_alpha": false
   },
   {
@@ -62,6 +129,64 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "CTI-Bench ATE",
+    "description": "Extracting MITRE ATT&CK techniques from malware and threat descriptions",
+    "category": "cybersecurity",
+    "tags": [
+      "extraction",
+      "cybersecurity"
+    ],
+    "function_name": "cti_bench_ate",
+    "is_alpha": false
+  },
+  {
+    "name": "CTI-Bench MCQ",
+    "description": "Multiple-choice questions evaluating understanding of CTI standards, threats, detection strategies, and best practices using authoritative sources like NIST and MITRE",
+    "category": "cybersecurity",
+    "tags": [
+      "multiple-choice",
+      "cybersecurity",
+      "knowledge"
+    ],
+    "function_name": "cti_bench_mcq",
+    "is_alpha": false
+  },
+  {
+    "name": "CTI-Bench RCM",
+    "description": "Mapping CVE descriptions to CWE categories to evaluate vulnerability classification ability",
+    "category": "cybersecurity",
+    "tags": [
+      "classification",
+      "cybersecurity"
+    ],
+    "function_name": "cti_bench_rcm",
+    "is_alpha": false
+  },
+  {
+    "name": "CTI-Bench VSP",
+    "description": "Calculating CVSS scores from vulnerability descriptions to assess severity evaluation skills",
+    "category": "cybersecurity",
+    "tags": [
+      "regression",
+      "cybersecurity"
+    ],
+    "function_name": "cti_bench_vsp",
+    "is_alpha": false
+  },
+  {
+    "name": "ClockBench",
+    "description": "Clock benchmark - time-based reasoning tasks",
+    "category": "community",
+    "tags": [
+      "time",
+      "analog",
+      "clock",
+      "reasoning"
+    ],
+    "function_name": "clockbench",
+    "is_alpha": false
+  },
+  {
     "name": "DROP",
     "description": "Reading comprehension benchmark requiring discrete reasoning over paragraphs (arithmetic, counting, sorting)",
     "category": "core",
@@ -73,6 +198,18 @@ export const benchmarksData = [
       "sorting"
     ],
     "function_name": "drop",
+    "is_alpha": false
+  },
+  {
+    "name": "DetailBench",
+    "description": "Tests whether LLMs notify users about wrong facts in a text while they are tasked to translate said text",
+    "category": "community",
+    "tags": [
+      "knowledge",
+      "graded",
+      "instruction-following"
+    ],
+    "function_name": "detailbench",
     "is_alpha": false
   },
   {
@@ -215,6 +352,45 @@ export const benchmarksData = [
     ],
     "function_name": "graphwalks_parents",
     "is_alpha": true
+  },
+  {
+    "name": "HMMT Feb 2023",
+    "description": "Harvard-MIT Mathematics Tournament February 2023",
+    "category": "math",
+    "tags": [
+      "math",
+      "competition",
+      "hmmt",
+      "2023"
+    ],
+    "function_name": "hmmt_feb_2023",
+    "is_alpha": false
+  },
+  {
+    "name": "HMMT Feb 2024",
+    "description": "Harvard-MIT Mathematics Tournament February 2024",
+    "category": "math",
+    "tags": [
+      "math",
+      "competition",
+      "hmmt",
+      "2024"
+    ],
+    "function_name": "hmmt_feb_2024",
+    "is_alpha": false
+  },
+  {
+    "name": "HMMT Feb 2025",
+    "description": "Harvard-MIT Mathematics Tournament February 2025",
+    "category": "math",
+    "tags": [
+      "math",
+      "competition",
+      "hmmt",
+      "2025"
+    ],
+    "function_name": "hmmt_feb_2025",
+    "is_alpha": false
   },
   {
     "name": "HealthBench",
@@ -766,6 +942,20 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "MMMU Math",
+    "description": "MMMU Mathematics subset focusing on mathematical reasoning",
+    "category": "math",
+    "tags": [
+      "multimodal",
+      "multiple-choice",
+      "mathematics",
+      "reasoning",
+      "images"
+    ],
+    "function_name": "mmmu_math",
+    "is_alpha": false
+  },
+  {
     "name": "MMMU Mechanical Engineering",
     "description": "MMMU Mechanical Engineering subset focusing on mechanical systems and design",
     "category": "core",
@@ -1066,206 +1256,16 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
-    "name": "CTI-Bench ATE",
-    "description": "Extracting MITRE ATT&CK techniques from malware and threat descriptions",
-    "category": "cybersecurity",
+    "name": "TUMLU",
+    "description": "TUMLU is a comprehensive, multilingual, and natively developed language understanding benchmark specifically designed for Turkic languages.",
+    "category": "community",
     "tags": [
-      "extraction",
-      "cybersecurity"
-    ],
-    "function_name": "cti_bench_ate",
-    "is_alpha": false
-  },
-  {
-    "name": "CTI-Bench MCQ",
-    "description": "Multiple-choice questions evaluating understanding of CTI standards, threats, detection strategies, and best practices using authoritative sources like NIST and MITRE",
-    "category": "cybersecurity",
-    "tags": [
+      "factuality",
+      "question-answering",
       "multiple-choice",
-      "cybersecurity",
-      "knowledge"
+      "reasoning"
     ],
-    "function_name": "cti_bench_mcq",
-    "is_alpha": false
-  },
-  {
-    "name": "CTI-Bench RCM",
-    "description": "Mapping CVE descriptions to CWE categories to evaluate vulnerability classification ability",
-    "category": "cybersecurity",
-    "tags": [
-      "classification",
-      "cybersecurity"
-    ],
-    "function_name": "cti_bench_rcm",
-    "is_alpha": false
-  },
-  {
-    "name": "CTI-Bench VSP",
-    "description": "Calculating CVSS scores from vulnerability descriptions to assess severity evaluation skills",
-    "category": "cybersecurity",
-    "tags": [
-      "regression",
-      "cybersecurity"
-    ],
-    "function_name": "cti_bench_vsp",
-    "is_alpha": false
-  },
-  {
-    "name": "AIME 2023 I",
-    "description": "American Invitational Mathematics Examination 2023 (First)",
-    "category": "math",
-    "tags": [
-      "math",
-      "competition",
-      "aime",
-      "2023"
-    ],
-    "function_name": "aime_2023_I",
-    "is_alpha": false
-  },
-  {
-    "name": "AIME 2023 II",
-    "description": "American Invitational Mathematics Examination 2023 (Second)",
-    "category": "math",
-    "tags": [
-      "math",
-      "competition",
-      "aime",
-      "2023"
-    ],
-    "function_name": "aime_2023_II",
-    "is_alpha": false
-  },
-  {
-    "name": "AIME 2024",
-    "description": "American Invitational Mathematics Examination 2024 (Combined I & II)",
-    "category": "math",
-    "tags": [
-      "math",
-      "competition",
-      "aime",
-      "2024",
-      "combined"
-    ],
-    "function_name": "aime_2024",
-    "is_alpha": false
-  },
-  {
-    "name": "AIME 2024 I",
-    "description": "American Invitational Mathematics Examination 2024 (First)",
-    "category": "math",
-    "tags": [
-      "math",
-      "competition",
-      "aime",
-      "2024"
-    ],
-    "function_name": "aime_2024_I",
-    "is_alpha": false
-  },
-  {
-    "name": "AIME 2024 II",
-    "description": "American Invitational Mathematics Examination 2024 (Second)",
-    "category": "math",
-    "tags": [
-      "math",
-      "competition",
-      "aime",
-      "2024"
-    ],
-    "function_name": "aime_2024_II",
-    "is_alpha": false
-  },
-  {
-    "name": "AIME 2025",
-    "description": "American Invitational Mathematics Examination 2025",
-    "category": "math",
-    "tags": [
-      "math",
-      "competition",
-      "aime",
-      "2025"
-    ],
-    "function_name": "aime_2025",
-    "is_alpha": false
-  },
-  {
-    "name": "AIME 2025 II",
-    "description": "American Invitational Mathematics Examination 2025 (Second)",
-    "category": "math",
-    "tags": [
-      "math",
-      "competition",
-      "aime",
-      "2025"
-    ],
-    "function_name": "aime_2025_II",
-    "is_alpha": false
-  },
-  {
-    "name": "BRUMO 2025",
-    "description": "Bruno Mathematical Olympiad 2025",
-    "category": "math",
-    "tags": [
-      "math",
-      "competition",
-      "olympiad",
-      "2025"
-    ],
-    "function_name": "brumo_2025",
-    "is_alpha": false
-  },
-  {
-    "name": "HMMT Feb 2023",
-    "description": "Harvard-MIT Mathematics Tournament February 2023",
-    "category": "math",
-    "tags": [
-      "math",
-      "competition",
-      "hmmt",
-      "2023"
-    ],
-    "function_name": "hmmt_feb_2023",
-    "is_alpha": false
-  },
-  {
-    "name": "HMMT Feb 2024",
-    "description": "Harvard-MIT Mathematics Tournament February 2024",
-    "category": "math",
-    "tags": [
-      "math",
-      "competition",
-      "hmmt",
-      "2024"
-    ],
-    "function_name": "hmmt_feb_2024",
-    "is_alpha": false
-  },
-  {
-    "name": "HMMT Feb 2025",
-    "description": "Harvard-MIT Mathematics Tournament February 2025",
-    "category": "math",
-    "tags": [
-      "math",
-      "competition",
-      "hmmt",
-      "2025"
-    ],
-    "function_name": "hmmt_feb_2025",
-    "is_alpha": false
-  },
-  {
-    "name": "MMMU Math",
-    "description": "MMMU Mathematics subset focusing on mathematical reasoning",
-    "category": "math",
-    "tags": [
-      "multimodal",
-      "multiple-choice",
-      "mathematics",
-      "reasoning",
-      "images"
-    ],
-    "function_name": "mmmu_math",
+    "function_name": "tumlu",
     "is_alpha": false
   }
 ];
