@@ -95,8 +95,6 @@ MCQ_PATTERNS = [
     """,
         re.MULTILINE,
     ),
-    # 12) Final fallback: extract the first character at start of text (A-E only)
-    re.compile(r"(?x)^\s*([A-E])"),
 ]
 
 # Add multilingual patterns after the English ones
