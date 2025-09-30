@@ -1,0 +1,107 @@
+---
+title: "MCQEval in OpenBench"
+description: "Robust infrastructure to support integration multiple choice question (MCQ) benchmarks."
+---
+
+## Implement MCQEval
+Our built-in MCQEval framework serves as an evaluation task factory. To implement, define two components and let OpenBench take care of the rest!
+
+### Component 1: Map Your Dataset to MCQ Samples
+Define a mapping for dataset records to fit the expected **MCQSample** format:
+
+```python
+class MCQSample(Sample):
+    input: str | list[ChatMessage]
+    target: str     # must be a single uppercase letter (e.g. "A")
+```
+```python evals/openbookqa.py
+def record_to_mcq_sample(record) -> MCQSample:
+    """Convert an OpenBookQA record to an OpenBench MCQSample."""
+
+    question = record["question_stem"]
+    options = [choice for choice in record["choices"]["text"]]
+    prompt = create_dynamic_multiple_choice_prompt(question, options)
+
+    return MCQSample(
+        input=prompt,
+        target=record["answerKey"],
+        id=record.get("id"),
+        metadata={"choice_labels": record["choices"]["label"]},
+    )
+```
+
+### Component 2: Define Your Eval Task
+Given a **record_to_mcq_sample** function, **MCQEval** will spin up an InspectAI Task:
+```python
+@task
+def openbookqa(split: str = "validation") -> Task:
+    """OpenBookQA multiple choice science question evaluation (MCQ Abstracted)."""
+
+    valid_splits = ["train", "validation", "test"]
+    if split not in valid_splits:
+        raise ValueError(f"Invalid split '{split}'. Must be one of {valid_splits}")
+
+    return MCQEval(
+        # required fields
+        name="openbookqa",
+        dataset_path="allenai/openbookqa",
+        record_to_mcq_sample=record_to_mcq_sample,
+        split=split,
+    )
+```
+And that's it! After registering your new MCQ task in the [registry](/development/architecture#1-task-registry-registry-py), you can run it with `bench eval`!
+ 
+## Additional Info
+MCQEval accepts additional configuration parameters:
+```
+def MCQEval(
+    *,
+    name: str,                                        # Task name
+    dataset_path: str,                                # Hugging Face dataset path/name
+    record_to_mcq_sample,                             # Function converting a raw record into an `MCQSample`
+    split: str,                                       # HF dataset split (e.g., "train", "validation", "test")
+    auto_id: bool = True,                             # Auto-generate IDs for samples when true
+    subset_name: Optional[str] = None,                # Dataset subset to load
+    group_keys: Optional[List[str]] = None,           # Optional metadata keys to group reported metrics
+    additional_metrics: Optional[List[Any]] = None,   # Optional additional metrics
+    prompt_template: Optional[str] = None,            # Optional system prompt
+    config: Optional[GenerateConfig] = None,          # Optional model `GenerateConfig`
+    epochs: Optional[Epochs] = None,                  # Optional `Epochs` to repeat samples and reduce scores
+    dataset_kwargs: Optional[dict[str, Any]] = None,  # Additional dataset-specific parameters
+) -> Task
+```
+When called, MCQEval loads the HuggingFace dataset according to the mapping function provided,
+```
+dataset = hf_dataset(
+    dataset_path,
+    split=split,
+    sample_fields=record_to_mcq_sample,
+    auto_id=auto_id,
+    name=subset_name,  # subset name
+    **(dataset_kwargs or {}),
+)
+```
+... defines a basic generation solver,
+```
+solver = [generate()]
+if prompt_template:
+    solver = [system_message(prompt_template), generate()]
+```
+... creates a dynamic mcq scorer,
+```
+scorer = create_mcq_scorer(
+    group_keys=group_keys,
+    additional_metrics=additional_metrics,
+)()
+```
+... and returns a packaged evaluation task.
+```
+return Task(
+    name=name,
+    dataset=dataset,
+    solver=solver,
+    scorer=scorer,
+    config=config if config else GenerateConfig(),
+    epochs=epochs,
+)
+```

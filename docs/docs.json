@@ -56,11 +56,6 @@
           "anchor": "PyPI",
           "href": "https://pypi.org/project/openbench/",
           "icon": "python"
-        },
-        {
-          "anchor": "Groq",
-          "href": "https://groq.com",
-          "icon": "microchip"
         }
       ]
     }
