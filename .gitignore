@@ -18,3 +18,5 @@ logs/
 local-prompts.md
 .env
 build/
+package-lock.json
+.prettierignore
