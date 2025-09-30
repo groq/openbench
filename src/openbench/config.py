@@ -998,6 +998,15 @@ BENCHMARKS = {
         function_name="mmmu_pro_vision",
         is_alpha=False,
     ),
+    "multichallenge": BenchmarkMetadata(
+        name="MultiChallenge",
+        description="Multi-turn conversational tasks requiring reasoning, instruction retention, and coherence.",
+        category="core",
+        tags=["multi-turn", "reasoning", "chat", "judged"],
+        module_path="openbench.evals.multichallenge",
+        function_name="multichallenge",
+        is_alpha=False,
+    ),
 }
 
 
