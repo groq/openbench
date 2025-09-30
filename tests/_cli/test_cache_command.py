@@ -1,6 +1,7 @@
 """Unit tests for cache command."""
 
 import os
+import re
 import shutil
 import tempfile
 from pathlib import Path
@@ -20,6 +21,12 @@ from openbench._cli.cache_command import (
 )
 
 runner = CliRunner()
+
+
+def strip_ansi_codes(text: str) -> str:
+    """Strip ANSI color codes from text for reliable string matching in tests."""
+    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+    return ansi_escape.sub('', text)
 
 
 class TestCacheHelperFunctions:
@@ -348,33 +355,37 @@ class TestCacheCommandIntegration:
         """Test cache help command."""
         result = runner.invoke(app, ["cache", "--help"])
         assert result.exit_code == 0
-        assert "Manage OpenBench caches" in result.stdout
-        assert "info" in result.stdout
-        assert "ls" in result.stdout
-        assert "clear" in result.stdout
+        clean_stdout = strip_ansi_codes(result.stdout)
+        assert "Manage OpenBench caches" in clean_stdout
+        assert "info" in clean_stdout
+        assert "ls" in clean_stdout
+        assert "clear" in clean_stdout
 
     def test_cache_info_help(self):
         """Test cache info help command."""
         result = runner.invoke(app, ["cache", "info", "--help"])
         assert result.exit_code == 0
-        assert "Show total and per-subdir sizes" in result.stdout
+        clean_stdout = strip_ansi_codes(result.stdout)
+        assert "Show total and per-subdir sizes" in clean_stdout
 
     def test_cache_ls_help(self):
         """Test cache ls help command."""
         result = runner.invoke(app, ["cache", "ls", "--help"])
         assert result.exit_code == 0
-        assert "List cache contents" in result.stdout
-        assert "--path" in result.stdout
-        assert "--tree" in result.stdout
+        clean_stdout = strip_ansi_codes(result.stdout)
+        assert "List cache contents" in clean_stdout
+        assert "--path" in clean_stdout
+        assert "--tree" in clean_stdout
 
     def test_cache_clear_help(self):
         """Test cache clear help command."""
         result = runner.invoke(app, ["cache", "clear", "--help"])
         assert result.exit_code == 0
-        assert "Remove selected cache data" in result.stdout
-        assert "--all" in result.stdout
-        assert "--path" in result.stdout
-        assert "--yes" in result.stdout
+        clean_stdout = strip_ansi_codes(result.stdout)
+        assert "Remove selected cache data" in clean_stdout
+        assert "--all" in clean_stdout
+        assert "--path" in clean_stdout
+        assert "--yes" in clean_stdout
 
 
 class TestPrintTreeFunction:
