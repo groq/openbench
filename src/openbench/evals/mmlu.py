@@ -103,9 +103,9 @@ def record_to_mcq_sample(record: dict[str, str]) -> MCQSample:
 
 
 @task
-def mmlu(language: str = "EN-US") -> Task:
+def mmlu(language: str = "EN_US") -> Task:
     """Evaluate the MMLU dataset. MCQ Abstracted."""
-    if language == "EN-US":
+    if language == "EN_US":
         dataset_path = "nmayorga7/mmlu-en-us"
         subset_name = None
     elif language in LANGUAGES:
