@@ -104,8 +104,6 @@ Whenever possible, you should use these tools to get accurate, up-to-date inform
 
 When you have completed the task and have an answer, call the submit()
 tool to report it.
-'
-
 """
 
 # adapted from LiveMCPBench grader system message

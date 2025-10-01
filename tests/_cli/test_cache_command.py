@@ -2,12 +2,10 @@
 
 import os
 import re
-import shutil
 import tempfile
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
-import pytest
 from typer.testing import CliRunner
 
 from openbench._cli import app
@@ -15,9 +13,6 @@ from openbench._cli.cache_command import (
     _lmcp_base,
     _human_size,
     _dir_size,
-    cache_info,
-    cache_ls,
-    cache_clear,
 )
 
 runner = CliRunner()
@@ -25,8 +20,8 @@ runner = CliRunner()
 
 def strip_ansi_codes(text: str) -> str:
     """Strip ANSI color codes from text for reliable string matching in tests."""
-    ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
-    return ansi_escape.sub('', text)
+    ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+    return ansi_escape.sub("", text)
 
 
 class TestCacheHelperFunctions:
@@ -42,7 +37,7 @@ class TestCacheHelperFunctions:
         assert _human_size(0) == "0.0 B"
         assert _human_size(512) == "512.0 B"
         assert _human_size(1024) == "1.0 KB"
-        assert _human_size(1536) == "1.5 KB" 
+        assert _human_size(1536) == "1.5 KB"
         assert _human_size(1024 * 1024) == "1.0 MB"
         assert _human_size(1024 * 1024 * 1024) == "1.0 GB"
         assert _human_size(1024 * 1024 * 1024 * 1024) == "1.0 TB"
@@ -63,7 +58,7 @@ class TestCacheHelperFunctions:
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             temp_file.write(b"hello world")
             temp_file.flush()
-            
+
             try:
                 assert _dir_size(Path(temp_file.name)) == 11
             finally:
@@ -73,16 +68,16 @@ class TestCacheHelperFunctions:
         """Test _dir_size calculates total size of directory with files."""
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
-            
+
             # Create files with known sizes
-            (temp_path / "file1.txt").write_bytes(b"a" * 100)  
+            (temp_path / "file1.txt").write_bytes(b"a" * 100)
             (temp_path / "file2.txt").write_bytes(b"b" * 200)
-            
+
             # Create subdirectory with file
             subdir = temp_path / "subdir"
             subdir.mkdir()
-            (subdir / "file3.txt").write_bytes(b"c" * 50) 
-            
+            (subdir / "file3.txt").write_bytes(b"c" * 50)
+
             assert _dir_size(temp_path) == 350
 
     def test_dir_size_handles_permission_errors(self):
@@ -90,16 +85,16 @@ class TestCacheHelperFunctions:
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
             (temp_path / "file.txt").write_bytes(b"test")
-            
+
             mock_file = MagicMock()
             mock_file.is_file.return_value = True
             mock_file.stat.side_effect = PermissionError("Access denied")
-            
+
             # Mock Path.rglob at the module level
             with patch("pathlib.Path.rglob", return_value=[mock_file]):
                 result = _dir_size(temp_path)
-                assert isinstance(result, int) 
-                assert result == 0  
+                assert isinstance(result, int)
+                assert result == 0
 
 
 class TestCacheInfoCommand:
@@ -111,7 +106,7 @@ class TestCacheInfoCommand:
         mock_path = MagicMock()
         mock_path.exists.return_value = False
         mock_lmcp_base.return_value = mock_path
-        
+
         result = runner.invoke(app, ["cache", "info"])
         assert result.exit_code == 0
         assert "No livemcpbench cache directory found." in result.stdout
@@ -125,7 +120,7 @@ class TestCacheInfoCommand:
         mock_path.iterdir.return_value = []
         mock_lmcp_base.return_value = mock_path
         mock_dir_size.return_value = 0
-        
+
         result = runner.invoke(app, ["cache", "info"])
         assert result.exit_code == 0
         assert "Total size: 0.0 B" in result.stdout
@@ -138,19 +133,19 @@ class TestCacheInfoCommand:
         subdir1 = MagicMock()
         subdir1.name = "subdir1"
         subdir1.is_dir.return_value = True
-        
+
         subdir2 = MagicMock()
         subdir2.name = "subdir2"
         subdir2.is_dir.return_value = True
-        
+
         mock_path = MagicMock()
         mock_path.exists.return_value = True
         mock_path.iterdir.return_value = [subdir1, subdir2]
         mock_lmcp_base.return_value = mock_path
-        
+
         # Mock sizes
         mock_dir_size.side_effect = [1024, 512, 256]  # total, subdir1, subdir2
-        
+
         result = runner.invoke(app, ["cache", "info"])
         assert result.exit_code == 0
         assert "Total size: 1.0 KB" in result.stdout
@@ -167,7 +162,7 @@ class TestCacheLsCommand:
         mock_path = MagicMock()
         mock_path.exists.return_value = False
         mock_lmcp_base.return_value = mock_path
-        
+
         result = runner.invoke(app, ["cache", "ls"])
         assert result.exit_code == 1
         assert "Path not found:" in result.stdout
@@ -180,7 +175,7 @@ class TestCacheLsCommand:
         mock_path.is_dir.return_value = True
         mock_path.iterdir.return_value = []
         mock_lmcp_base.return_value = mock_path
-        
+
         result = runner.invoke(app, ["cache", "ls"])
         assert result.exit_code == 0
         assert "(empty)" in result.stdout
@@ -192,20 +187,20 @@ class TestCacheLsCommand:
         mock_file = MagicMock()
         mock_file.name = "file.txt"
         mock_file.is_dir.return_value = False
-        
+
         mock_dir = MagicMock()
         mock_dir.name = "subdir"
         mock_dir.is_dir.return_value = True
-        
+
         mock_path = MagicMock()
         mock_path.exists.return_value = True
         mock_path.is_dir.return_value = True
         mock_path.iterdir.return_value = [mock_file, mock_dir]
         mock_lmcp_base.return_value = mock_path
-        
+
         result = runner.invoke(app, ["cache", "ls"])
         assert result.exit_code == 0
-        assert "subdir/" in result.stdout  
+        assert "subdir/" in result.stdout
         assert "file.txt" in result.stdout
 
     @patch("openbench._cli.cache_command._lmcp_base")
@@ -215,7 +210,7 @@ class TestCacheLsCommand:
         mock_path.exists.return_value = True
         mock_path.is_dir.return_value = False
         mock_lmcp_base.return_value = mock_path
-        
+
         result = runner.invoke(app, ["cache", "ls"])
         assert result.exit_code == 0
         assert "(file)" in result.stdout
@@ -228,7 +223,7 @@ class TestCacheLsCommand:
         mock_path.exists.return_value = True
         mock_path.is_dir.return_value = True
         mock_lmcp_base.return_value = mock_path
-        
+
         result = runner.invoke(app, ["cache", "ls", "--tree"])
         assert result.exit_code == 0
         mock_print_tree.assert_called_once_with(mock_path)
@@ -241,10 +236,10 @@ class TestCacheLsCommand:
         mock_subpath.exists.return_value = True
         mock_subpath.is_dir.return_value = True
         mock_subpath.iterdir.return_value = []
-        
+
         mock_base.__truediv__.return_value = mock_subpath
         mock_lmcp_base.return_value = mock_base
-        
+
         result = runner.invoke(app, ["cache", "ls", "--path", "subdir"])
         assert result.exit_code == 0
         assert "(empty)" in result.stdout
@@ -257,7 +252,10 @@ class TestCacheClearCommand:
         """Test cache clear without required arguments."""
         result = runner.invoke(app, ["cache", "clear"])
         assert result.exit_code == 2
-        assert "Specify --all to clear everything or --path to clear a subpath." in result.stdout
+        assert (
+            "Specify --all to clear everything or --path to clear a subpath."
+            in result.stdout
+        )
 
     def test_cache_clear_conflicting_arguments(self):
         """Test cache clear with conflicting arguments."""
@@ -271,7 +269,7 @@ class TestCacheClearCommand:
         mock_path = MagicMock()
         mock_path.exists.return_value = False
         mock_lmcp_base.return_value = mock_path
-        
+
         result = runner.invoke(app, ["cache", "clear", "--all", "--yes"])
         assert result.exit_code == 1
         assert "Path not found:" in result.stdout
@@ -284,7 +282,7 @@ class TestCacheClearCommand:
         mock_path.exists.return_value = True
         mock_lmcp_base.return_value = mock_path
         mock_confirm.return_value = False
-        
+
         result = runner.invoke(app, ["cache", "clear", "--all"])
         assert result.exit_code == 0
         assert "Aborted." in result.stdout
@@ -297,7 +295,7 @@ class TestCacheClearCommand:
         mock_path.exists.return_value = True
         mock_path.is_file.return_value = False
         mock_lmcp_base.return_value = mock_path
-        
+
         result = runner.invoke(app, ["cache", "clear", "--all", "--yes"])
         assert result.exit_code == 0
         assert "✅ Cleared." in result.stdout
@@ -310,7 +308,7 @@ class TestCacheClearCommand:
         mock_path.exists.return_value = True
         mock_path.is_file.return_value = True
         mock_lmcp_base.return_value = mock_path
-        
+
         result = runner.invoke(app, ["cache", "clear", "--all", "--yes"])
         assert result.exit_code == 0
         assert "✅ Cleared." in result.stdout
@@ -325,7 +323,7 @@ class TestCacheClearCommand:
         mock_path.is_file.return_value = False
         mock_lmcp_base.return_value = mock_path
         mock_rmtree.side_effect = PermissionError("Access denied")
-        
+
         result = runner.invoke(app, ["cache", "clear", "--all", "--yes"])
         assert result.exit_code == 1
         assert "❌ Failed to clear:" in result.stdout
@@ -338,10 +336,10 @@ class TestCacheClearCommand:
         mock_subpath = MagicMock()
         mock_subpath.exists.return_value = True
         mock_subpath.is_file.return_value = True
-        
+
         mock_base.__truediv__.return_value = mock_subpath
         mock_lmcp_base.return_value = mock_base
-        
+
         result = runner.invoke(app, ["cache", "clear", "--path", "subdir", "--yes"])
         assert result.exit_code == 0
         assert "✅ Cleared." in result.stdout
@@ -396,19 +394,19 @@ class TestPrintTreeFunction:
         """Test that _print_tree is called recursively for directories."""
         # Import the actual function to test it
         from openbench._cli.cache_command import _print_tree
-        
+
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
-            
+
             # Create a simple directory structure
             (temp_path / "file.txt").write_text("test")
             subdir = temp_path / "subdir"
             subdir.mkdir()
             (subdir / "nested_file.txt").write_text("nested")
-            
+
             # Call the actual function
             _print_tree(temp_path)
-            
+
             # Verify typer.echo was called (indicating output was generated)
             assert mock_echo.call_count > 0
 
@@ -416,9 +414,9 @@ class TestPrintTreeFunction:
     def test_print_tree_nonexistent_path(self, mock_echo):
         """Test _print_tree with nonexistent path."""
         from openbench._cli.cache_command import _print_tree
-        
+
         nonexistent_path = Path("/nonexistent/path")
         _print_tree(nonexistent_path)
-        
+
         # Should print error message
         mock_echo.assert_called_with(f"Path not found: {nonexistent_path}")

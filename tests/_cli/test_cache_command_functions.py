@@ -5,8 +5,6 @@ import tempfile
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
-import pytest
-
 from openbench._cli.cache_command import (
     _lmcp_base,
     _human_size,
@@ -29,7 +27,7 @@ class TestLmcpBase:
         """Test that _lmcp_base properly expands ~ to user home."""
         result = _lmcp_base()
         assert "~" not in str(result)  # Should be expanded
-        
+
     @patch("os.path.expanduser")
     def test_lmcp_base_uses_expanduser(self, mock_expanduser):
         """Test that _lmcp_base uses os.path.expanduser."""
@@ -82,7 +80,7 @@ class TestHumanSize:
         """Test edge cases for human size formatting."""
         # Very small float
         assert _human_size(0.5) == "0.5 B"
-        
+
         # Exact boundaries
         assert _human_size(1023.9) == "1023.9 B"
         assert _human_size(1024.0) == "1.0 KB"
@@ -107,7 +105,7 @@ class TestDirSize:
             content = b"hello world"
             temp_file.write(content)
             temp_file.flush()
-            
+
             try:
                 result = _dir_size(Path(temp_file.name))
                 assert result == len(content)
@@ -118,32 +116,32 @@ class TestDirSize:
         """Test _dir_size with directory containing files."""
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
-            
+
             # Create files with known content
             file1 = temp_path / "file1.txt"
             file1.write_bytes(b"a" * 100)
-            
+
             file2 = temp_path / "file2.txt"
             file2.write_bytes(b"b" * 200)
-            
+
             assert _dir_size(temp_path) == 300
 
     def test_dir_size_nested_directories(self):
         """Test _dir_size with nested directory structure."""
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
-            
+
             # Create nested structure
             (temp_path / "file1.txt").write_bytes(b"x" * 50)
-            
+
             subdir1 = temp_path / "subdir1"
             subdir1.mkdir()
             (subdir1 / "file2.txt").write_bytes(b"y" * 75)
-            
+
             subdir2 = subdir1 / "nested"
             subdir2.mkdir()
             (subdir2 / "file3.txt").write_bytes(b"z" * 25)
-            
+
             assert _dir_size(temp_path) == 150
 
     def test_dir_size_ignores_stat_errors(self):
@@ -151,14 +149,14 @@ class TestDirSize:
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
             (temp_path / "good_file.txt").write_bytes(b"test")
-            
+
             # Mock rglob to return both a good file and one that raises an exception
             good_file = temp_path / "good_file.txt"
             bad_file = MagicMock()
             bad_file.is_file.return_value = True
             bad_file.stat.side_effect = PermissionError("Access denied")
-            
-            with patch.object(Path, 'rglob', return_value=[good_file, bad_file]):
+
+            with patch.object(Path, "rglob", return_value=[good_file, bad_file]):
                 # Should not raise exception, should return size of good file only
                 result = _dir_size(temp_path)
                 assert result == 4  # Length of b"test"
@@ -167,15 +165,15 @@ class TestDirSize:
         """Test _dir_size handles various file types."""
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
-            
+
             # Regular file
             regular_file = temp_path / "regular.txt"
             regular_file.write_bytes(b"regular" * 10)
-            
+
             # Create a subdirectory that should be skipped by is_file() check
             subdir = temp_path / "subdir"
             subdir.mkdir()
-            
+
             result = _dir_size(temp_path)
             assert result == 70  # 7 * 10
 
@@ -197,9 +195,9 @@ class TestPrintTree:
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
             (temp_path / "test.txt").write_text("content")
-            
+
             _print_tree(temp_path)
-            
+
             mock_echo.assert_called_once_with("└── test.txt")
 
     @patch("typer.echo")
@@ -209,9 +207,9 @@ class TestPrintTree:
             temp_path = Path(temp_dir)
             (temp_path / "a.txt").write_text("content")
             (temp_path / "b.txt").write_text("content")
-            
+
             _print_tree(temp_path)
-            
+
             # Should be called twice, once for each file
             assert mock_echo.call_count == 2
             # First file should use ├── and second should use └──
@@ -226,9 +224,9 @@ class TestPrintTree:
             temp_path = Path(temp_dir)
             (temp_path / "z_file.txt").write_text("content")
             (temp_path / "a_directory").mkdir()
-            
+
             _print_tree(temp_path)
-            
+
             calls = [call.args[0] for call in mock_echo.call_args_list]
             # Directory should come first despite alphabetical order
             assert calls[0] == "├── a_directory"
@@ -242,9 +240,9 @@ class TestPrintTree:
             subdir = temp_path / "subdir"
             subdir.mkdir()
             (subdir / "nested.txt").write_text("content")
-            
+
             _print_tree(temp_path)
-            
+
             calls = [call.args[0] for call in mock_echo.call_args_list]
             assert any("└── subdir" in call for call in calls)
             assert any("    └── nested.txt" in call for call in calls)
@@ -254,25 +252,25 @@ class TestPrintTree:
         """Test _print_tree with complex directory structure."""
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
-            
+
             # Create complex structure
             (temp_path / "file1.txt").write_text("content")
-            
+
             dir1 = temp_path / "dir1"
             dir1.mkdir()
             (dir1 / "file2.txt").write_text("content")
-            
+
             dir2 = temp_path / "dir2"
             dir2.mkdir()
             nested = dir2 / "nested"
             nested.mkdir()
             (nested / "deep.txt").write_text("content")
-            
+
             _print_tree(temp_path)
-            
+
             # Verify structure is printed correctly
             calls = [call.args[0] for call in mock_echo.call_args_list]
-            
+
             # Should have proper tree structure with correct connectors
             assert any("├── dir1" in call for call in calls)
             assert any("├── dir2" in call for call in calls)
@@ -285,7 +283,7 @@ class TestPrintTree:
         """Test _print_tree handles FileNotFoundError."""
         nonexistent_path = Path("/nonexistent/path")
         _print_tree(nonexistent_path)
-        
+
         mock_echo.assert_called_once_with(f"Path not found: {nonexistent_path}")
 
     @patch("typer.echo")
@@ -294,9 +292,9 @@ class TestPrintTree:
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
             (temp_path / "test.txt").write_text("content")
-            
+
             _print_tree(temp_path, prefix="  ")
-            
+
             mock_echo.assert_called_once_with("  └── test.txt")
 
 
@@ -316,7 +314,7 @@ class TestCacheCommandEdgeCases:
 
     def test_human_size_very_large_number(self):
         """Test _human_size with extremely large number."""
-        very_large = 1024 ** 6  # Exabyte
+        very_large = 1024**6  # Exabyte
         result = _human_size(very_large)
         assert result == "1024.0 PB"  # Should still use PB as largest unit
 
