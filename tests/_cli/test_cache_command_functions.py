@@ -49,59 +49,59 @@ class TestCacheDiscovery:
         mock_path = MagicMock()
         mock_path.exists.return_value = False
         mock_cache_root.return_value = mock_path
-        
+
         result = _discover_cache_types()
         assert result == []
-    
+
     @patch("openbench._cli.cache_command._cache_root")
     def test_discover_cache_types_with_dirs(self, mock_cache_root):
         """Test _discover_cache_types with multiple cache directories."""
         mock_dir1 = MagicMock()
         mock_dir1.name = "livemcpbench"
         mock_dir1.is_dir.return_value = True
-        
+
         mock_dir2 = MagicMock()
         mock_dir2.name = "scicode"
         mock_dir2.is_dir.return_value = True
-        
+
         mock_file = MagicMock()
         mock_file.name = "somefile.txt"
         mock_file.is_dir.return_value = False
-        
+
         mock_path = MagicMock()
         mock_path.exists.return_value = True
         mock_path.iterdir.return_value = [mock_dir1, mock_dir2, mock_file]
         mock_cache_root.return_value = mock_path
-        
+
         result = _discover_cache_types()
         assert set(result) == {"livemcpbench", "scicode"}
-    
+
     def test_get_cache_path_with_type(self):
         """Test _get_cache_path with specific cache type."""
         result = _get_cache_path("livemcpbench")
         expected = Path(os.path.expanduser("~/.openbench/livemcpbench")).resolve()
         assert result == expected
-    
+
     def test_get_cache_path_without_type(self):
         """Test _get_cache_path without cache type returns root."""
         result = _get_cache_path()
         expected = Path(os.path.expanduser("~/.openbench")).resolve()
         assert result == expected
-    
+
     @patch("openbench._cli.cache_command._discover_cache_types")
     def test_get_default_cache_type_single_livemcp(self, mock_discover):
         """Test _get_default_cache_type returns livemcpbench when it's the only type."""
         mock_discover.return_value = ["livemcpbench"]
         result = _get_default_cache_type()
         assert result == "livemcpbench"
-    
+
     @patch("openbench._cli.cache_command._discover_cache_types")
     def test_get_default_cache_type_multiple_types(self, mock_discover):
         """Test _get_default_cache_type returns None when multiple types exist."""
         mock_discover.return_value = ["livemcpbench", "scicode"]
         result = _get_default_cache_type()
         assert result is None
-    
+
     @patch("openbench._cli.cache_command._discover_cache_types")
     def test_get_default_cache_type_no_types(self, mock_discover):
         """Test _get_default_cache_type returns None when no types exist."""

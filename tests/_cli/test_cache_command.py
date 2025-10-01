@@ -34,66 +34,66 @@ class TestCacheHelperFunctions:
         """Test that _cache_root returns the expected cache root directory path."""
         expected = Path(os.path.expanduser("~/.openbench")).resolve()
         assert _cache_root() == expected
-    
+
     def test_get_cache_path_with_type(self):
         """Test _get_cache_path with specific cache type."""
         result = _get_cache_path("livemcpbench")
         expected = Path(os.path.expanduser("~/.openbench/livemcpbench")).resolve()
         assert result == expected
-    
+
     def test_get_cache_path_without_type(self):
         """Test _get_cache_path without cache type returns root."""
         result = _get_cache_path()
         expected = Path(os.path.expanduser("~/.openbench")).resolve()
         assert result == expected
-    
+
     @patch("openbench._cli.cache_command._cache_root")
     def test_discover_cache_types_empty(self, mock_cache_root):
         """Test _discover_cache_types with no cache directory."""
         mock_path = MagicMock()
         mock_path.exists.return_value = False
         mock_cache_root.return_value = mock_path
-        
+
         result = _discover_cache_types()
         assert result == []
-    
+
     @patch("openbench._cli.cache_command._cache_root")
     def test_discover_cache_types_with_caches(self, mock_cache_root):
         """Test _discover_cache_types with multiple cache types."""
         mock_dir1 = MagicMock()
         mock_dir1.name = "livemcpbench"
         mock_dir1.is_dir.return_value = True
-        
+
         mock_dir2 = MagicMock()
         mock_dir2.name = "scicode"
         mock_dir2.is_dir.return_value = True
-        
+
         mock_file = MagicMock()
         mock_file.name = "somefile.txt"
         mock_file.is_dir.return_value = False
-        
+
         mock_path = MagicMock()
         mock_path.exists.return_value = True
         mock_path.iterdir.return_value = [mock_dir1, mock_dir2, mock_file]
         mock_cache_root.return_value = mock_path
-        
+
         result = _discover_cache_types()
         assert set(result) == {"livemcpbench", "scicode"}
-    
+
     @patch("openbench._cli.cache_command._discover_cache_types")
     def test_get_default_cache_type_single_livemcp(self, mock_discover):
         """Test _get_default_cache_type returns livemcpbench when it's the only type."""
         mock_discover.return_value = ["livemcpbench"]
         result = _get_default_cache_type()
         assert result == "livemcpbench"
-    
+
     @patch("openbench._cli.cache_command._discover_cache_types")
     def test_get_default_cache_type_multiple_types(self, mock_discover):
         """Test _get_default_cache_type returns None when multiple types exist."""
         mock_discover.return_value = ["livemcpbench", "scicode"]
         result = _get_default_cache_type()
         assert result is None
-    
+
     @patch("openbench._cli.cache_command._discover_cache_types")
     def test_get_default_cache_type_no_types(self, mock_discover):
         """Test _get_default_cache_type returns None when no types exist."""
@@ -181,7 +181,9 @@ class TestCacheInfoCommand:
     @patch("openbench._cli.cache_command._dir_size")
     @patch("openbench._cli.cache_command._discover_cache_types")
     @patch("openbench._cli.cache_command._cache_root")
-    def test_cache_info_with_cache_types(self, mock_cache_root, mock_discover, mock_dir_size):
+    def test_cache_info_with_cache_types(
+        self, mock_cache_root, mock_discover, mock_dir_size
+    ):
         """Test cache info with multiple cache types."""
         mock_root = MagicMock()
         mock_cache_root.return_value = mock_root
@@ -225,36 +227,38 @@ class TestCacheInfoCommand:
         """Test cache info shows subdirectories for each cache type."""
         import tempfile
         from pathlib import Path
-        
+
         with tempfile.TemporaryDirectory() as temp_dir:
-            cache_root = Path(temp_dir) / '.openbench'
-            
+            cache_root = Path(temp_dir) / ".openbench"
+
             # Create livemcpbench cache with subdirectories
-            lmcp_dir = cache_root / 'livemcpbench'
+            lmcp_dir = cache_root / "livemcpbench"
             lmcp_dir.mkdir(parents=True)
-            (lmcp_dir / 'copilot').mkdir()
-            (lmcp_dir / 'root').mkdir()
-            (lmcp_dir / 'copilot' / 'test.txt').write_text('test data')
-            (lmcp_dir / 'root' / 'data.json').write_text('{}')
-            
-            # Create scicode cache with subdirectories  
-            sci_dir = cache_root / 'scicode'
+            (lmcp_dir / "copilot").mkdir()
+            (lmcp_dir / "root").mkdir()
+            (lmcp_dir / "copilot" / "test.txt").write_text("test data")
+            (lmcp_dir / "root" / "data.json").write_text("{}")
+
+            # Create scicode cache with subdirectories
+            sci_dir = cache_root / "scicode"
             sci_dir.mkdir()
-            (sci_dir / 'downloads').mkdir()
-            (sci_dir / 'downloads' / 'file.h5').write_text('binary data')
-            
+            (sci_dir / "downloads").mkdir()
+            (sci_dir / "downloads" / "file.h5").write_text("binary data")
+
             # Mock the cache root to point to our temp directory
-            with patch('openbench._cli.cache_command._cache_root', return_value=cache_root):
+            with patch(
+                "openbench._cli.cache_command._cache_root", return_value=cache_root
+            ):
                 result = runner.invoke(app, ["cache", "info"])
                 assert result.exit_code == 0
-                
+
                 # Check that cache types are shown
                 assert "livemcpbench" in result.stdout
                 assert "scicode" in result.stdout
-                
+
                 # Check that subdirectories are shown with tree symbols
                 assert "└─ copilot" in result.stdout
-                assert "└─ root" in result.stdout  
+                assert "└─ root" in result.stdout
                 assert "└─ downloads" in result.stdout
 
 
@@ -331,7 +335,9 @@ class TestCacheLsCommand:
     @patch("openbench._cli.cache_command._print_tree")
     @patch("openbench._cli.cache_command._get_cache_path")
     @patch("openbench._cli.cache_command._get_default_cache_type")
-    def test_cache_ls_tree_view(self, mock_default_type, mock_get_cache_path, mock_print_tree):
+    def test_cache_ls_tree_view(
+        self, mock_default_type, mock_get_cache_path, mock_print_tree
+    ):
         """Test cache ls with tree view."""
         mock_default_type.return_value = "livemcpbench"
         mock_path = MagicMock()
@@ -396,7 +402,9 @@ class TestCacheClearCommand:
     @patch("typer.confirm")
     @patch("openbench._cli.cache_command._get_cache_path")
     @patch("openbench._cli.cache_command._get_default_cache_type")
-    def test_cache_clear_user_aborts(self, mock_default_type, mock_get_cache_path, mock_confirm):
+    def test_cache_clear_user_aborts(
+        self, mock_default_type, mock_get_cache_path, mock_confirm
+    ):
         """Test cache clear when user aborts confirmation."""
         mock_default_type.return_value = "livemcpbench"
         mock_path = MagicMock()
@@ -411,7 +419,9 @@ class TestCacheClearCommand:
     @patch("shutil.rmtree")
     @patch("openbench._cli.cache_command._get_cache_path")
     @patch("openbench._cli.cache_command._get_default_cache_type")
-    def test_cache_clear_directory_success(self, mock_default_type, mock_get_cache_path, mock_rmtree):
+    def test_cache_clear_directory_success(
+        self, mock_default_type, mock_get_cache_path, mock_rmtree
+    ):
         """Test successful cache clear of directory."""
         mock_default_type.return_value = "livemcpbench"
         mock_path = MagicMock()
@@ -442,7 +452,9 @@ class TestCacheClearCommand:
     @patch("shutil.rmtree")
     @patch("openbench._cli.cache_command._get_cache_path")
     @patch("openbench._cli.cache_command._get_default_cache_type")
-    def test_cache_clear_failure(self, mock_default_type, mock_get_cache_path, mock_rmtree):
+    def test_cache_clear_failure(
+        self, mock_default_type, mock_get_cache_path, mock_rmtree
+    ):
         """Test cache clear failure handling."""
         mock_default_type.return_value = "livemcpbench"
         mock_path = MagicMock()
