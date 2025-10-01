@@ -1,7 +1,10 @@
-from inspect_ai.dataset import Dataset, csv_dataset, Sample
+from inspect_ai import task, Task
+from inspect_ai.model import GenerateConfig
+from openbench.utils.mcq import MCQEval, MCQSample
 from openbench.utils.text import MULTIPLE_CHOICE_PROMPT_TEMPLATE
 
 # Adapted from https://github.com/openai/simple-evals
+
 SUBJECT_TO_CATEGORY = {
     "abstract_algebra": "stem",
     "anatomy": "other",
@@ -63,26 +66,26 @@ SUBJECT_TO_CATEGORY = {
 }
 
 LANGUAGES = [
-    "EN-US",
-    "AR-XY",
-    "BN-BD",
-    "DE-DE",
-    "ES-LA",
-    "FR-FR",
-    "HI-IN",
-    "ID-ID",
-    "IT-IT",
-    "JA-JP",
-    "KO-KR",
-    "PT-BR",
-    "ZH-CN",
-    "SW-KE",
-    "YO-NG",
+    "AR_XY",
+    "BN_BD",
+    "DE_DE",
+    "ES_LA",
+    "FR_FR",
+    "HI_IN",
+    "ID_ID",
+    "IT_IT",
+    "JA_JP",
+    "KO_KR",
+    "PT_BR",
+    "ZH_CN",
+    "SW_KE",
+    "YO_NG",
 ]
 
 
-def record_to_sample(record: dict[str, str]) -> Sample:
-    return Sample(
+def record_to_mcq_sample(record: dict[str, str]) -> MCQSample:
+    """Convert a MMLU record to an OpenBench MCQSample."""
+    return MCQSample(
         input=MULTIPLE_CHOICE_PROMPT_TEMPLATE.format(
             prompt=record["Question"],
             option_a=record["A"],
@@ -93,20 +96,41 @@ def record_to_sample(record: dict[str, str]) -> Sample:
         target=record["Answer"],
         metadata={
             "subject": record["Subject"],
-            "category": SUBJECT_TO_CATEGORY[record["Subject"]],
+            "category": SUBJECT_TO_CATEGORY[record["Subject"]]
+            if record["Subject"] in SUBJECT_TO_CATEGORY
+            else "Invalid Subject: " + record["Subject"],
         },
     )
 
 
-def get_dataset(language: str = "EN-US") -> Dataset:
-    if language not in LANGUAGES:
-        raise ValueError(f"Language {language} not supported")
+@task
+def mmmlu(language: str = "") -> Task:
+    """Evaluate the MMMLU dataset (MMLU translated to 15 languages). MCQ Abstracted."""
+    if language == "EN_US":
+        # redirect to mmlu if language is EN_US
+        raise ValueError("EN_US is not supported by MMMLU. Use mmlu() instead.")
+    elif language in LANGUAGES:
+        # specific language, use the corresponding dataset
+        dataset_path = "openai/MMMLU"
+        subset_name = language
+    elif not language.strip():
+        # default: no language given → run all
+        dataset_path = "openai/MMMLU"
+        subset_name = None
+    else:
+        raise ValueError(
+            f"Language {language} not supported. Make sure to use a valid language code: {LANGUAGES}"
+        )
 
-    return csv_dataset(
-        csv_file="https://openaipublic.blob.core.windows.net/simple-evals/mmlu.csv"
-        if language == "EN-US"
-        else f"https://openaipublic.blob.core.windows.net/simple-evals/mmlu_{language}.csv",
-        sample_fields=record_to_sample,
+    return MCQEval(
+        name="mmmlu",
+        dataset_path=dataset_path,
+        subset_name=subset_name,
+        record_to_mcq_sample=record_to_mcq_sample,
+        split="test",
         auto_id=True,
-        name="mmlu_simple_eval",
+        config=GenerateConfig(
+            temperature=0.5,
+        ),
+        group_keys=["category"],
     )

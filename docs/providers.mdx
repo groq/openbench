@@ -1,0 +1,90 @@
+---
+title: "Model Providers"
+description: "OpenBench supports 30+ model providers through OpenBench."
+---
+
+To access any major model, set the appropriate API key environment variable:
+
+| Provider              | Environment Variable   | Example Model String             |
+| --------------------- | ---------------------- | -------------------------------- |
+| **AI21 Labs**         | `AI21_API_KEY`         | `ai21/model-name`                |
+| **Anthropic**         | `ANTHROPIC_API_KEY`    | `anthropic/model-name`           |
+| **AWS Bedrock**       | AWS credentials        | `bedrock/model-name`             |
+| **Azure**             | `AZURE_OPENAI_API_KEY` | `azure/<deployment-name>`        |
+| **Baseten**           | `BASETEN_API_KEY`      | `baseten/model-name`             |
+| **Cerebras**          | `CEREBRAS_API_KEY`     | `cerebras/model-name`            |
+| **Cohere**            | `COHERE_API_KEY`       | `cohere/model-name`              |
+| **Crusoe**            | `CRUSOE_API_KEY`       | `crusoe/model-name`              |
+| **DeepInfra**         | `DEEPINFRA_API_KEY`    | `deepinfra/model-name`           |
+| **Friendli**          | `FRIENDLI_TOKEN`       | `friendli/model-name`            |
+| **Google**            | `GOOGLE_API_KEY`       | `google/model-name`              |
+| **Groq**              | `GROQ_API_KEY`         | `groq/model-name`                |
+| **Hugging Face**      | `HF_TOKEN`             | `huggingface/model-name`         |
+| **Hyperbolic**        | `HYPERBOLIC_API_KEY`   | `hyperbolic/model-name`          |
+| **Lambda**            | `LAMBDA_API_KEY`       | `lambda/model-name`              |
+| **MiniMax**           | `MINIMAX_API_KEY`      | `minimax/model-name`             |
+| **Mistral**           | `MISTRAL_API_KEY`      | `mistral/model-name`             |
+| **Moonshot**          | `MOONSHOT_API_KEY`     | `moonshot/model-name`            |
+| **Nebius**            | `NEBIUS_API_KEY`       | `nebius/model-name`              |
+| **Nous Research**     | `NOUS_API_KEY`         | `nous/model-name`                |
+| **Novita AI**         | `NOVITA_API_KEY`       | `novita/model-name`              |
+| **Ollama**            | None (local)           | `ollama/model-name`              |
+| **OpenAI**            | `OPENAI_API_KEY`       | `openai/model-name`              |
+| **OpenRouter**        | `OPENROUTER_API_KEY`   | `openrouter/model-name`          |
+| **Parasail**          | `PARASAIL_API_KEY`     | `parasail/model-name`            |
+| **Perplexity**        | `PERPLEXITY_API_KEY`   | `perplexity/model-name`          |
+| **Reka**              | `REKA_API_KEY`         | `reka/model-name`                |
+| **SambaNova**         | `SAMBANOVA_API_KEY`    | `sambanova/model-name`           |
+| **Together AI**       | `TOGETHER_API_KEY`     | `together/model-name`            |
+| **Vercel AI Gateway** | `AI_GATEWAY_API_KEY`   | `vercel/creator-name/model-name` |
+| **vLLM**              | None (local)           | `vllm/model-name`                |
+
+### General Model Configuration
+| CLI Command        | Environment Variable   | Description                                   |
+|--------------------|------------------------|-----------------------------------------------|
+| `--model`          | `BENCH_MODEL`          | Model(s) to evaluate.                         |
+| `--model-base-url` | `BENCH_MODEL_BASE_URL` | Base URL for model(s).                        |
+| `--model-role`     | `BENCH_MODEL_ROLE`     | Map role(s) to specific models.               |
+
+Use `-M` Flag for Other Model-Specific Arguments  
+(e.g. `bench eval simpleqa --model openai/o3-2025-04-16 -M reasoning_effort=high`)
+
+## OpenRouter
+[OpenRouter](https://openrouter.ai/) allows access to 60+ providers and 500+ models, all through one centralized platform. See a comprehensive list of available models [here](https://openrouter.ai/models).
+
+To configure OpenRouter, set your API key:
+```bash
+export OPENROUTER_API_KEY="sk-or-..."
+```
+Then, set the model to evaluate using the OpenBench CLI format. Model naming follows the standard format:
+```bash
+# provider/model-name
+bench eval mrcr --model openrouter/openai/gpt-5
+bench eval mmlu --model openrouter/deepseek/deepseek-chat-v3.1
+bench eval graphwalks --model openrouter/anthropic/claude-sonnet-4.1
+```
+
+### OpenRouter Advanced Configuration
+Provider routing parameters can be specified with the `-M` flag to control which providers are used.:
+
+| Parameter        | Description   | Example                                   |
+|--------------------|------------------------|-----------------------------------------------|
+| **only**       | Restrict to specific providers   | `-M only=groq` or <br />`-M only=cerebras,openai`                     |
+| **order**    | Provider priority order   | `-M order=openai,anthropic`      |
+| **allow_fallbacks**       | Enable/disable fallback providers        |     `-M allow_fallbacks=True`                     |
+| **ignore** | `Providers to skip | `-M ignore=cerebras,fireworks`  |
+| **sort**  | Sort providers  | `-M sort=price` or <br />`-M sort=throughput` |
+| **max_price**       | Maximum price limits   | `-M max_price={"completion": 0.01}`                     |
+| **quantizations**    | Filter by quantization levels     | `-M quantizations=int4,int8`      |
+| **require_parameters**       | Require parameter support        | `-M require_parameters=False`         |
+| **data_collection** | Data collection setting | `-M data_collection=allow` or <br />`-M data_collection=deny` |
+
+### Sample Usage
+
+```bash
+bench eval mmlu 
+    --model openrouter/openai/gpt-oss-120b 
+    --max-connections 100
+    -M only=groq,together 
+    -M sort=price 
+```

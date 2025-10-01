@@ -22,6 +22,7 @@
           "installation",
           "quickstart",
           "configuration",
+          "providers",
           "benchmarks_catalog",
           "troubleshooting"
         ]
@@ -41,7 +42,8 @@
         "group": "Development",
         "pages": [
           "development/architecture",
-          "development/contributing"
+          "development/contributing",
+          "development/mcq"
         ]
       }
     ],
@@ -56,11 +58,6 @@
           "anchor": "PyPI",
           "href": "https://pypi.org/project/openbench/",
           "icon": "python"
-        },
-        {
-          "anchor": "Groq",
-          "href": "https://groq.com",
-          "icon": "microchip"
         }
       ]
     }

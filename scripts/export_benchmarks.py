@@ -70,7 +70,7 @@ def export_benchmarks(snippet_mdx_path: Path) -> List[Dict[str, Any]]:
         rows.append(normalize_benchmark(metadata))
 
     # Output sorted by category, then name
-    rows.sort(key=lambda r: (r.get("category", ""), r.get("name", "")))
+    rows.sort(key=lambda r: r.get("name", ""))
 
     # write to MDX snippet for docs to source benchmarks info
     snippet_mdx_path.parent.mkdir(parents=True, exist_ok=True)

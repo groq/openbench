@@ -240,6 +240,7 @@ from .evals.simpleqa import simpleqa  # noqa: F401, E402
 from .evals.tumlu import tumlu  # noqa: F401, E402
 from .evals.detailbench import detailbench  # noqa: F401, E402
 from .evals.supergpqa import supergpqa  # noqa: F401, E402
+from .evals.mmmlu import mmmlu  # noqa: F401, E402
 from .evals.mmmu import (  # noqa: F401, E402
     mmmu,
     mmmu_mcq,
