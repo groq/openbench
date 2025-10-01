@@ -4,11 +4,11 @@ Authored by:
 Rootly AI Labs
 
 # run evaluation
-bench eval rootly_terraform --model "groq/llama-3.1-8b-instant" --T subtask=rootly-terraform-azure-k8s-mcq
+uv run openbench eval rootly_terraform --model "groq/llama-3.1-8b-instant" --T subtask=azure-k8s-mcq
 
 Available subtasks:
-- rootly-terraform-azure-k8s-mcq
-- rootly-terraform-s3-security-mcq
+- azure-k8s-mcq
+- s3-security-mcq
 """
 
 from typing import Optional

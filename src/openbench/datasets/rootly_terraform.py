@@ -4,11 +4,11 @@ import warnings
 
 # Dataset configurations
 DATASETS = {
-    "rootly-terraform-azure-k8s-mcq": {
+    "azure-k8s-mcq": {
         "path": "TheFloatingString/rootly_terraform_azure_k8s_1",
         "revision": "2852e65fd8dc1b5302b83899381b1c086dd119ba",
     },
-    "rootly-terraform-s3-security-mcq": {
+    "s3-security-mcq": {
         "path": "TheFloatingString/s3_tf_s3_security_mcq",
         "revision": "a4fc90b54b1f191c1a13224dedddc0c9eb881a2d",
     },
@@ -35,12 +35,12 @@ def get_dataset_config(subtask: str | None = None) -> dict:
     """Get dataset configuration for a given subtask."""
     if subtask is None:
         warnings.warn(
-            "No subtask provided, defaulting to rootly-terraform-azure-k8s-mcq. "
+            "No subtask provided, defaulting to azure-k8s-mcq. "
             "If you want to use a specific subtask, use the `-T subtask=<subtask: str>` flag in the OpenBench CLI.",
             UserWarning,
         )
 
-        subtask = "rootly-terraform-azure-k8s-mcq"
+        subtask = "azure-k8s-mcq"
 
     if subtask not in DATASETS:
         valid_subtasks = ", ".join(DATASETS.keys())
