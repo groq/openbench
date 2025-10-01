@@ -29,14 +29,12 @@ Shows total cache size and breakdown by evaluation or component.
 List cache contents with various viewing options:
 
 ```bash
-# Basic listing
+
+# List all cache contents  
 bench cache ls
 
-# Tree view for hierarchical display
-bench cache ls --tree
-
-# List specific subdirectory
-bench cache ls --path livemcpbench
+# List specific cache with tree view
+bench cache ls --type livemcpbench --tree
 ```
 
 ### clear
@@ -44,32 +42,13 @@ bench cache ls --path livemcpbench
 Remove cached data with flexible targeting:
 
 ```bash
-# Clear entire cache (with confirmation)
-bench cache clear --all
+# Clear specific cache completely
+bench cache clear --type livemcpbench
 
-# Clear specific subdirectory
-bench cache clear --path livemcpbench
-
-# Skip confirmation prompt
-bench cache clear -y
+# Clear subdirectory of specific cache
+bench cache clear --type livemcpbench --path logs
 ```
 
 ## Cache Location
 
 All cache data is stored under `~/.openbench/` in your home directory. This location is consistent across different evaluations and provides centralized cache management.
-
-## Usage Examples
-
-```bash
-# Check total cache usage
-bench cache info
-
-# Browse LiveMCPBench cache contents
-bench cache ls --path livemcpbench --tree
-
-# Clear only LiveMCPBench cache
-bench cache clear --path livemcpbench
-
-# Full cache cleanup
-bench cache clear --all -y
-```
