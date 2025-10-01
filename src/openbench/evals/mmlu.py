@@ -85,17 +85,18 @@ def record_to_mcq_sample(record: dict[str, str]) -> MCQSample:
 
 
 @task
-def mmlu() -> Task:
-    """Evaluate the MMLU dataset (EN_US only). MCQ Abstracted."""
-    dataset_path = "nmayorga7/mmlu-en-us"
-    subset_name = None
+def mmlu(language: str = "EN_US") -> Task:
+    """Evaluate the MMLU dataset. MCQ Abstracted."""
+    if language == "EN_US":
+        csv_file = "https://openaipublic.blob.core.windows.net/simple-evals/mmlu.csv"
+    else:
+        raise ValueError(f"Language {language} not supported.")
 
     return MCQEval(
         name="mmlu",
-        dataset_path=dataset_path,
-        subset_name=subset_name,
+        dataset_type="csv",
+        dataset_path=csv_file,
         record_to_mcq_sample=record_to_mcq_sample,
-        split="test",
         auto_id=True,
         config=GenerateConfig(
             temperature=0.5,
