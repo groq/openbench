@@ -163,15 +163,14 @@ The `bench cache` command helps manage OpenBench's caches, particularly for Live
 # Show cache information and sizes
 bench cache info
 
-# List cache contents
+# List all cache contents
 bench cache ls
-bench cache ls --tree
-bench cache ls --path some/subdir
 
-# Clear cache data
-bench cache clear --all          # Clear entire cache
-bench cache clear --path subdir  # Clear specific subpath
-bench cache clear -y             # Skip confirmation prompt
+#List specific cache with tree view
+bench cache ls --type livemcpbench --tree
+
+# Clear specific cache completely
+bench cache clear --type livemcpbench --all
 ```
 
 All cache data is stored under `~/.openbench`. The cache command helps you monitor and manage this storage.
