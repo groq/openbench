@@ -1,17 +1,36 @@
+"""
+Rootly Terraform Multiple Choice Questions
+Authored by:
+Rootly AI Labs
+
+# run evaluation
+bench eval rootly_terraform --model "groq/llama-3.1-8b-instant" --T subtask=rootly-terraform-azure-k8s-mcq
+
+Available subtasks:
+- rootly-terraform-azure-k8s-mcq
+- rootly-terraform-s3-security-mcq
+"""
+
+from typing import Optional
 from inspect_ai import Task, task
 from inspect_ai.model import GenerateConfig
-from inspect_ai.solver import generate
-
-from openbench.datasets.rootly_terraform import load_rootly_terraform_dataset
-from openbench.scorers.mcq import simple_mcq_scorer
+from openbench.utils.mcq import MCQEval
+from openbench.datasets.rootly_terraform import (
+    get_dataset_config,
+    record_to_mcq_sample,
+)
 
 
 @task
-def rootly_terraform(subtask: str = None) -> Task:  # type: ignore
-    dataset = load_rootly_terraform_dataset(subtask)
-    return Task(
-        dataset=dataset,
-        solver=[generate()],
-        scorer=simple_mcq_scorer(),
+def rootly_terraform(subtask: Optional[str] = None) -> Task:  # type: ignore
+    """Rootly Terraform MCQ evaluation with optional subtask selection."""
+    dataset_config = get_dataset_config(subtask)
+
+    return MCQEval(
+        name="rootly_terraform",
+        dataset_path=dataset_config["path"],
+        record_to_mcq_sample=record_to_mcq_sample,
+        split="test",
+        dataset_kwargs={"revision": dataset_config["revision"]},
         config=GenerateConfig(),
     )
