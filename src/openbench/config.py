@@ -569,6 +569,14 @@ BENCHMARKS = {
         module_path="openbench.evals.rootly_gmcq",
         function_name="rootly_gmcq",
     ),
+    "rootly_terraform": BenchmarkMetadata(
+        name="Terraform",
+        description="Terraform Multiple Choice Questions",
+        category="core",
+        tags=["code-understanding"],
+        module_path="openbench.evals.rootly_terraform",
+        function_name="rootly_terraform",
+    ),
     "jsonschemabench": BenchmarkMetadata(
         name="JSONSchemaBench",
         description="JSON Schema generation benchmark with ~10K real-world schemas from GitHub, Kubernetes, and other sources for evaluating constrained decoding",
