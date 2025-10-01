@@ -83,7 +83,7 @@ BENCHMARKS = {
     # Core benchmarks
     "mmlu": BenchmarkMetadata(
         name="MMLU (cais/mmlu)",
-        description="Massive Multitask Language Understanding - 57 academic subjects from the cais/mmlu dataset",
+        description="Massive Multitask Language Understanding - 57 academic subjects from the cais/mmlu dataset. Only supports English (EN-US).",
         category="core",
         tags=["multiple-choice", "knowledge", "reasoning", "multitask"],
         module_path="openbench.evals.mmlu",
@@ -96,6 +96,14 @@ BENCHMARKS = {
         tags=["multiple-choice", "knowledge", "reasoning", "multitask"],
         module_path="openbench.evals.mmlu_pro",
         function_name="mmlu_pro",
+    ),
+    "mmmlu": BenchmarkMetadata(
+        name="MMMLU (openai/MMMLU)",
+        description="MMLU translated to 15 languages.",
+        category="core",
+        tags=["multiple-choice", "knowledge", "reasoning", "multitask"],
+        module_path="openbench.evals.mmmlu",
+        function_name="mmmlu",
     ),
     "openai_mrcr": BenchmarkMetadata(
         name="OpenAI MRCR (Full)",

@@ -596,7 +596,7 @@ export const benchmarksData = [
   },
   {
     "name": "MMLU (cais/mmlu)",
-    "description": "Massive Multitask Language Understanding - 57 academic subjects from the cais/mmlu dataset",
+    "description": "Massive Multitask Language Understanding - 57 academic subjects from the cais/mmlu dataset. Only supports English (EN-US).",
     "category": "core",
     "tags": [
       "multiple-choice",
@@ -618,6 +618,19 @@ export const benchmarksData = [
       "multitask"
     ],
     "function_name": "mmlu_pro",
+    "is_alpha": false
+  },
+  {
+    "name": "MMMLU (openai/MMMLU)",
+    "description": "MMLU translated to 15 languages.",
+    "category": "core",
+    "tags": [
+      "multiple-choice",
+      "knowledge",
+      "reasoning",
+      "multitask"
+    ],
+    "function_name": "mmmlu",
     "is_alpha": false
   },
   {
