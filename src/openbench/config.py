@@ -83,7 +83,7 @@ BENCHMARKS = {
     # Core benchmarks
     "mmlu": BenchmarkMetadata(
         name="MMLU (cais/mmlu)",
-        description="Massive Multitask Language Understanding - 57 academic subjects from the cais/mmlu dataset",
+        description="Massive Multitask Language Understanding - 57 academic subjects from the cais/mmlu dataset. Only supports English (EN-US).",
         category="core",
         tags=["multiple-choice", "knowledge", "reasoning", "multitask"],
         module_path="openbench.evals.mmlu",
@@ -96,6 +96,14 @@ BENCHMARKS = {
         tags=["multiple-choice", "knowledge", "reasoning", "multitask"],
         module_path="openbench.evals.mmlu_pro",
         function_name="mmlu_pro",
+    ),
+    "mmmlu": BenchmarkMetadata(
+        name="MMMLU (openai/MMMLU)",
+        description="MMLU translated to 15 languages.",
+        category="core",
+        tags=["multiple-choice", "knowledge", "reasoning", "multitask"],
+        module_path="openbench.evals.mmmlu",
+        function_name="mmmlu",
     ),
     "openai_mrcr": BenchmarkMetadata(
         name="OpenAI MRCR (Full)",
@@ -569,6 +577,14 @@ BENCHMARKS = {
         module_path="openbench.evals.rootly_gmcq",
         function_name="rootly_gmcq",
     ),
+    "rootly_terraform": BenchmarkMetadata(
+        name="Terraform",
+        description="Terraform Multiple Choice Questions",
+        category="core",
+        tags=["code-understanding"],
+        module_path="openbench.evals.rootly_terraform",
+        function_name="rootly_terraform",
+    ),
     "jsonschemabench": BenchmarkMetadata(
         name="JSONSchemaBench",
         description="JSON Schema generation benchmark with ~10K real-world schemas from GitHub, Kubernetes, and other sources for evaluating constrained decoding",
@@ -996,6 +1012,15 @@ BENCHMARKS = {
         tags=["multimodal", "vision", "multiple-choice", "images", "mmmu-pro"],
         module_path="openbench.evals.mmmu_pro",
         function_name="mmmu_pro_vision",
+        is_alpha=False,
+    ),
+    "livemcpbench": BenchmarkMetadata(
+        name="LiveMCPBench",
+        description="Benchmark for evaluating LLM agents on real-world tasks using the Model Context Protocol (MCP) - 95 tasks across different categories",
+        category="core",
+        tags=["mcp", "agents", "real-world", "tools", "graded"],
+        module_path="openbench.evals.livemcpbench",
+        function_name="livemcpbench",
         is_alpha=False,
     ),
 }

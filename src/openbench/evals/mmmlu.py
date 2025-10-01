@@ -65,6 +65,23 @@ SUBJECT_TO_CATEGORY = {
     "world_religions": "humanities",
 }
 
+LANGUAGES = [
+    "AR_XY",
+    "BN_BD",
+    "DE_DE",
+    "ES_LA",
+    "FR_FR",
+    "HI_IN",
+    "ID_ID",
+    "IT_IT",
+    "JA_JP",
+    "KO_KR",
+    "PT_BR",
+    "ZH_CN",
+    "SW_KE",
+    "YO_NG",
+]
+
 
 def record_to_mcq_sample(record: dict[str, str]) -> MCQSample:
     """Convert a MMLU record to an OpenBench MCQSample."""
@@ -79,24 +96,38 @@ def record_to_mcq_sample(record: dict[str, str]) -> MCQSample:
         target=record["Answer"],
         metadata={
             "subject": record["Subject"],
-            "category": SUBJECT_TO_CATEGORY[record["Subject"]],
+            "category": SUBJECT_TO_CATEGORY[record["Subject"]]
+            if record["Subject"] in SUBJECT_TO_CATEGORY
+            else "Invalid Subject: " + record["Subject"],
         },
     )
 
 
 @task
-def mmlu(language: str = "EN_US") -> Task:
-    """Evaluate the MMLU dataset. MCQ Abstracted."""
+def mmmlu(language: str = "") -> Task:
+    """Evaluate the MMMLU dataset (MMLU translated to 15 languages). MCQ Abstracted."""
     if language == "EN_US":
-        csv_file = "https://openaipublic.blob.core.windows.net/simple-evals/mmlu.csv"
+        # redirect to mmlu if language is EN_US
+        raise ValueError("EN_US is not supported by MMMLU. Use mmlu() instead.")
+    elif language in LANGUAGES:
+        # specific language, use the corresponding dataset
+        dataset_path = "openai/MMMLU"
+        subset_name = language
+    elif not language.strip():
+        # default: no language given → run all
+        dataset_path = "openai/MMMLU"
+        subset_name = None
     else:
-        raise ValueError(f"Language {language} not supported.")
+        raise ValueError(
+            f"Language {language} not supported. Make sure to use a valid language code: {LANGUAGES}"
+        )
 
     return MCQEval(
-        name="mmlu",
-        dataset_type="csv",
-        dataset_path=csv_file,
+        name="mmmlu",
+        dataset_path=dataset_path,
+        subset_name=subset_name,
         record_to_mcq_sample=record_to_mcq_sample,
+        split="test",
         auto_id=True,
         config=GenerateConfig(
             temperature=0.5,

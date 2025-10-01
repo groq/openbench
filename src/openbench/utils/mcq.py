@@ -8,7 +8,7 @@ from inspect_ai.model import (
     ChatMessage,
 )
 from pydantic import BeforeValidator
-from inspect_ai.dataset import Sample, hf_dataset
+from inspect_ai.dataset import Sample, csv_dataset, hf_dataset, json_dataset
 from inspect_ai.solver import generate, system_message
 from inspect_ai import Task, Epochs
 from openbench.scorers.mcq import create_mcq_scorer
@@ -67,9 +67,10 @@ class MCQSample(Sample):
 def MCQEval(
     *,
     name: str,
+    dataset_type: str = "hf",
     dataset_path: str,
     record_to_mcq_sample,
-    split: str,
+    split: Optional[str] = None,
     auto_id: bool = True,
     subset_name: Optional[str] = None,
     group_keys: Optional[List[str]] = None,
@@ -84,27 +85,49 @@ def MCQEval(
 
     Args:
         name: Task name.
-        dataset_path: Hugging Face dataset path/name.
+        dataset_type: Dataset type (hf, csv, json).
+        dataset_path: Dataset path/name.
         record_to_mcq_sample: Function converting a raw record into an `MCQSample`.
         split: HF dataset split (e.g., "train", "validation", "test").
         auto_id: Auto-generate IDs for samples when true.
+        subset_name: Dataset subset name.
         group_keys: Optional metadata keys to group reported metrics by (e.g., ["category"], ["subject"]).
         additional_metrics: Optional additional metrics to include alongside accuracy/stderr/std.
         prompt_template: Optional system prompt prepended before `generate()`.
         config: Optional model `GenerateConfig` for this task (defaults to a new `GenerateConfig()`).
         epochs: Optional `Epochs` to repeat samples and reduce scores across repeats.
+        dataset_kwargs: Optional additional dataset-specific parameters.
 
     Returns:
         Task: Configured Inspect AI task with dataset, solver, scorer, config, and epochs.
     """
-    dataset = hf_dataset(
-        dataset_path,
-        split=split,
-        sample_fields=record_to_mcq_sample,
-        auto_id=auto_id,
-        name=subset_name,  # subset name
-        **(dataset_kwargs or {}),
-    )
+    if dataset_type == "hf":
+        if split is None:
+            raise ValueError("For dataset_type='hf', you must provide split")
+        dataset = hf_dataset(
+            dataset_path,
+            split=split,
+            sample_fields=record_to_mcq_sample,
+            auto_id=auto_id,
+            name=subset_name,  # subset name
+            **(dataset_kwargs or {}),
+        )
+    elif dataset_type == "csv":
+        dataset = csv_dataset(
+            csv_file=dataset_path,
+            sample_fields=record_to_mcq_sample,
+            auto_id=auto_id,
+            **(dataset_kwargs or {}),
+        )
+    elif dataset_type == "json":
+        dataset = json_dataset(
+            json_file=dataset_path,
+            sample_fields=record_to_mcq_sample,
+            auto_id=auto_id,
+            **(dataset_kwargs or {}),
+        )
+    else:
+        raise ValueError(f"Unsupported dataset type: {dataset_type}")
 
     solver = [generate()]
     if prompt_template:
