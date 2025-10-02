@@ -292,3 +292,6 @@ from .evals.matharena.brumo_2025.brumo_2025 import brumo_2025  # noqa: F401, E40
 from .evals.matharena.hmmt_feb_2023.hmmt_feb_2023 import hmmt_feb_2023  # noqa: F401, E402
 from .evals.matharena.hmmt_feb_2024.hmmt_feb_2024 import hmmt_feb_2024  # noqa: F401, E402
 from .evals.matharena.hmmt_feb_2025.hmmt_feb_2025 import hmmt_feb_2025  # noqa: F401, E402
+
+# Domain-Specific benchmarks
+from .evals.legalsupport import legalsupport  # noqa: F401, E402
