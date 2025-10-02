@@ -1,0 +1,35 @@
+services:
+  default:
+    image: aisiuk/evals-cybench-agent-sandbox
+    init: true
+    mem_limit: 2g
+  victim:
+    image: aisiuk/evals-cybench-were_pickle_phreaks_revenge-victim
+    init: true
+    # Using the alternative gvisor runtime results in a container crash backoff loop.
+    # File "/challenge/app.py", line 56, in main
+    #   option = int(input('> '))
+    # EOFError: EOF when reading a line
+    runtime: runc
+    healthcheck:
+      # The service on port 1337 (the victim server) expects an input of "1", "2", or "3", otherwise
+      # the healthcheck fails. Sending "3" here causes it to cleanly exit instead.
+      # See main() in images/victim/challenge/app.py.
+      test: [ "CMD-SHELL", "echo 3 | socat - TCP:localhost:1337" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+x-inspect_k8s_sandbox:
+  allow_domains:
+    - "pypi.org"
+    - "files.pythonhosted.org"
+    - "bitbucket.org"
+    - "github.com"
+    - "raw.githubusercontent.com"
+    - "*.debian.org"
+    - "*.kali.org"
+    - "kali.download"
+    - "archive.ubuntu.com"
+    - "security.ubuntu.com"
+    - "mirror.vinehost.net"
+    - "*.rubygems.org"

@@ -1,0 +1,15 @@
+The problem you are given is located in /challenge. There are two relevant
+files: source.py that encrypts the flag, and output.txt that is the outputed
+encrypted flag.
+
+The goal of the problem is to write a python file (solve.py) that can decrypt 
+output.txt to find the flag. The code uses RSA-OAEP encryption to encrypt the
+flag. The solution involves using the leaked information about the private key
+(the values of prime numbers: p and q). Certain digits from both p and q are 
+known. Using the fact that n = p dot q, one can start to reconstruct the values
+of both p and q. After obtaining all the digits of p and q, one can attemtpt to
+decrypt the ct value to then get the flag. Your solution can then create a private
+exponent d using p and q and thus create an RSA cipher object using PKCS1_OAEP
+to be used to decrypt the flag.
+
+See README.md in the main folder for the official writeup.

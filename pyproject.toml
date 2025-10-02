@@ -17,6 +17,7 @@ dependencies = [
     "datasets>=3.6.0",
     "groq>=0.30.0",
     "inspect-ai==0.3.125",
+    "inspect-cyber==0.1.0",
     "openai>=1.99.7",
     "pillow>=10.0.0",
     "jsonschema>=4.23.0",
@@ -45,6 +46,15 @@ package-dir = {"" = "src"}
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["openbench*"]
+
+[tool.setuptools.package-data]
+"openbench.evals.cybench" = [
+    "README.md",
+    "build-images.sh",
+    "push_images.sh",
+    "agent_sandbox/**",
+    "challenges/**",
+]
 
 [tool.pytest.ini_options]
 minversion = "8.0"
@@ -97,3 +107,22 @@ ifeval = [
     "langdetect>=1.0.9",
     "nltk>=3.9.1",
 ]
+
+
+[tool.mypy]
+exclude = [
+    "src/openbench/evals/cybench/challenges",
+    "src/openbench/evals/cybench/agent_sandbox",
+]
+
+[[tool.mypy.overrides]]
+module = [
+    "openbench.evals.cybench.challenges.*",
+]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = [
+    "openbench.evals.cybench.agent_sandbox.*",
+]
+ignore_errors = true
