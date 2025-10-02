@@ -67,6 +67,12 @@ markers = [
     "integration: marks tests that require external services (deselect with '-m \"not integration\"')",
 ]
 
+[tool.ruff]
+  extend-exclude = [
+      "src/openbench/evals/cybench/challenges",
+      "src/openbench/evals/cybench/agent_sandbox",
+  ]
+
 [tool.coverage.run]
 source = ["src/openbench"]
 omit = ["tests/*", "**/__init__.py", "**/conftest.py"]
