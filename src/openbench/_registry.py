@@ -280,6 +280,9 @@ from .evals.mmmu import (  # noqa: F401, E402
 from .evals.mmmu_pro import mmmu_pro, mmmu_pro_vision  # noqa: F401, E402
 from .evals.arc_agi import arc_agi, arc_agi_1, arc_agi_2  # noqa: F401, E402
 
+# AGIEval benchmarks
+from .evals import agieval  # noqa: F401, E402
+
 # MathArena benchmarks
 from .evals.matharena.aime_2023_I.aime_2023_I import aime_2023_I  # noqa: F401, E402
 from .evals.matharena.aime_2023_II.aime_2023_II import aime_2023_II  # noqa: F401, E402
