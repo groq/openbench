@@ -1,0 +1,74 @@
+---
+title: "LiveMCPBench - MCP Tool Calling Evaluation"
+description: "Evaluates how effectively language models can navigate and utilize the Model Context Protocol ecosystem"
+---
+
+## Overview
+
+LiveMCPBench is a comprehensive benchmark that evaluates how effectively language models can navigate and utilize the Model Context Protocol (MCP) ecosystem. With 70 MCP servers and 527 available tools, this benchmark tests a model's ability to understand tool capabilities, select appropriate tools, and orchestrate complex multi-step workflows to solve real-world tasks.
+
+## Key Features
+
+- **70 MCP Servers**: Diverse collection of MCP servers providing various capabilities
+- **527 Tools**: Extensive toolkit covering multiple domains and use cases
+- **Complex Task Solving**: Multi-step problems requiring tool orchestration
+- **Real-World Scenarios**: Tasks that mirror actual use cases for AI agents
+- **Tool Discovery**: Tests ability to explore and understand available tools
+
+
+## Usage
+
+Run LiveMCPBench evaluation with:
+
+```bash
+bench eval livemcpbench
+```
+
+## Cache Requirements
+
+LiveMCPBench uses a cache at `~/.openbench/livemcpbench` containing:
+
+- **Embedding Index**: Pre-computed embeddings for LiveMCPTool (persistent across runs)
+- **Annotated Data**: Task definitions and evaluation data
+
+### API Requirements
+
+- **OPENAI_API_KEY**: Required for both grading and embedding models
+  - Grader: `gpt-4o-mini`
+  - Embedding: `text-embedding-3-small`
+
+### Data Management
+
+During evaluation, agents interact with data files that are refreshed after each run to maintain consistency. The embedding index remains cached for performance.
+
+Use `bench cache` to manage storage - see [Cache CLI](/cli/cache) for details.
+
+## Scoring
+
+LiveMCPBench uses LiveMCPEval, an LLM-as-a-judge framework that evaluates models across key capabilities:
+
+- **Tool Discovery**: Finding and understanding available MCP servers and tools
+- **Task Planning**: Breaking down complex problems and selecting appropriate tools
+- **Execution & Orchestration**: Correctly invoking tools and managing workflows
+- **Tool Usage Validation**: Verifying reliance on tool outputs rather than internal knowledge
+- **Task Completion**: Successfully hitting key points required by the task
+- **Adaptation & Learning**: Dynamically discovering tools and iterating on approaches
+
+## Dataset Information
+
+- **Task Count**: Comprehensive set of real-world scenarios requiring tool use
+- **Task Categories**: 
+  - **Office** - Document management, scheduling, communication
+  - **Lifestyle** - Personal organization, health tracking, entertainment
+  - **Finance** - Budget management, expense tracking, financial planning
+  - **Travel** - Trip planning, booking, navigation assistance
+  - **Shopping** - Product research, price comparison, purchase assistance
+- **Tool Ecosystem**: 70 MCP servers providing 527 tools
+- **Data Interaction**: Tasks require reading and writing to data sources
+- **Complexity**: Multi-step workflows requiring tool orchestration
+
+## Resources
+
+- **Paper**: [LiveMCPBench: Can Agents Navigate an Ocean of MCP Tools?](https://arxiv.org/pdf/2508.01780)
+- **Code**: [GitHub](https://github.com/icip-cas/LiveMCPBench)
+- **Dataset**: [ICIP/LiveMCPBench](https://huggingface.co/datasets/ICIP/LiveMCPBench)

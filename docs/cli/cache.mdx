@@ -1,0 +1,54 @@
+---
+title: "bench cache"
+description: "Manage and view cache"
+---
+
+The `bench cache` command helps manage OpenBench's caches, particularly for LiveMCPBench. It provides tools to inspect, list, and clear cached data stored under `~/.openbench`.
+
+## Overview
+
+Currently, LiveMCPBench is the primary evaluation that uses caching. It stores:
+- Embedding indexes for LiveMCPTool
+- Annotated task data
+- Other evaluation assets
+
+## Subcommands
+
+### info
+
+Display cache information and storage sizes:
+
+```bash
+bench cache info
+```
+
+Shows total cache size and breakdown by evaluation or component.
+
+### ls
+
+List cache contents with various viewing options:
+
+```bash
+
+# List all cache contents  
+bench cache ls
+
+# List specific cache with tree view
+bench cache ls --type livemcpbench --tree
+```
+
+### clear
+
+Remove cached data with flexible targeting:
+
+```bash
+# Clear specific cache completely
+bench cache clear --type livemcpbench
+
+# Clear subdirectory of specific cache
+bench cache clear --type livemcpbench --path logs
+```
+
+## Cache Location
+
+All cache data is stored under `~/.openbench/` in your home directory. This location is consistent across different evaluations and provides centralized cache management.

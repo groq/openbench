@@ -1,0 +1,43 @@
+---
+title: "MMLU - Massive Multitask Language Understanding"
+description: "Comprehensive evaluation across 57 academic subjects testing knowledge and reasoning capabilities"
+---
+
+## Overview
+
+The Massive Multitask Language Understanding (MMLU) benchmark is a comprehensive evaluation suite that tests a model's knowledge and reasoning capabilities across 57 diverse academic subjects. From elementary mathematics to advanced computer science, from US history to professional medicine, MMLU provides a broad assessment of a language model's educational knowledge.
+
+## Key Features
+
+- **57 Academic Subjects**: Covers a wide range of domains including STEM, humanities, social sciences, and professional fields
+- **Multiple Choice Format**: Standardized 4-option multiple choice questions
+- **Difficulty Levels**: Questions range from elementary to professional/graduate level
+- **Knowledge & Reasoning**: Tests both factual knowledge and reasoning abilities
+
+
+## Usage
+
+Run MMLU evaluation with:
+
+```bash
+bench eval mmlu
+```
+
+## Scoring
+
+MMLU uses accuracy as the primary metric, calculated as the percentage of questions answered correctly across all subjects. The benchmark also provides per-subject breakdowns to identify strengths and weaknesses in specific domains.
+
+## Dataset Information
+
+- **Total Questions**: ~14,000 questions across 57 subjects
+- **Subject Categories**:
+  - **STEM** - Mathematics, physics, chemistry, biology, computer science, and engineering
+  - **Humanities** - History, philosophy, logic, world religions, and moral reasoning  
+  - **Social Sciences** - Law, medicine, psychology, business, economics, and sociology
+  - **Other** - Geography, government, politics, and miscellaneous topics
+- **Format**: Multiple choice with 4 options
+- **Difficulty Levels**: Elementary to professional/graduate level 
+
+## Resources
+
+- **Paper**: [Measuring Massive Multitask Language Understanding](https://arxiv.org/abs/2009.03300)

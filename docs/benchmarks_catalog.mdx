@@ -9,64 +9,46 @@ import { benchmarksData } from "/snippets/benchmarks.data.mdx"
 ## Featured
 
 <CardGroup cols={3}>
-  <Card title="MMLU" icon="graduation-cap">
+  <Card title="MMLU" icon="graduation-cap" href="/evals/mmlu">
     **57 subjects** · Multiple choice · Knowledge & reasoning
 
     Massive Multitask Language Understanding - 57 academic subjects from the cais/mmlu dataset
     
-    ```bash
-    bench eval mmlu
-    ```
   </Card>
   
-  <Card title="GPQA Diamond" icon="diamond">
+  <Card title="GPQA Diamond" icon="diamond" href="/evals/gpqa-diamond">
     **Graduate-level** · Science · Multiple choice
 
     Graduate-level Google-Proof Q&A in biology, chemistry, and physics
     
-    ```bash
-    bench eval gpqa_diamond
-    ```
   </Card>
   
-  <Card title="HumanEval" icon="code">
-    **Code generation** · Execution
+  <Card title="LiveMCPBench" icon="wrench" href="/evals/livemcpbench">
+    **MCP** · Agent · Tool Calling
 
-    Code generation benchmark with 164 programming problems
-    
-    ```bash
-    bench eval humaneval
-    ```
+    evaluates how effectively language models can navigate and utilize the Model Context Protocol (MCP) ecosystem.
+
   </Card>
   
-  <Card title="SimpleQA" icon="message-question">
+  <Card title="SimpleQA" icon="message-question" href="/evals/simpleqa">
     **Factuality** · Model-Graded
 
     Measuring short-form factuality in large language models with simple Q&A pairs
     
-    ```bash
-    bench eval simpleqa
-    ```
   </Card>
   
-  <Card title="SciCode" icon="flask">
+  <Card title="SciCode" icon="flask" href="/evals/scicode">
     **Science** · Code generation
 
     Scientific computing and programming challenges
-    
-    ```bash
-    bench eval scicode
-    ```
+
   </Card>
   
-  <Card title="GraphWalks" icon="hexagon-nodes">
+  <Card title="GraphWalks" icon="hexagon-nodes" href="/evals/graphwalks">
     **Graphs** · Long-context · Reasoning
 
     Multi-hop reasoning on graphs - both BFS and parent finding tasks
 
-    ```bash
-    bench eval graphwalks
-    ```
   </Card>
 </CardGroup>
 

@@ -226,6 +226,7 @@ from .evals.exercism.exercism import (  # noqa: F401, E402
     exercism_java,
     exercism_rust,
 )
+from .evals.livemcpbench import livemcpbench  # noqa: F401, E402
 from .evals.math import math, math_500  # noqa: F401, E402
 from .evals.mbpp import mbpp  # noqa: F401, E402
 from .evals.mgsm import mgsm, mgsm_en, mgsm_latin, mgsm_non_latin  # noqa: F401, E402
@@ -240,6 +241,7 @@ from .evals.simpleqa import simpleqa  # noqa: F401, E402
 from .evals.tumlu import tumlu  # noqa: F401, E402
 from .evals.detailbench import detailbench  # noqa: F401, E402
 from .evals.supergpqa import supergpqa  # noqa: F401, E402
+from .evals.mmmlu import mmmlu  # noqa: F401, E402
 from .evals.mmmu import (  # noqa: F401, E402
     mmmu,
     mmmu_mcq,
@@ -276,6 +278,7 @@ from .evals.mmmu import (  # noqa: F401, E402
     mmmu_sociology,
 )
 from .evals.mmmu_pro import mmmu_pro, mmmu_pro_vision  # noqa: F401, E402
+from .evals.arc_agi import arc_agi, arc_agi_1, arc_agi_2  # noqa: F401, E402
 
 # MathArena benchmarks
 from .evals.matharena.aime_2023_I.aime_2023_I import aime_2023_I  # noqa: F401, E402

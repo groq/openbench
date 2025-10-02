@@ -1,5 +1,5 @@
 ---
-title: "MCQ Eval"
+title: "Multiple Choice Evals (MCQ)"
 description: "Robust infrastructure to support integration multiple choice question (MCQ) benchmarks."
 ---
 
@@ -57,6 +57,7 @@ MCQEval accepts additional configuration parameters:
 def MCQEval(
     *,
     name: str,                                        # Task name
+    dataset_type: str = "hf"                          # "hf", "csv", or "json"
     dataset_path: str,                                # Hugging Face dataset path/name
     record_to_mcq_sample,                             # Function converting a raw record into an `MCQSample`
     split: str,                                       # HF dataset split (e.g., "train", "validation", "test")
@@ -70,7 +71,7 @@ def MCQEval(
     dataset_kwargs: Optional[dict[str, Any]] = None,  # Additional dataset-specific parameters
 ) -> Task
 ```
-When called, MCQEval loads the HuggingFace dataset according to the mapping function provided,
+When called, MCQEval loads the dataset type (default hf) according to the provided mapping function, e.g.,
 ```
 dataset = hf_dataset(
     dataset_path,

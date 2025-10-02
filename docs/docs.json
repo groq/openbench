@@ -35,7 +35,8 @@
           "cli/eval-retry",
           "cli/list",
           "cli/describe",
-          "cli/view"
+          "cli/view",
+          "cli/cache"
         ]
       },
       {
@@ -81,15 +82,15 @@
   },
   "contextual": {
     "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   },
   "footer": {
     "socials": {

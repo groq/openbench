@@ -92,6 +92,51 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "ARC-AGI",
+    "description": "Abstraction and Reasoning Corpus for Artificial General Intelligence; specify version with -T version=1 or version=2",
+    "category": "core",
+    "tags": [
+      "reasoning",
+      "pattern-recognition",
+      "abstract-reasoning",
+      "visual",
+      "logic",
+      "agi"
+    ],
+    "function_name": "arc_agi",
+    "is_alpha": false
+  },
+  {
+    "name": "ARC-AGI-1",
+    "description": "ARC-AGI dataset version 1",
+    "category": "core",
+    "tags": [
+      "reasoning",
+      "pattern-recognition",
+      "abstract-reasoning",
+      "visual",
+      "logic",
+      "agi"
+    ],
+    "function_name": "arc_agi_1",
+    "is_alpha": false
+  },
+  {
+    "name": "ARC-AGI-2",
+    "description": "ARC-AGI dataset version 2",
+    "category": "core",
+    "tags": [
+      "reasoning",
+      "pattern-recognition",
+      "abstract-reasoning",
+      "visual",
+      "logic",
+      "agi"
+    ],
+    "function_name": "arc_agi_2",
+    "is_alpha": false
+  },
+  {
     "name": "BRUMO 2025",
     "description": "Bruno Mathematical Olympiad 2025",
     "category": "math",
@@ -499,6 +544,20 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "LiveMCPBench",
+    "description": "Benchmark for evaluating LLM agents on real-world tasks using the Model Context Protocol (MCP) - 95 tasks across different categories",
+    "category": "core",
+    "tags": [
+      "mcp",
+      "agents",
+      "real-world",
+      "tools",
+      "graded"
+    ],
+    "function_name": "livemcpbench",
+    "is_alpha": false
+  },
+  {
     "name": "MATH",
     "description": "Measuring Mathematical Problem Solving - 5000 competition math problems across 7 subjects and 5 difficulty levels",
     "category": "core",
@@ -596,7 +655,7 @@ export const benchmarksData = [
   },
   {
     "name": "MMLU (cais/mmlu)",
-    "description": "Massive Multitask Language Understanding - 57 academic subjects from the cais/mmlu dataset",
+    "description": "Massive Multitask Language Understanding - 57 academic subjects from the cais/mmlu dataset. Only supports English (EN-US).",
     "category": "core",
     "tags": [
       "multiple-choice",
@@ -618,6 +677,19 @@ export const benchmarksData = [
       "multitask"
     ],
     "function_name": "mmlu_pro",
+    "is_alpha": false
+  },
+  {
+    "name": "MMMLU (openai/MMMLU)",
+    "description": "MMLU translated to 15 languages.",
+    "category": "core",
+    "tags": [
+      "multiple-choice",
+      "knowledge",
+      "reasoning",
+      "multitask"
+    ],
+    "function_name": "mmmlu",
     "is_alpha": false
   },
   {
@@ -1266,6 +1338,16 @@ export const benchmarksData = [
       "reasoning"
     ],
     "function_name": "tumlu",
+    "is_alpha": false
+  },
+  {
+    "name": "Terraform",
+    "description": "Terraform Multiple Choice Questions",
+    "category": "core",
+    "tags": [
+      "code-understanding"
+    ],
+    "function_name": "rootly_terraform",
     "is_alpha": false
   }
 ];

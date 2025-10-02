@@ -11,6 +11,7 @@ from openbench.config import load_task
 from openbench.monkeypatch.display_results_patch import patch_display_results
 from openbench._cli.utils import parse_cli_args
 from openbench.agents import AgentManager
+from openbench.utils.cache import prepare_livemcpbench_cache, clear_livemcpbench_root
 
 
 class SandboxType(str, Enum):
@@ -325,6 +326,14 @@ def run_eval(
             envvar="BENCH_HUB_PRIVATE",
         ),
     ] = False,
+    keep_livemcp_root: Annotated[
+        bool,
+        typer.Option(
+            "--keep-livemcp-root",
+            help="Do not auto-clean ~/.openbench/livemcpbench/root after eval",
+            envvar="BENCH_KEEP_LIVEMCP_ROOT",
+        ),
+    ] = False,
     alpha: Annotated[
         bool,
         typer.Option(
@@ -400,6 +409,13 @@ def run_eval(
         except (ValueError, ImportError, AttributeError) as e:
             raise typer.BadParameter(str(e))
 
+    # auto-prepare caches for livemcpbench
+    try:
+        if "livemcpbench" in benchmarks:
+            prepare_livemcpbench_cache()
+    except Exception as e:
+        raise typer.BadParameter(str(e))
+
     # Monkey patch FileRecorder log file name if logfile is provided
     if logfile:
         from openbench.monkeypatch.file_recorder_logfile_patch import (
@@ -418,57 +434,61 @@ def run_eval(
     start_time = time.time()
 
     try:
-        eval_logs = eval(
-            tasks=tasks,
-            model=model,
-            max_connections=max_connections,
-            model_base_url=model_base_url,
-            model_args=model_args,
-            model_roles=role_models if role_models else None,
-            task_args=task_args,
-            epochs=epochs,
-            limit=parsed_limit,
-            fail_on_error=fail_on_error,
-            message_limit=message_limit,
-            max_subprocesses=max_subprocesses,
-            log_samples=log_samples,
-            log_images=log_images,
-            log_buffer=log_buffer,
-            score=score,
-            temperature=temperature,
-            top_p=top_p,
-            max_tokens=max_tokens,
-            seed=seed,
-            display=display.value if display else None,
-            timeout=timeout,
-            reasoning_effort=reasoning_effort.value if reasoning_effort else None,
-            sandbox=sandbox,
-            log_format=log_format.value if log_format else None,
-        )
-
-        typer.echo("Evaluation complete!")
-
-        if hub_repo:
-            from openbench._cli.export import export_logs_to_hub
-
-            export_logs_to_hub(
-                logfile=logfile,
-                start_time=start_time,
-                hub_repo=hub_repo,
-                hub_private=hub_private,
+        try:
+            eval_logs = eval(
+                tasks=tasks,
+                model=model,
+                max_connections=max_connections,
+                model_base_url=model_base_url,
+                model_args=model_args,
+                model_roles=role_models if role_models else None,
+                task_args=task_args,
+                epochs=epochs,
+                limit=parsed_limit,
+                fail_on_error=fail_on_error,
+                message_limit=message_limit,
+                max_subprocesses=max_subprocesses,
+                log_samples=log_samples,
+                log_images=log_images,
+                log_buffer=log_buffer,
+                score=score,
+                temperature=temperature,
+                top_p=top_p,
+                max_tokens=max_tokens,
+                seed=seed,
+                display=display.value if display else None,
+                timeout=timeout,
+                reasoning_effort=reasoning_effort.value if reasoning_effort else None,
+                sandbox=sandbox,
+                log_format=log_format.value if log_format else None,
             )
-        return eval_logs
-    except Exception as e:
-        if debug:
-            # In debug mode, let the full stack trace show
-            raise
-        else:
-            # In normal mode, show clean error message
-            error_msg = str(e)
-            typer.secho(f"\n❌ Error: {error_msg}", fg=typer.colors.RED, err=True)
-            typer.secho(
-                "\nFor full stack trace, run with --debug flag",
-                fg=typer.colors.CYAN,
-                err=True,
-            )
-            sys.exit(1)
+
+            typer.echo("Evaluation complete!")
+
+            if hub_repo:
+                from openbench._cli.export import export_logs_to_hub
+
+                export_logs_to_hub(
+                    logfile=logfile,
+                    start_time=start_time,
+                    hub_repo=hub_repo,
+                    hub_private=hub_private,
+                )
+            return eval_logs
+        except Exception as e:
+            if debug:
+                raise
+            else:
+                # In normal mode, show clean error message
+                error_msg = str(e)
+                typer.secho(f"\n❌ Error: {error_msg}", fg=typer.colors.RED, err=True)
+                typer.secho(
+                    "\nFor full stack trace, run with --debug flag",
+                    fg=typer.colors.CYAN,
+                    err=True,
+                )
+                sys.exit(1)
+    finally:
+        # Auto-clean root sandbox for livemcpbench unless opted out
+        if "livemcpbench" in benchmarks and not keep_livemcp_root:
+            clear_livemcpbench_root(quiet=False)
