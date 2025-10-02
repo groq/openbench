@@ -211,11 +211,13 @@ _override_builtin_openrouter_provider()
 # Task Registration
 
 # Core benchmarks
+from .evals.arc import arc_easy, arc_challenge  # noqa: F401, E402
 from .evals.clockbench import clockbench  # noqa: F401, E402
 from .evals.drop import drop  # noqa: F401, E402
 from .evals.gpqa_diamond import gpqa_diamond  # noqa: F401, E402
 from .evals.graphwalks import graphwalks  # noqa: F401, E402
 from .evals.healthbench import healthbench, healthbench_hard, healthbench_consensus  # noqa: F401, E402
+from .evals.hellaswag import hellaswag  # noqa: F401, E402
 from .evals.hle import hle, hle_text  # noqa: F401, E402
 from .evals.humaneval import humaneval  # noqa: F401, E402
 from .evals.exercism.exercism import (  # noqa: F401, E402
@@ -236,9 +238,14 @@ from .evals.mrcr import openai_mrcr, openai_mrcr_2n, openai_mrcr_4n, openai_mrcr
 from .evals.mmstar import mmstar  # noqa: F401, E402
 from .evals.musr import musr  # noqa: F401, E402
 from .evals.openbookqa import openbookqa  # noqa: F401, E402
+from .evals.piqa import piqa  # noqa: F401, E402
+from .evals.prost import prost  # noqa: F401, E402
 from .evals.scicode import scicode  # noqa: F401, E402
+from .evals.swag import swag  # noqa: F401, E402
 from .evals.simpleqa import simpleqa  # noqa: F401, E402
 from .evals.tumlu import tumlu  # noqa: F401, E402
+from .evals.winogrande import winogrande  # noqa: F401, E402
+from .evals.wsc273 import wsc273  # noqa: F401, E402
 from .evals.detailbench import detailbench  # noqa: F401, E402
 from .evals.supergpqa import supergpqa  # noqa: F401, E402
 from .evals.mmmlu import mmmlu  # noqa: F401, E402
