@@ -18,7 +18,7 @@ bench eval arc_challenge --model "groq/llama-3.1-70b"
 from inspect_ai import Task, task
 from inspect_ai.model import GenerateConfig
 from openbench.utils.mcq import MCQEval, MCQSample
-from openbench.utils.text import MULTIPLE_CHOICE_PROMPT_TEMPLATE
+from openbench.utils.text import create_dynamic_multiple_choice_prompt
 
 
 def record_to_mcq_sample(record: dict) -> MCQSample:
@@ -33,31 +33,30 @@ def record_to_mcq_sample(record: dict) -> MCQSample:
     choices = record["choices"]
     answer_key = record["answerKey"]
 
-    # ARC typically has 3-5 choices, map them to A, B, C, D, E
+    # ARC can have 3-5 choices
     choice_texts = choices["text"]
     choice_labels = choices["label"]
 
     # Create mapping from label to text
     label_to_text = dict(zip(choice_labels, choice_texts))
 
-    # Pad with empty strings for missing options (up to 5 choices)
-    option_a = label_to_text.get("A", label_to_text.get("1", ""))
-    option_b = label_to_text.get("B", label_to_text.get("2", ""))
-    option_c = label_to_text.get("C", label_to_text.get("3", ""))
-    option_d = label_to_text.get("D", label_to_text.get("4", ""))
+    # Normalize numeric labels to letters if present
+    label_mapping = {"1": "A", "2": "B", "3": "C", "4": "D", "5": "E"}
 
-    # Build prompt with only non-empty options
-    prompt = MULTIPLE_CHOICE_PROMPT_TEMPLATE.format(
-        prompt=question,
-        option_a=option_a,
-        option_b=option_b,
-        option_c=option_c,
-        option_d=option_d,
-    )
+    # Build options list dynamically based on available choices
+    options = []
+    expected_labels = ["A", "B", "C", "D", "E"]
+    for i, label in enumerate(expected_labels[: len(choice_texts)]):
+        # Try letter first, then numeric equivalent
+        text = label_to_text.get(label) or label_to_text.get(str(i + 1), "")
+        if text:
+            options.append(text)
+
+    # Build prompt with dynamic number of choices
+    prompt = create_dynamic_multiple_choice_prompt(question, options)
 
     # Normalize answer key (sometimes it's "1" instead of "A")
-    answer_mapping = {"1": "A", "2": "B", "3": "C", "4": "D", "5": "E"}
-    target = answer_mapping.get(answer_key, answer_key)
+    target = label_mapping.get(answer_key, answer_key)
 
     return MCQSample(
         input=prompt,
