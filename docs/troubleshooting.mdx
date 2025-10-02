@@ -1,0 +1,77 @@
+---
+title: "Tips and Troubleshooting"
+description: "Get the most out of OpenBench with these best practices and solutions to common issues."
+---
+
+# Quick Tips
+
+<CardGroup cols={2}>
+  <Card title="Start Small" icon="play">
+    Always test with `--limit 10` before running full benchmarks
+  </Card>
+  
+  <Card title="Use Model & Task Flags" icon="flag">
+    Use `-M` for model and `-T` for any benchmark-specific arguments
+  </Card>
+  
+  <Card title="Debug Mode" icon="bug">
+    Use `--debug` for full stack tracing when troubleshooting
+  </Card>
+  
+  <Card title="Detailed Breakdown" icon="chart-line">
+    Use `bench view` for detailed sample-by-sample evaluation breakdown
+  </Card>
+
+  <Card title="Global Help" icon="circle-question">
+    Use `--help` on any command to see all available options
+  </Card>
+  
+  <Card title="Use Groq for Testing" icon="bolt">
+    Free tier with fast inference - perfect for development
+  </Card>
+</CardGroup>
+
+# Common Issues & Solutions
+
+<AccordionGroup>
+  <Accordion title="Command 'bench' not found, import errors, or missing dependencies">
+    Package not properly installed, **try**:
+    ```bash
+    # Reinstall with pip
+    pip install --upgrade openbench
+
+    # Or if using UV
+    uv sync --dev
+    ```
+  </Accordion>
+  <Accordion title="Environment variables not working">
+    ```bash
+    export BENCH_MODEL="groq/llama-3.3-70b"  # ✓ Correct
+    BENCH_MODEL="groq/llama-3.3-70b"         # ✗ Wrong
+    ```
+  </Accordion>
+  
+  <Accordion title="Configuration precedence confusion">
+    **Remember**: Command-line arguments override environment variables
+
+    ```bash
+    export BENCH_MODEL="model-a"
+    bench eval mmlu --model model-b  # Uses model-b, not model-a
+    ```
+  </Accordion>
+
+</AccordionGroup>
+
+## Runtime Errors
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `API key not found` | Missing credentials | Set `OPENAI_API_KEY` or relevant env var |
+| `Rate limit exceeded` | Too many parallel requests | Reduce `--max-connections` |
+| `Model not found` | Invalid model name | Check provider documentation |
+| `Timeout` | Slow model responses | Increase `--timeout` |
+| `Out of memory` | Large benchmark/batch | Use `--limit` to reduce size |
+
+## Still Need Help?
+
+**GitHub Issues**: [Report bugs or ask questions](https://github.com/groq/openbench/issues/new/choose)

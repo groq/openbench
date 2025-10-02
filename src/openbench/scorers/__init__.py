@@ -17,6 +17,7 @@ from .mcq import robust_mcq_scorer, extract_mcq_answer
 from .robust_boxed import robust_boxed_scorer, aime_scorer, extract_boxed_answer
 from .open_answer import create_open_answer_scorer, simple_open_answer_scorer
 from .mmmu import mmmu_mixed_scorer
+from .exercism import exercism_scorer
 
 __all__ = [
     # Number scoring functions
@@ -38,4 +39,6 @@ __all__ = [
     "fallback_scorer",
     # Mixed scoring for mcq and open-answer
     "mmmu_mixed_scorer",
+    # Code execution scoring
+    "exercism_scorer",
 ]

@@ -5,8 +5,10 @@ repos:
       - id: ruff
         name: ruff check
         args: [--fix]
+        files: ^src/
       - id: ruff-format
         name: ruff format
+        files: ^src/
   - repo: local
     hooks:
       - id: mypy
@@ -14,5 +16,13 @@ repos:
         entry: .venv/bin/mypy
         language: system
         types: [python]
-        args: [.]
+        args: [src]
         pass_filenames: false
+        files: ^src/
+      - id: export-benchmarks
+        name: export benchmarks
+        entry: .venv/bin/python scripts/export_benchmarks.py
+        language: system
+        pass_filenames: false
+        # run when benchmark config or snippet file changes
+        files: ^(src/openbench/config.py|docs/snippets/benchmarks\.data\.mdx)$

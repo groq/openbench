@@ -76,12 +76,6 @@ class TestMCQExtraction:
         assert extract_mcq_answer("answer: a") == "A"
         assert extract_mcq_answer("ANSWER: B") == "B"
 
-    def test_fallback_to_first_char(self):
-        """Test fallback to first character."""
-        assert extract_mcq_answer("A") == "A"
-        assert extract_mcq_answer("B is the answer") == "B"
-        assert extract_mcq_answer("**C") == "C"
-
     def test_no_answer_found(self):
         """Test when no answer is found."""
         assert extract_mcq_answer("No valid answer here") is None

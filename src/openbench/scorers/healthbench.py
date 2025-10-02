@@ -5,10 +5,11 @@ from typing import Any, Callable, Dict
 
 import numpy as np
 from inspect_ai.model import ChatMessageUser, get_model
-from inspect_ai.scorer import Score, Target, accuracy, metric, scorer, stderr
+from inspect_ai.scorer import Score, Target, accuracy, scorer, stderr
 from inspect_ai.solver import TaskState
 
 from openbench.utils.text import format_chat_messages, parse_json_from_response
+from openbench.metrics.healthbench import healthbench_metrics
 
 
 GRADER_TEMPLATE = """
@@ -66,32 +67,6 @@ Return just the json object in markdown format. Do not include any other text in
 def format_rubric(rubric: Dict[str, Any]) -> str:
     """Format a rubric item for display."""
     return f"[{rubric['points']}] {rubric['criterion']}"
-
-
-@metric
-def healthbench_metrics():
-    """Calculate HealthBench specific metrics including tag scores."""
-
-    def metric_fn(scores):
-        if not scores:
-            return {}
-
-        # Aggregate tag scores
-        tag_values = defaultdict(list)
-        for score in scores:
-            if score.metadata:
-                for key, value in score.metadata.items():
-                    if key.startswith("tag_") and isinstance(value, (int, float)):
-                        tag_values[key].append(value)
-
-        # Calculate mean for each tag
-        result = {}
-        for key, values in tag_values.items():
-            result[key] = float(np.clip(np.mean(values), 0, 1))
-
-        return result
-
-    return metric_fn
 
 
 @scorer(metrics=[accuracy(), stderr(), healthbench_metrics()])

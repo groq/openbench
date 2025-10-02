@@ -86,7 +86,9 @@ class GroqAPI(ModelAPI):
             api_key=self.api_key,
             base_url=model_base_url(base_url, "GROQ_BASE_URL"),
             **model_args,
-            http_client=httpx.AsyncClient(limits=httpx.Limits(max_connections=None)),
+            http_client=httpx.AsyncClient(
+                limits=httpx.Limits(max_connections=None),
+            ),
         )
 
         # create time tracker
@@ -132,7 +134,10 @@ class GroqAPI(ModelAPI):
         request = dict(
             messages=messages,
             model=self.model_name,
-            extra_headers={HttpxHooks.REQUEST_ID_HEADER: request_id},
+            extra_headers={
+                HttpxHooks.REQUEST_ID_HEADER: request_id,
+                "User-Agent": "openbench",
+            },
             **params,
         )
 

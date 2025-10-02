@@ -12,7 +12,7 @@ import sys
 import uuid
 from pathlib import Path
 from types import ModuleType
-from typing import Callable, List, Optional
+from typing import Callable, Iterable, List, Optional
 
 
 @dataclass
@@ -34,7 +34,25 @@ class BenchmarkMetadata:
 
 # Benchmark metadata - minimal, no duplication
 BENCHMARKS = {
+    "mbpp": BenchmarkMetadata(
+        name="MBPP",
+        description="Mostly Basic Python Problems — code generation tasks with unit test verification",
+        category="core",
+        tags=["code", "generation", "sandbox", "reasoning"],
+        module_path="openbench.evals.mbpp",
+        function_name="mbpp",
+        is_alpha=False,
+    ),
     # Graphwalks benchmarks (alpha)
+    "clockbench": BenchmarkMetadata(
+        name="ClockBench",
+        description="Clock benchmark - time-based reasoning tasks",
+        category="community",
+        tags=["time", "analog", "clock", "reasoning"],
+        module_path="openbench.evals.clockbench",
+        function_name="clockbench",
+        is_alpha=False,
+    ),
     "graphwalks": BenchmarkMetadata(
         name="GraphWalks",
         description="Multi-hop reasoning on graphs - both BFS and parent finding tasks",
@@ -65,7 +83,7 @@ BENCHMARKS = {
     # Core benchmarks
     "mmlu": BenchmarkMetadata(
         name="MMLU (cais/mmlu)",
-        description="Massive Multitask Language Understanding - 57 academic subjects from the cais/mmlu dataset",
+        description="Massive Multitask Language Understanding - 57 academic subjects from the cais/mmlu dataset. Only supports English (EN-US).",
         category="core",
         tags=["multiple-choice", "knowledge", "reasoning", "multitask"],
         module_path="openbench.evals.mmlu",
@@ -78,6 +96,14 @@ BENCHMARKS = {
         tags=["multiple-choice", "knowledge", "reasoning", "multitask"],
         module_path="openbench.evals.mmlu_pro",
         function_name="mmlu_pro",
+    ),
+    "mmmlu": BenchmarkMetadata(
+        name="MMMLU (openai/MMMLU)",
+        description="MMLU translated to 15 languages.",
+        category="core",
+        tags=["multiple-choice", "knowledge", "reasoning", "multitask"],
+        module_path="openbench.evals.mmmlu",
+        function_name="mmmlu",
     ),
     "openai_mrcr": BenchmarkMetadata(
         name="OpenAI MRCR (Full)",
@@ -126,6 +152,63 @@ BENCHMARKS = {
         tags=["coding", "generation", "execution"],
         module_path="openbench.evals.humaneval",
         function_name="humaneval",
+    ),
+    # Exercism benchmarks
+    "exercism": BenchmarkMetadata(
+        name="Exercism",
+        description="Multi-language coding benchmark with real-world programming exercises across Python, Go, JavaScript, Java, and Rust",
+        category="core",
+        tags=["coding", "multi-language", "execution", "docker"],
+        module_path="openbench.evals.exercism.exercism",
+        function_name="exercism",
+    ),
+    "exercism_python": BenchmarkMetadata(
+        name="Exercism (Python)",
+        description="Python coding tasks from the Exercism benchmark",
+        category="core",
+        tags=["coding", "python", "execution", "docker"],
+        module_path="openbench.evals.exercism.exercism",
+        function_name="exercism_python",
+    ),
+    "exercism_javascript": BenchmarkMetadata(
+        name="Exercism (JavaScript)",
+        description="JavaScript coding tasks from the Exercism benchmark",
+        category="core",
+        tags=["coding", "javascript", "execution", "docker"],
+        module_path="openbench.evals.exercism.exercism",
+        function_name="exercism_javascript",
+    ),
+    "exercism_go": BenchmarkMetadata(
+        name="Exercism (Go)",
+        description="Go coding tasks from the Exercism benchmark",
+        category="core",
+        tags=["coding", "go", "execution", "docker"],
+        module_path="openbench.evals.exercism.exercism",
+        function_name="exercism_go",
+    ),
+    "exercism_java": BenchmarkMetadata(
+        name="Exercism (Java)",
+        description="Java coding tasks from the Exercism benchmark",
+        category="core",
+        tags=["coding", "java", "execution", "docker"],
+        module_path="openbench.evals.exercism.exercism",
+        function_name="exercism_java",
+    ),
+    "exercism_rust": BenchmarkMetadata(
+        name="Exercism (Rust)",
+        description="Rust coding tasks from the Exercism benchmark",
+        category="core",
+        tags=["coding", "rust", "execution", "docker"],
+        module_path="openbench.evals.exercism.exercism",
+        function_name="exercism_rust",
+    ),
+    "ifeval": BenchmarkMetadata(
+        name="Instruction Following",
+        description="Tests ability to follow specific formatting and content constraints with both strict and loose evaluation metrics",
+        category="core",
+        tags=["instruction-following", "constraints", "formatting"],
+        module_path="openbench.evals.ifeval",
+        function_name="ifeval",
     ),
     "openbookqa": BenchmarkMetadata(
         name="OpenBookQA",
@@ -201,6 +284,22 @@ BENCHMARKS = {
         module_path="openbench.evals.simpleqa",
         function_name="simpleqa",
     ),
+    "tumlu": BenchmarkMetadata(
+        name="TUMLU",
+        description="TUMLU is a comprehensive, multilingual, and natively developed language understanding benchmark specifically designed for Turkic languages.",
+        category="community",
+        tags=["factuality", "question-answering", "multiple-choice", "reasoning"],
+        module_path="openbench.evals.tumlu",
+        function_name="tumlu",
+    ),
+    "detailbench": BenchmarkMetadata(
+        name="DetailBench",
+        description="Tests whether LLMs notify users about wrong facts in a text while they are tasked to translate said text",
+        category="community",
+        tags=["knowledge", "graded", "instruction-following"],
+        module_path="openbench.evals.detailbench",
+        function_name="detailbench",
+    ),
     "browsecomp": BenchmarkMetadata(
         name="BrowseComp",
         description="A Simple Yet Challenging Benchmark for Browsing Agents - evaluates model performance on browsing-related tasks",
@@ -224,6 +323,14 @@ BENCHMARKS = {
         tags=["knowledge", "reasoning", "text-only", "graded", "frontier"],
         module_path="openbench.evals.hle",
         function_name="hle_text",
+    ),
+    "mmstar": BenchmarkMetadata(
+        name="MMStar",
+        description="MMStar benchmark for measuring multi-modal gain and leakage via coordinated vision and text ablations",
+        category="core",
+        tags=["vision", "multi-modal", "leakage", "perception", "reasoning"],
+        module_path="openbench.evals.mmstar",
+        function_name="mmstar",
     ),
     "healthbench": BenchmarkMetadata(
         name="HealthBench",
@@ -430,14 +537,6 @@ BENCHMARKS = {
         function_name="scicode",
         is_alpha=True,
     ),
-    "cti_bench": BenchmarkMetadata(
-        name="CTI-Bench",
-        description="Comprehensive evaluation framework for cyber threat intelligence understanding with 4 tasks: knowledge questions, vulnerability classification, CVSS scoring, and technique extraction",
-        category="cybersecurity",
-        tags=["cybersecurity", "multi-task"],
-        module_path="openbench.evals.cti_bench",
-        function_name="cti_bench",
-    ),
     "cti_bench_ate": BenchmarkMetadata(
         name="CTI-Bench ATE",
         description="Extracting MITRE ATT&CK techniques from malware and threat descriptions",
@@ -477,6 +576,14 @@ BENCHMARKS = {
         tags=["code-understanding"],
         module_path="openbench.evals.rootly_gmcq",
         function_name="rootly_gmcq",
+    ),
+    "rootly_terraform": BenchmarkMetadata(
+        name="Terraform",
+        description="Terraform Multiple Choice Questions",
+        category="core",
+        tags=["code-understanding"],
+        module_path="openbench.evals.rootly_terraform",
+        function_name="rootly_terraform",
     ),
     "jsonschemabench": BenchmarkMetadata(
         name="JSONSchemaBench",
@@ -952,12 +1059,54 @@ BENCHMARKS = {
         module_path="openbench.evals.arc_agi",
         function_name="arc_agi_2",
     ),
+    "livemcpbench": BenchmarkMetadata(
+        name="LiveMCPBench",
+        description="Benchmark for evaluating LLM agents on real-world tasks using the Model Context Protocol (MCP) - 95 tasks across different categories",
+        category="core",
+        tags=["mcp", "agents", "real-world", "tools", "graded"],
+        module_path="openbench.evals.livemcpbench",
+        function_name="livemcpbench",
+        is_alpha=False,
+    ),
 }
+
+
+def _normalize_benchmark_key(name: str) -> str:
+    """Normalize benchmark keys so '-' and '_' are treated the same."""
+
+    return name.replace("-", "_")
+
+
+def _build_normalized_lookup(names: Iterable[str]) -> dict[str, str]:
+    """Build a lookup mapping normalized benchmark keys to canonical names."""
+
+    lookup: dict[str, str] = {}
+    for key in names:
+        normalized = _normalize_benchmark_key(key)
+        existing = lookup.get(normalized)
+        if existing and existing != key:
+            raise ValueError(
+                "Benchmark names cannot differ only by '-' vs '_' ("
+                f"conflict between '{existing}' and '{key}')"
+            )
+        lookup[normalized] = key
+    return lookup
+
+
+_NORMALIZED_BENCHMARK_NAMES = _build_normalized_lookup(BENCHMARKS.keys())
 
 
 def get_benchmark_metadata(name: str) -> Optional[BenchmarkMetadata]:
     """Get benchmark metadata by name."""
-    return BENCHMARKS.get(name)
+    metadata = BENCHMARKS.get(name)
+    if metadata:
+        return metadata
+
+    canonical_name = _NORMALIZED_BENCHMARK_NAMES.get(_normalize_benchmark_key(name))
+    if canonical_name:
+        return BENCHMARKS[canonical_name]
+
+    return None
 
 
 def get_all_benchmarks(include_alpha: bool = False) -> dict[str, BenchmarkMetadata]:
@@ -1038,6 +1187,8 @@ def _generate_task_registry(include_alpha: bool = True):
 # Full registry including alpha benchmarks for backward compatibility
 TASK_REGISTRY = _generate_task_registry(include_alpha=True)
 
+_NORMALIZED_TASK_REGISTRY = _build_normalized_lookup(TASK_REGISTRY.keys())
+
 
 def _import_module_from_path(path: Path) -> ModuleType:
     """
@@ -1108,6 +1259,13 @@ def load_task(benchmark_name: str, allow_alpha: bool = False) -> Callable:
 
     # Try registry first (registry names take precedence)
     import_path = TASK_REGISTRY.get(benchmark_name)
+    if import_path is None:
+        canonical_name = _NORMALIZED_TASK_REGISTRY.get(
+            _normalize_benchmark_key(benchmark_name)
+        )
+        if canonical_name:
+            import_path = TASK_REGISTRY[canonical_name]
+            benchmark_name = canonical_name
     if import_path:
         module_path, func_name = import_path.rsplit(".", 1)
         module = importlib.import_module(module_path)

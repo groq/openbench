@@ -1,0 +1,12 @@
+## Auto-generated at runtime by DockerManager.generate_eval_files()
+services:
+  default:
+    build:
+      context: .
+      tags:
+    init: true
+    command: tail -f /dev/null
+    networks: [eval_net]
+
+networks:
+  eval_net: { driver: bridge, internal: false }

@@ -32,3 +32,28 @@ def test_load_task_caching():
     task1 = load_task("mmlu")
     task2 = load_task("mmlu")
     assert task1 is task2  # Same object due to caching
+
+
+def test_load_task_dash_underscore_equivalence():
+    """Dash/underscore variants should load the same benchmark."""
+
+    dash_task = load_task("mmlu-pro")
+    underscore_task = load_task("mmlu_pro")
+    assert dash_task is underscore_task
+
+
+def test_load_task_dash_alias_for_underscore_name():
+    """Benchmarks registered with underscores accept dash aliases."""
+
+    task = load_task("gpqa-diamond")
+    assert callable(task)
+
+
+def test_load_task_alpha_requires_flag_with_dash_variant():
+    """Alpha benchmarks still require --alpha even with dash aliases."""
+
+    with pytest.raises(ValueError):
+        load_task("graphwalks-parents")
+
+    task = load_task("graphwalks-parents", allow_alpha=True)
+    assert callable(task)

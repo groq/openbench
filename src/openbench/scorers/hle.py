@@ -6,14 +6,11 @@ from inspect_ai.scorer import (
     stderr,
     Score,
     Target,
-    metric,
-    Metric,
-    Value,
-    SampleScore,
 )
 from inspect_ai.solver import TaskState
 from inspect_ai.model import get_model, ChatMessageUser, Model
 from openbench.utils.text import extract_confidence_score
+from openbench.metrics.hle import hle_metrics
 
 
 # HLE judge prompt template - using raw string to preserve literal \%
@@ -56,33 +53,6 @@ def parse_judge_response(judge_response: str) -> tuple[str, str, int]:
     confidence = int(confidence_match.group(1)) if confidence_match else 100
 
     return is_correct, reasoning, confidence
-
-
-@metric
-def hle_metrics() -> Metric:
-    """Calculate HLE specific metrics including average confidence."""
-
-    def metric_calculator(scores: list[SampleScore]) -> Value:
-        if not scores:
-            return {
-                "avg_confidence": 0.0,
-            }
-
-        confidences = []
-
-        for sample_score in scores:
-            # Get confidence from metadata
-            metadata = sample_score.score.metadata
-            if metadata and "confidence" in metadata:
-                confidences.append(metadata["confidence"])
-
-        avg_confidence = sum(confidences) / len(confidences) if confidences else 100.0
-
-        return {
-            "avg_confidence": avg_confidence,
-        }
-
-    return metric_calculator
 
 
 @scorer(metrics=[accuracy(), stderr(), hle_metrics()])

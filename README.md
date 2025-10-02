@@ -12,21 +12,14 @@ OpenBench provides standardized, reproducible benchmarking for LLMs across 30+ e
 
 We're building in public! This is an alpha release - expect rapid iteration. The first stable release is coming soon.
 
-## 🎉 What's New in v0.3.0
-
-- **📡 18 More Model Providers**: Added support for AI21, Baseten, Cerebras, Cohere, Crusoe, DeepInfra, Friendli, Hugging Face, Hyperbolic, Lambda, MiniMax, Moonshot, Nebius, Nous, Novita, Parasail, Reka, SambaNova and more
-- **🧪 New Benchmarks**: DROP (reading comprehension), experimental benchmarks available with `--alpha` flag
-- **⚡ CLI Enhancements**: `openbench` alias, `-M`/`-T` flags for model/task args, `--debug` mode for eval-retry
-- **🔧 Developer Tools**: GitHub Actions integration, Inspect AI extension support
-
 ## Features
 
 - **🎯 35+ Benchmarks**: MMLU, GPQA, HumanEval, SimpleQA, competition math (AIME, HMMT), SciCode, GraphWalks, and more
-- **🔧 Simple CLI**: `bench list`, `bench describe`, `bench eval` (also available as `openbench`)
+- **🔧 Simple CLI**: `bench list`, `bench describe`, `bench eval` (also available as `openbench`), `-M`/`-T` flags for model/task args, `--debug` mode for eval-retry, experimental benchmarks with `--alpha` flag
 - **🏗️ Built on inspect-ai**: Industry-standard evaluation framework
 - **📊 Extensible**: Easy to add new benchmarks and metrics
 - **🤖 Provider-agnostic**: Works with 30+ model providers out of the box
-- **🛠️ Local Eval Support**: Privatized benchmarks can now be run with `bench eval <path>`
+- **🛠️ Local Eval Support**: Privatized benchmarks can be run with `bench eval <path>`
 - **📤 Hugging Face Integration**: Push evaluation results directly to Hugging Face datasets
 
 ## 🏃 Speedrun: Evaluate a Model in 60 Seconds
@@ -71,6 +64,9 @@ bench eval musr --model ollama/llama3.1:70b
 
 # Hugging Face Inference Providers
 bench eval mmlu --model huggingface/gpt-oss-120b:groq
+
+# OpenRouter
+bench eval gpqa_diamond --model openrouter/deepseek/deepseek-chat-v3.1
 
 # 30+ providers supported - see full list below
 ```
@@ -120,15 +116,17 @@ Here are the currently available benchmarks. For an up-to-date list use `bench l
 > [!NOTE]
 > Benchmark names are case-sensitive in the CLI.
 
-| Category          | Benchmarks                                                                                                                                                                                                                                                                                                      |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Knowledge**     | MMLU (57 subjects), GPQA (graduate-level), SuperGPQA (285 disciplines), OpenBookQA, HLE (Humanity's Last Exam - 2,500 questions from 1,000+ experts), HLE_text (text-only version)                                                                                                                              |
-| **Coding**        | HumanEval (164 problems)                                                                                                                                                                                                                                                                                        |
-| **Math**          | AIME 2023-2025, HMMT Feb 2023-2025, BRUMO 2025, MATH (competition-level problems), MATH-500 (challenging subset), MGSM (multilingual grade school math), MGSM_en (English), MGSM_latin (5 languages), MGSM_non_latin (6 languages)                                                                              |
-| **Reasoning**     | SimpleQA (factuality), MuSR (multi-step reasoning), DROP (discrete reasoning over paragraphs), MMMU (multi-modal reasoning with 30+ subjects), MMMU_MCQ (multiple choice version), MMMU_OPEN (open answer version), MMMU_PRO (more rigorous version of mmmu), MMMU_PRO_VISION (vision only version of mmmu_pro) |
-| **Long Context**  | OpenAI MRCR (multiple needle retrieval), OpenAI MRCR_2n (2 needle), OpenAI MRCR_4 (4 needle), OpenAI MRCR_8n (8 needle)                                                                                                                                                                                         |
-| **Healthcare**    | HealthBench (open-ended healthcare eval), HealthBench_hard (challenging variant), HealthBench_consensus (consensus variant)                                                                                                                                                                                     |
-| **Cybersecurity** | CTI-Bench (complete cyber threat intelligence suite), CTI-Bench ATE (MITRE ATT&CK technique extraction), CTI-Bench MCQ (knowledge questions on CTI standards and best practices), CTI-Bench RCM (CVE to CWE vulnerability mapping), CTI-Bench VSP (CVSS score calculation)                                      |
+| Category          | Benchmarks                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Knowledge**     | MMLU (57 subjects), MMLU-Pro, GPQA (graduate-level), SuperGPQA (285 disciplines), TUMLU (9 languages), OpenBookQA, HLE (Humanity's Last Exam - 2,500 questions from 1,000+ experts), HLE_text (text-only version)                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| **Coding**        | HumanEval (164 problems), MBPP, SciCode (alpha), GMCQ, JSONSchemaBench, Exercism (code agent eval across 5 languages)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| **Math**          | AIME 2023-2025, HMMT Feb 2023-2025, BRUMO 2025, MATH (competition-level problems), MATH-500 (challenging subset), MGSM (multilingual grade school math), MGSM_en (English), MGSM_latin (5 languages), MGSM_non_latin (6 languages)                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| **Reasoning**     | SimpleQA (factuality), MuSR, MuSR murder_mysteries, MuSR object_placements, MuSR team_allocation, DROP (discrete reasoning over paragraphs), GraphWalks (multi-hop reasoning), BrowseComp (browsing agents), MMMU, MMMU_MCQ, MMMU_OPEN, MMMU_PRO, MMMU_PRO_VISION, MMMU subsets: accounting, agriculture, architecture_and_engineering, art, art_theory, basic_medical_science, biology, chemistry, clinical_medicine, design, diagnostics_and_laboratory_medicine, electronics, energy_and_power, finance, geography, history, literature, manage, marketing, materials, math, mechanical_engineering, music, pharmacy, physics, psychology, public_health, sociology |
+| **Long Context**  | OpenAI MRCR (multiple needle retrieval), OpenAI MRCR_2n (2 needle), OpenAI MRCR_4n (4 needle), OpenAI MRCR_8n (8 needle)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| **Healthcare**    | HealthBench (open-ended healthcare eval), HealthBench_hard (challenging variant), HealthBench_consensus (consensus variant)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| **Cybersecurity** | CTI-Bench ATE (MITRE ATT&CK technique extraction), CTI-Bench MCQ (knowledge questions on CTI standards and best practices), CTI-Bench RCM (CVE to CWE vulnerability mapping), CTI-Bench VSP (CVSS score calculation)                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| **Community**     | ClockBench, DetailBench                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| **MCP**           | LiveMCPBench (70 MCP servers and 527 tools)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 
 ## Configuration
 
@@ -137,6 +135,7 @@ Here are the currently available benchmarks. For an up-to-date list use `bench l
 export GROQ_API_KEY=your_key
 export HF_TOKEN=your_key
 export OPENAI_API_KEY=your_key  # Optional
+export OPENROUTER_API_KEY=your_key  # For OpenRouter
 
 # Set default model
 export BENCH_MODEL=groq/openai/gpt-oss-20b
@@ -154,29 +153,52 @@ For a complete list of all commands and options, run: `bench --help`
 | `bench eval-retry`       | Retry a failed evaluation                          |
 | `bench view`             | View logs from previous benchmark runs             |
 | `bench eval <path>`      | Run your local/private evals built with Inspect AI |
+| `bench cache`            | Manage OpenBench caches (info/ls/clear)            |
 
-### Key `eval` Command Options
+### Cache Command
 
-| Option               | Environment Variable     | Default         | Description                                                      |
-| -------------------- | ------------------------ | --------------- | ---------------------------------------------------------------- |
-| `-M <args>`          | None                     | None            | Pass model-specific arguments (e.g., `-M reasoning_effort=high`) |
-| `-T <args>`          | None                     | None            | Pass task-specific arguments to the benchmark                    |
-| `--model`            | `BENCH_MODEL`            | `groq/openai/gpt-oss-20b` | Model(s) to evaluate                                             |
-| `--epochs`           | `BENCH_EPOCHS`           | `1`             | Number of epochs to run each evaluation                          |
-| `--max-connections`  | `BENCH_MAX_CONNECTIONS`  | `10`            | Maximum parallel requests to model                               |
-| `--temperature`      | `BENCH_TEMPERATURE`      | `0.6`           | Model temperature                                                |
-| `--top-p`            | `BENCH_TOP_P`            | `1.0`           | Model top-p                                                      |
-| `--max-tokens`       | `BENCH_MAX_TOKENS`       | `None`          | Maximum tokens for model response                                |
-| `--seed`             | `BENCH_SEED`             | `None`          | Seed for deterministic generation                                |
-| `--limit`            | `BENCH_LIMIT`            | `None`          | Limit evaluated samples (number or start,end)                    |
-| `--logfile`          | `BENCH_OUTPUT`           | `None`          | Output file for results                                          |
-| `--sandbox`          | `BENCH_SANDBOX`          | `None`          | Environment to run evaluation (local/docker)                     |
-| `--timeout`          | `BENCH_TIMEOUT`          | `10000`         | Timeout for each API request (seconds)                           |
-| `--display`          | `BENCH_DISPLAY`          | `None`          | Display type (full/conversation/rich/plain/none)                 |
-| `--reasoning-effort` | `BENCH_REASONING_EFFORT` | `None`          | Reasoning effort level (low/medium/high)                         |
-| `--json`             | None                     | `False`         | Output results in JSON format                                    |
-| `--log-format`       | `BENCH_LOG_FORMAT`       | `eval`          | Output logging format (eval/json)                                |
-| `--hub-repo`         | `BENCH_HUB_REPO`         | `None`          | Push results to a Hugging Face Hub dataset                       |
+The `bench cache` command helps manage OpenBench's caches, particularly for LiveMCPBench. It provides three subcommands:
+
+```bash
+# Show cache information and sizes
+bench cache info
+
+# List all cache contents
+bench cache ls
+
+#List specific cache with tree view
+bench cache ls --type livemcpbench --tree
+
+# Clear specific cache completely
+bench cache clear --type livemcpbench --all
+```
+
+All cache data is stored under `~/.openbench`. The cache command helps you monitor and manage this storage.
+
+### Key `eval` Command Common Configuration Options
+
+| Option                | Environment Variable      | Default                   | Description                                                      |
+| --------------------- | ------------------------- | ------------------------- | ---------------------------------------------------------------- |
+| `-M <args>`           | None                      | None                      | Pass model-specific arguments (e.g., `-M reasoning_effort=high`) |
+| `-T <args>`           | None                      | None                      | Pass task-specific arguments to the benchmark                    |
+| `--model`             | `BENCH_MODEL`             | `groq/openai/gpt-oss-20b` | Model(s) to evaluate                                             |
+| `--epochs`            | `BENCH_EPOCHS`            | `1`                       | Number of epochs to run each evaluation                          |
+| `--max-connections`   | `BENCH_MAX_CONNECTIONS`   | `10`                      | Maximum parallel requests to model                               |
+| `--temperature`       | `BENCH_TEMPERATURE`       | `0.6`                     | Model temperature                                                |
+| `--top-p`             | `BENCH_TOP_P`             | `1.0`                     | Model top-p                                                      |
+| `--max-tokens`        | `BENCH_MAX_TOKENS`        | `None`                    | Maximum tokens for model response                                |
+| `--seed`              | `BENCH_SEED`              | `None`                    | Seed for deterministic generation                                |
+| `--limit`             | `BENCH_LIMIT`             | `None`                    | Limit evaluated samples (number or start,end)                    |
+| `--logfile`           | `BENCH_OUTPUT`            | `None`                    | Output file for results                                          |
+| `--sandbox`           | `BENCH_SANDBOX`           | `None`                    | Environment to run evaluation (local/docker)                     |
+| `--timeout`           | `BENCH_TIMEOUT`           | `10000`                   | Timeout for each API request (seconds)                           |
+| `--display`           | `BENCH_DISPLAY`           | `None`                    | Display type (full/conversation/rich/plain/none)                 |
+| `--reasoning-effort`  | `BENCH_REASONING_EFFORT`  | `None`                    | Reasoning effort level (low/medium/high)                         |
+| `--json`              | None                      | `False`                   | Output results in JSON format                                    |
+| `--log-format`        | `BENCH_LOG_FORMAT`        | `eval`                    | Output logging format (eval/json)                                |
+| `--hub-repo`          | `BENCH_HUB_REPO`          | `None`                    | Push results to a Hugging Face Hub dataset                       |
+| `--keep-livemcp-root` | `BENCH_KEEP_LIVEMCP_ROOT` | `False`                   | Allow preservation of root data after livemcpbench eval runs     |
+| `--code-agent`        | `BENCH_CODE_AGENT`        | `opencode`                | Select code agent for exercism tasks                             |
 
 ## Grader Information
 
@@ -190,15 +212,17 @@ export OPENAI_API_KEY=your_openai_key
 
 The following benchmarks use a grader model:
 
-| Benchmark | Default Grader Model |
-| :--- | :--- |
-| `simpleqa` | `openai/gpt-4.1-2025-04-14` |
-| `hle` | `openai/o3-mini-2025-01-31` |
-| `hle_text` | `openai/o3-mini-2025-01-31` |
-| `browsecomp` | `openai/gpt-4.1-2025-04-14` |
-| `healthbench` | `openai/gpt-4.1-2025-04-14` |
-| `math` | `openai/gpt-4-turbo-preview` |
-| `math_500` | `openai/gpt-4-turbo-preview` |
+| Benchmark      | Default Grader Model             |
+| :------------- | :------------------------------- |
+| `simpleqa`     | `openai/gpt-4.1-2025-04-14`      |
+| `hle`          | `openai/o3-mini-2025-01-31`      |
+| `hle_text`     | `openai/o3-mini-2025-01-31`      |
+| `browsecomp`   | `openai/gpt-4.1-2025-04-14`      |
+| `healthbench`  | `openai/gpt-4.1-2025-04-14`      |
+| `math`         | `openai/gpt-4-turbo-preview`     |
+| `math_500`     | `openai/gpt-4-turbo-preview`     |
+| `detailbench`  | `gpt-5-mini-2025-08-07`          |
+| `livemcpbench` | `openai/gpt-4.1-mini-2025-04-14` |
 
 ## Building Your Own Evals
 

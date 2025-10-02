@@ -163,6 +163,14 @@ def vercel() -> Type[ModelAPI]:
     return VercelAPI
 
 
+@modelapi(name="openrouter")
+def openrouter() -> Type[ModelAPI]:
+    """Register OpenRouter provider."""
+    from .model._providers.openrouter import OpenRouterAPI
+
+    return OpenRouterAPI
+
+
 def _override_builtin_groq_provider():
     """Replace Inspect AI's built-in groq provider with enhanced OpenBench version."""
     from inspect_ai._util.registry import _registry
@@ -179,28 +187,61 @@ def _override_builtin_groq_provider():
     return openbench_groq_override
 
 
-# Execute the override
+def _override_builtin_openrouter_provider():
+    """Replace Inspect AI's built-in openrouter provider with enhanced OpenBench version."""
+    from inspect_ai._util.registry import _registry
+    from .model._providers.openrouter import OpenRouterAPI
+    from inspect_ai.model._registry import modelapi
+
+    @modelapi(name="openrouter")
+    def openbench_openrouter_override():
+        return OpenRouterAPI
+
+    # Force override the inspect_ai/openrouter entry with OpenBench implementation
+    _registry["modelapi:inspect_ai/openrouter"] = openbench_openrouter_override
+
+    return openbench_openrouter_override
+
+
+# Execute the overrides
 _override_builtin_groq_provider()
+_override_builtin_openrouter_provider()
 
 
 # Task Registration
 
 # Core benchmarks
+from .evals.clockbench import clockbench  # noqa: F401, E402
 from .evals.drop import drop  # noqa: F401, E402
 from .evals.gpqa_diamond import gpqa_diamond  # noqa: F401, E402
 from .evals.graphwalks import graphwalks  # noqa: F401, E402
 from .evals.healthbench import healthbench, healthbench_hard, healthbench_consensus  # noqa: F401, E402
 from .evals.hle import hle, hle_text  # noqa: F401, E402
 from .evals.humaneval import humaneval  # noqa: F401, E402
+from .evals.exercism.exercism import (  # noqa: F401, E402
+    exercism,
+    exercism_python,
+    exercism_javascript,
+    exercism_go,
+    exercism_java,
+    exercism_rust,
+)
+from .evals.livemcpbench import livemcpbench  # noqa: F401, E402
 from .evals.math import math, math_500  # noqa: F401, E402
+from .evals.mbpp import mbpp  # noqa: F401, E402
 from .evals.mgsm import mgsm, mgsm_en, mgsm_latin, mgsm_non_latin  # noqa: F401, E402
 from .evals.mmlu import mmlu  # noqa: F401, E402
 from .evals.mmlu_pro import mmlu_pro  # noqa: F401, E402
 from .evals.mrcr import openai_mrcr, openai_mrcr_2n, openai_mrcr_4n, openai_mrcr_8n  # noqa: F401, E402
+from .evals.mmstar import mmstar  # noqa: F401, E402
 from .evals.musr import musr  # noqa: F401, E402
 from .evals.openbookqa import openbookqa  # noqa: F401, E402
+from .evals.scicode import scicode  # noqa: F401, E402
 from .evals.simpleqa import simpleqa  # noqa: F401, E402
+from .evals.tumlu import tumlu  # noqa: F401, E402
+from .evals.detailbench import detailbench  # noqa: F401, E402
 from .evals.supergpqa import supergpqa  # noqa: F401, E402
+from .evals.mmmlu import mmmlu  # noqa: F401, E402
 from .evals.mmmu import (  # noqa: F401, E402
     mmmu,
     mmmu_mcq,
