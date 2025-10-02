@@ -1,1 +1,1 @@
-"""OpenBench model providers."""
+"""openbench model providers."""

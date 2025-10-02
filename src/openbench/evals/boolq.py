@@ -29,7 +29,7 @@ Answer the following multiple choice question. The entire content of your respon
 
 # original implementation uses built in multiple_choice solver
 def record_to_mcq_sample(record: dict) -> MCQSample:
-    """Convert a BoolQ record to an OpenBench MCQSample."""
+    """Convert a BoolQ record to an openbench MCQSample."""
     answer_label = record["answer"]
     int_to_char = {0: "A", 1: "B"}
 

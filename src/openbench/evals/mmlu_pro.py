@@ -3,7 +3,7 @@ from openbench.utils.mcq import MCQEval, MCQSample
 
 
 def record_to_mcq_sample(record: dict[str, str]) -> MCQSample:
-    """Convert a MMLU Pro record to an OpenBench MCQSample."""
+    """Convert a MMLU Pro record to an openbench MCQSample."""
     prompt_list = [
         "Answer the following multiple choice question. The last line of your response should be of the following format: 'Answer: $LETTER' (without quotes) where LETTER is a single uppercase letter.",
         "",

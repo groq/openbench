@@ -1,4 +1,4 @@
-# OpenBench
+# openbench
 
 **Provider-agnostic, open-source evaluation infrastructure for language models** 🚀
 
@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 
-OpenBench provides standardized, reproducible benchmarking for LLMs across 30+ evaluation suites (and growing) spanning knowledge, math, reasoning, coding, science, reading comprehension, health, long-context recall, graph reasoning, and first-class support for your own local evals to preserve privacy. **Works with any model provider** - Groq, OpenAI, Anthropic, Cohere, Google, AWS Bedrock, Azure, local models via Ollama, Hugging Face, and 30+ other providers.
+openbench provides standardized, reproducible benchmarking for LLMs across 30+ evaluation suites (and growing) spanning knowledge, math, reasoning, coding, science, reading comprehension, health, long-context recall, graph reasoning, and first-class support for your own local evals to preserve privacy. **Works with any model provider** - Groq, OpenAI, Anthropic, Cohere, Google, AWS Bedrock, Azure, local models via Ollama, Hugging Face, and 30+ other providers.
 
 ## 🚧 Alpha Release
 
@@ -27,7 +27,7 @@ We're building in public! This is an alpha release - expect rapid iteration. The
 **Prerequisite**: [Install uv](https://docs.astral.sh/uv/getting-started/installation/)
 
 ```bash
-# Create a virtual environment and install OpenBench (30 seconds)
+# Create a virtual environment and install openbench (30 seconds)
 uv venv
 source .venv/bin/activate
 uv pip install openbench
@@ -73,7 +73,7 @@ bench eval gpqa_diamond --model openrouter/deepseek/deepseek-chat-v3.1
 
 ## Supported Providers
 
-OpenBench supports 30+ model providers through Inspect AI. Set the appropriate API key environment variable and you're ready to go:
+openbench supports 30+ model providers through Inspect AI. Set the appropriate API key environment variable and you're ready to go:
 
 | Provider              | Environment Variable   | Example Model String             |
 | --------------------- | ---------------------- | -------------------------------- |
@@ -202,11 +202,11 @@ The following benchmarks use a grader model:
 
 ## Building Your Own Evals
 
-OpenBench is built on [Inspect AI](https://inspect.aisi.org.uk/). To create custom evaluations, check out their excellent [documentation](https://inspect.aisi.org.uk/). Once you do build your own private evaluations with Inspect AI that you don't want to open-source, you can point OpenBench at them with `bench eval <path>` to run!
+openbench is built on [Inspect AI](https://inspect.aisi.org.uk/). To create custom evaluations, check out their excellent [documentation](https://inspect.aisi.org.uk/). Once you do build your own private evaluations with Inspect AI that you don't want to open-source, you can point openbench at them with `bench eval <path>` to run!
 
 ## Exporting Logs to Hugging Face
 
-OpenBench can export logs to a Hugging Face Hub dataset. This is useful if you want to share your results with the community or use them for further analysis.
+openbench can export logs to a Hugging Face Hub dataset. This is useful if you want to share your results with the community or use them for further analysis.
 
 ```bash
 export HF_TOKEN=<your-huggingface-token>
@@ -218,9 +218,9 @@ This will export the logs to a Hugging Face Hub dataset with the name `openbench
 
 ## FAQ
 
-### How does OpenBench differ from Inspect AI?
+### How does openbench differ from Inspect AI?
 
-OpenBench provides:
+openbench provides:
 
 - **Reference implementations** of 20+ major benchmarks with consistent interfaces
 - **Shared utilities** for common patterns (math scoring, multi-language support, etc.)
@@ -231,13 +231,13 @@ Think of it as a benchmark library built on Inspect's excellent foundation.
 
 ### Why not just use Inspect AI, lm-evaluation-harness, or lighteval?
 
-Different tools for different needs! OpenBench focuses on:
+Different tools for different needs! openbench focuses on:
 
 - **Shared components**: Common scorers, solvers, and datasets across benchmarks reduce code duplication
 - **Clean implementations**: Each eval is written for readability and reliability
 - **Developer experience**: Simple CLI, consistent patterns, easy to extend
 
-We built OpenBench because we needed evaluation code that was easy to understand, modify, and trust. It's a curated set of benchmarks built on Inspect AI's excellent foundation.
+We built openbench because we needed evaluation code that was easy to understand, modify, and trust. It's a curated set of benchmarks built on Inspect AI's excellent foundation.
 
 ### How can I run `bench` outside of the `uv` environment?
 
@@ -296,21 +296,21 @@ Quick links:
 
 ## Reproducibility Statement
 
-As the authors of OpenBench, we strive to implement this tool's evaluations as faithfully as possible with respect to the original benchmarks themselves.
+As the authors of openbench, we strive to implement this tool's evaluations as faithfully as possible with respect to the original benchmarks themselves.
 
-However, it is expected that developers may observe numerical discrepancies between OpenBench's scores and the reported scores from other sources.
+However, it is expected that developers may observe numerical discrepancies between openbench's scores and the reported scores from other sources.
 
-These numerical differences can be attributed to many reasons, including (but not limited to) minor variations in the model prompts, different model quantization or inference approaches, and repurposing benchmarks to be compatible with the packages used to develop OpenBench.
+These numerical differences can be attributed to many reasons, including (but not limited to) minor variations in the model prompts, different model quantization or inference approaches, and repurposing benchmarks to be compatible with the packages used to develop openbench.
 
-As a result, OpenBench results are meant to be compared with OpenBench results, not as a universal one-to-one comparison with every external result. For meaningful comparisons, ensure you are using the same version of OpenBench.
+As a result, openbench results are meant to be compared with openbench results, not as a universal one-to-one comparison with every external result. For meaningful comparisons, ensure you are using the same version of openbench.
 
-We encourage developers to identify areas of improvement and we welcome open source contributions to OpenBench.
+We encourage developers to identify areas of improvement and we welcome open source contributions to openbench.
 
 ## Acknowledgments
 
 This project would not be possible without:
 
-- **[Inspect AI](https://github.com/UKGovernmentBEIS/inspect_ai)** - The incredible evaluation framework that powers OpenBench
+- **[Inspect AI](https://github.com/UKGovernmentBEIS/inspect_ai)** - The incredible evaluation framework that powers openbench
 - **[EleutherAI's lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness)** - Pioneering work in standardized LLM evaluation
 - **[Hugging Face's lighteval](https://github.com/huggingface/lighteval)** - Excellent evaluation infrastructure
 
@@ -318,7 +318,7 @@ This project would not be possible without:
 
 ```bibtex
 @software{openbench,
-  title = {OpenBench: Provider-agnostic, open-source evaluation infrastructure for language models},
+  title = {openbench: Provider-agnostic, open-source evaluation infrastructure for language models},
   author = {Sah, Aarush},
   year = {2025},
   url = {https://openbench.dev}

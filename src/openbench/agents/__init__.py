@@ -1,5 +1,5 @@
 """
-Code agent implementations for OpenBench evaluations.
+Code agent implementations for openbench evaluations.
 
 This module provides a unified interface for different CLI code agents
 used in coding evaluations.

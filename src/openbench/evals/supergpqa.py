@@ -1,4 +1,4 @@
-"""OpenBench implementation of SuperGPQA.
+"""openbench implementation of SuperGPQA.
 SuperGPQA: Scaling LLM Evaluation across 285 Graduate Disciplines
 
 Implemented by Aarush Sah

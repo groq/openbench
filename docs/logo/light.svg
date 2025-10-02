@@ -1,6 +1,6 @@
 <svg width="240" height="48" viewBox="0 0 240 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-  <title id="title">OpenBench</title>
-  <desc id="desc">OpenBench logo with circular ring and three ascending bars</desc>
+  <title id="title">openbench</title>
+  <desc id="desc">openbench logo with circular ring and three ascending bars</desc>
 
   <!-- Brand palette -->
   <!-- primary: #39434F, secondary: #EDE6DD, tertiary: #B39DDB -->
@@ -15,6 +15,6 @@
 
   <!-- Wordmark -->
   <text x="60" y="31" font-family="Neue Regrade, Inter, system-ui, sans-serif" font-size="22" font-weight="700" fill="#39434F" letter-spacing="0.2">
-    OpenBench
+    openbench
   </text>
 </svg>

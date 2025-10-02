@@ -85,7 +85,7 @@ LANGUAGES = [
 
 
 def record_to_mcq_sample(record: dict[str, str]) -> MCQSample:
-    """Convert a MMLU record to an OpenBench MCQSample."""
+    """Convert a MMLU record to an openbench MCQSample."""
     return MCQSample(
         input=MULTIPLE_CHOICE_PROMPT_TEMPLATE.format(
             prompt=record["Question"],

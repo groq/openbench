@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "openbench"
 version = "0.4.1"
 requires-python = ">=3.10"
-description = "OpenBench - open source, replicable, and standardized evaluation infrastructure"
+description = "openbench - open source, replicable, and standardized evaluation infrastructure"
 readme = "README.md"
 license = {text = "MIT"}
 authors = [

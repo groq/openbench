@@ -1,5 +1,5 @@
 """
-Agent manager for code agents in OpenBench evaluations.
+Agent manager for code agents in openbench evaluations.
 """
 
 from __future__ import annotations

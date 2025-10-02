@@ -5,7 +5,7 @@ authors:
 - family-names: "Sah"
   given-names: "Aarush"
   orcid: "https://orcid.org/0009-0004-6429-8982"
-title: "OpenBench: Provider-agnostic, open-source evaluation infrastructure for language models"
+title: "openbench: Provider-agnostic, open-source evaluation infrastructure for language models"
 version: 0.3.0
 date-released: 2025-07-31
 url: "https://openbench.dev"

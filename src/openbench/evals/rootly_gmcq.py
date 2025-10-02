@@ -33,7 +33,7 @@ from openbench.utils.mcq import MCQEval, MCQSample
 
 
 def record_to_mcq_sample(record: dict) -> MCQSample:
-    """Convert a GMCQ record to an OpenBench MCQSample.
+    """Convert a GMCQ record to an openbench MCQSample.
 
     Handles chat-style inputs (list of role/content dicts) and plain strings.
     """

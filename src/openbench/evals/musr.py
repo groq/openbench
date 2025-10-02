@@ -1,4 +1,4 @@
-"""OpenBench implementation of MuSR (Testing the Limits of Chain-of-thought with Multistep Soft Reasoning).
+"""openbench implementation of MuSR (Testing the Limits of Chain-of-thought with Multistep Soft Reasoning).
 MuSR is a dataset that tests chain-of-thought reasoning with three types of tasks:
 - Murder mysteries: Who is the most likely murderer?
 - Object placements: Where would someone look for an object?
@@ -18,7 +18,7 @@ from openbench.scorers.mcq import create_mcq_scorer
 
 
 def record_to_mcq_sample(record: dict, subset: Optional[str] = None) -> MCQSample:
-    """Convert a MuSR record to an OpenBench MCQSample."""
+    """Convert a MuSR record to an openbench MCQSample."""
     try:
         choices_list = ast.literal_eval(record["choices"])  # type: ignore[arg-type]
     except Exception:

@@ -1,11 +1,11 @@
 ---
 title: "Architecture"
-description: "Understanding OpenBench's design and implementation"
+description: "Understanding openbench's design and implementation"
 ---
 
 ## Overview
 
-OpenBench is built on top of [Inspect AI](https://github.com/UKGovernmentBEIS/inspect_ai), providing a unified interface for evaluating language models across multiple benchmarks and providers.
+openbench is built on top of [Inspect AI](https://github.com/UKGovernmentBEIS/inspect_ai), providing a unified interface for evaluating language models across multiple benchmarks and providers.
 
 ## System Architecture
 
@@ -41,7 +41,7 @@ from .evals.simpleqa import simpleqa  # noqa: F401, E402
 ```
 
 <Note>
-Custom evaluations must be added to the registry to be discoverable by OpenBench.
+Custom evaluations must be added to the registry to be discoverable by openbench.
 </Note>
 
 ### 2. Benchmark Metadata (`config.py`)
@@ -288,7 +288,7 @@ Reference InspectAI: [Metric](https://inspect.aisi.org.uk/reference/inspect_ai.s
 ### 6. Model Solver Logic (`solvers/`)
 
 Solvers define how the evaluated model processes questions.
-OpenBench supports custom solver logic, though InspectAI provides a number of robust [built-in solvers](https://inspect.aisi.org.uk/solvers.html#built-in-solvers).
+openbench supports custom solver logic, though InspectAI provides a number of robust [built-in solvers](https://inspect.aisi.org.uk/solvers.html#built-in-solvers).
 
 ```python
 Task(
@@ -359,4 +359,4 @@ openbench/
 5. Benchmark metadata in `config.py`
 6. Import eval task into `_registry.py`
 
-<Tip> OpenBench provides infrastructure for multiple-choice question (MCQ) evals. [See more](mcq).</Tip>
+<Tip> openbench provides infrastructure for multiple-choice question (MCQ) evals. [See more](mcq).</Tip>

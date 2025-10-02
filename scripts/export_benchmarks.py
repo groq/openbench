@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Export OpenBench benchmark metadata for the docs catalog.
+Export openbench benchmark metadata for the docs catalog.
 
 Outputs (fixed paths):
 - docs/data/benchmarks.json

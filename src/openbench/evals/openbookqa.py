@@ -1,4 +1,4 @@
-"""OpenBench implementation of OpenBookQA (MCQ abstracted)."""
+"""openbench implementation of OpenBookQA (MCQ abstracted)."""
 
 from inspect_ai import Task, task
 from openbench.utils.mcq import MCQEval, MCQSample
@@ -6,7 +6,7 @@ from openbench.utils.text import create_dynamic_multiple_choice_prompt
 
 
 def record_to_mcq_sample(record) -> MCQSample:
-    """Convert an OpenBookQA record to an OpenBench MCQSample."""
+    """Convert an OpenBookQA record to an openbench MCQSample."""
     question = record["question_stem"]
     options = [choice for choice in record["choices"]["text"]]
     prompt = create_dynamic_multiple_choice_prompt(question, options)

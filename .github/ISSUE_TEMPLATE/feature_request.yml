@@ -1,12 +1,12 @@
 name: Feature Request
-description: Suggest an idea for OpenBench
+description: Suggest an idea for openbench
 title: "[Feature]: "
 labels: ["enhancement"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for suggesting a new feature for OpenBench!
+        Thanks for suggesting a new feature for openbench!
 
   - type: textarea
     id: problem

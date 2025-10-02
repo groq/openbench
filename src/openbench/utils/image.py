@@ -1,4 +1,4 @@
-"""Image utility functions for OpenBench."""
+"""Image utility functions for openbench."""
 
 import io
 from PIL import Image

@@ -4,7 +4,7 @@ description: "Robust infrastructure to support integration multiple choice quest
 ---
 
 ## Implement MCQEval
-Our built-in MCQEval framework serves as an evaluation task factory. To implement, define two components and let OpenBench take care of the rest!
+Our built-in MCQEval framework serves as an evaluation task factory. To implement, define two components and let openbench take care of the rest!
 
 ### Component 1: Map Your Dataset to MCQ Samples
 Define a mapping for dataset records to fit the expected **MCQSample** format:
@@ -16,7 +16,7 @@ class MCQSample(Sample):
 ```
 ```python evals/openbookqa.py
 def record_to_mcq_sample(record) -> MCQSample:
-    """Convert an OpenBookQA record to an OpenBench MCQSample."""
+    """Convert an OpenBookQA record to an openbench MCQSample."""
 
     question = record["question_stem"]
     options = [choice for choice in record["choices"]["text"]]

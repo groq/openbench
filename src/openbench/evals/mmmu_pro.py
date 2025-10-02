@@ -20,7 +20,7 @@ def _parse_options_string(options_string: str) -> List[str]:
 
 
 def record_to_mcq_sample(record: Dict[str, Any]) -> MCQSample:
-    """Convert a MMMU Pro record to an OpenBench MCQSample."""
+    """Convert a MMMU Pro record to an openbench MCQSample."""
     # Question text may be missing for vision-only samples
     question_raw = record.get("question")
     question = (

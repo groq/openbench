@@ -98,7 +98,7 @@ class TestBoxedExtraction:
         assert extract_boxed_answer(r"Answer: \framebox{0}") == "0"
 
     def test_fbox_extraction(self):
-        """Test extraction from \fbox{} format (OpenBench compatibility)."""
+        """Test extraction from \fbox{} format (openbench compatibility)."""
         assert extract_boxed_answer(r"\fbox{42}") == "42"
         assert extract_boxed_answer(r"The answer is \fbox{-10}") == "-10"
 

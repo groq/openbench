@@ -109,7 +109,7 @@ uv publish
 4. **Shared components**: Common scorers and utilities reduce code duplication
 
 ### Dependency Architecture
-OpenBench uses a tightly coupled architecture where benchmarks share common infrastructure:
+openbench uses a tightly coupled architecture where benchmarks share common infrastructure:
 
 ```
 ┌─────────────┐      ┌──────────────┐      ┌──────────────┐

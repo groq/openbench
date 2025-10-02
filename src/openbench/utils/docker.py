@@ -1,5 +1,5 @@
 """
-Docker command utilities for OpenBench.
+Docker command utilities for openbench.
 
 This module contains all Docker-related command strings and installation
 scripts used across agents and the Docker manager.

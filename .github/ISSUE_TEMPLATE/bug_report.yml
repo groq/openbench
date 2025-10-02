@@ -1,5 +1,5 @@
 name: Bug Report
-description: File a bug report to help us improve OpenBench
+description: File a bug report to help us improve openbench
 title: "[Bug]: "
 labels: ["bug"]
 body:
@@ -11,8 +11,8 @@ body:
   - type: input
     id: version
     attributes:
-      label: OpenBench Version
-      description: What version of OpenBench are you running?
+      label: openbench Version
+      description: What version of openbench are you running?
       placeholder: "0.3.0"
     validations:
       required: true

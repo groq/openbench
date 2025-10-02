@@ -8,7 +8,7 @@ from openbench.utils.text import MULTIPLE_CHOICE_PROMPT_TEMPLATE
 
 # There is one difference between this and the original gpqa simple eval - the prompts are not reshuffled for every epoch. Shouldn't be that big of a deal, but worth noting.
 def record_to_mcq_sample(record: dict) -> MCQSample:
-    """Convert a GQPQA Diamond record to an OpenBench MCQSample."""
+    """Convert a GQPQA Diamond record to an openbench MCQSample."""
     random.seed(0)
     options = [
         record["Correct Answer"],

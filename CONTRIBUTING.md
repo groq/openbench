@@ -1,6 +1,6 @@
-# Contributing to OpenBench
+# Contributing to openbench
 
-Thank you for your interest in contributing to OpenBench! We welcome contributions from the community and are grateful for your support in making language model evaluation more accessible and reliable.
+Thank you for your interest in contributing to openbench! We welcome contributions from the community and are grateful for your support in making language model evaluation more accessible and reliable.
 
 ## 🚀 Quick Start
 
@@ -228,7 +228,7 @@ openbench/
 ```
 
 #### Dependency Architecture
-OpenBench uses a tightly coupled architecture where benchmarks share common infrastructure:
+openbench uses a tightly coupled architecture where benchmarks share common infrastructure:
 - **Core dependencies** (inspect-ai, datasets, scipy, numpy): Required by multiple benchmarks
 - **Optional dependencies**: Specific to individual benchmarks (e.g., scicode, jsonschema)
 - Most benchmarks can run with just core dependencies
@@ -266,7 +266,7 @@ We have structured issue templates to help you report problems effectively:
 
 ### Bug Reports
 Use our [bug report template](https://github.com/groq/openbench/issues/new?assignees=&labels=bug&projects=&template=bug_report.yml) which includes:
-- OpenBench version and environment details
+- openbench version and environment details
 - Exact command that failed
 - Expected vs actual behavior
 - Error logs and reproduction steps
@@ -297,4 +297,4 @@ Please note that this project is released with a Contributor Code of Conduct. By
 
 ## 📄 License
 
-By contributing to OpenBench, you agree that your contributions will be licensed under the MIT License.
+By contributing to openbench, you agree that your contributions will be licensed under the MIT License.

@@ -172,7 +172,7 @@ def openrouter() -> Type[ModelAPI]:
 
 
 def _override_builtin_groq_provider():
-    """Replace Inspect AI's built-in groq provider with enhanced OpenBench version."""
+    """Replace Inspect AI's built-in groq provider with enhanced openbench version."""
     from inspect_ai._util.registry import _registry
     from .model._providers.groq import GroqAPI
     from inspect_ai.model._registry import modelapi
@@ -181,14 +181,14 @@ def _override_builtin_groq_provider():
     def openbench_groq_override():
         return GroqAPI
 
-    # Force override the inspect_ai/groq entry with OpenBench implementation
+    # Force override the inspect_ai/groq entry with openbench implementation
     _registry["modelapi:inspect_ai/groq"] = openbench_groq_override
 
     return openbench_groq_override
 
 
 def _override_builtin_openrouter_provider():
-    """Replace Inspect AI's built-in openrouter provider with enhanced OpenBench version."""
+    """Replace Inspect AI's built-in openrouter provider with enhanced openbench version."""
     from inspect_ai._util.registry import _registry
     from .model._providers.openrouter import OpenRouterAPI
     from inspect_ai.model._registry import modelapi
@@ -197,7 +197,7 @@ def _override_builtin_openrouter_provider():
     def openbench_openrouter_override():
         return OpenRouterAPI
 
-    # Force override the inspect_ai/openrouter entry with OpenBench implementation
+    # Force override the inspect_ai/openrouter entry with openbench implementation
     _registry["modelapi:inspect_ai/openrouter"] = openbench_openrouter_override
 
     return openbench_openrouter_override

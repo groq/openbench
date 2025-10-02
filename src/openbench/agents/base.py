@@ -1,5 +1,5 @@
 """
-Base class for code agents in OpenBench evaluations.
+Base class for code agents in openbench evaluations.
 """
 
 from __future__ import annotations
