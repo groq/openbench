@@ -1068,6 +1068,39 @@ BENCHMARKS = {
         function_name="livemcpbench",
         is_alpha=False,
     ),
+    # Knowledge QA benchmarks
+    "logiqa": BenchmarkMetadata(
+        name="LogiQA",
+        description="Logical reasoning dataset from Chinese civil service exam questions - tests deductive reasoning skills",
+        category="knowledge-qa",
+        tags=["multiple-choice", "logical-reasoning", "deduction", "critical-thinking"],
+        module_path="openbench.evals.logiqa",
+        function_name="logiqa",
+    ),
+    "math_qa": BenchmarkMetadata(
+        name="MathQA",
+        description="Mathematical word problems with multiple-choice answers and solution rationales",
+        category="knowledge-qa",
+        tags=["multiple-choice", "mathematics", "word-problems", "reasoning"],
+        module_path="openbench.evals.mathqa",
+        function_name="math_qa",
+    ),
+    "sciq": BenchmarkMetadata(
+        name="SciQ",
+        description="Science exam questions covering Physics, Chemistry, Biology, and other scientific domains",
+        category="knowledge-qa",
+        tags=["multiple-choice", "science", "physics", "chemistry", "biology"],
+        module_path="openbench.evals.sciq",
+        function_name="sciq",
+    ),
+    "truthfulqa": BenchmarkMetadata(
+        name="TruthfulQA",
+        description="Tests if models generate truthful answers to questions that humans often answer falsely due to misconceptions",
+        category="knowledge-qa",
+        tags=["multiple-choice", "truthfulness", "misconceptions", "factuality"],
+        module_path="openbench.evals.truthfulqa",
+        function_name="truthfulqa",
+    ),
 }
 
 
