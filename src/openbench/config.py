@@ -1068,6 +1068,83 @@ BENCHMARKS = {
         function_name="livemcpbench",
         is_alpha=False,
     ),
+    # Reading Comprehension benchmarks
+    "race_high": BenchmarkMetadata(
+        name="RACE-High",
+        description="High school level reading comprehension from English exams for Chinese students - passages with multiple questions",
+        category="reading-comprehension",
+        tags=[
+            "multiple-choice",
+            "reading-comprehension",
+            "english-exam",
+            "high-school",
+        ],
+        module_path="openbench.evals.race",
+        function_name="race_high",
+    ),
+    "qa4mre": BenchmarkMetadata(
+        name="QA4MRE (All Years)",
+        description="Question Answering for Machine Reading Evaluation - CLEF shared tasks 2011-2013",
+        category="reading-comprehension",
+        tags=["multiple-choice", "reading-comprehension", "clef", "machine-reading"],
+        module_path="openbench.evals.qa4mre",
+        function_name="qa4mre",
+    ),
+    "qa4mre_2011": BenchmarkMetadata(
+        name="QA4MRE 2011",
+        description="Question Answering for Machine Reading Evaluation (English, 2011)",
+        category="reading-comprehension",
+        tags=[
+            "multiple-choice",
+            "reading-comprehension",
+            "clef",
+            "machine-reading",
+            "qa4mre",
+        ],
+        module_path="openbench.evals.qa4mre",
+        function_name="qa4mre_2011",
+    ),
+    "qa4mre_2012": BenchmarkMetadata(
+        name="QA4MRE 2012",
+        description="Question Answering for Machine Reading Evaluation (English, 2012)",
+        category="reading-comprehension",
+        tags=[
+            "multiple-choice",
+            "reading-comprehension",
+            "clef",
+            "machine-reading",
+            "qa4mre",
+        ],
+        module_path="openbench.evals.qa4mre",
+        function_name="qa4mre_2012",
+    ),
+    "qa4mre_2013": BenchmarkMetadata(
+        name="QA4MRE 2013",
+        description="Question Answering for Machine Reading Evaluation (English, 2013)",
+        category="reading-comprehension",
+        tags=[
+            "multiple-choice",
+            "reading-comprehension",
+            "clef",
+            "machine-reading",
+            "qa4mre",
+        ],
+        module_path="openbench.evals.qa4mre",
+        function_name="qa4mre_2013",
+    ),
+    "qasper_ll": BenchmarkMetadata(
+        name="QASPER (Binary MCQ)",
+        description="Question Answering on Scientific Papers - binary yes/no questions on research paper abstracts",
+        category="reading-comprehension",
+        tags=[
+            "multiple-choice",
+            "reading-comprehension",
+            "scientific-papers",
+            "binary-classification",
+        ],
+        module_path="openbench.evals.qasper",
+        function_name="qasper_ll",
+    ),
 }
 
 
