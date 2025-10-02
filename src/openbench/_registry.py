@@ -292,3 +292,16 @@ from .evals.matharena.brumo_2025.brumo_2025 import brumo_2025  # noqa: F401, E40
 from .evals.matharena.hmmt_feb_2023.hmmt_feb_2023 import hmmt_feb_2023  # noqa: F401, E402
 from .evals.matharena.hmmt_feb_2024.hmmt_feb_2024 import hmmt_feb_2024  # noqa: F401, E402
 from .evals.matharena.hmmt_feb_2025.hmmt_feb_2025 import hmmt_feb_2025  # noqa: F401, E402
+
+# Domain-Specific benchmarks
+from .evals.arabic_exams import (  # noqa: F401, E402
+    arabic_exams,
+    arabic_exams_accounting_university,
+    arabic_exams_arabic_language_general,
+    arabic_exams_computer_science_high_school,
+    arabic_exams_computer_science_university,
+    arabic_exams_islamic_studies_general,
+    arabic_exams_math_high_school,
+    arabic_exams_physics_high_school,
+    arabic_exams_physics_university,
+)
