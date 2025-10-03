@@ -4316,6 +4316,9 @@ def _merge_benchmarks_with_normalization(
     Entry point benchmarks can override built-ins even if they differ only in
     '-' vs '_'. The entry point's key format wins.
 
+    When multiple entry points normalize to the same key, the last one wins
+    (consistent with dict merge semantics).
+
     Args:
         builtin: Built-in benchmark metadata
         entry_points: Entry point benchmark metadata
@@ -4325,20 +4328,21 @@ def _merge_benchmarks_with_normalization(
     """
     merged = dict(builtin)
 
-    # Build a reverse lookup: normalized_key -> original_key (from built-ins)
-    builtin_normalized = {_normalize_benchmark_key(k): k for k in builtin.keys()}
+    # Build a reverse lookup: normalized_key -> original_key (tracks ALL keys processed)
+    normalized_lookup = {_normalize_benchmark_key(k): k for k in builtin.keys()}
 
     for ep_key, ep_meta in entry_points.items():
         normalized = _normalize_benchmark_key(ep_key)
 
-        # If an entry point overrides a built-in (even with different - vs _),
-        # remove the old key and add the new one
-        if normalized in builtin_normalized:
-            old_key = builtin_normalized[normalized]
+        # Check if there's an existing key that normalizes to the same value
+        if normalized in normalized_lookup:
+            old_key = normalized_lookup[normalized]
+            # Remove the old key if it's different from the new one
             if old_key != ep_key and old_key in merged:
                 del merged[old_key]
-                builtin_normalized[normalized] = ep_key
 
+        # Update lookup and merged dict
+        normalized_lookup[normalized] = ep_key
         merged[ep_key] = ep_meta
 
     return merged
