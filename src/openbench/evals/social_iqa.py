@@ -63,7 +63,7 @@ def record_to_mcq_sample(record: dict) -> MCQSample:
     prompt_text = create_dynamic_multiple_choice_prompt(full_question, options)
 
     # Convert label to letter
-    # Label might be 1-indexed (1,2,3) or 0-indexed (0,1,2) or a string
+    # Dataset label is 1-indexed (1,2,3)
     label = record.get("label", record.get("correct", 0))
     target = chr(64 + int(label))  # 1->A, 2->B, 3->C
 
