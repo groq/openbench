@@ -18,6 +18,7 @@ bench eval gpqa_mc --model groq/llama-3.1-70b-versatile
 ```
 """
 
+import random
 from inspect_ai import Task, task
 from openbench.utils.mcq import MCQEval, MCQSample
 from openbench.utils.text import MULTIPLE_CHOICE_PROMPT_TEMPLATE
@@ -40,14 +41,36 @@ def record_to_mcq_sample(record: dict) -> MCQSample:
     incorrect_2 = record.get("Incorrect Answer 2", "")
     incorrect_3 = record.get("Incorrect Answer 3", "")
 
-    # Place correct answer in position A (we'll shuffle if needed)
-    # For now, keep it simple and fixed
-    options = [correct_answer, incorrect_1, incorrect_2, incorrect_3]
+    # Validate that correct answer is not empty
+    if not correct_answer or not correct_answer.strip():
+        raise ValueError("Correct answer is empty or missing")
 
-    # Filter out empty options
-    options = [opt for opt in options if opt]
+    # Create list of (answer_text, is_correct) tuples
+    all_answers = [
+        (correct_answer, True),
+        (incorrect_1, False),
+        (incorrect_2, False),
+        (incorrect_3, False),
+    ]
 
-    # Ensure we have 4 options, pad if necessary
+    # Filter out empty incorrect answers
+    all_answers = [
+        (text, is_correct) for text, is_correct in all_answers if text and text.strip()
+    ]
+
+    # Shuffle answers deterministically based on question text
+    # This ensures consistent ordering across runs while varying across samples
+    rng = random.Random(hash(question) % (2**32))
+    rng.shuffle(all_answers)
+
+    # Find position of correct answer
+    correct_idx = next(i for i, (_, is_correct) in enumerate(all_answers) if is_correct)
+    target = chr(65 + correct_idx)  # 0->A, 1->B, 2->C, 3->D
+
+    # Extract answer texts
+    options = [text for text, _ in all_answers]
+
+    # Pad to 4 options if necessary (though GPQA should always have 4)
     while len(options) < 4:
         options.append("No answer provided")
 
@@ -59,7 +82,7 @@ def record_to_mcq_sample(record: dict) -> MCQSample:
             option_c=options[2],
             option_d=options[3],
         ),
-        target="A",  # Correct answer is always in position A with this setup
+        target=target,
         metadata={
             "subdomain": record.get("subdomain", record.get("Subdomain", "")),
         },
