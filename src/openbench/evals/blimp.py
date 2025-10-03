@@ -33,6 +33,8 @@ Citation:
 
 from inspect_ai import Task, task
 from openbench.utils.mcq import MCQEval, MCQSample
+from openbench.utils.text import create_dynamic_multiple_choice_prompt
+import hashlib
 
 # All 67 BLIMP tasks
 BLIMP_TASKS = [
@@ -123,18 +125,22 @@ def record_to_mcq_sample(record: dict) -> MCQSample:
     sentence_good = record["sentence_good"]
     sentence_bad = record["sentence_bad"]
 
-    # Create a binary choice prompt
+    # Create a binary choice prompt with deterministic A/B randomization to avoid positional bias
     question = "Which sentence is grammatically correct?"
 
-    prompt = f"""Answer the following multiple choice question. The last line of your response should be of the following format: 'Answer: $LETTER' (without quotes) where LETTER is one of AB.
+    # Use pair_id (or sentences) to deterministically decide option order
+    seed_input = str(record.get("pair_id", "")) or f"{sentence_good}||{sentence_bad}"
+    seed_hash = int(hashlib.sha256(seed_input.encode("utf-8")).hexdigest(), 16)
+    flip = seed_hash % 2 == 1
 
-{question}
+    if flip:
+        options = [sentence_bad, sentence_good]
+        target = "B"  # good sentence is second
+    else:
+        options = [sentence_good, sentence_bad]
+        target = "A"  # good sentence is first
 
-A) {sentence_good}
-B) {sentence_bad}""".strip()
-
-    # The correct answer is always A (sentence_good)
-    target = "A"
+    prompt = create_dynamic_multiple_choice_prompt(question, options)
 
     return MCQSample(
         input=prompt,
