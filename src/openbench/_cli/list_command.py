@@ -14,6 +14,7 @@ from openbench.config import (
     get_all_benchmarks,
     get_benchmarks_by_category,
     get_categories,
+    EVAL_PRESETS,
 )
 from openbench._cli.utils import (
     get_category_display_name,
@@ -134,7 +135,33 @@ def list_evals(
     status_msg += "[/dim]"
     console.print(status_msg)
     console.print()
+
+    # Show available presets
+    console.print("[bold green]Available Presets[/bold green]")
+    console.print("─" * 60)
+    preset_table = Table(show_header=False, show_lines=False, padding=(0, 1), box=None)
+    preset_table.add_column("Preset", style="cyan", width=18)
+    preset_table.add_column("Name", style="white", width=20)
+    preset_table.add_column("Description", style="dim")
+
+    for preset_key, preset in sorted(EVAL_PRESETS.items()):
+        desc = preset.description
+        if len(desc) > 50:
+            desc = desc[:47] + "..."
+        preset_table.add_row(
+            f"[bold cyan]{preset_key}[/bold cyan]",
+            preset.name,
+            f"{desc} [dim]({len(preset.benchmarks)})[/dim]",
+        )
+
+    console.print(preset_table)
+    console.print()
+
     console.print("[dim]Commands:[/dim]")
-    console.print("   bench describe <name> - Show detailed information")
-    console.print("   bench eval <name>     - Run evaluation")
+    console.print("   bench describe <name>        - Show detailed information")
+    console.print("   bench eval <name>            - Run evaluation")
+    console.print("   bench eval <preset>          - Run all benchmarks in preset")
+    console.print(
+        "   bench eval <preset> <name>   - Combine presets and individual benchmarks"
+    )
     console.print()

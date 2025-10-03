@@ -95,23 +95,17 @@ def arabic_exams_computer_science_university() -> Task:
 
 @task
 def arabic_exams_islamic_studies_general() -> Task:
-    """Arabic Exams: Islamic Studies (General)"""
-    return arabic_exams(subset="Islamic Studies (General)")
+    """Arabic Exams: Islamic Studies"""
+    return arabic_exams(subset="Islamic Studies")
 
 
 @task
 def arabic_exams_math_high_school() -> Task:
-    """Arabic Exams: Math (High School)"""
-    return arabic_exams(subset="Math (High School)")
+    """Arabic Exams: Math (Primary School)"""
+    return arabic_exams(subset="Math (Primary School)")
 
 
 @task
 def arabic_exams_physics_high_school() -> Task:
     """Arabic Exams: Physics (High School)"""
     return arabic_exams(subset="Physics (High School)")
-
-
-@task
-def arabic_exams_physics_university() -> Task:
-    """Arabic Exams: Physics (University)"""
-    return arabic_exams(subset="Physics (University)")
