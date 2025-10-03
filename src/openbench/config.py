@@ -3287,7 +3287,7 @@ BENCHMARKS = {
         ],
         module_path="openbench.evals.xwinograd",
         function_name="xwinograd_zh",
-    ),    # Knowledge QA benchmarks
+    ),  # Knowledge QA benchmarks
     "logiqa": BenchmarkMetadata(
         name="LogiQA",
         description="Logical reasoning dataset from Chinese civil service exam questions - tests deductive reasoning skills",
@@ -3319,6 +3319,7 @@ BENCHMARKS = {
         tags=["multiple-choice", "truthfulness", "misconceptions", "factuality"],
         module_path="openbench.evals.truthfulqa",
         function_name="truthfulqa",
+    ),
     # BLiMP: Benchmark of Linguistic Minimal Pairs
     "blimp": BenchmarkMetadata(
         name="BLiMP (67 Linguistic Phenomena)",
