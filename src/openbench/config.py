@@ -1149,6 +1149,14 @@ BENCHMARKS = {
         module_path="openbench.evals.glue",
         function_name="multirc",
     ),
+    "superglue": BenchmarkMetadata(
+        name="SuperGLUE (All Tasks)",
+        description="SuperGLUE benchmark suite - run any subset by name (copa, rte, wic, wsc, cb, multirc)",
+        category="glue",
+        tags=["multiple-choice", "superglue", "nli", "reasoning"],
+        module_path="openbench.evals.glue",
+        function_name="superglue",
+    ),
     "glue": BenchmarkMetadata(
         name="GLUE (All Tasks)",
         description="General Language Understanding Evaluation benchmark suite",
