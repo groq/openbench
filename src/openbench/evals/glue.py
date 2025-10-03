@@ -78,9 +78,7 @@ def record_to_mcq_sample_rte(record: dict) -> MCQSample:
     can be inferred from a premise.
     """
     input_question = (
-        f"{record['premise']}\n"
-        f"Question: {record['hypothesis']} True or False?\n"
-        f"Answer:"
+        f"{record['premise']}\nQuestion: {record['hypothesis']} True or False?\nAnswer:"
     )
 
     input_msg = prompt(
@@ -187,9 +185,7 @@ def record_to_mcq_sample_multirc(record: dict) -> MCQSample:
     MultiRC (Multi-Sentence Reading Comprehension) tests whether
     a given answer to a question is correct based on a paragraph.
     """
-    input_question = (
-        f"{record['paragraph']}\n" f"Question: {record['question']}\n" f"Answer:"
-    )
+    input_question = f"{record['paragraph']}\nQuestion: {record['question']}\nAnswer:"
 
     # Each sample asks "Is this answer correct?"
     input_msg = prompt(
