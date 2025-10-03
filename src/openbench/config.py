@@ -4301,7 +4301,7 @@ _BUILTIN_BENCHMARKS = {
     "otis_mock_aime": BenchmarkMetadata(
         name="MockAIME (2024-2025)",
         description="Otis Mock AIME - a benchmark from the OTIS Mock AIME 2024-2025 exams",
-        category="domain-specific",
+        category="math",
         tags=["aime", "problem-solving", "math", "2024-2025"],
         module_path="openbench.evals.mockaime",
         function_name="otis_mock_aime",
