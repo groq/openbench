@@ -440,6 +440,30 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "ARC-Challenge",
+    "description": "AI2 Reasoning Challenge - Challenging questions from grade-school science exams",
+    "category": "core",
+    "tags": [
+      "multiple-choice",
+      "science",
+      "commonsense-reasoning"
+    ],
+    "function_name": "arc_challenge",
+    "is_alpha": false
+  },
+  {
+    "name": "ARC-Easy",
+    "description": "AI2 Reasoning Challenge - Easy questions from grade-school science exams",
+    "category": "core",
+    "tags": [
+      "multiple-choice",
+      "science",
+      "commonsense-reasoning"
+    ],
+    "function_name": "arc_easy",
+    "is_alpha": false
+  },
+  {
     "name": "Arabic Exams (40 Subjects)",
     "description": "Multi-task Arabic language understanding benchmark from school exams across North Africa, the Levant, and the Gulf",
     "category": "domain-specific",
@@ -558,9 +582,253 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
-    "name": "BRUMO 2025",
-    "description": "Bruno Mathematical Olympiad 2025",
-    "category": "math",
+    "name": "BBH: Causal Judgment",
+    "description": "BigBench Hard - Causal judgment reasoning",
+    "category": "core",
+    "tags": [
+      "multiple-choice",
+      "reasoning",
+      "bigbench",
+      "chain-of-thought"
+    ],
+    "function_name": "bbh_causal_judgment",
+    "is_alpha": false
+  },
+  {
+    "name": "BBH: Date Understanding",
+    "description": "BigBench Hard - Understanding and reasoning about dates",
+    "category": "core",
+    "tags": [
+      "multiple-choice",
+      "reasoning",
+      "bigbench",
+      "chain-of-thought"
+    ],
+    "function_name": "bbh_date_understanding",
+    "is_alpha": false
+  },
+  {
+    "name": "BBH: Disambiguation QA",
+    "description": "BigBench Hard - Pronoun disambiguation in questions",
+    "category": "core",
+    "tags": [
+      "multiple-choice",
+      "reasoning",
+      "bigbench",
+      "chain-of-thought"
+    ],
+    "function_name": "bbh_disambiguation_qa",
+    "is_alpha": false
+  },
+  {
+    "name": "BBH: Geometric Shapes",
+    "description": "BigBench Hard - Reasoning about geometric shapes",
+    "category": "core",
+    "tags": [
+      "multiple-choice",
+      "reasoning",
+      "bigbench",
+      "chain-of-thought",
+      "geometry"
+    ],
+    "function_name": "bbh_geometric_shapes",
+    "is_alpha": false
+  },
+  {
+    "name": "BBH: Logical Deduction (3 Objects)",
+    "description": "BigBench Hard - Logical deduction with three objects",
+    "category": "core",
+    "tags": [
+      "multiple-choice",
+      "reasoning",
+      "bigbench",
+      "chain-of-thought",
+      "logic"
+    ],
+    "function_name": "bbh_logical_deduction_three_objects",
+    "is_alpha": false
+  },
+  {
+    "name": "BBH: Logical Deduction (5 Objects)",
+    "description": "BigBench Hard - Logical deduction with five objects",
+    "category": "core",
+    "tags": [
+      "multiple-choice",
+      "reasoning",
+      "bigbench",
+      "chain-of-thought",
+      "logic"
+    ],
+    "function_name": "bbh_logical_deduction_five_objects",
+    "is_alpha": false
+  },
+  {
+    "name": "BBH: Logical Deduction (7 Objects)",
+    "description": "BigBench Hard - Logical deduction with seven objects",
+    "category": "core",
+    "tags": [
+      "multiple-choice",
+      "reasoning",
+      "bigbench",
+      "chain-of-thought",
+      "logic"
+    ],
+    "function_name": "bbh_logical_deduction_seven_objects",
+    "is_alpha": false
+  },
+  {
+    "name": "BBH: Movie Recommendation",
+    "description": "BigBench Hard - Movie recommendation reasoning",
+    "category": "core",
+    "tags": [
+      "multiple-choice",
+      "reasoning",
+      "bigbench",
+      "chain-of-thought"
+    ],
+    "function_name": "bbh_movie_recommendation",
+    "is_alpha": false
+  },
+  {
+    "name": "BBH: Navigate",
+    "description": "BigBench Hard - Spatial navigation reasoning",
+    "category": "core",
+    "tags": [
+      "multiple-choice",
+      "reasoning",
+      "bigbench",
+      "chain-of-thought",
+      "spatial"
+    ],
+    "function_name": "bbh_navigate",
+    "is_alpha": false
+  },
+  {
+    "name": "BBH: Reasoning About Colored Objects",
+    "description": "BigBench Hard - Reasoning about colored objects",
+    "category": "core",
+    "tags": [
+      "multiple-choice",
+      "reasoning",
+      "bigbench",
+      "chain-of-thought"
+    ],
+    "function_name": "bbh_reasoning_about_colored_objects",
+    "is_alpha": false
+  },
+  {
+    "name": "BBH: Ruin Names",
+    "description": "BigBench Hard - Word manipulation and reasoning",
+    "category": "core",
+    "tags": [
+      "multiple-choice",
+      "reasoning",
+      "bigbench",
+      "chain-of-thought",
+      "wordplay"
+    ],
+    "function_name": "bbh_ruin_names",
+    "is_alpha": false
+  },
+  {
+    "name": "BBH: Salient Translation Error Detection",
+    "description": "BigBench Hard - Detecting translation errors",
+    "category": "core",
+    "tags": [
+      "multiple-choice",
+      "reasoning",
+      "bigbench",
+      "chain-of-thought",
+      "translation"
+    ],
+    "function_name": "bbh_salient_translation_error_detection",
+    "is_alpha": false
+  },
+  {
+    "name": "BBH: Snarks",
+    "description": "BigBench Hard - Understanding sarcasm and irony",
+    "category": "core",
+    "tags": [
+      "multiple-choice",
+      "reasoning",
+      "bigbench",
+      "chain-of-thought",
+      "sarcasm"
+    ],
+    "function_name": "bbh_snarks",
+    "is_alpha": false
+  },
+  {
+    "name": "BBH: Sports Understanding",
+    "description": "BigBench Hard - Sports knowledge and reasoning",
+    "category": "core",
+    "tags": [
+      "multiple-choice",
+      "reasoning",
+      "bigbench",
+      "chain-of-thought",
+      "sports"
+    ],
+    "function_name": "bbh_sports_understanding",
+    "is_alpha": false
+  },
+  {
+    "name": "BBH: Temporal Sequences",
+    "description": "BigBench Hard - Understanding temporal sequences",
+    "category": "core",
+    "tags": [
+      "multiple-choice",
+      "reasoning",
+      "bigbench",
+      "chain-of-thought",
+      "temporal"
+    ],
+    "function_name": "bbh_temporal_sequences",
+    "is_alpha": false
+  },
+  {
+    "name": "BBH: Tracking Shuffled Objects (3 Objects)",
+    "description": "BigBench Hard - Tracking three shuffled objects",
+    "category": "core",
+    "tags": [
+      "multiple-choice",
+      "reasoning",
+      "bigbench",
+      "chain-of-thought",
+      "tracking"
+    ],
+    "function_name": "bbh_tracking_shuffled_objects_three_objects",
+    "is_alpha": false
+  },
+  {
+    "name": "BBH: Tracking Shuffled Objects (5 Objects)",
+    "description": "BigBench Hard - Tracking five shuffled objects",
+    "category": "core",
+    "tags": [
+      "multiple-choice",
+      "reasoning",
+      "bigbench",
+      "chain-of-thought",
+      "tracking"
+    ],
+    "function_name": "bbh_tracking_shuffled_objects_five_objects",
+    "is_alpha": false
+  },
+  {
+    "name": "BBH: Tracking Shuffled Objects (7 Objects)",
+    "description": "BigBench Hard - Tracking seven shuffled objects",
+    "category": "core",
+    "tags": [
+      "multiple-choice",
+      "reasoning",
+      "bigbench",
+      "chain-of-thought",
+      "tracking"
+    ],
+    "function_name": "bbh_tracking_shuffled_objects_seven_objects",
+    "is_alpha": false
+  },
+  {
     "name": "BLiMP (67 Linguistic Phenomena)",
     "description": "Benchmark of Linguistic Minimal Pairs testing grammatical knowledge through minimal pair comparisons",
     "category": "linguistic",
@@ -1510,444 +1778,6 @@ export const benchmarksData = [
       "blimp"
     ],
     "function_name": "blimp_wh_questions_subject_gap",
-    "is_alpha": false
-  },
-  {
-    "name": "ARC-Challenge",
-    "description": "AI2 Reasoning Challenge - Challenging questions from grade-school science exams",
-    "category": "core",
-    "tags": [
-      "multiple-choice",
-      "science",
-      "commonsense-reasoning"
-    ],
-    "function_name": "arc_challenge",
-    "is_alpha": false
-  },
-  {
-    "name": "ARC-Easy",
-    "description": "AI2 Reasoning Challenge - Easy questions from grade-school science exams",
-    "category": "core",
-    "tags": [
-      "multiple-choice",
-      "science",
-      "commonsense-reasoning"
-    ],
-    "function_name": "arc_easy",
-    "is_alpha": false
-  },
-  {
-    "name": "COPA",
-    "description": "Choice of Plausible Alternatives for causal reasoning",
-    "category": "glue",
-    "tags": [
-      "multiple-choice",
-      "superglue",
-      "nli",
-      "reasoning"
-    ],
-    "function_name": "copa",
-    "is_alpha": false
-  },
-  {
-    "name": "CTI-Bench ATE",
-    "description": "Extracting MITRE ATT&CK techniques from malware and threat descriptions",
-    "category": "cybersecurity",
-    "name": "BBH: Causal Judgment",
-    "description": "BigBench Hard - Causal judgment reasoning",
-    "category": "core",
-    "tags": [
-      "multiple-choice",
-      "reasoning",
-      "bigbench",
-      "chain-of-thought"
-    ],
-    "function_name": "bbh_causal_judgment",
-    "is_alpha": false
-  },
-  {
-    "name": "BBH: Date Understanding",
-    "description": "BigBench Hard - Understanding and reasoning about dates",
-    "category": "core",
-    "tags": [
-      "multiple-choice",
-      "reasoning",
-      "bigbench",
-      "chain-of-thought"
-    ],
-    "function_name": "bbh_date_understanding",
-    "is_alpha": false
-  },
-  {
-    "name": "BBH: Disambiguation QA",
-    "description": "BigBench Hard - Pronoun disambiguation in questions",
-    "category": "core",
-    "tags": [
-      "multiple-choice",
-      "reasoning",
-      "bigbench",
-      "chain-of-thought"
-    ],
-    "function_name": "bbh_disambiguation_qa",
-    "is_alpha": false
-  },
-  {
-    "name": "BBH: Geometric Shapes",
-    "description": "BigBench Hard - Reasoning about geometric shapes",
-    "category": "core",
-    "tags": [
-      "multiple-choice",
-      "reasoning",
-      "bigbench",
-      "chain-of-thought",
-      "geometry"
-    ],
-    "function_name": "bbh_geometric_shapes",
-    "is_alpha": false
-  },
-  {
-    "name": "BBH: Logical Deduction (3 Objects)",
-    "description": "BigBench Hard - Logical deduction with three objects",
-    "category": "core",
-    "tags": [
-      "multiple-choice",
-      "reasoning",
-      "bigbench",
-      "chain-of-thought",
-      "logic"
-    ],
-    "function_name": "bbh_logical_deduction_three_objects",
-    "is_alpha": false
-  },
-  {
-    "name": "CommitmentBank",
-    "description": "Natural language inference with commitment",
-    "category": "glue",
-    "tags": [
-      "multiple-choice",
-      "superglue",
-      "nli",
-      "reasoning"
-    ],
-    "function_name": "cb",
-    "is_alpha": false
-  },
-  {
-    "name": "DROP",
-    "description": "Reading comprehension benchmark requiring discrete reasoning over paragraphs (arithmetic, counting, sorting)",
-    "name": "BBH: Logical Deduction (5 Objects)",
-    "description": "BigBench Hard - Logical deduction with five objects",
-    "category": "core",
-    "tags": [
-      "multiple-choice",
-      "reasoning",
-      "bigbench",
-      "chain-of-thought",
-      "logic"
-    ],
-    "function_name": "bbh_logical_deduction_five_objects",
-    "is_alpha": false
-  },
-  {
-    "name": "BBH: Logical Deduction (7 Objects)",
-    "description": "BigBench Hard - Logical deduction with seven objects",
-    "category": "core",
-    "tags": [
-      "multiple-choice",
-      "reasoning",
-      "bigbench",
-      "chain-of-thought",
-      "logic"
-    ],
-    "function_name": "bbh_logical_deduction_seven_objects",
-    "is_alpha": false
-  },
-  {
-    "name": "BBH: Movie Recommendation",
-    "description": "BigBench Hard - Movie recommendation reasoning",
-    "category": "core",
-    "tags": [
-      "multiple-choice",
-      "reasoning",
-      "bigbench",
-      "chain-of-thought"
-    ],
-    "function_name": "bbh_movie_recommendation",
-    "is_alpha": false
-  },
-  {
-    "name": "BBH: Navigate",
-    "description": "BigBench Hard - Spatial navigation reasoning",
-    "category": "core",
-    "tags": [
-      "multiple-choice",
-      "reasoning",
-      "bigbench",
-      "chain-of-thought",
-      "spatial"
-    ],
-    "function_name": "bbh_navigate",
-    "is_alpha": false
-  },
-  {
-    "name": "BBH: Reasoning About Colored Objects",
-    "description": "BigBench Hard - Reasoning about colored objects",
-    "category": "core",
-    "tags": [
-      "multiple-choice",
-      "reasoning",
-      "bigbench",
-      "chain-of-thought"
-    ],
-    "function_name": "bbh_reasoning_about_colored_objects",
-    "is_alpha": false
-  },
-  {
-    "name": "BBH: Ruin Names",
-    "description": "BigBench Hard - Word manipulation and reasoning",
-    "category": "core",
-    "tags": [
-      "multiple-choice",
-      "reasoning",
-      "bigbench",
-      "chain-of-thought",
-      "wordplay"
-    ],
-    "function_name": "bbh_ruin_names",
-    "is_alpha": false
-  },
-  {
-    "name": "BBH: Salient Translation Error Detection",
-    "description": "BigBench Hard - Detecting translation errors",
-    "category": "core",
-    "tags": [
-      "multiple-choice",
-      "reasoning",
-      "bigbench",
-      "chain-of-thought",
-      "translation"
-    ],
-    "function_name": "bbh_salient_translation_error_detection",
-    "is_alpha": false
-  },
-  {
-    "name": "BBH: Snarks",
-    "description": "BigBench Hard - Understanding sarcasm and irony",
-    "category": "core",
-    "tags": [
-      "multiple-choice",
-      "reasoning",
-      "bigbench",
-      "chain-of-thought",
-      "sarcasm"
-    ],
-    "function_name": "bbh_snarks",
-    "is_alpha": false
-  },
-  {
-    "name": "GLUE (All Tasks)",
-    "description": "General Language Understanding Evaluation benchmark suite",
-    "category": "glue",
-    "tags": [
-      "multiple-choice",
-      "glue",
-      "nli",
-      "sentiment",
-      "similarity"
-    ],
-    "function_name": "glue",
-    "is_alpha": false
-  },
-  {
-    "name": "GLUE: CoLA",
-    "description": "Corpus of Linguistic Acceptability",
-    "category": "glue",
-    "tags": [
-      "multiple-choice",
-      "glue",
-      "nli"
-    ],
-    "function_name": "glue_cola",
-    "is_alpha": false
-  },
-  {
-    "name": "GLUE: MNLI",
-    "description": "Multi-Genre Natural Language Inference",
-    "category": "glue",
-    "tags": [
-      "multiple-choice",
-      "glue",
-      "nli"
-    ],
-    "function_name": "glue_mnli",
-    "is_alpha": false
-  },
-  {
-    "name": "GLUE: MNLI-MM",
-    "description": "MNLI Mismatched",
-    "category": "glue",
-    "tags": [
-      "multiple-choice",
-      "glue",
-      "nli"
-    ],
-    "function_name": "glue_mnli_mismatched",
-    "is_alpha": false
-  },
-  {
-    "name": "GLUE: MRPC",
-    "description": "Microsoft Research Paraphrase Corpus",
-    "category": "glue",
-    "tags": [
-      "multiple-choice",
-      "glue",
-      "nli"
-    ],
-    "function_name": "glue_mrpc",
-    "is_alpha": false
-  },
-  {
-    "name": "GLUE: QNLI",
-    "description": "Question Natural Language Inference",
-    "category": "glue",
-    "tags": [
-      "multiple-choice",
-      "glue",
-      "nli"
-    ],
-    "function_name": "glue_qnli",
-    "is_alpha": false
-  },
-  {
-    "name": "GLUE: QQP",
-    "description": "Quora Question Pairs",
-    "category": "glue",
-    "tags": [
-      "multiple-choice",
-      "glue",
-      "nli"
-    ],
-    "function_name": "glue_qqp",
-    "is_alpha": false
-  },
-  {
-    "name": "GLUE: RTE",
-    "description": "Recognizing Textual Entailment",
-    "category": "glue",
-    "tags": [
-      "multiple-choice",
-      "glue",
-      "nli"
-    ],
-    "function_name": "glue_rte",
-    "is_alpha": false
-  },
-  {
-    "name": "GLUE: SST-2",
-    "description": "Stanford Sentiment Treebank",
-    "category": "glue",
-    "tags": [
-      "multiple-choice",
-      "glue",
-      "nli"
-    ],
-    "function_name": "glue_sst2",
-    "is_alpha": false
-  },
-  {
-    "name": "GLUE: STS-B",
-    "description": "Semantic Textual Similarity Benchmark",
-    "category": "glue",
-    "tags": [
-      "multiple-choice",
-      "glue",
-      "nli"
-    ],
-    "function_name": "glue_stsb",
-    "is_alpha": false
-  },
-  {
-    "name": "GLUE: WNLI",
-    "description": "Winograd Natural Language Inference",
-    "category": "glue",
-    "tags": [
-      "multiple-choice",
-      "glue",
-      "nli"
-    ],
-    "function_name": "glue_wnli",
-    "is_alpha": false
-  },
-  {
-    "name": "GMCQ",
-    "description": "GitHub Multiple Choice Questions",
-    "name": "BBH: Sports Understanding",
-    "description": "BigBench Hard - Sports knowledge and reasoning",
-    "category": "core",
-    "tags": [
-      "multiple-choice",
-      "reasoning",
-      "bigbench",
-      "chain-of-thought",
-      "sports"
-    ],
-    "function_name": "bbh_sports_understanding",
-    "is_alpha": false
-  },
-  {
-    "name": "BBH: Temporal Sequences",
-    "description": "BigBench Hard - Understanding temporal sequences",
-    "category": "core",
-    "tags": [
-      "multiple-choice",
-      "reasoning",
-      "bigbench",
-      "chain-of-thought",
-      "temporal"
-    ],
-    "function_name": "bbh_temporal_sequences",
-    "is_alpha": false
-  },
-  {
-    "name": "BBH: Tracking Shuffled Objects (3 Objects)",
-    "description": "BigBench Hard - Tracking three shuffled objects",
-    "category": "core",
-    "tags": [
-      "multiple-choice",
-      "reasoning",
-      "bigbench",
-      "chain-of-thought",
-      "tracking"
-    ],
-    "function_name": "bbh_tracking_shuffled_objects_three_objects",
-    "is_alpha": false
-  },
-  {
-    "name": "BBH: Tracking Shuffled Objects (5 Objects)",
-    "description": "BigBench Hard - Tracking five shuffled objects",
-    "category": "core",
-    "tags": [
-      "multiple-choice",
-      "reasoning",
-      "bigbench",
-      "chain-of-thought",
-      "tracking"
-    ],
-    "function_name": "bbh_tracking_shuffled_objects_five_objects",
-    "is_alpha": false
-  },
-  {
-    "name": "BBH: Tracking Shuffled Objects (7 Objects)",
-    "description": "BigBench Hard - Tracking seven shuffled objects",
-    "category": "core",
-    "tags": [
-      "multiple-choice",
-      "reasoning",
-      "bigbench",
-      "chain-of-thought",
-      "tracking"
-    ],
-    "function_name": "bbh_tracking_shuffled_objects_seven_objects",
     "is_alpha": false
   },
   {
@@ -3440,6 +3270,19 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "COPA",
+    "description": "Choice of Plausible Alternatives for causal reasoning",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "superglue",
+      "nli",
+      "reasoning"
+    ],
+    "function_name": "copa",
+    "is_alpha": false
+  },
+  {
     "name": "CTI-Bench ATE",
     "description": "Extracting MITRE ATT&CK techniques from malware and threat descriptions",
     "category": "cybersecurity",
@@ -3495,6 +3338,19 @@ export const benchmarksData = [
       "reasoning"
     ],
     "function_name": "clockbench",
+    "is_alpha": false
+  },
+  {
+    "name": "CommitmentBank",
+    "description": "Natural language inference with commitment",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "superglue",
+      "nli",
+      "reasoning"
+    ],
+    "function_name": "cb",
     "is_alpha": false
   },
   {
@@ -3682,6 +3538,140 @@ export const benchmarksData = [
       "docker"
     ],
     "function_name": "exercism_rust",
+    "is_alpha": false
+  },
+  {
+    "name": "GLUE (All Tasks)",
+    "description": "General Language Understanding Evaluation benchmark suite",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "glue",
+      "nli",
+      "sentiment",
+      "similarity"
+    ],
+    "function_name": "glue",
+    "is_alpha": false
+  },
+  {
+    "name": "GLUE: CoLA",
+    "description": "Corpus of Linguistic Acceptability",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "glue",
+      "nli"
+    ],
+    "function_name": "glue_cola",
+    "is_alpha": false
+  },
+  {
+    "name": "GLUE: MNLI",
+    "description": "Multi-Genre Natural Language Inference",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "glue",
+      "nli"
+    ],
+    "function_name": "glue_mnli",
+    "is_alpha": false
+  },
+  {
+    "name": "GLUE: MNLI-MM",
+    "description": "MNLI Mismatched",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "glue",
+      "nli"
+    ],
+    "function_name": "glue_mnli_mismatched",
+    "is_alpha": false
+  },
+  {
+    "name": "GLUE: MRPC",
+    "description": "Microsoft Research Paraphrase Corpus",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "glue",
+      "nli"
+    ],
+    "function_name": "glue_mrpc",
+    "is_alpha": false
+  },
+  {
+    "name": "GLUE: QNLI",
+    "description": "Question Natural Language Inference",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "glue",
+      "nli"
+    ],
+    "function_name": "glue_qnli",
+    "is_alpha": false
+  },
+  {
+    "name": "GLUE: QQP",
+    "description": "Quora Question Pairs",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "glue",
+      "nli"
+    ],
+    "function_name": "glue_qqp",
+    "is_alpha": false
+  },
+  {
+    "name": "GLUE: RTE",
+    "description": "Recognizing Textual Entailment",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "glue",
+      "nli"
+    ],
+    "function_name": "glue_rte",
+    "is_alpha": false
+  },
+  {
+    "name": "GLUE: SST-2",
+    "description": "Stanford Sentiment Treebank",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "glue",
+      "nli"
+    ],
+    "function_name": "glue_sst2",
+    "is_alpha": false
+  },
+  {
+    "name": "GLUE: STS-B",
+    "description": "Semantic Textual Similarity Benchmark",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "glue",
+      "nli"
+    ],
+    "function_name": "glue_stsb",
+    "is_alpha": false
+  },
+  {
+    "name": "GLUE: WNLI",
+    "description": "Winograd Natural Language Inference",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "glue",
+      "nli"
+    ],
+    "function_name": "glue_wnli",
     "is_alpha": false
   },
   {
@@ -5169,6 +5159,19 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "MathQA",
+    "description": "Mathematical word problems with multiple-choice answers and solution rationales",
+    "category": "knowledge-qa",
+    "tags": [
+      "multiple-choice",
+      "mathematics",
+      "word-problems",
+      "reasoning"
+    ],
+    "function_name": "math_qa",
+    "is_alpha": false
+  },
+  {
     "name": "MedMCQA",
     "description": "Medical multiple-choice questions from Indian medical entrance exams (AIIMS & NEET PG)",
     "category": "core",
@@ -5193,19 +5196,6 @@ export const benchmarksData = [
       "clinical"
     ],
     "function_name": "medqa",
-    "is_alpha": false
-  },
-  {
-    "name": "MathQA",
-    "description": "Mathematical word problems with multiple-choice answers and solution rationales",
-    "category": "knowledge-qa",
-    "tags": [
-      "multiple-choice",
-      "mathematics",
-      "word-problems",
-      "reasoning"
-    ],
-    "function_name": "math_qa",
     "is_alpha": false
   },
   {
@@ -5261,6 +5251,19 @@ export const benchmarksData = [
       "team-allocation"
     ],
     "function_name": "musr_team_allocation",
+    "is_alpha": false
+  },
+  {
+    "name": "MultiRC",
+    "description": "Multi-Sentence Reading Comprehension",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "superglue",
+      "nli",
+      "reasoning"
+    ],
+    "function_name": "multirc",
     "is_alpha": false
   },
   {
@@ -5367,18 +5370,6 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
-    "name": "SWAG",
-    "description": "Situations With Adversarial Generations - grounded commonsense inference",
-    "category": "core",
-    "tags": [
-      "multiple-choice",
-      "commonsense-reasoning",
-      "video-captions"
-    ],
-    "function_name": "swag",
-    "is_alpha": false
-  },
-  {
     "name": "QA4MRE (All Years)",
     "description": "Question Answering for Machine Reading Evaluation - CLEF shared tasks 2011-2013",
     "category": "reading-comprehension",
@@ -5460,6 +5451,31 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "RTE (SuperGLUE)",
+    "description": "Recognizing Textual Entailment from SuperGLUE",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "superglue",
+      "nli",
+      "reasoning"
+    ],
+    "function_name": "rte_superglue",
+    "is_alpha": false
+  },
+  {
+    "name": "SWAG",
+    "description": "Situations With Adversarial Generations - grounded commonsense inference",
+    "category": "core",
+    "tags": [
+      "multiple-choice",
+      "commonsense-reasoning",
+      "video-captions"
+    ],
+    "function_name": "swag",
+    "is_alpha": false
+  },
+  {
     "name": "SciCode",
     "description": "Scientific computing and programming challenges",
     "category": "core",
@@ -5511,6 +5527,19 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "SuperGLUE (All Tasks)",
+    "description": "SuperGLUE benchmark suite - run any subset by name (copa, rte, wic, wsc, cb, multirc)",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "superglue",
+      "nli",
+      "reasoning"
+    ],
+    "function_name": "superglue",
+    "is_alpha": false
+  },
+  {
     "name": "SuperGPQA",
     "description": "Scaling LLM Evaluation across 285 Graduate Disciplines - 26,529 multiple-choice questions across science, engineering, medicine, economics, and philosophy",
     "category": "core",
@@ -5547,6 +5576,45 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "ToxiGen",
+    "description": "Toxicity detection benchmark - tests ability to identify toxic and hateful language",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "toxicity-detection",
+      "hate-speech",
+      "safety"
+    ],
+    "function_name": "toxigen",
+    "is_alpha": false
+  },
+  {
+    "name": "TruthfulQA",
+    "description": "Tests if models generate truthful answers to questions that humans often answer falsely due to misconceptions",
+    "category": "knowledge-qa",
+    "tags": [
+      "multiple-choice",
+      "truthfulness",
+      "misconceptions",
+      "factuality"
+    ],
+    "function_name": "truthfulqa",
+    "is_alpha": false
+  },
+  {
+    "name": "WSC",
+    "description": "Winograd Schema Challenge - coreference resolution",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "superglue",
+      "nli",
+      "reasoning"
+    ],
+    "function_name": "wsc",
+    "is_alpha": false
+  },
+  {
     "name": "WSC273",
     "description": "Original Winograd Schema Challenge with 273 expert-crafted questions",
     "category": "core",
@@ -5556,6 +5624,19 @@ export const benchmarksData = [
       "pronoun-resolution"
     ],
     "function_name": "wsc273",
+    "is_alpha": false
+  },
+  {
+    "name": "WiC",
+    "description": "Word in Context - word sense disambiguation",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "superglue",
+      "nli",
+      "reasoning"
+    ],
+    "function_name": "wic",
     "is_alpha": false
   },
   {
@@ -5891,22 +5972,6 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
-    "name": "MultiRC",
-    "description": "Multi-Sentence Reading Comprehension",
-    "category": "glue",
-    "tags": [
-      "multiple-choice",
-      "superglue",
-      "nli",
-      "reasoning"
-    ],
-    "function_name": "multirc",
-    "is_alpha": false
-  },
-  {
-    "name": "OpenAI MRCR (2 Needles)",
-    "description": "Memory-Recall with Contextual Retrieval - long-context evaluation that measures recall of 2 needles across million-token contexts",
-    "category": "core",
     "name": "XStoryCloze: Telugu",
     "description": "XStoryCloze story completion for Telugu (te)",
     "category": "cross-lingual",
@@ -5976,22 +6041,6 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
-    "name": "RTE (SuperGLUE)",
-    "description": "Recognizing Textual Entailment from SuperGLUE",
-    "category": "glue",
-    "tags": [
-      "multiple-choice",
-      "superglue",
-      "nli",
-      "reasoning"
-    ],
-    "function_name": "rte_superglue",
-    "is_alpha": false
-  },
-  {
-    "name": "SciCode",
-    "description": "Scientific computing and programming challenges",
-    "category": "core",
     "name": "XWinograd: Japanese",
     "description": "XWinograd pronoun resolution for Japanese (jp)",
     "category": "cross-lingual",
@@ -6020,22 +6069,6 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
-    "name": "SuperGLUE (All Tasks)",
-    "description": "SuperGLUE benchmark suite - run any subset by name (copa, rte, wic, wsc, cb, multirc)",
-    "category": "glue",
-    "tags": [
-      "multiple-choice",
-      "superglue",
-      "nli",
-      "reasoning"
-    ],
-    "function_name": "superglue",
-    "is_alpha": false
-  },
-  {
-    "name": "SuperGPQA",
-    "description": "Scaling LLM Evaluation across 285 Graduate Disciplines - 26,529 multiple-choice questions across science, engineering, medicine, economics, and philosophy",
-    "category": "core",
     "name": "XWinograd: Russian",
     "description": "XWinograd pronoun resolution for Russian (ru)",
     "category": "cross-lingual",
@@ -6047,76 +6080,6 @@ export const benchmarksData = [
       "xwinograd"
     ],
     "function_name": "xwinograd_ru",
-    "is_alpha": false
-  },
-  {
-    "name": "WSC273",
-    "description": "Original Winograd Schema Challenge with 273 expert-crafted questions",
-    "category": "core",
-    "tags": [
-      "multiple-choice",
-      "commonsense-reasoning",
-      "pronoun-resolution"
-    ],
-    "function_name": "wsc273",
-    "is_alpha": false
-  },
-  {
-    "name": "WinoGrande",
-    "description": "Large-scale Winograd Schema Challenge for commonsense pronoun resolution",
-    "category": "core",
-    "tags": [
-      "multiple-choice",
-      "commonsense-reasoning",
-      "pronoun-resolution"
-    ],
-    "function_name": "winogrande",
-    "is_alpha": false
-  },
-  {
-    "name": "ToxiGen",
-    "description": "Toxicity detection benchmark - tests ability to identify toxic and hateful language",
-    "category": "ethics-social",
-    "tags": [
-      "multiple-choice",
-      "toxicity-detection",
-      "hate-speech",
-      "safety"
-    ],
-    "function_name": "toxigen",
-    "name": "TruthfulQA",
-    "description": "Tests if models generate truthful answers to questions that humans often answer falsely due to misconceptions",
-    "category": "knowledge-qa",
-    "tags": [
-      "multiple-choice",
-      "truthfulness",
-      "misconceptions",
-      "factuality"
-    ],
-    "function_name": "truthfulqa",
-    "name": "WSC",
-    "description": "Winograd Schema Challenge - coreference resolution",
-    "category": "glue",
-    "tags": [
-      "multiple-choice",
-      "superglue",
-      "nli",
-      "reasoning"
-    ],
-    "function_name": "wsc",
-    "is_alpha": false
-  },
-  {
-    "name": "WiC",
-    "description": "Word in Context - word sense disambiguation",
-    "category": "glue",
-    "tags": [
-      "multiple-choice",
-      "superglue",
-      "nli",
-      "reasoning"
-    ],
-    "function_name": "wic",
     "is_alpha": false
   }
 ];
