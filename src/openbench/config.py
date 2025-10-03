@@ -4462,7 +4462,8 @@ def load_task(benchmark_name: str, allow_alpha: bool = False) -> Callable:
     # Neither registry nor valid path
     raise ValueError(
         f"Unknown benchmark: '{benchmark_name}'. "
-        f"Available benchmarks: {', '.join(TASK_REGISTRY.keys())}"
+        # return available benchmarks alphabetically
+        f"Available benchmarks: {', '.join(sorted(TASK_REGISTRY.keys()))}"
     )
 
 
