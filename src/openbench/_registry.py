@@ -307,6 +307,8 @@ from .evals import logiqa  # noqa: F401, E402
 from .evals import mathqa  # noqa: F401, E402
 from .evals import sciq  # noqa: F401, E402
 from .evals import truthfulqa  # noqa: F401, E402
+# Linguistic Phenomena benchmarks
+from .evals import blimp  # noqa: F401, E402
 
 # MathArena benchmarks
 from .evals.matharena.aime_2023_I.aime_2023_I import aime_2023_I  # noqa: F401, E402
