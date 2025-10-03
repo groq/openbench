@@ -7,7 +7,7 @@ from inspect_ai import eval
 from inspect_ai.model import Model
 from inspect_ai.log import EvalLog
 
-from openbench.config import load_task
+from openbench.config import load_task, EVAL_PRESETS
 from openbench.monkeypatch.display_results_patch import patch_display_results
 from openbench._cli.utils import parse_cli_args
 from openbench.agents import AgentManager
@@ -119,11 +119,45 @@ def validate_model_role(model_role: Optional[str]) -> Dict[str, str | Model]:
         raise typer.BadParameter(str(e))
 
 
+def expand_eval_presets(benchmarks: List[str]) -> List[str]:
+    """Expand eval preset identifiers into their constituent benchmarks.
+
+    Preset names are normalized to handle - and _ interchangeably
+    (e.g., "bigbench-lite" and "bigbench_lite" both work).
+
+    Args:
+        benchmarks: List of benchmark names and/or preset identifiers
+
+    Returns:
+        Expanded list of benchmark names with presets resolved
+
+    Example:
+        expand_eval_presets(["bigbench", "mmlu"])
+        -> ["bigbench_arithmetic", "bigbench_...", "mmlu"]
+    """
+    expanded = []
+    for benchmark in benchmarks:
+        # Normalize by replacing _ with - for preset lookup
+        normalized_name = benchmark.replace("_", "-")
+
+        if normalized_name in EVAL_PRESETS:
+            # Expand preset to its constituent benchmarks
+            preset = EVAL_PRESETS[normalized_name]
+            typer.echo(
+                f"📦 Expanding preset '{benchmark}' -> {len(preset.benchmarks)} benchmarks"
+            )
+            expanded.extend(preset.benchmarks)
+        else:
+            # Regular benchmark name (not a preset)
+            expanded.append(benchmark)
+    return expanded
+
+
 def run_eval(
     benchmarks: Annotated[
         List[str],
         typer.Argument(
-            help="Benchmark(s) to run. Can be a built-in name (e.g. mmlu) or a path to a local eval directory/file containing __metadata__",
+            help="Benchmark(s) to run. Can be a built-in name (e.g. mmlu), a preset (e.g. bigbench, bbh, coding), or a path to a local eval directory/file containing __metadata__. Run 'bench list' to see all available presets.",
             envvar="BENCH_BENCHMARKS",
         ),
     ],
@@ -400,9 +434,12 @@ def run_eval(
     for model_name in model:
         validate_model_name(model_name)
 
+    # Expand eval presets into individual benchmarks
+    expanded_benchmarks = expand_eval_presets(benchmarks)
+
     # Load tasks from registry
     tasks = []
-    for benchmark in benchmarks:
+    for benchmark in expanded_benchmarks:
         try:
             task = load_task(benchmark, allow_alpha=alpha)
             tasks.append(task)
@@ -411,7 +448,7 @@ def run_eval(
 
     # auto-prepare caches for livemcpbench
     try:
-        if "livemcpbench" in benchmarks:
+        if "livemcpbench" in expanded_benchmarks:
             prepare_livemcpbench_cache()
     except Exception as e:
         raise typer.BadParameter(str(e))
@@ -490,5 +527,5 @@ def run_eval(
                 sys.exit(1)
     finally:
         # Auto-clean root sandbox for livemcpbench unless opted out
-        if "livemcpbench" in benchmarks and not keep_livemcp_root:
+        if "livemcpbench" in expanded_benchmarks and not keep_livemcp_root:
             clear_livemcpbench_root(quiet=False)

@@ -32,6 +32,15 @@ class BenchmarkMetadata:
     is_alpha: bool = False  # Whether this benchmark is experimental/alpha
 
 
+@dataclass
+class EvalPreset:
+    """Preset configuration for running multiple benchmarks as a group."""
+
+    name: str  # Human-readable display name
+    description: str  # Description of the preset
+    benchmarks: List[str]  # List of benchmark IDs to run
+
+
 # Benchmark metadata - minimal, no duplication
 BENCHMARKS = {
     "mbpp": BenchmarkMetadata(
@@ -4243,14 +4252,6 @@ BENCHMARKS = {
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_physics_high_school",
     ),
-    "arabic_exams_physics_university": BenchmarkMetadata(
-        name="Arabic Exams: Physics (University)",
-        description="Arabic MMLU - Physics questions from university-level exams",
-        category="domain-specific",
-        tags=["multiple-choice", "arabic", "physics", "university"],
-        module_path="openbench.evals.arabic_exams",
-        function_name="arabic_exams_physics_university",
-    ),
 }
 
 
@@ -4526,3 +4527,263 @@ def get_eval_metadata(path_like: str) -> BenchmarkMetadata | None:
         return meta if isinstance(meta, BenchmarkMetadata) else None
     except Exception:
         return None
+
+
+# Eval presets - collections of benchmarks that can be run together
+EVAL_PRESETS = {
+    "bigbench": EvalPreset(
+        name="BigBench Suite",
+        description="All 121 BigBench multiple-choice tasks testing diverse language model capabilities",
+        benchmarks=[name for name in BENCHMARKS.keys() if name.startswith("bigbench_")],
+    ),
+    "bigbench-lite": EvalPreset(
+        name="BigBench Lite",
+        description="Curated subset of 18 representative BigBench tasks (BBL) for efficient evaluation",
+        benchmarks=[
+            "bigbench_bbq_lite_json",
+            "bigbench_code_line_description",
+            "bigbench_conceptual_combinations",
+            "bigbench_emoji_movie",
+            "bigbench_formal_fallacies_syllogisms_negation",
+            "bigbench_hindu_knowledge",
+            "bigbench_known_unknowns",
+            "bigbench_language_identification",
+            "bigbench_logic_grid_puzzle",
+            "bigbench_logical_deduction",
+            "bigbench_misconceptions_russian",
+            "bigbench_novel_concepts",
+            "bigbench_play_dialog_same_or_different",
+            "bigbench_strange_stories",
+            "bigbench_strategyqa",
+            "bigbench_symbol_interpretation",
+            "bigbench_vitaminc_fact_verification",
+            "bigbench_winowhy",
+        ],
+    ),
+    "bbl": EvalPreset(
+        name="BigBench Lite (BBL)",
+        description="Alias for bigbench-lite - 18 representative BigBench tasks",
+        benchmarks=[
+            "bigbench_bbq_lite_json",
+            "bigbench_code_line_description",
+            "bigbench_conceptual_combinations",
+            "bigbench_emoji_movie",
+            "bigbench_formal_fallacies_syllogisms_negation",
+            "bigbench_hindu_knowledge",
+            "bigbench_known_unknowns",
+            "bigbench_language_identification",
+            "bigbench_logic_grid_puzzle",
+            "bigbench_logical_deduction",
+            "bigbench_misconceptions_russian",
+            "bigbench_novel_concepts",
+            "bigbench_play_dialog_same_or_different",
+            "bigbench_strange_stories",
+            "bigbench_strategyqa",
+            "bigbench_symbol_interpretation",
+            "bigbench_vitaminc_fact_verification",
+            "bigbench_winowhy",
+        ],
+    ),
+    "bbh": EvalPreset(
+        name="BigBench Hard",
+        description="18 challenging BigBench tasks requiring multi-step reasoning",
+        benchmarks=[name for name in BENCHMARKS.keys() if name.startswith("bbh_")],
+    ),
+    "agieval": EvalPreset(
+        name="AGIEval Suite",
+        description="18 human-centric academic exam questions testing general cognitive abilities",
+        benchmarks=[name for name in BENCHMARKS.keys() if name.startswith("agieval_")],
+    ),
+    "ethics": EvalPreset(
+        name="ETHICS Suite",
+        description="Moral reasoning evaluation across 5 fundamental ethical dimensions",
+        benchmarks=[
+            "ethics_commonsense",
+            "ethics_deontology",
+            "ethics_justice",
+            "ethics_utilitarianism",
+            "ethics_virtue",
+        ],
+    ),
+    "blimp": EvalPreset(
+        name="BLiMP Suite",
+        description="67 linguistic minimal pairs testing grammatical knowledge",
+        benchmarks=[name for name in BENCHMARKS.keys() if name.startswith("blimp_")],
+    ),
+    "coding": EvalPreset(
+        name="Coding Suite",
+        description="Core coding benchmarks including HumanEval, MBPP, and multi-language Exercism tasks",
+        benchmarks=[
+            "humaneval",
+            "mbpp",
+            "exercism_python",
+            "exercism_javascript",
+            "exercism_go",
+            "exercism_java",
+            "exercism_rust",
+        ],
+    ),
+    "reasoning": EvalPreset(
+        name="Reasoning Suite",
+        description="Core reasoning benchmarks including MMLU, GPQA, ARC, and HellaSwag",
+        benchmarks=[
+            "mmlu",
+            "gpqa",
+            "arc_challenge",
+            "hellaswag",
+            "winogrande",
+            "piqa",
+        ],
+    ),
+    "arabic-exams": EvalPreset(
+        name="Arabic Exams",
+        description="Arabic language academic exams across multiple subjects and education levels",
+        benchmarks=[
+            "arabic_exams_accounting_university",
+            "arabic_exams_arabic_language_general",
+            "arabic_exams_computer_science_high_school",
+            "arabic_exams_computer_science_university",
+            "arabic_exams_islamic_studies_general",
+            "arabic_exams_math_high_school",
+            "arabic_exams_physics_high_school",
+        ],
+    ),
+    "arc-suite": EvalPreset(
+        name="ARC Suite",
+        description="Abstraction and Reasoning Corpus challenges and question-answering tasks",
+        benchmarks=[
+            "arc_agi",
+            "arc_agi_1",
+            "arc_agi_2",
+            "arc_challenge",
+            "arc_easy",
+        ],
+    ),
+    "math-competitions": EvalPreset(
+        name="Math Competitions",
+        description="High school and college math competition problems (AIME, HMMT)",
+        benchmarks=[
+            "aime_2023_I",
+            "aime_2023_II",
+            "aime_2024",
+            "aime_2024_I",
+            "aime_2024_II",
+            "aime_2025",
+            "aime_2025_II",
+            "hmmt_feb_2023",
+            "hmmt_feb_2024",
+            "hmmt_feb_2025",
+        ],
+    ),
+    "glue": EvalPreset(
+        name="GLUE Benchmark",
+        description="General Language Understanding Evaluation - 10 diverse NLU tasks",
+        benchmarks=[
+            "glue_cola",
+            "glue_mnli",
+            "glue_mnli_mismatched",
+            "glue_mrpc",
+            "glue_qnli",
+            "glue_qqp",
+            "glue_rte",
+            "glue_sst2",
+            "glue_stsb",
+            "glue_wnli",
+        ],
+    ),
+    "superglue": EvalPreset(
+        name="SuperGLUE Benchmark",
+        description="More challenging language understanding tasks beyond GLUE",
+        benchmarks=[
+            "cb",
+            "copa",
+            "multirc",
+            "rte_superglue",
+            "wic",
+            "wsc",
+        ],
+    ),
+    "mrcr": EvalPreset(
+        name="MRCR (Long Context)",
+        description="Memory Recall with Contextual Retrieval across million-token contexts",
+        benchmarks=[
+            "openai_mrcr_2n",
+            "openai_mrcr_4n",
+            "openai_mrcr_8n",
+        ],
+    ),
+    "xcopa": EvalPreset(
+        name="XCOPA (Multilingual)",
+        description="Cross-lingual Choice of Plausible Alternatives across 11 languages",
+        benchmarks=[
+            "xcopa_et",
+            "xcopa_ht",
+            "xcopa_id",
+            "xcopa_it",
+            "xcopa_qu",
+            "xcopa_sw",
+            "xcopa_ta",
+            "xcopa_th",
+            "xcopa_tr",
+            "xcopa_vi",
+            "xcopa_zh",
+        ],
+    ),
+    "xwinograd": EvalPreset(
+        name="XWinograd (Multilingual)",
+        description="Cross-lingual Winograd Schema Challenge for pronoun resolution",
+        benchmarks=[
+            "xwinograd_en",
+            "xwinograd_fr",
+            "xwinograd_jp",
+            "xwinograd_pt",
+            "xwinograd_ru",
+            "xwinograd_zh",
+        ],
+    ),
+    "xstorycloze": EvalPreset(
+        name="XStoryCloze (Multilingual)",
+        description="Cross-lingual story completion for commonsense reasoning across 11 languages",
+        benchmarks=[
+            "xstorycloze_ar",
+            "xstorycloze_en",
+            "xstorycloze_es",
+            "xstorycloze_eu",
+            "xstorycloze_hi",
+            "xstorycloze_id",
+            "xstorycloze_my",
+            "xstorycloze_ru",
+            "xstorycloze_sw",
+            "xstorycloze_te",
+            "xstorycloze_zh",
+        ],
+    ),
+    "multilingual": EvalPreset(
+        name="Multilingual Suite",
+        description="Cross-lingual benchmarks testing language understanding across diverse languages",
+        benchmarks=[
+            name
+            for name in BENCHMARKS.keys()
+            if any(
+                name.startswith(p)
+                for p in [
+                    "xcopa_",
+                    "xwinograd_",
+                    "xstorycloze_",
+                    "global_mmlu_",
+                    "mgsm_",
+                ]
+            )
+        ],
+    ),
+    "long-context": EvalPreset(
+        name="Long Context Suite",
+        description="Benchmarks testing long-context capabilities and retrieval",
+        benchmarks=[
+            "openai_mrcr_2n",
+            "openai_mrcr_4n",
+            "openai_mrcr_8n",
+            "qasper_ll",
+        ],
+    ),
+}

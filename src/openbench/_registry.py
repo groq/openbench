@@ -348,6 +348,5 @@ from .evals.arabic_exams import (  # noqa: F401, E402
     arabic_exams_islamic_studies_general,
     arabic_exams_math_high_school,
     arabic_exams_physics_high_school,
-    arabic_exams_physics_university,
 )
 from .evals.legalsupport import legalsupport  # noqa: F401, E402
