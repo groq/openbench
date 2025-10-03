@@ -4,7 +4,6 @@ Only contains human-written metadata that cannot be extracted from code.
 Everything else (epochs, temperature, etc.) comes from the actual task definitions.
 """
 
-from dataclasses import dataclass
 from functools import lru_cache
 import importlib
 import importlib.util
@@ -14,26 +13,74 @@ from pathlib import Path
 from types import ModuleType
 from typing import Callable, Iterable, List, Optional
 
+from importlib.metadata import entry_points
+import logging
 
-@dataclass
-class BenchmarkMetadata:
-    """Minimal metadata for a benchmark - only what can't be extracted."""
+from openbench.utils import BenchmarkMetadata
 
-    name: str  # Human-readable display name
-    description: str  # Human-written description
-    category: str  # Category for grouping
-    tags: List[str]  # Tags for searchability
-
-    # Registry info - still needed
-    module_path: str
-    function_name: str
-
-    # Alpha/experimental flag
-    is_alpha: bool = False  # Whether this benchmark is experimental/alpha
+logger = logging.getLogger(__name__)
 
 
-# Benchmark metadata - minimal, no duplication
-BENCHMARKS = {
+def _load_entry_point_benchmarks() -> dict[str, BenchmarkMetadata]:
+    """Load benchmarks registered via entry points.
+
+    External packages can register benchmarks by adding to their pyproject.toml:
+
+    [project.entry-points."openbench.benchmarks"]
+    my_benchmark = "my_package.benchmarks:get_benchmark_metadata"
+
+    The entry point should return either:
+    - A BenchmarkMetadata instance (registered with the entry point name)
+    - A dict[str, BenchmarkMetadata] (multiple benchmarks)
+    """
+    discovered = {}
+
+    try:
+        eps = entry_points()
+        benchmark_eps = eps.select(group="openbench.benchmarks")
+
+        for ep in benchmark_eps:
+            try:
+                loaded = ep.load()
+
+                # If the loaded object is callable, call it to get the result
+                if callable(loaded):
+                    result = loaded()
+                else:
+                    result = loaded
+
+                if isinstance(result, BenchmarkMetadata):
+                    # Single benchmark registered with entry point name
+                    discovered[ep.name] = result
+                elif isinstance(result, dict):
+                    # Multiple benchmarks
+                    for key, value in result.items():
+                        if not isinstance(value, BenchmarkMetadata):
+                            logger.warning(
+                                f"Entry point '{ep.name}' returned non-BenchmarkMetadata "
+                                f"value for key '{key}', skipping"
+                            )
+                            continue
+                        discovered[key] = value
+                else:
+                    logger.warning(
+                        f"Entry point '{ep.name}' returned unexpected type "
+                        f"{type(result).__name__}, expected BenchmarkMetadata or dict"
+                    )
+            except Exception as e:
+                # Log loading errors but don't fail
+                logger.warning(
+                    f"Failed to load benchmark from entry point '{ep.name}': {e}"
+                )
+    except Exception as e:
+        # If entry_points() itself fails, log but continue
+        logger.warning(f"Failed to load entry points: {e}")
+
+    return discovered
+
+
+# Built-in benchmark metadata - minimal, no duplication
+_BUILTIN_BENCHMARKS = {
     "mbpp": BenchmarkMetadata(
         name="MBPP",
         description="Mostly Basic Python Problems — code generation tasks with unit test verification",
@@ -4251,6 +4298,16 @@ BENCHMARKS = {
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_physics_university",
     ),
+}
+
+
+# Merge built-in benchmarks with those from entry points.
+# Entry points are merged last so they can override built-ins. This allows external
+# packages to patch/extend benchmarks (e.g., fixing dataset bugs, adding custom splits,
+# or swapping implementations). If you want stable behavior, pin your dependencies.
+BENCHMARKS = {
+    **_BUILTIN_BENCHMARKS,
+    **_load_entry_point_benchmarks(),
 }
 
 

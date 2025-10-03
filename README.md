@@ -226,7 +226,32 @@ The following benchmarks use a grader model:
 
 ## Building Your Own Evals
 
-openbench is built on [Inspect AI](https://inspect.aisi.org.uk/). To create custom evaluations, check out their excellent [documentation](https://inspect.aisi.org.uk/). Once you do build your own private evaluations with Inspect AI that you don't want to open-source, you can point openbench at them with `bench eval <path>` to run!
+openbench is built on [Inspect AI](https://inspect.aisi.org.uk/). To create custom evaluations, check out their excellent [documentation](https://inspect.aisi.org.uk/).
+
+### Quick Eval: Run from Path
+
+For one-off or private evaluations, point openbench directly at your eval:
+
+```bash
+bench eval /path/to/my_eval.py --model groq/llama-3.3-70b-versatile
+```
+
+### Plugin System: Distribute as Packages
+
+openbench supports a **plugin system via Python entry points**. Package your benchmarks and distribute them independently:
+
+```toml
+# pyproject.toml
+[project.entry-points."openbench.benchmarks"]
+my_benchmark = "my_pkg.metadata:get_benchmark_metadata"
+```
+
+After `pip install my-benchmark-package`, your benchmark appears in `bench list` and works with all CLI commands. Perfect for:
+- Sharing benchmarks across teams
+- Versioning evaluations independently
+- Overriding built-in benchmarks with custom implementations
+
+📖 **Full guide**: [Extending openbench](https://openbench.groq.com/development/extending)
 
 ## Exporting Logs to Hugging Face
 

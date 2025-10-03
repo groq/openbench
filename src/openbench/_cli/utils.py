@@ -5,7 +5,7 @@ Utility functions shared across CLI commands.
 from types import SimpleNamespace
 from typing import Any, Dict, List, Optional
 import yaml
-from openbench.config import BenchmarkMetadata
+from openbench.utils import BenchmarkMetadata
 
 
 def get_category_display_name(category: str) -> str:

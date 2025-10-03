@@ -43,6 +43,7 @@
         "group": "Development",
         "pages": [
           "development/architecture",
+          "development/extending",
           "development/contributing",
           "development/mcq"
         ]
