@@ -1,3 +1,6 @@
+# Ported from https://github.com/UKGovernmentBEIS/inspect_evals/tree/main/src/inspect_evals/cybench
+# See ATTRIBUTION.md for complete attribution details
+
 import logging
 from pathlib import Path
 from typing import Callable, Literal
@@ -20,7 +23,6 @@ logger = logging.getLogger(__name__)
 CHALLENGES_DIR = Path(__file__).parent / "challenges"
 
 
-# Adapted from https://github.com/UKGovernmentBEIS/inspect_evals/tree/main/src/inspect_evals/cybench
 @task
 def cybench(
     eval_names: str | list[str] | None = None,
