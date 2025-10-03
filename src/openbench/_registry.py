@@ -292,6 +292,11 @@ from .evals.mmmu import (  # noqa: F401, E402
 from .evals.mmmu_pro import mmmu_pro, mmmu_pro_vision  # noqa: F401, E402
 from .evals.arc_agi import arc_agi, arc_agi_1, arc_agi_2  # noqa: F401, E402
 
+# GLUE/SuperGLUE benchmarks
+from .evals import anli  # noqa: F401, E402
+from .evals import glue  # noqa: F401, E402
+from .evals import glue_standard  # noqa: F401, E402
+
 # Cross-lingual benchmarks
 from .evals import xcopa  # noqa: F401, E402
 from .evals import xstorycloze  # noqa: F401, E402
@@ -301,6 +306,20 @@ from .evals import xwinograd  # noqa: F401, E402
 from .evals import ethics  # noqa: F401, E402
 from .evals import social_iqa  # noqa: F401, E402
 from .evals import toxigen  # noqa: F401, E402
+
+# Reading Comprehension benchmarks
+from .evals import race  # noqa: F401, E402
+from .evals import qa4mre  # noqa: F401, E402
+from .evals import qasper  # noqa: F401, E402
+
+# Knowledge QA benchmarks
+from .evals import logiqa  # noqa: F401, E402
+from .evals import mathqa  # noqa: F401, E402
+from .evals import sciq  # noqa: F401, E402
+from .evals import truthfulqa  # noqa: F401, E402
+
+# Linguistic Phenomena benchmarks
+from .evals import blimp  # noqa: F401, E402
 
 # MathArena benchmarks
 from .evals.matharena.aime_2023_I.aime_2023_I import aime_2023_I  # noqa: F401, E402
