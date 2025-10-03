@@ -136,7 +136,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmlu",
         function_name="mmlu",
     ),
-    "mmlu-pro": BenchmarkMetadata(
+    "mmlu_pro": BenchmarkMetadata(
         name="MMLU Pro (TIGER-Lab)",
         description="Enhanced version of MMLU with more challenging, reasoning-focused questions.",
         category="core",
@@ -4301,20 +4301,52 @@ _BUILTIN_BENCHMARKS = {
 }
 
 
-# Merge built-in benchmarks with those from entry points.
-# Entry points are merged last so they can override built-ins. This allows external
-# packages to patch/extend benchmarks (e.g., fixing dataset bugs, adding custom splits,
-# or swapping implementations). If you want stable behavior, pin your dependencies.
-BENCHMARKS = {
-    **_BUILTIN_BENCHMARKS,
-    **_load_entry_point_benchmarks(),
-}
-
-
 def _normalize_benchmark_key(name: str) -> str:
     """Normalize benchmark keys so '-' and '_' are treated the same."""
 
     return name.replace("-", "_")
+
+
+def _merge_benchmarks_with_normalization(
+    builtin: dict[str, BenchmarkMetadata],
+    entry_points: dict[str, BenchmarkMetadata],
+) -> dict[str, BenchmarkMetadata]:
+    """Merge benchmark dicts, treating '-' and '_' as equivalent for overrides.
+
+    Entry point benchmarks can override built-ins even if they differ only in
+    '-' vs '_'. The entry point's key format wins.
+    """
+    merged = dict(builtin)
+
+    # Build a reverse lookup: normalized_key -> original_key (from built-ins)
+    builtin_normalized = {_normalize_benchmark_key(k): k for k in builtin.keys()}
+
+    for ep_key, ep_meta in entry_points.items():
+        normalized = _normalize_benchmark_key(ep_key)
+
+        # If an entry point overrides a built-in (even with different - vs _),
+        # remove the old key and add the new one
+        if normalized in builtin_normalized:
+            old_key = builtin_normalized[normalized]
+            if old_key != ep_key and old_key in merged:
+                del merged[old_key]
+                builtin_normalized[normalized] = ep_key
+
+        merged[ep_key] = ep_meta
+
+    return merged
+
+
+# Merge built-in benchmarks with those from entry points.
+# Entry points are merged last so they can override built-ins. This allows external
+# packages to patch/extend benchmarks (e.g., fixing dataset bugs, adding custom splits,
+# or swapping implementations). If you want stable behavior, pin your dependencies.
+# Keys differing only in '-' vs '_' are treated as referring to the same benchmark,
+# with the entry point's key format taking precedence.
+BENCHMARKS = _merge_benchmarks_with_normalization(
+    _BUILTIN_BENCHMARKS,
+    _load_entry_point_benchmarks(),
+)
 
 
 def _build_normalized_lookup(names: Iterable[str]) -> dict[str, str]:
