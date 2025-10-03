@@ -145,13 +145,13 @@ BENCHMARKS = {
         module_path="openbench.evals.gpqa_diamond",
         function_name="gpqa_diamond",
     ),
-    "gpqa_mc": BenchmarkMetadata(
-        name="GPQA MC",
+    "gpqa": BenchmarkMetadata(
+        name="GPQA",
         description="Graduate-level science questions (multiple choice) across physics, chemistry, and biology",
         category="core",
         tags=["multiple-choice", "science", "graduate-level", "reasoning"],
-        module_path="openbench.evals.gpqa_mc",
-        function_name="gpqa_mc",
+        module_path="openbench.evals.gpqa",
+        function_name="gpqa",
     ),
     "humaneval": BenchmarkMetadata(
         name="HumanEval",

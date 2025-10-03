@@ -1,5 +1,5 @@
 """
-GPQA MC: Graduate-Level Science Questions (Multiple Choice)
+GPQA: Graduate-Level Science Questions (Multiple Choice)
 
 This benchmark evaluates models on graduate-level science questions across physics,
 chemistry, and biology. The questions are designed to be challenging even for experts
@@ -14,7 +14,7 @@ Note: This dataset is gated and requires authentication to access.
 
 Sample usage:
 ```bash
-bench eval gpqa_mc --model groq/llama-3.1-70b-versatile
+bench eval gpqa --model groq/llama-3.1-70b-versatile
 ```
 """
 
@@ -90,14 +90,14 @@ def record_to_mcq_sample(record: dict) -> MCQSample:
 
 
 @task
-def gpqa_mc(split: str = "train") -> Task:
-    """Evaluate the GPQA MC benchmark for graduate-level science questions.
+def gpqa(split: str = "train") -> Task:
+    """Evaluate the GPQA benchmark for graduate-level science questions.
 
     Note: Requires authentication to access the dataset.
     Set HF_TOKEN before running.
     """
     return MCQEval(
-        name="gpqa_mc",
+        name="gpqa",
         dataset_path="Idavidrein/gpqa",
         subset_name="gpqa_main",
         record_to_mcq_sample=record_to_mcq_sample,
