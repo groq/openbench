@@ -53,10 +53,14 @@ def record_to_mcq_sample(record: dict) -> MCQSample:
         (incorrect_3, False),
     ]
 
-    # Filter out empty incorrect answers
+    # Filter out empty answers
     all_answers = [
         (text, is_correct) for text, is_correct in all_answers if text and text.strip()
     ]
+
+    # Pad to 4 answers BEFORE shuffling so placeholders are randomized too
+    while len(all_answers) < 4:
+        all_answers.append(("No answer provided", False))
 
     # Shuffle answers deterministically based on question text
     # This ensures consistent ordering across runs while varying across samples
@@ -67,12 +71,8 @@ def record_to_mcq_sample(record: dict) -> MCQSample:
     correct_idx = next(i for i, (_, is_correct) in enumerate(all_answers) if is_correct)
     target = chr(65 + correct_idx)  # 0->A, 1->B, 2->C, 3->D
 
-    # Extract answer texts
+    # Extract answer texts (already length 4)
     options = [text for text, _ in all_answers]
-
-    # Pad to 4 options if necessary (though GPQA should always have 4)
-    while len(options) < 4:
-        options.append("No answer provided")
 
     return MCQSample(
         input=MULTIPLE_CHOICE_PROMPT_TEMPLATE.format(
