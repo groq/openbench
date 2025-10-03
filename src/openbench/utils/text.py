@@ -165,6 +165,32 @@ LIVEMCPBENCH_VERDICT_PATTERN = re.compile(
     r"Thoughts:\s*(.+?)\s*Status:\s*(\w+)", re.DOTALL
 )
 
+MOCK_AIME_PROMPT = """
+Please solve this AIME problem step by step. The answer is an integer ranging from 000 to 999, inclusive.
+
+{question}
+
+Remember to show your work clearly and end with ‘ANSWER: X’ where X is your final numerical answer.
+"""
+
+
+MOCK_AIME_GRADER_PROMPT = """
+You are a mathematics expert tasked with grading AIME solutions. You will be given:
+
+A student's complete solution with their reasoning
+The correct solution
+Grade the student solution as either CORRECT or INCORRECT, based only on the student's final answer.
+Only respond with a single word: either "CORRECT" or "INCORRECT".
+
+Student Solution:
+{response}
+
+Correct Solution:
+{correct_solution}
+
+Grade (CORRECT/INCORRECT):
+"""
+
 
 def create_dynamic_multiple_choice_prompt(question: str, options: list[str]) -> str:
     """

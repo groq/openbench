@@ -29,6 +29,10 @@ def fallback_scorer(
         for individual_scorer in scorers:
             current_score = await individual_scorer(state, target)
 
+            # Skip if the scorer returned None
+            if current_score is None:
+                continue
+
             # Update our best-effort final score.
             # A score with an answer is always better than one without.
             if final_score is None or current_score.answer is not None:
