@@ -211,11 +211,15 @@ _override_builtin_openrouter_provider()
 # Task Registration
 
 # Core benchmarks
+from .evals.arc import arc_easy, arc_challenge  # noqa: F401, E402
+from .evals import bigbench, bigbench_hard, global_mmlu  # noqa: F401, E402
 from .evals.clockbench import clockbench  # noqa: F401, E402
 from .evals.drop import drop  # noqa: F401, E402
 from .evals.gpqa_diamond import gpqa_diamond  # noqa: F401, E402
 from .evals.graphwalks import graphwalks  # noqa: F401, E402
+from .evals.headqa import headqa, headqa_en, headqa_es  # noqa: F401, E402
 from .evals.healthbench import healthbench, healthbench_hard, healthbench_consensus  # noqa: F401, E402
+from .evals.hellaswag import hellaswag  # noqa: F401, E402
 from .evals.hle import hle, hle_text  # noqa: F401, E402
 from .evals.humaneval import humaneval  # noqa: F401, E402
 from .evals.exercism.exercism import (  # noqa: F401, E402
@@ -229,6 +233,8 @@ from .evals.exercism.exercism import (  # noqa: F401, E402
 from .evals.livemcpbench import livemcpbench  # noqa: F401, E402
 from .evals.math import math, math_500  # noqa: F401, E402
 from .evals.mbpp import mbpp  # noqa: F401, E402
+from .evals.medmcqa import medmcqa  # noqa: F401, E402
+from .evals.medqa import medqa  # noqa: F401, E402
 from .evals.mgsm import mgsm, mgsm_en, mgsm_latin, mgsm_non_latin  # noqa: F401, E402
 from .evals.mmlu import mmlu  # noqa: F401, E402
 from .evals.mmlu_pro import mmlu_pro  # noqa: F401, E402
@@ -236,9 +242,15 @@ from .evals.mrcr import openai_mrcr, openai_mrcr_2n, openai_mrcr_4n, openai_mrcr
 from .evals.mmstar import mmstar  # noqa: F401, E402
 from .evals.musr import musr  # noqa: F401, E402
 from .evals.openbookqa import openbookqa  # noqa: F401, E402
+from .evals.pubmedqa import pubmedqa  # noqa: F401, E402
+from .evals.piqa import piqa  # noqa: F401, E402
+from .evals.prost import prost  # noqa: F401, E402
 from .evals.scicode import scicode  # noqa: F401, E402
+from .evals.swag import swag  # noqa: F401, E402
 from .evals.simpleqa import simpleqa  # noqa: F401, E402
 from .evals.tumlu import tumlu  # noqa: F401, E402
+from .evals.winogrande import winogrande  # noqa: F401, E402
+from .evals.wsc273 import wsc273  # noqa: F401, E402
 from .evals.detailbench import detailbench  # noqa: F401, E402
 from .evals.supergpqa import supergpqa  # noqa: F401, E402
 from .evals.mmmlu import mmmlu  # noqa: F401, E402
@@ -279,6 +291,11 @@ from .evals.mmmu import (  # noqa: F401, E402
 )
 from .evals.mmmu_pro import mmmu_pro, mmmu_pro_vision  # noqa: F401, E402
 from .evals.arc_agi import arc_agi, arc_agi_1, arc_agi_2  # noqa: F401, E402
+
+# Cross-lingual benchmarks
+from .evals import xcopa  # noqa: F401, E402
+from .evals import xstorycloze  # noqa: F401, E402
+from .evals import xwinograd  # noqa: F401, E402
 
 # Knowledge QA benchmarks
 from .evals import logiqa  # noqa: F401, E402
