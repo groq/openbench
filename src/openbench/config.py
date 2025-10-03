@@ -2694,7 +2694,7 @@ BENCHMARKS = {
         module_path="openbench.evals.livemcpbench",
         function_name="livemcpbench",
         is_alpha=False,
-    ),    # GLUE/SuperGLUE benchmarks
+    ),  # GLUE/SuperGLUE benchmarks
     "anli": BenchmarkMetadata(
         name="ANLI (All Rounds)",
         description="Adversarial Natural Language Inference - challenging NLI benchmark",
@@ -2870,6 +2870,7 @@ BENCHMARKS = {
         tags=["multiple-choice", "glue", "nli"],
         module_path="openbench.evals.glue_standard",
         function_name="glue_wnli",
+    ),
     # Cross-lingual Understanding benchmarks
     "xcopa": BenchmarkMetadata(
         name="XCOPA (11 Languages)",
