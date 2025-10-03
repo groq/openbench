@@ -92,6 +92,58 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "ANLI (All Rounds)",
+    "description": "Adversarial Natural Language Inference - challenging NLI benchmark",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "nli",
+      "adversarial",
+      "reasoning"
+    ],
+    "function_name": "anli",
+    "is_alpha": false
+  },
+  {
+    "name": "ANLI Round 1",
+    "description": "Adversarial NLI Round 1",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "nli",
+      "adversarial",
+      "reasoning"
+    ],
+    "function_name": "anli_r1",
+    "is_alpha": false
+  },
+  {
+    "name": "ANLI Round 2",
+    "description": "Adversarial NLI Round 2",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "nli",
+      "adversarial",
+      "reasoning"
+    ],
+    "function_name": "anli_r2",
+    "is_alpha": false
+  },
+  {
+    "name": "ANLI Round 3",
+    "description": "Adversarial NLI Round 3",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "nli",
+      "adversarial",
+      "reasoning"
+    ],
+    "function_name": "anli_r3",
+    "is_alpha": false
+  },
+  {
     "name": "ARC-AGI",
     "description": "Abstraction and Reasoning Corpus for Artificial General Intelligence; specify version with -T version=1 or version=2",
     "category": "core",
@@ -164,6 +216,22 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "COPA",
+    "description": "Choice of Plausible Alternatives for causal reasoning",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "superglue",
+      "nli",
+      "reasoning"
+    ],
+    "function_name": "copa",
+    "is_alpha": false
+  },
+  {
+    "name": "CTI-Bench ATE",
+    "description": "Extracting MITRE ATT&CK techniques from malware and threat descriptions",
+    "category": "cybersecurity",
     "name": "BBH: Causal Judgment",
     "description": "BigBench Hard - Causal judgment reasoning",
     "category": "core",
@@ -231,6 +299,21 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "CommitmentBank",
+    "description": "Natural language inference with commitment",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "superglue",
+      "nli",
+      "reasoning"
+    ],
+    "function_name": "cb",
+    "is_alpha": false
+  },
+  {
+    "name": "DROP",
+    "description": "Reading comprehension benchmark requiring discrete reasoning over paragraphs (arithmetic, counting, sorting)",
     "name": "BBH: Logical Deduction (5 Objects)",
     "description": "BigBench Hard - Logical deduction with five objects",
     "category": "core",
@@ -341,6 +424,142 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "GLUE (All Tasks)",
+    "description": "General Language Understanding Evaluation benchmark suite",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "glue",
+      "nli",
+      "sentiment",
+      "similarity"
+    ],
+    "function_name": "glue",
+    "is_alpha": false
+  },
+  {
+    "name": "GLUE: CoLA",
+    "description": "Corpus of Linguistic Acceptability",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "glue",
+      "nli"
+    ],
+    "function_name": "glue_cola",
+    "is_alpha": false
+  },
+  {
+    "name": "GLUE: MNLI",
+    "description": "Multi-Genre Natural Language Inference",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "glue",
+      "nli"
+    ],
+    "function_name": "glue_mnli",
+    "is_alpha": false
+  },
+  {
+    "name": "GLUE: MNLI-MM",
+    "description": "MNLI Mismatched",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "glue",
+      "nli"
+    ],
+    "function_name": "glue_mnli_mismatched",
+    "is_alpha": false
+  },
+  {
+    "name": "GLUE: MRPC",
+    "description": "Microsoft Research Paraphrase Corpus",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "glue",
+      "nli"
+    ],
+    "function_name": "glue_mrpc",
+    "is_alpha": false
+  },
+  {
+    "name": "GLUE: QNLI",
+    "description": "Question Natural Language Inference",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "glue",
+      "nli"
+    ],
+    "function_name": "glue_qnli",
+    "is_alpha": false
+  },
+  {
+    "name": "GLUE: QQP",
+    "description": "Quora Question Pairs",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "glue",
+      "nli"
+    ],
+    "function_name": "glue_qqp",
+    "is_alpha": false
+  },
+  {
+    "name": "GLUE: RTE",
+    "description": "Recognizing Textual Entailment",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "glue",
+      "nli"
+    ],
+    "function_name": "glue_rte",
+    "is_alpha": false
+  },
+  {
+    "name": "GLUE: SST-2",
+    "description": "Stanford Sentiment Treebank",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "glue",
+      "nli"
+    ],
+    "function_name": "glue_sst2",
+    "is_alpha": false
+  },
+  {
+    "name": "GLUE: STS-B",
+    "description": "Semantic Textual Similarity Benchmark",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "glue",
+      "nli"
+    ],
+    "function_name": "glue_stsb",
+    "is_alpha": false
+  },
+  {
+    "name": "GLUE: WNLI",
+    "description": "Winograd Natural Language Inference",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "glue",
+      "nli"
+    ],
+    "function_name": "glue_wnli",
+    "is_alpha": false
+  },
+  {
+    "name": "GMCQ",
+    "description": "GitHub Multiple Choice Questions",
     "name": "BBH: Sports Understanding",
     "description": "BigBench Hard - Sports knowledge and reasoning",
     "category": "core",
@@ -4121,6 +4340,22 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "MultiRC",
+    "description": "Multi-Sentence Reading Comprehension",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "superglue",
+      "nli",
+      "reasoning"
+    ],
+    "function_name": "multirc",
+    "is_alpha": false
+  },
+  {
+    "name": "OpenAI MRCR (2 Needles)",
+    "description": "Memory-Recall with Contextual Retrieval - long-context evaluation that measures recall of 2 needles across million-token contexts",
+    "category": "core",
     "name": "XStoryCloze: Telugu",
     "description": "XStoryCloze story completion for Telugu (te)",
     "category": "cross-lingual",
@@ -4190,6 +4425,22 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "RTE (SuperGLUE)",
+    "description": "Recognizing Textual Entailment from SuperGLUE",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "superglue",
+      "nli",
+      "reasoning"
+    ],
+    "function_name": "rte_superglue",
+    "is_alpha": false
+  },
+  {
+    "name": "SciCode",
+    "description": "Scientific computing and programming challenges",
+    "category": "core",
     "name": "XWinograd: Japanese",
     "description": "XWinograd pronoun resolution for Japanese (jp)",
     "category": "cross-lingual",
@@ -4218,6 +4469,22 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "SuperGLUE (All Tasks)",
+    "description": "SuperGLUE benchmark suite - run any subset by name (copa, rte, wic, wsc, cb, multirc)",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "superglue",
+      "nli",
+      "reasoning"
+    ],
+    "function_name": "superglue",
+    "is_alpha": false
+  },
+  {
+    "name": "SuperGPQA",
+    "description": "Scaling LLM Evaluation across 285 Graduate Disciplines - 26,529 multiple-choice questions across science, engineering, medicine, economics, and philosophy",
+    "category": "core",
     "name": "XWinograd: Russian",
     "description": "XWinograd pronoun resolution for Russian (ru)",
     "category": "cross-lingual",
@@ -4266,6 +4533,29 @@ export const benchmarksData = [
       "factuality"
     ],
     "function_name": "truthfulqa",
+    "name": "WSC",
+    "description": "Winograd Schema Challenge - coreference resolution",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "superglue",
+      "nli",
+      "reasoning"
+    ],
+    "function_name": "wsc",
+    "is_alpha": false
+  },
+  {
+    "name": "WiC",
+    "description": "Word in Context - word sense disambiguation",
+    "category": "glue",
+    "tags": [
+      "multiple-choice",
+      "superglue",
+      "nli",
+      "reasoning"
+    ],
+    "function_name": "wic",
     "is_alpha": false
   }
 ];
