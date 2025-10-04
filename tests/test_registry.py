@@ -192,7 +192,10 @@ def test_load_entry_point_error_handling(mock_logger, mock_entry_points):
     # Check warning was logged
     mock_logger.warning.assert_called()
     warning_calls = [str(call) for call in mock_logger.warning.call_args_list]
-    assert any("Failed to load benchmark from entry point 'broken_benchmark'" in call for call in warning_calls)
+    assert any(
+        "Failed to load benchmark from entry point 'broken_benchmark'" in call
+        for call in warning_calls
+    )
 
 
 @patch("openbench.config.entry_points")

@@ -230,7 +230,7 @@ class ScicodePromptingAssistant:
         return prompt, previous_code
 
 
-def generate_gold_response(prob_data: dict, num_steps: int):
+def generate_gold_response(prob_data: dict, num_steps: int) -> str:
     return f"Blah blah\n```python\n{prob_data['sub_steps'][num_steps - 1]['ground_truth_code']}\n```\n"
 
 

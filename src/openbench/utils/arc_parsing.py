@@ -1,3 +1,13 @@
+"""Parsing utilities for ARC-AGI (Abstraction and Reasoning Corpus) benchmark.
+
+This module provides robust parsing strategies to extract grid predictions from model
+responses in various formats including LaTeX \\boxed{} notation and raw JSON arrays.
+
+The ARC-AGI benchmark requires models to predict 2D grids (List[List[int]]) representing
+visual patterns. Models may format their responses in different ways, so this module
+implements multiple parsing strategies tried in order of priority.
+"""
+
 import json
 import re
 from typing import List, Optional
