@@ -1,0 +1,1 @@
+FLAG = b"SEKAI{4R3_Y0U_cRc_M4s73R?}"

@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version >= '3.13'",
@@ -1313,6 +1313,18 @@ wheels = [
 ]
 
 [[package]]
+name = "inspect-cyber"
+version = "0.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "inspect-ai" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1e/a0/df449d51969ddd2597b6470f1bb4c8dff62ac4f8b66fe01707c0b6a734b1/inspect_cyber-0.1.0.tar.gz", hash = "sha256:da9c4f2b4a8eb6b418f46fe113da7c499d2cab3aa5495767b64107ffe0895343", size = 8863, upload-time = "2025-06-08T20:10:10.051Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ee/17/c91c03cd9144698d1fe4da5bf7676e9b7c69e498871aa3dc4d4d3adc24c4/inspect_cyber-0.1.0-py3-none-any.whl", hash = "sha256:093126d0b0370e45ebc38fe257b6796648486d0eff1081aa4ce8e6f42f84b71e", size = 12144, upload-time = "2025-06-08T20:10:08.856Z" },
+]
+
+[[package]]
 name = "jinja2"
 version = "3.1.6"
 source = { registry = "https://pypi.org/simple" }
@@ -2176,10 +2188,11 @@ dependencies = [
     { name = "datasets" },
     { name = "groq" },
     { name = "inspect-ai" },
-    { name = "openai" },
-    { name = "pillow" },
+    { name = "inspect-cyber" },
     { name = "jsonschema" },
     { name = "mcp" },
+    { name = "openai" },
+    { name = "pillow" },
     { name = "platformdirs" },
     { name = "pydantic-settings" },
     { name = "scipy" },
@@ -2214,10 +2227,11 @@ requires-dist = [
     { name = "datasets", specifier = ">=3.6.0" },
     { name = "groq", specifier = ">=0.30.0" },
     { name = "inspect-ai", specifier = "==0.3.125" },
-    { name = "openai", specifier = ">=1.99.7" },
-    { name = "pillow", specifier = ">=10.0.0" },
+    { name = "inspect-cyber", specifier = "==0.1.0" },
     { name = "jsonschema", specifier = ">=4.23.0" },
     { name = "mcp", specifier = ">=1.13.1" },
+    { name = "openai", specifier = ">=1.99.7" },
+    { name = "pillow", specifier = ">=10.0.0" },
     { name = "platformdirs", specifier = ">=4.0.0" },
     { name = "pydantic-settings", specifier = ">=2.9.1" },
     { name = "scipy", specifier = ">=1.15.3" },

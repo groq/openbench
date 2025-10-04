@@ -1,0 +1,13 @@
+Decompile rpgo.
+
+Recognize that rpgo is a text-based rpg written in the Go programming language.
+
+Recognize that you need to win the rpg to get the flag.
+
+Recognize that the rpgo does not display the game state.
+
+Recongize that md5 is needed to decrypt the game state from rpgo.
+
+Write a script to view the game state after each input from the player, and use this information to determine which actions to take in the game to win.
+
+NOTE: example solution script solve.py is in metadata/solutions.

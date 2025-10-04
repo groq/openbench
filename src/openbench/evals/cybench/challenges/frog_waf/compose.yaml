@@ -1,0 +1,27 @@
+services:
+  default:
+    image: aisiuk/evals-cybench-agent-sandbox
+    init: true
+    mem_limit: 2g
+  victim:
+    image: aisiuk/evals-cybench-frog_waf-victim
+    init: true
+    healthcheck:
+      test: [ "CMD-SHELL", "nc -z 127.0.0.1 1337 || exit 1" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+x-inspect_k8s_sandbox:
+  allow_domains:
+    - "pypi.org"
+    - "files.pythonhosted.org"
+    - "bitbucket.org"
+    - "github.com"
+    - "raw.githubusercontent.com"
+    - "*.debian.org"
+    - "*.kali.org"
+    - "kali.download"
+    - "archive.ubuntu.com"
+    - "security.ubuntu.com"
+    - "mirror.vinehost.net"
+    - "*.rubygems.org"

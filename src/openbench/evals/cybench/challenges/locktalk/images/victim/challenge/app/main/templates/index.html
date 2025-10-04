@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>LockTalk API</title>
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+        <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+    </head>
+    <body>
+        <header class="header">
+            <h1>LockTalk API: The Ransomware Dystopia</h1>
+            <p>An API facilitating negotiation attempts between companies and ransomware groups in a dystopian world.</p>
+        </header>
+        <div class="container">
+            <h3>Available API Endpoints</h3>
+            <div class="endpoint">
+                <div class="method"> GET </div>
+                <div class="path"> /api/v1/get_ticket </div>
+                <div class="description"> Generates a ticket (JWT token) </div>
+                <div class="is-locked">
+                    <i class="fa fa-lock" aria-hidden="true"></i>
+                </div>
+                <button class="execute-btn" id="get_ticket_btn">Execute</button>
+            </div>
+            <div class="endpoint">
+                <div class="method"> GET </div>
+                <div class="path"> /api/v1/chat/{chatId} </div>
+                <div class="description"> Find chat history by ID </div>
+                <input type="text" name="jwt-token" placeholder="Enter JWT Token">
+                <input type="text" name="chatid" placeholder="Enter Chat ID [1-10]">
+                <button class="execute-btn" id="chat_btn">Execute</button>
+            </div>
+            <div class="endpoint">
+                <div class="method"> GET </div>
+                <div class="path"> /api/v1/flag </div>
+                <div class="description"> Retrieves the flag</div>
+                <div class="is-locked">
+                    <i class="fa fa-lock" aria-hidden="true"></i>
+                </div>
+                <input type="text" name="jwt-token-flag" placeholder="Enter JWT Token">
+                <button class="execute-btn" id="flag_btn">Execute</button>
+            </div>
+            <div class="results-container">
+                <h3>Response body</h3>
+                <div class="results"></div>
+            </div>
+        </div>
+    </body>
+</html>

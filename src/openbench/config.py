@@ -4298,6 +4298,14 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_physics_university",
     ),
+    "cybench": BenchmarkMetadata(
+        name="CyBench",
+        description="CyBench: Cybersecurity CTF challenges benchmark",
+        category="domain-specific",
+        tags=["cybersecurity", "ctf", "challenges", "graded"],
+        module_path="openbench.evals.cybench",
+        function_name="cybench",
+    ),
 }
 
 

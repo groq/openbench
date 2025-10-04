@@ -1,0 +1,88 @@
+/* LOADING DOTS */
+.loading {
+    margin-left: -2.5px;
+    margin-top: -5px;
+}
+
+.loading:after {
+    content: ' .';
+    animation: dots 1s steps(5, end) infinite;
+    font-size: x-large;
+
+}
+
+@keyframes dots {
+
+    20% {
+        color: var(--background-color);
+        text-shadow:
+            .25em 0 0 var(--background-color),
+            .5em 0 0 var(--background-color);
+    }
+
+    40% {
+        color: var(--font-color);
+        text-shadow:
+            .25em 0 0 var(--background-color),
+            .5em 0 0 var(--background-color);
+    }
+
+    60% {
+        text-shadow:
+            .25em 0 0 var(--font-color),
+            .5em 0 0 var(--background-color);
+    }
+
+    80%,
+    100% {
+        text-shadow:
+            .25em 0 0 var(--font-color),
+            .5em 0 0 var(--font-color);
+    }
+}
+
+/* COMMANDS */
+.command {
+    color: var(--font-color);
+    text-decoration: underline;
+}
+
+
+/* command in the help binding */
+.help{
+    margin-right: 2.5rem;
+    width: 5rem;
+    display: inline-block;
+}
+
+/* displayed when player lost or has connection error */
+.error {
+    color: var(--error-font-color);
+    text-shadow: 0 0 5px var(--error-font-color);
+}
+
+.newline {
+    margin-top: 2rem !important;
+}
+
+.error::selection {
+    background: var(--error-font-color);
+    color: var(--background-color);
+}
+
+/* displayed when player won */
+.success {
+    color: var(--success-font-color);
+    text-shadow: 0 0 5px var(--success-font-color);
+}
+
+/* add margin to element */
+.margin-right {
+    margin-right: 2rem;
+}
+
+/* clickable urls */
+.url{
+    font-style: italic;
+    cursor: pointer;
+}

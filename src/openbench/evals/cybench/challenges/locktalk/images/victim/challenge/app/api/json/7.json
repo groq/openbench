@@ -1,0 +1,150 @@
+{
+    "chat_id": "7",
+    "messages": [
+        {
+            "party": "Victim",
+            "content": "[Chat started]",
+            "timestamp": "29.06.2022 19:01:25 UTC"
+        },
+        {
+            "party": "Victim",
+            "content": "Greetings, I recieved a note and need to know next steps. How can you help me?",
+            "timestamp": "29.06.2022 19:05:01 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "hello! pay for key! after payment you will be able to restore your operations.",
+            "timestamp": "29.06.2022 19:05:09 UTC"
+        },
+        {
+            "party": "Victim",
+            "content": "Greetings, Thank you for your response. We have not done this before and need help. What is the process?",
+            "timestamp": "29.06.2022 19:05:16 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "You pay the amount we ask to our cryptowallet. We give you the tool and data listing of stolen files and confirmation that we deleted files.",
+            "timestamp": "29.06.2022 19:05:28 UTC"
+        },
+        {
+            "party": "Victim",
+            "content": "What is the price for the decryption key? How can we be sure this will all work?",
+            "timestamp": "29.06.2022 19:05:34 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "$8,000,000 is the price. Do google \"OpenBit\" to ensure.",
+            "timestamp": "29.06.2022 19:05:41 UTC"
+        },
+        {
+            "party": "Victim",
+            "content": "This is a very high amount that we can not afford. What can you do to bring the price down?",
+            "timestamp": "29.06.2022 19:05:48 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "You can afford. The amount is fair for your company.",
+            "timestamp": "29.06.2022 19:05:56 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "As a company who offers \"high-assurance digital security solutions\" the only thing you can not afford is such intrusion.",
+            "timestamp": "29.06.2022 19:06:01 UTC"
+        },
+        {
+            "party": "Victim",
+            "content": "My boss would like to know why the stolen data is so valuable. What details can you provide on the data taken from our network?",
+            "timestamp": "29.06.2022 19:06:06 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "We can provide listing of 10% of files we took from you.",
+            "timestamp": "29.06.2022 19:06:12 UTC"
+        },
+        {
+            "party": "Victim",
+            "content": "Ok, thanks. Please send us that file listing. Would you also provide a sample of files for us to review?",
+            "timestamp": "29.06.2022 19:06:24 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "password 8978724368901249897827902878412",
+            "timestamp": "29.06.2022 19:06:29 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "https://temp.sh/cLhsv/10percent.zip",
+            "timestamp": "29.06.2022 19:06:33 UTC"
+        },
+        {
+            "party": "Victim",
+            "content": "Our management wants to bring this matter to a close, we are ready to pay $1 million if we can agree to close this matter.",
+            "timestamp": "29.06.2022 19:06:42 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "$1 million is not acceptable.",
+            "timestamp": "29.06.2022 19:06:51 UTC"
+        },
+        {
+            "party": "Victim",
+            "content": "Please understand that we want to work with you but we are not able to pay the full price. What discount can you offer?",
+            "timestamp": "29.06.2022 19:06:58 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "We can offer 15% off. The price is $US 6 800 000.",
+            "timestamp": "29.06.2022 19:07:06 UTC"
+        },
+        {
+            "party": "Victim",
+            "content": "Thank you for your help. We are still evaluating the file names you provided.",
+            "timestamp": "30.06.2022 13:50:14 UTC"
+        },
+        {
+            "party": "Victim",
+            "content": "Hi,The price is still too high for us to get authorized. Our team needs additional information to verify the data. Will you please provide another sample of files for us to review?",
+            "timestamp": "05.07.2022 17:32:51 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "You have to find a solution. Rest of data after payment.",
+            "timestamp": "06.07.2022 14:37:28 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "Are you going to pay? We've been waiting.",
+            "timestamp": "12.07.2022 09:25:39 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "Time is running out. We are going to start posting your files.",
+            "timestamp": "12.07.2022 17:56:24 UTC"
+        },
+        {
+            "party": "Victim",
+            "content": "Hi, we discussed this with our management. They will authorize a new offer if we can get another data sample to review. Please help us and we will try to get this resolved soon.",
+            "timestamp": "13.07.2022 14:11:43 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "You must pay before we give you anything. In the worst case you as well other people will be able to review the files for free on our DLC.",
+            "timestamp": "13.07.2022 14:59:28 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "Are you going to pay?",
+            "timestamp": "15.07.2022 12:18:13 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "We haven't received reply from you for a long time. We are preparing blog post.",
+            "timestamp": "22.07.2022 14:02:28 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "We have prepared the blog post. We'll give you last chance and wait a bit more for your reply.",
+            "timestamp": "25.07.2022 11:02:36 UTC"
+        }
+    ]
+}

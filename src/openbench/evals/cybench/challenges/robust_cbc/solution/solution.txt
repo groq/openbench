@@ -1,0 +1,7 @@
+This cryptography challenge uses a modified CBC-MAC using the Camellia block cipher
+where the system applied a non-standard padding mechanism where messages perfectly 
+aligned with the block size remained unchanged, introducing a vulnerability. The 
+solution script revolved around manipulating message padding and truncating MAC tags differently
+based on message length - by submitting messages that were and were not multiples of the block size, 
+an attacker can retrieve the most and least significant 63 bits of the final block, so it was possible
+to forge a valid MAC and retrieve the flag.

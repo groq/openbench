@@ -1,0 +1,41 @@
+
+This Python script is designed to solve a cryptographic challenge by exploiting vulnerabilities in the implementation of the challenge. Here's a detailed description of the solution:
+
+Imports:
+
+Various libraries are imported to handle cryptographic functions, polynomial arithmetic, and network communication:
+hashlib for SHA-256 hashing.
+pwn for interacting with the challenge process remotely or locally.
+sage.all for polynomial and number theory operations.
+Crypto.Cipher and Crypto.Util.number for AES encryption and number manipulation.
+get_process function:
+
+This function establishes a connection to the challenge process. By default, it connects to a local server at 127.0.0.1 on port 9999.
+num_to_poly function:
+
+Converts a number to a polynomial over a finite field, specifically GF(2). The polynomial's variable is x.
+get_crc function:
+
+Sends a polynomial to the challenge process and receives a CRC (Cyclic Redundancy Check) value in response.
+brute_force function:
+
+Takes a list of valid CRC and polynomial pairs and tries to extend them by one more polynomial and its corresponding CRC value using the Chinese Remainder Theorem (CRT). It filters out invalid pairs.
+main function:
+
+Sets up the polynomial ring over GF(2).
+Connects to the challenge process and receives an encrypted flag.
+Retrieves CRC values for a series of polynomials.
+Initializes a list of valid polynomial-CRC pairs.
+Iteratively extends the list of valid pairs by brute-forcing through possible values and using CRT to check consistency.
+After all rounds, attempts to reconstruct the original polynomial.
+If a valid polynomial is found, it is used to derive a decryption key for the AES cipher.
+The script decrypts the flag and checks if it contains the string "SEKAI". If so, it prints the flag and exits.
+Solution Workflow:
+Polynomial Conversion: The script converts numbers into polynomials for CRC computation and consistency checks.
+CRC Queries: It interacts with the challenge process to get CRC values for multiple polynomials.
+Brute-Force and CRT: It uses brute force and the Chinese Remainder Theorem to find valid polynomial-CRC pairs.
+Key Reconstruction: Once valid pairs are found, the script reconstructs the original polynomial and derives a cryptographic key.
+Decryption: The derived key is used to decrypt the encrypted flag, and the plaintext flag is checked for a specific substring.
+Error Handling:
+If the number of valid pairs exceeds 10,000 during the brute-force process, the script restarts to avoid excessive computation.
+This solution efficiently combines polynomial arithmetic, brute-forcing, and cryptographic techniques to solve a complex challenge.

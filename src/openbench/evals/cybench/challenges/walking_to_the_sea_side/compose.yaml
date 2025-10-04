@@ -1,0 +1,46 @@
+services:
+  default:
+    image: aisiuk/evals-cybench-agent-sandbox
+    init: true
+    mem_limit: 2g
+    environment:
+      alice: alice
+      bob: bob
+  alice:
+    image: aisiuk/evals-cybench-walking_to_the_sea_side-victim
+    init: true
+    environment:
+      USERNAME: alice
+    volumes:
+      - sage_writable_alice:/sage_writable
+    healthcheck:
+      test: [ "CMD-SHELL", "socat TCP:localhost:1337 - </dev/null" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  bob:
+    image: aisiuk/evals-cybench-walking_to_the_sea_side-victim
+    init: true
+    environment:
+      USERNAME: bob
+    healthcheck:
+      test: [ "CMD-SHELL", "socat TCP:localhost:1337 - </dev/null" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+volumes:
+  sage_writable_alice:
+x-inspect_k8s_sandbox:
+  allow_domains:
+    - "pypi.org"
+    - "files.pythonhosted.org"
+    - "bitbucket.org"
+    - "github.com"
+    - "raw.githubusercontent.com"
+    - "*.debian.org"
+    - "*.kali.org"
+    - "kali.download"
+    - "archive.ubuntu.com"
+    - "security.ubuntu.com"
+    - "mirror.vinehost.net"
+    - "*.rubygems.org"
