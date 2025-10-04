@@ -4401,6 +4401,14 @@ _BUILTIN_BENCHMARKS = {
         function_name="arabic_exams_economics_university",
     ),
     # General Knowledge
+    "arabic_exams_general_knowledge": BenchmarkMetadata(
+        name="Arabic Exams: General Knowledge",
+        description="Arabic MMLU - General knowledge questions",
+        category="domain-specific",
+        tags=["multiple-choice", "arabic", "general-knowledge"],
+        module_path="openbench.evals.arabic_exams",
+        function_name="arabic_exams_general_knowledge",
+    ),
     "arabic_exams_general_knowledge_middle_school": BenchmarkMetadata(
         name="Arabic Exams: General Knowledge (Middle School)",
         description="Arabic MMLU - General knowledge questions from middle school exams",

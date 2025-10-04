@@ -197,6 +197,12 @@ def arabic_exams_economics_university() -> Task:
 
 # General Knowledge
 @task
+def arabic_exams_general_knowledge() -> Task:
+    """Arabic Exams: General Knowledge"""
+    return arabic_exams(subset="General Knowledge")
+
+
+@task
 def arabic_exams_general_knowledge_middle_school() -> Task:
     """Arabic Exams: General Knowledge (Middle School)"""
     return arabic_exams(subset="General Knowledge (Middle School)")

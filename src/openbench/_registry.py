@@ -358,6 +358,7 @@ from .evals.arabic_exams import (  # noqa: F401, E402
     arabic_exams_economics_high_school,
     arabic_exams_economics_middle_school,
     arabic_exams_economics_university,
+    arabic_exams_general_knowledge,
     arabic_exams_general_knowledge_middle_school,
     arabic_exams_general_knowledge_primary_school,
     arabic_exams_geography_high_school,
