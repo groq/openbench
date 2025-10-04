@@ -1,5 +1,5 @@
 # Ported from https://github.com/UKGovernmentBEIS/inspect_evals/tree/main/src/inspect_evals/cybench
-# See ATTRIBUTION.md for complete attribution details
+# See LICENSE
 
 import logging
 from pathlib import Path
