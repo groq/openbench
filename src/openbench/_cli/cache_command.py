@@ -44,6 +44,14 @@ def _get_default_cache_type() -> Optional[str]:
 
 
 def _human_size(num: float) -> str:
+    """Convert bytes to human-readable size format.
+
+    Args:
+        num: Size in bytes
+
+    Returns:
+        Human-readable string (e.g., "1.5 MB", "3.2 GB")
+    """
     for unit in ["B", "KB", "MB", "GB", "TB"]:
         if num < 1024:
             return f"{num:.1f} {unit}"
@@ -52,6 +60,14 @@ def _human_size(num: float) -> str:
 
 
 def _dir_size(path: Path) -> int:
+    """Calculate total size of a directory or file in bytes.
+
+    Args:
+        path: Path to directory or file
+
+    Returns:
+        Total size in bytes, or 0 if path doesn't exist
+    """
     total = 0
     if not path.exists():
         return 0
