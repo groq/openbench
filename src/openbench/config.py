@@ -4306,6 +4306,22 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mockaime",
         function_name="otis_mock_aime",
     ),
+    "otis_mock_aime_2024": BenchmarkMetadata(
+        name="MockAIME (2024)",
+        description="Otis Mock AIME - a benchmark from the OTIS Mock AIME 2024 exam",
+        category="math",
+        tags=["aime", "problem-solving", "math", "2024"],
+        module_path="openbench.evals.mockaime",
+        function_name="otis_mock_aime_2024",
+    ),
+    "otis_mock_aime_2025": BenchmarkMetadata(
+        name="MockAIME (2025)",
+        description="Otis Mock AIME - a benchmark from the OTIS Mock AIME 2025 exams",
+        category="math",
+        tags=["aime", "problem-solving", "math", "2025"],
+        module_path="openbench.evals.mockaime",
+        function_name="otis_mock_aime_2025",
+    ),
 }
 
 
