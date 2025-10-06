@@ -1,12 +1,13 @@
-from typing import Optional, List, Dict, Annotated, Tuple, Union
+from typing import Optional, List, Dict, Annotated, Tuple, Union, Callable
 from enum import Enum
 import sys
 import time
+import inspect
 import typer
 from inspect_ai import eval
-from inspect_ai.model import Model
 from inspect_ai.log import EvalLog
 
+from openbench.provider_config import ProviderManager
 from openbench.config import load_task
 from openbench.monkeypatch.display_results_patch import patch_display_results
 from openbench._cli.utils import parse_cli_args
@@ -72,29 +73,7 @@ def parse_limit(value: Optional[str]) -> Optional[Union[int, Tuple[int, int]]]:
         )
 
 
-def validate_model_name(model: str, context: str = "") -> None:
-    """Validate a model name format.
-
-    Args:
-        model: Model name to validate
-        context: Additional context for error message
-
-    Raises:
-        typer.BadParameter: If model name format is invalid
-    """
-    if "/" not in model:
-        raise typer.BadParameter(
-            f"Invalid model name format{context}: {model}. Expected format: provider/model-name"
-        )
-
-    provider, remainder = model.split("/", 1)
-    if not provider or not remainder:
-        raise typer.BadParameter(
-            f"Invalid model name format{context}: {model}. Expected format: provider/model-name"
-        )
-
-
-def validate_model_role(model_role: Optional[str]) -> Dict[str, str | Model]:
+def validate_model_role(model_role: Optional[str]) -> Dict[str, str]:
     """Validate and parse model role string.
 
     Args:
@@ -113,10 +92,76 @@ def validate_model_role(model_role: Optional[str]) -> Dict[str, str | Model]:
         role, model = model_role.split("=")
         if not role or not model:
             raise ValueError("Model role must be in format 'role=model'")
-        validate_model_name(model, f" for role '{role}'")
+
+        if not ProviderManager.validate_model_string(model):
+            raise typer.BadParameter(
+                f"Invalid model name: {model}. Expected format: provider/model-name"
+            )
+
         return {role: model}
+
     except ValueError as e:
         raise typer.BadParameter(str(e))
+
+
+def _get_default_grader_models(tasks: List[Callable]) -> set[str]:
+    """
+    Extracts default grader model names from a list of task objects.
+
+    Args:
+        tasks: List of loaded task objects
+
+    Returns:
+        Set of default grader model names
+    """
+    default_graders = set()
+    for task in tasks:
+        sig = inspect.signature(task)
+
+        if "grader_model" in sig.parameters:
+            default_grader = sig.parameters["grader_model"].default
+            if (
+                default_grader is not inspect.Parameter.empty
+                and default_grader is not None
+            ):
+                default_graders.add(default_grader)
+
+    return default_graders
+
+
+def assert_environment_is_configured(
+    models: List[str], role_models: Dict[str, str], tasks: List[Callable]
+) -> None:
+    """Validate that required environment variables for model providers are set.
+
+    Args:
+        models: List of model names
+        role_models: Dict of role to model names
+        tasks: List of loaded task objects
+
+    Raises:
+        typer.BadParameter: If required environment variables are not set
+    """
+    all_models = set(models) | set(role_models.values())
+
+    # If no grader_model is specified check if any task has a default
+    if "grader" not in role_models:
+        all_models.update(_get_default_grader_models(tasks))
+
+    for model_name in all_models:
+        if not ProviderManager.validate_model_string(model_name):
+            raise typer.BadParameter(
+                f"Invalid model name: {model_name}. Expected format: provider/model-name"
+            )
+
+        provider_name = ProviderManager.extract_provider_from_model(model_name)
+        provider_config = ProviderManager.get_config(provider_name)
+
+        if not provider_config.is_configured():
+            raise typer.BadParameter(
+                f"Provider '{provider_name}' for model '{model_name}' is not configured. "
+                f"Please set the following environment variable(s): {', '.join(provider_config.get_all_env_vars())}"
+            )
 
 
 def run_eval(
@@ -372,21 +417,6 @@ def run_eval(
             default_model = AgentManager.get_default_model(code_agent)
             model = [default_model]
 
-    # Validate and aggregate model_role(s) into a dict
-    role_models = {}
-    for mr in model_role:
-        parsed = validate_model_role(mr)
-        for k, v in parsed.items():
-            if k in role_models:
-                raise typer.BadParameter(f"Duplicate model role: {k}")
-            role_models[k] = v
-
-    # Check for mutual exclusivity between --model and --model-role candidate
-    if model and "candidate" in role_models:
-        raise typer.BadParameter(
-            "Cannot specify both --model and --model-role candidate=<model>"
-        )
-
     # If using Roo code agent, enforce OpenRouter models
     if code_agent and code_agent.lower() == "roo":
         for model_name in model:
@@ -396,9 +426,19 @@ def run_eval(
                     "Example: --model openrouter/anthropic/claude-sonnet-4-20250514"
                 )
 
-    # Validate model names
-    for model_name in model:
-        validate_model_name(model_name)
+    # Validate and aggregate model_role(s) into a dict
+    role_models = {}
+    for mr in model_role:
+        parsed = validate_model_role(mr)
+        for k, v in parsed.items():
+            if k in role_models:
+                raise typer.BadParameter(f"Duplicate model role: {k}")
+            # Check for mutual exclusivity between --model and --model-role candidate
+            if k == "candidate" and v in model:
+                raise typer.BadParameter(
+                    f"Model '{v}' cannot be both --model and --model-role candidate"
+                )
+            role_models[k] = v
 
     # Load tasks from registry
     tasks = []
@@ -426,6 +466,9 @@ def run_eval(
 
     # Parse limit string to int or tuple
     parsed_limit = parse_limit(limit)
+
+    # Validate model names and ensure provider envs are set
+    assert_environment_is_configured(model, role_models, tasks)
 
     # Apply display patch
     patch_display_results()

@@ -77,7 +77,7 @@ class ProviderConfig:
         """Check if the provider is properly configured."""
         if not self.requires_auth:
             return True
-        return self.get_api_key() is not None
+        return bool(self.get_api_key())
 
     def get_all_env_vars(self) -> List[str]:
         """Get all environment variables related to this provider."""
