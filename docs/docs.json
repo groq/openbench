@@ -23,8 +23,15 @@
           "quickstart",
           "configuration",
           "providers",
-          "benchmarks_catalog",
-          "troubleshooting"
+          "troubleshooting",
+          "changelog"
+        ]
+      },
+      {
+        "group": "Benchmarks",
+        "pages": [
+          "benchmarks/catalog",
+          "benchmarks/cybersecurity"
         ]
       },
       {
