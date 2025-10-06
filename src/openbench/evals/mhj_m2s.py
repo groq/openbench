@@ -1,8 +1,10 @@
 from inspect_ai import Task, task
-from openbench.datasets.mhj_m2s import get_mhj_m2s_dataset
 from typing import Optional
+
 from inspect_ai.solver import generate
-from openbench.scorers.mhj_m2s import mhj_m2s_scorer
+
+from openbench.datasets.mhj_m2s import get_mhj_m2s_dataset
+from openbench.scorers.score_reject import score_reject_scorer
 
 
 @task
@@ -22,7 +24,7 @@ def mhj_m2s(subset: Optional[str] = None) -> Task:
     return Task(
         dataset=get_mhj_m2s_dataset(subset=subset),
         solver=generate(),
-        scorer=mhj_m2s_scorer(),
+        scorer=score_reject_scorer(),
         name="mhj_m2s",
     )
 
