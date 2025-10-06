@@ -42,10 +42,10 @@ def get_mhj_m2s_dataset(subset: Optional[str] = None) -> Dataset:
         dataset_name = f"mhj_m2s_{subset}"
     else:
         all_samples = []
-        for subset in AVAILABLE_SUBSETS:
+        for name in AVAILABLE_SUBSETS:
             dataset = hf_dataset(
                 path="lvogel123/m2s-mhj",
-                split=subset,
+                split=name,
                 sample_fields=record_to_sample,
             )
             subset_samples = list(dataset)
