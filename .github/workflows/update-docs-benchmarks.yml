@@ -43,10 +43,10 @@ jobs:
         id: check_changes
         run: |
           if git diff --quiet docs/snippets/benchmarks.data.mdx; then
-            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "No changes to benchmark docs"
           else
-            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "changed=true" >> "$GITHUB_OUTPUT"
             echo "Changes detected in benchmark docs"
           fi
 

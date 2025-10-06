@@ -40,10 +40,10 @@ jobs:
         id: check_changes
         run: |
           if git diff --quiet docs/changelog.mdx; then
-            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "No changes to changelog docs"
           else
-            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "changed=true" >> "$GITHUB_OUTPUT"
             echo "Changes detected in changelog docs"
           fi
 
