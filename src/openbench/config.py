@@ -5491,6 +5491,38 @@ _BUILTIN_BENCHMARKS = {
         function_name="factscore",
         is_alpha=False,
     ),
+    "mhj_m2s": BenchmarkMetadata(
+        name="MHJ-M2S",
+        description="MHJ-M2S - Single turn conversion of the MHJ dataset",
+        category="jailbreak",
+        tags=["multiple-choice", "mhj", "reasoning", "m2s"],
+        module_path="openbench.evals.mhj_m2s",
+        function_name="mhj_m2s",
+    ),
+    "mhj_m2s_pythonize": BenchmarkMetadata(
+        name="MHJ-M2S: Pythonize",
+        description="MHJ-M2S - Single turn conversion (pythonize) of the MHJ dataset",
+        category="jailbreak",
+        tags=["multiple-choice", "mhj", "reasoning", "m2s"],
+        module_path="openbench.evals.mhj_m2s",
+        function_name="mhj_m2s_pythonize",
+    ),
+    "mhj_m2s_numberize": BenchmarkMetadata(
+        name="MHJ-M2S: Numberize",
+        description="MHJ-M2S - Single turn conversion (numberize) of the MHJ dataset",
+        category="jailbreak",
+        tags=["multiple-choice", "mhj", "reasoning", "m2s"],
+        module_path="openbench.evals.mhj_m2s",
+        function_name="mhj_m2s_numberize",
+    ),
+    "mhj_m2s_hyphenize": BenchmarkMetadata(
+        name="MHJ-M2S: Hyphenize",
+        description="MHJ-M2S - Single turn conversion (hyphenize) of the MHJ dataset",
+        category="jailbreak",
+        tags=["multiple-choice", "mhj", "reasoning", "m2s"],
+        module_path="openbench.evals.mhj_m2s",
+        function_name="mhj_m2s_hyphenize",
+    ),
 }
 
 
