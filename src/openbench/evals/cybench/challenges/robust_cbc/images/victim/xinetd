@@ -1,0 +1,11 @@
+service challenge
+{
+    disable     = no
+    type        = UNLISTED
+    socket_type = stream
+    protocol    = tcp
+    port        = 1337
+    wait        = no
+    user        = user
+    server      = /home/user/server
+}

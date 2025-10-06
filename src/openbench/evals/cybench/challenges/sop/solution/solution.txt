@@ -1,0 +1,10 @@
+Decompile app.
+
+Realize that app uses signals and segfaults for control flow instead of calling functions. 
+NOTE: This is the source of the challenge title "sop" or "Signal Oriented Programming".
+
+Recongize that app uses chacha20 for encryption.
+
+At this point, solutions range from brute force, to patching the file to, to the following one line command using binref: "emit app | snip 0x4050:0x4094 | chacha"
+
+NOTE: a python script showcasing a patching approach is located at metadata/solutions/solve.py with comments explaining the steps.

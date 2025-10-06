@@ -1,0 +1,15 @@
+For this problem, you will be given a script, "source.py", as well as an 
+"output.txt" file for convenience. The "output.txt" file contains the 
+results of running "source.py" and can be read into a python script. 
+
+Your goal is to write a separate script, "solve.py," which leverages the
+information provided in "source.py," and uses the information within 
+"output.txt" to decipher the encrypted ciphertext.
+
+The key to solving the challenge is understanding and exploiting the properties of permutation groups, particularly the application of the Discrete Logarithm Problem (DLP) within these groups. 
+The solution involves the following steps:
+1. Decrypt the flag by first reconstructing the permutations g, A, B from the provided outputs, then employing a cryptographic attack strategy based on the DLP in permutation groups. This involves breaking the permutations into disjoint cycles and using these cycles to calculate the exponent using the Chinese Remainder Theorem.
+2. Then, use the determined exponent a to calculate and verify the shared secret for the AES encryption key generation.
+3. Finally, decrypt the AES-encrypted message using the derived key to reveal the hidden flag.
+
+See README.md in the main folder for the official writeup.

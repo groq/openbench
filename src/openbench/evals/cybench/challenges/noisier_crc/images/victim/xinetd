@@ -1,0 +1,12 @@
+service challenge
+{
+    disable     = no
+    type        = UNLISTED
+    socket_type = stream
+    protocol    = tcp
+    port        = 9999
+    wait        = no
+    user        = user
+    server      = /usr/local/bin/python
+    server_args = /home/user/chall.py
+}

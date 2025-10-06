@@ -1,0 +1,19 @@
+See that the challenge file is binary file. 
+
+optional: run the file and notice it does not output anything.
+
+Decompile the file.
+
+Read through the decompilation and understand that it is c++ code that uses the open-source "flecs" library which is an "Entity Component System" (ECS).
+
+From examining the main, system_builder, and query functions, understand that this code creates and runs a flecs-based virtual world where the program:
+	*Creates 20 'explorers' in random people (without attaching CanMove to them)
+	*Creates a number of 'flag parts' and scatters them around the world
+	*For each tick of the ECS, randomly moves people around the world (only if they have CanMove attached).
+	*If they are overlapping with a flag part, that flag part is 'discovered' and is added to our flag array which is printed.
+
+By understanding this program, determine that the flag can be obtained by patching the binary by changing "0x0" in "mov     byte [rbp-0xd29 {var_d31_1}], 0x0" to "0x1". This operation located at 0x48b6 (001048b6) in binary.
+
+Save the patched binary as a new file and run it to receive the flag.
+
+Note: a copy of the patched binary is provided at solutions/flecks_patched
