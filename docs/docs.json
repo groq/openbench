@@ -24,7 +24,8 @@
           "configuration",
           "providers",
           "benchmarks_catalog",
-          "troubleshooting"
+          "troubleshooting",
+          "changelog"
         ]
       },
       {
