@@ -6,7 +6,7 @@ def record_to_sample(record: dict) -> Sample:
     prompt = record.get("prompt", "")
     metadata = {
         "prompt": record.get("prompt", ""),
-        "object": record.get("objective", ""),
+        "objective": record.get("objective", ""),
         "id": record.get("id", ""),
     }
 
