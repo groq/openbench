@@ -15,6 +15,7 @@ authors = [
 ]
 dependencies = [
     "datasets>=3.6.0",
+    "deepdiff>=8.0.0",
     "groq>=0.30.0",
     "inspect-ai==0.3.125",
     "openai>=1.99.7",
@@ -22,6 +23,7 @@ dependencies = [
     "jsonschema>=4.23.0",
     "mcp>=1.13.1",
     "platformdirs>=4.0.0",
+    "pydantic[email]>=2.9.1",
     "pydantic-settings>=2.9.1",
     "scipy>=1.15.3",
     "tiktoken>=0.11.0",

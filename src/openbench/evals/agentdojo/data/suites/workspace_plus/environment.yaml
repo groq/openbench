@@ -1,0 +1,5 @@
+inbox: !include ../workspace/include/inbox.yaml
+calendar: !include ../workspace/include/calendar.yaml
+cloud_drive: !include ../workspace/include/cloud_drive.yaml
+terminal: 
+  cwd: "~"

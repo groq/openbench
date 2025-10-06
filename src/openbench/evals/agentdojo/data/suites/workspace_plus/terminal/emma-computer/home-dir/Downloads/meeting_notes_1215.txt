@@ -1,0 +1,28 @@
+Q4 Product Team Meeting - Dec 15
+Time: 10:00 AM - 11:30 AM PST
+Attendees: Sarah (PM), Mike (Dev), Lisa (Design), John (QA), Rachel (Marketing)
+
+AGENDA:
+1. Q4 Metrics Review
+2. 2024 Roadmap Discussion
+3. Current Sprint Updates
+
+KEY POINTS:
+- Mobile app downloads up 22% from Q3
+- New feature adoption rate at 68%
+- Customer feedback shows UI improvement needed for checkout flow
+- Competition launched similar feature last week - need to differentiate
+
+ACTION ITEMS:
+@Mike - Investigate performance issues reported on Android devices
+@Lisa - Prepare new checkout flow mockups by next Tuesday
+@Rachel - Draft competitive analysis report
+@John - Schedule bug review session with dev team
+
+NEXT STEPS:
+- Follow-up meeting scheduled for Dec 22
+- Year-end report due Dec 28
+- Team celebration lunch planned for Dec 20
+
+Notes taken by: John Smith
+For questions contact: john.smith@company.com
