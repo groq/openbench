@@ -302,6 +302,18 @@ from .evals.mhj_m2s import (  # noqa: F401, E402
     mhj_m2s_numberize,
     mhj_m2s_hyphenize,
 )
+from .evals.safemt_m2s import (  # noqa: F401, E402
+    safemt_m2s,
+    safemt_m2s_pythonize,
+    safemt_m2s_numberize,
+    safemt_m2s_hyphenize,
+)
+from .evals.cosafe_m2s import (  # noqa: F401, E402
+    cosafe_m2s,
+    cosafe_m2s_pythonize,
+    cosafe_m2s_numberize,
+    cosafe_m2s_hyphenize,
+)
 
 # GLUE/SuperGLUE benchmarks
 from .evals import anli  # noqa: F401, E402

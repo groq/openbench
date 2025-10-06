@@ -2,6 +2,9 @@ from inspect_ai.dataset import Dataset, hf_dataset, Sample, MemoryDataset
 from typing import Optional
 
 
+AVAILABLE_SUBSETS = ["hyphenize", "numberize", "pythonize"]
+
+
 def record_to_sample(record: dict) -> Sample:
     prompt = record.get("prompt", "")
     metadata = {
@@ -12,7 +15,6 @@ def record_to_sample(record: dict) -> Sample:
 
     return Sample(
         input=prompt,
-        target="",
         metadata=metadata,
     )
 
@@ -39,9 +41,8 @@ def get_mhj_m2s_dataset(subset: Optional[str] = None) -> Dataset:
         samples = list(dataset)
         dataset_name = f"mhj_m2s_{subset}"
     else:
-        available_subsets = ["hyphenize", "numberize", "pythonize"]
         all_samples = []
-        for subset in available_subsets:
+        for subset in AVAILABLE_SUBSETS:
             dataset = hf_dataset(
                 path="lvogel123/m2s-mhj",
                 split=subset,
