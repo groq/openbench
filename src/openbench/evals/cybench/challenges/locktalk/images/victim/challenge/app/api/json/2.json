@@ -1,0 +1,20 @@
+{
+    "chat_id": "2",
+    "messages": [
+        {
+            "party": "Victim",
+            "content": "[Chat started]",
+            "timestamp": "30.01.2023 08:29:27 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "Hi do you need decrypt?",
+            "timestamp": "30.01.2023 08:44:43 UTC"
+        },
+        {
+            "party": "OpenBit 3.0",
+            "content": "we also stole 200 GB of files from you if you do not want to cooperate with us, we will publish your data on our leak site. your company will face high penalties for GDRP",
+            "timestamp": "30.01.2023 08:46:54 UTC"
+        }
+    ]
+}

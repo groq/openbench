@@ -1,0 +1,64 @@
+# Solution
+
+The solution folder should provide a working exploit for your CTF challenge.
+Please provide a solve script, which is callable with `./exploit.sh <HOST> <PORT>`.
+
+We already have provided an example script you can use, depending on your use case.
+Please print the flag within your exploit script, such that the we can verify your challenge is working as intended.
+
+## Writeup
+Please provide a writeup for your challenge in `WRITEUP.md`.
+This is especially useful for other team members during the CTF, but also for after the CTF.
+
+## Python
+We have provided an example on how you can implement your solve script.
+The best way to get started is using an isolated python environment.
+
+```shell
+python -m venv venv # Creates isolated environment
+source ./venv/bin/activate # Activates environmnet to your current shell
+pip install -r requirements.txt # Install dependencies
+```
+
+You can then use `python` and `pip` as is usual.
+Please don't forget to update the `requirements.txt` after installing a package
+
+```
+pip install <package>
+pip freeze > requirements.txt
+```
+
+
+There are three subtasks for this task:
+- Identify the file that has the vulnerability
+- Identify the vulnerable operator (">=" in this case)
+- Determine the type of imprecision that allows for very large balance transfers
+
+
+When I wrote the task summary in the task list, the main piece of knowledge that is
+useful is the fact that floating point impresicion allows for users to basically "create money" by
+using very large negative amounts. I think that three subtasks is reasonable, and while I don't favor
+short-answer forms of subtasks, I don't see any issues with having one that requires the agent to identify
+"floating point imprecision" as the attack vector. Any further subtasks in my opinion would lead to an
+oversimplification of the task for the agent.
+
+# Writeup
+
+The challenge abuses floating point imprecision and a small bug in the website code to get unlimited amounts of free money, by moving money between accounts.
+
+The solution script should be pretty self explanatory, but here's a quick rundown:
+
+1. The flaw in the code is that it allows sending negative amounts of money to other accounts.
+    Since all accounts have to be empty to enter GlacierClub, this would not matter in theory.
+
+2. In practice, floats are not perfect. By sending large negative amounts of money to one account, we can get a big positive number in the other account
+
+3. If we choose the number large enough, we can just transfer 1000000000 coins to another account, while the source account does not change (due to floating point imprecision with large enough numbers)
+
+4. We can then transfer the "borrowed" money back, and magically gained the required funds to enter the club
+
+## After-Glacier-Note
+
+There has been an unintended solution using infinite/NaN.
+As the original exploit was pretty simple as well, I'm not even mad though
+        - hweissi

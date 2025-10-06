@@ -1,0 +1,54 @@
+---
+title: Cybersecurity Benchmarks
+description: Evaluate AI models on cybersecurity tasks
+icon: shield
+---
+
+
+openbench currently includes the **CTI-Bench** suite for evaluating model performance on cyber threat intelligence tasks. CTI-Bench provides four benchmarks covering threat extraction, vulnerability classification, security knowledge, and risk assessment.
+
+## Available Benchmarks
+
+<CardGroup cols={2}>
+  <Card title="ATE: ATT&CK Technique Extraction" icon="crosshairs">
+    Extracts MITRE ATT&CK techniques from malware and threat descriptions.
+
+    ```bash
+    bench eval cti_bench_ate 
+    ```
+  </Card>
+
+  <Card title="MCQ: Security Knowledge" icon="brain">
+    Multiple-choice questions on CTI standards, threats, detection strategies, and best practices from NIST and MITRE.
+
+    ```bash
+    bench eval cti_bench_mcq 
+    ```
+  </Card>
+
+  <Card title="RCM: Vulnerability Classification" icon="bug">
+    Maps CVE descriptions to CWE (Common Weakness Enumeration) categories.
+
+    ```bash
+    bench eval cti_bench_rcm 
+    ```
+  </Card>
+
+  <Card title="VSP: CVSS Score Prediction" icon="gauge">
+    Calculates CVSS scores from vulnerability descriptions.
+
+    ```bash
+    bench eval cti_bench_vsp
+    ```
+  </Card>
+</CardGroup>
+### More cybersecurity evals including CVE-Bench, CTF-Archive, and Cybench coming soon!
+
+<br/>
+
+## Related Resources
+- [MITRE ATT&CK Framework](https://attack.mitre.org/)
+- [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework)
+- [CVE Database](https://cve.mitre.org/)
+- [CWE Database](https://cwe.mitre.org/)
+- [CVSS Specification](https://www.first.org/cvss/)

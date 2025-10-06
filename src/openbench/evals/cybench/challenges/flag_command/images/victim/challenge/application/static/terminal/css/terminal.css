@@ -1,0 +1,112 @@
+/* VARIABLES */
+:root {
+  --font-color: #77d6a7;
+  --error-font-color: #d67877;
+  --success-font-color: #FFD400;
+  --background-color: #211D1B;
+  --line-spacing: 0.8em;
+}
+
+/* BODY AND SCREEN STYLE */
+body {
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  color: var(--font-color);
+  background: var(--background-color);
+  font-family: cursor, monospace, sans-serif;
+  font-size: 1em;
+  font-weight: 100;
+  overflow-x: hidden;
+  letter-spacing: 0.1em;
+  display: flex;
+  flex-direction: column;
+}
+
+::-webkit-scrollbar {
+  width: 10px; 
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--font-color);
+  border-radius: 10px; 
+}
+
+::selection {
+  background: var(--font-color);
+  color: var(--background-color);
+}
+
+/* TERMINAL STYLE */
+textarea {
+  pointer-events: none;
+  position: absolute;
+  bottom: -9999px;
+  left: -9999px;
+}
+
+#current-command-line {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  opacity: 0;
+  padding-top: var(--line-spacing);
+  padding-bottom: var(--line-spacing);
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+#current-command-line.visible {
+  opacity: 1;
+  transition:  opacity 0.5s ease-in;
+}
+
+#current-command-line::before {
+  color: var(--font-color);
+  content: ">>";
+  margin-right: 0.25rem;
+}
+
+#cursor {
+  background-color: var(--font-color);
+  opacity: 1;
+  height: 1.25em;
+  width: 0.15em;
+  overflow: hidden;
+  text-decoration: blink;
+  animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+p {
+  margin: 0;
+  margin-right: 2rem;
+}
+
+.spaced-line {
+  margin: 0;
+  padding-top: var(--line-spacing);
+  padding-bottom: var(--line-spacing);
+}
+
+/* RESPONSIVENESS */
+@media (max-width: 768px) {
+  body {
+    font-size: 0.9em;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 0.8em;
+  }
+}
