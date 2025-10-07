@@ -9,7 +9,6 @@ from openbench.scorers.multichallenge import multichallenge_scorer
 @task
 def multichallenge(
     grader_model: str = "openai/gpt-4.1-2025-04-14",
-    limit: Optional[int] = None,
     max_turns: Optional[int] = None,
 ) -> Task:
     """
@@ -19,7 +18,7 @@ def multichallenge(
     and computes strict per-axis metrics using a judging model.
 
     Args:
-        limit: Max number of samples to evaluate (for faster debugging).
+        grader_model: Model to use for grading responses (defaults to gpt-4.1-2025-04-14)
         max_turns: Truncate conversations to last N turns.
 
     Returns:
@@ -27,11 +26,8 @@ def multichallenge(
     """
 
     return Task(
-        dataset=get_dataset(
-            max_turns=max_turns,
-            limit=limit,
-        ),
-        solver=generate(),
+        dataset=get_dataset(max_turns=max_turns),
+        solver=[generate()],
         scorer=multichallenge_scorer(model=grader_model),
         name="multichallenge",
         config=GenerateConfig(temperature=0.0),

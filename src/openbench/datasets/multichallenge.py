@@ -51,14 +51,12 @@ def record_to_sample(
 
 
 def get_dataset(
-    limit: Optional[int] = None,
     max_turns: Optional[int] = None,
 ) -> Dataset:
     """
     Load the MultiChallenge dataset as an Inspect/OpenBench Dataset.
 
     Args:
-        limit : Optional[int]: limit the number of samples
         max_turns : Optional[int]: truncate each conversation to the last `max_turns` messages
 
     Returns:
@@ -68,6 +66,5 @@ def get_dataset(
         path="nmayorga7/multichallenge",
         split="train",  # multichallenge dataset only has train split
         sample_fields=record_to_sample(max_turns=max_turns),
-        limit=limit,
     )
     return dataset
