@@ -119,7 +119,7 @@ def validate_model_role(model_role: Optional[str]) -> Dict[str, str | Model]:
         raise typer.BadParameter(str(e))
 
 
-def expand_eval_presets(benchmarks: List[str]) -> List[str]:
+def expand_eval_presets(benchmarks: List[str]) -> Tuple[List[str], List[str]]:
     """Expand eval preset identifiers into their constituent benchmarks.
 
     Preset names are normalized to handle - and _ interchangeably
@@ -129,13 +129,17 @@ def expand_eval_presets(benchmarks: List[str]) -> List[str]:
         benchmarks: List of benchmark names and/or preset identifiers
 
     Returns:
-        Expanded list of benchmark names with presets resolved
+        Tuple of (all_expanded_benchmarks, preset_only_benchmarks):
+        - all_expanded_benchmarks: All benchmarks including presets and individual tasks
+        - preset_only_benchmarks: Only benchmarks that came from preset expansion
 
     Example:
         expand_eval_presets(["bigbench", "mmlu"])
-        -> ["bigbench_arithmetic", "bigbench_...", "mmlu"]
+        -> (["bigbench_arithmetic", "bigbench_...", "mmlu"], ["bigbench_arithmetic", "bigbench_..."])
     """
-    expanded = []
+    all_expanded = []
+    preset_only = []
+
     for benchmark in benchmarks:
         # Normalize by replacing _ with - for preset lookup
         normalized_name = benchmark.replace("_", "-")
@@ -146,11 +150,67 @@ def expand_eval_presets(benchmarks: List[str]) -> List[str]:
             typer.echo(
                 f"📦 Expanding preset '{benchmark}' -> {len(preset.benchmarks)} benchmarks"
             )
-            expanded.extend(preset.benchmarks)
+            all_expanded.extend(preset.benchmarks)
+            preset_only.extend(preset.benchmarks)
         else:
             # Regular benchmark name (not a preset)
-            expanded.append(benchmark)
-    return expanded
+            all_expanded.append(benchmark)
+
+    return all_expanded, preset_only
+
+
+def display_preset_summary(
+    preset_benchmarks: List[str], eval_logs: List[EvalLog]
+) -> None:
+    """Display aggregate metrics for preset benchmarks.
+
+    Args:
+        preset_benchmarks: List of benchmark names that came from preset expansion
+        eval_logs: List of evaluation logs from all benchmarks
+    """
+    # Filter to only logs from preset benchmarks
+    preset_logs = [log for log in eval_logs if log.eval.task in preset_benchmarks]
+
+    if not preset_logs:
+        return
+
+    # Aggregate metrics
+    total_samples = 0
+    total_correct = 0
+    completed_samples = 0
+
+    for log in preset_logs:
+        if log.results:
+            completed_samples += log.results.completed_samples
+
+            # Try to extract accuracy metric to calculate correct count
+            if log.results.scores:
+                for score in log.results.scores:
+                    if "accuracy" in score.metrics:
+                        accuracy = score.metrics["accuracy"].value
+                        # Calculate correct count from accuracy
+                        correct = int(accuracy * log.results.completed_samples)
+                        total_correct += correct
+                        total_samples += log.results.completed_samples
+                        break
+
+    # Only display if we have data
+    if total_samples == 0:
+        return
+
+    total_incorrect = total_samples - total_correct
+    aggregate_accuracy = total_correct / total_samples if total_samples > 0 else 0.0
+
+    # Display summary
+    typer.echo("\n" + "=" * 60)
+    typer.echo("📊 PRESET SUMMARY")
+    typer.echo("=" * 60)
+    typer.echo(f"Total benchmarks:    {len(preset_logs)}")
+    typer.echo(f"Total samples:       {total_samples:,}")
+    typer.echo(f"Correct:             {total_correct:,}")
+    typer.echo(f"Incorrect:           {total_incorrect:,}")
+    typer.echo(f"Aggregate accuracy:  {aggregate_accuracy:.2%}")
+    typer.echo("=" * 60 + "\n")
 
 
 def run_eval(
@@ -435,7 +495,7 @@ def run_eval(
         validate_model_name(model_name)
 
     # Expand eval presets into individual benchmarks
-    expanded_benchmarks = expand_eval_presets(benchmarks)
+    expanded_benchmarks, preset_benchmarks = expand_eval_presets(benchmarks)
 
     # Load tasks from registry
     tasks = []
@@ -501,6 +561,10 @@ def run_eval(
             )
 
             typer.echo("Evaluation complete!")
+
+            # Display preset summary if presets were used
+            if preset_benchmarks:
+                display_preset_summary(preset_benchmarks, eval_logs)
 
             if hub_repo:
                 from openbench._cli.export import export_logs_to_hub
