@@ -5,6 +5,7 @@ from openbench._cli.eval_command import (
     parse_limit,
     validate_model_name,
     validate_model_role,
+    assert_environment_is_configured,
 )
 
 
@@ -57,3 +58,22 @@ def test_validate_model_role_invalid():
     """Test invalid model role."""
     with pytest.raises(Exception):
         validate_model_role("invalid-format")
+
+
+def test_assert_environment_is_configured_valid():
+    """Test assert_environment_is_configured with mock data."""
+    models = ["groq/test-model", "openai/test-model"]
+    role_models = {"grader": "openrouter/test-model"}
+    tasks = []
+
+    assert_environment_is_configured(models, role_models, tasks)
+
+
+def test_assert_environment_is_configured_invalid():
+    """Test assert_environment_is_configured with invalid model names."""
+    models = ["invalid"]
+    role_models = {"grader": "invalid/also"}
+    tasks = []
+
+    with pytest.raises(Exception):
+        assert_environment_is_configured(models, role_models, tasks)
