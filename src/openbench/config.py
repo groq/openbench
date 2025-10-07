@@ -4332,6 +4332,7 @@ _BUILTIN_BENCHMARKS = {
     ),
 }
 
+
 def _normalize_benchmark_key(name: str) -> str:
     """Normalize benchmark keys so '-' and '_' are treated the same."""
 
