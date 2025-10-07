@@ -14,17 +14,24 @@
   },
   "favicon": "/favicon.svg",
   "navigation": {
+    "pages": ["index"],
     "groups": [
       {
         "group": "Getting Started",
         "pages": [
-          "index",
           "installation",
           "quickstart",
           "configuration",
           "providers",
-          "benchmarks_catalog",
-          "troubleshooting"
+          "troubleshooting",
+          "changelog"
+        ]
+      },
+      {
+        "group": "Benchmarks",
+        "pages": [
+          "benchmarks/catalog",
+          "benchmarks/cybersecurity"
         ]
       },
       {
@@ -43,6 +50,7 @@
         "group": "Development",
         "pages": [
           "development/architecture",
+          "development/extending",
           "development/contributing",
           "development/mcq"
         ]

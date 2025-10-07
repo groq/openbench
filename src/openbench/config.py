@@ -4,7 +4,6 @@ Only contains human-written metadata that cannot be extracted from code.
 Everything else (epochs, temperature, etc.) comes from the actual task definitions.
 """
 
-from dataclasses import dataclass
 from functools import lru_cache
 import importlib
 import importlib.util
@@ -14,23 +13,18 @@ from pathlib import Path
 from types import ModuleType
 from typing import Callable, Iterable, List, Optional
 
+from importlib.metadata import entry_points
+import logging
 
-@dataclass
-class BenchmarkMetadata:
-    """Minimal metadata for a benchmark - only what can't be extracted."""
+from openbench.utils import BenchmarkMetadata
 
-    name: str  # Human-readable display name
-    description: str  # Human-written description
-    category: str  # Category for grouping
-    tags: List[str]  # Tags for searchability
+logger = logging.getLogger(__name__)
 
-    # Registry info - still needed
-    module_path: str
-    function_name: str
 
-    # Alpha/experimental flag
-    is_alpha: bool = False  # Whether this benchmark is experimental/alpha
+def _load_entry_point_benchmarks() -> dict[str, BenchmarkMetadata]:
+    """Load benchmarks registered via entry points.
 
+    External packages can register benchmarks by adding to their pyproject.toml:
 
 @dataclass
 class EvalPreset:
@@ -43,6 +37,61 @@ class EvalPreset:
 
 # Benchmark metadata - minimal, no duplication
 BENCHMARKS = {
+    [project.entry-points."openbench.benchmarks"]
+    my_benchmark = "my_package.benchmarks:get_benchmark_metadata"
+
+    The entry point should return either:
+    - A BenchmarkMetadata instance (registered with the entry point name)
+    - A dict[str, BenchmarkMetadata] (multiple benchmarks)
+    """
+    discovered = {}
+
+    try:
+        eps = entry_points()
+        benchmark_eps = eps.select(group="openbench.benchmarks")
+
+        for ep in benchmark_eps:
+            try:
+                loaded = ep.load()
+
+                # If the loaded object is callable, call it to get the result
+                if callable(loaded):
+                    result = loaded()
+                else:
+                    result = loaded
+
+                if isinstance(result, BenchmarkMetadata):
+                    # Single benchmark registered with entry point name
+                    discovered[ep.name] = result
+                elif isinstance(result, dict):
+                    # Multiple benchmarks
+                    for key, value in result.items():
+                        if not isinstance(value, BenchmarkMetadata):
+                            logger.warning(
+                                f"Entry point '{ep.name}' returned non-BenchmarkMetadata "
+                                f"value for key '{key}', skipping"
+                            )
+                            continue
+                        discovered[key] = value
+                else:
+                    logger.warning(
+                        f"Entry point '{ep.name}' returned unexpected type "
+                        f"{type(result).__name__}, expected BenchmarkMetadata or dict"
+                    )
+            except Exception as e:
+                # Log loading errors but don't fail
+                logger.warning(
+                    f"Failed to load benchmark from entry point '{ep.name}': {e}"
+                )
+    except Exception as e:
+        # If entry_points() itself fails, log but continue
+        logger.warning(f"Failed to load entry points: {e}")
+
+    return discovered
+
+
+# Built-in benchmark metadata - minimal, no duplication
+_BUILTIN_BENCHMARKS = {
     "mbpp": BenchmarkMetadata(
         name="MBPP",
         description="Mostly Basic Python Problems — code generation tasks with unit test verification",
@@ -4252,13 +4301,105 @@ BENCHMARKS = {
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_physics_high_school",
     ),
+    "arabic_exams_physics_university": BenchmarkMetadata(
+        name="Arabic Exams: Physics (University)",
+        description="Arabic MMLU - Physics questions from university-level exams",
+        category="domain-specific",
+        tags=["multiple-choice", "arabic", "physics", "university"],
+        module_path="openbench.evals.arabic_exams",
+        function_name="arabic_exams_physics_university",
+    ),
+    "otis_mock_aime": BenchmarkMetadata(
+        name="MockAIME (2024-2025)",
+        description="Otis Mock AIME - a benchmark from the OTIS Mock AIME 2024-2025 exams",
+        category="math",
+        tags=["aime", "problem-solving", "math", "2024-2025"],
+        module_path="openbench.evals.mockaime",
+        function_name="otis_mock_aime",
+    ),
+    "otis_mock_aime_2024": BenchmarkMetadata(
+        name="MockAIME (2024)",
+        description="Otis Mock AIME - a benchmark from the OTIS Mock AIME 2024 exam",
+        category="math",
+        tags=["aime", "problem-solving", "math", "2024"],
+        module_path="openbench.evals.mockaime",
+        function_name="otis_mock_aime_2024",
+    ),
+    "otis_mock_aime_2025": BenchmarkMetadata(
+        name="MockAIME (2025)",
+        description="Otis Mock AIME - a benchmark from the OTIS Mock AIME 2025 exams",
+        category="math",
+        tags=["aime", "problem-solving", "math", "2025"],
+        module_path="openbench.evals.mockaime",
+        function_name="otis_mock_aime_2025",
+    ),
+    "cybench": BenchmarkMetadata(
+        name="CyBench",
+        description="CyBench: Cybersecurity CTF challenges benchmark",
+        category="domain-specific",
+        tags=["cybersecurity", "ctf", "challenges", "graded"],
+        module_path="openbench.evals.cybench",
+        function_name="cybench",
+    ),
 }
-
 
 def _normalize_benchmark_key(name: str) -> str:
     """Normalize benchmark keys so '-' and '_' are treated the same."""
 
     return name.replace("-", "_")
+
+
+def _merge_benchmarks_with_normalization(
+    builtin: dict[str, BenchmarkMetadata],
+    entry_points: dict[str, BenchmarkMetadata],
+) -> dict[str, BenchmarkMetadata]:
+    """Merge benchmark dicts, treating '-' and '_' as equivalent for overrides.
+
+    Entry point benchmarks can override built-ins even if they differ only in
+    '-' vs '_'. The entry point's key format wins.
+
+    When multiple entry points normalize to the same key, the last one wins
+    (consistent with dict merge semantics).
+
+    Args:
+        builtin: Built-in benchmark metadata
+        entry_points: Entry point benchmark metadata
+
+    Returns:
+        Merged benchmark dict with entry point overrides applied
+    """
+    merged = dict(builtin)
+
+    # Build a reverse lookup: normalized_key -> original_key (tracks ALL keys processed)
+    normalized_lookup = {_normalize_benchmark_key(k): k for k in builtin.keys()}
+
+    for ep_key, ep_meta in entry_points.items():
+        normalized = _normalize_benchmark_key(ep_key)
+
+        # Check if there's an existing key that normalizes to the same value
+        if normalized in normalized_lookup:
+            old_key = normalized_lookup[normalized]
+            # Remove the old key if it's different from the new one
+            if old_key != ep_key and old_key in merged:
+                del merged[old_key]
+
+        # Update lookup and merged dict
+        normalized_lookup[normalized] = ep_key
+        merged[ep_key] = ep_meta
+
+    return merged
+
+
+# Merge built-in benchmarks with those from entry points.
+# Entry points are merged last so they can override built-ins. This allows external
+# packages to patch/extend benchmarks (e.g., fixing dataset bugs, adding custom splits,
+# or swapping implementations). If you want stable behavior, pin your dependencies.
+# Keys differing only in '-' vs '_' are treated as referring to the same benchmark,
+# with the entry point's key format taking precedence.
+BENCHMARKS = _merge_benchmarks_with_normalization(
+    _BUILTIN_BENCHMARKS,
+    _load_entry_point_benchmarks(),
+)
 
 
 def _build_normalized_lookup(names: Iterable[str]) -> dict[str, str]:
@@ -4463,7 +4604,8 @@ def load_task(benchmark_name: str, allow_alpha: bool = False) -> Callable:
     # Neither registry nor valid path
     raise ValueError(
         f"Unknown benchmark: '{benchmark_name}'. "
-        f"Available benchmarks: {', '.join(TASK_REGISTRY.keys())}"
+        # return available benchmarks alphabetically
+        f"Available benchmarks: {', '.join(sorted(TASK_REGISTRY.keys()))}"
     )
 
 

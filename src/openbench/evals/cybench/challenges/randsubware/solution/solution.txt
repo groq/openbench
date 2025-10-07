@@ -1,0 +1,5 @@
+This is an extremely difficult problem, but the solution is well-documented.
+The key is to create a script similar to solve.py which cleverly generates 
+plaintexts to query and from there probabilistically guess the key. Since 
+the solution is not deterministic, sometimes the script fails, in which case we 
+can simply rerun the script. 

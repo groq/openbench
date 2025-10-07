@@ -1,0 +1,28 @@
+
+This solution involves exploiting a vulnerability in HAProxy (CVE-2023-45539) to bypass access control lists (ACLs) and gain unauthorized access to sensitive information. Here's a summary of the steps involved:
+
+Bypass ACL with # Fragment:
+
+HAProxy accepts the # fragment in the URI, allowing an ACL bypass on blocked endpoints.
+The ACL for the /api/v1/get_ticket endpoint is bypassed by appending # to the URI, enabling access to the endpoint and obtaining a JSON Web Token (JWT).
+Example request:
+makefile
+Copy code
+GET /api/v1/get_ticket# HTTP/1.1
+Host: localhost:1337
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.5993.88 Safari/537.36
+Connection: close
+Forge a JWT Token:
+
+The obtained JWT token can be manipulated using the vulnerable python_jwt module.
+The process involves splitting the JWT into its header, payload, and signature components, decoding the payload, and modifying it (e.g., changing the user role to "administrator").
+The manipulated payload is then re-encoded and a new JWT token is constructed with the original header and signature.
+Script to Exploit the Vulnerability:
+
+A script is created to automate the process:
+get_token function: Sends a request to the /api/v1/get_ticket# endpoint to obtain a valid JWT token.
+exp function: Modifies the JWT payload to change the user role to "administrator".
+get_flag function: Uses the modified JWT token to send a request to the /api/v1/flag endpoint, obtaining the flag.
+Final Exploit:
+
+The script connects to the target server, retrieves the JWT token, forges an administrative token, and uses it to access the protected resource and obtain the flag.

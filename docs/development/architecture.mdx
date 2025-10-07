@@ -351,12 +351,37 @@ openbench/
 
 ## Extension Points - Adding New Benchmarks
 
+### Built-in Benchmarks (Contribution)
+
+To add a benchmark to openbench core:
+
 1. Eval task in `evals/`
 2. Dataset loader in `datasets/`
 3. Scoring logic in `scorers/`
-3. Custom solver in `solvers/`
-4. Custom metric in `metrics/`
-5. Benchmark metadata in `config.py`
-6. Import eval task into `_registry.py`
+4. Custom solver in `solvers/` (if needed)
+5. Custom metric in `metrics/` (if needed)
+6. Benchmark metadata in `config.py`
+7. Import eval task into `_registry.py`
 
 <Tip> openbench provides infrastructure for multiple-choice question (MCQ) evals. [See more](mcq).</Tip>
+
+### External Benchmarks (Plugin System)
+
+openbench supports a **plugin system via Python entry points**, allowing you to distribute custom benchmarks as standalone packages:
+
+```toml pyproject.toml
+[project.entry-points."openbench.benchmarks"]
+my_benchmark = "my_pkg.metadata:get_benchmark_metadata"
+```
+
+After installing your package, benchmarks appear in `bench list` and work with all CLI commands.
+
+**Benefits:**
+- No need to modify openbench source code
+- Version and distribute benchmarks independently
+- Share benchmarks across teams/organizations
+- Override built-in benchmarks with custom implementations
+
+<Tip>
+See the [Extending openbench](extending) guide for comprehensive documentation, examples, and best practices.
+</Tip>
