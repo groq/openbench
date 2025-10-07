@@ -69,12 +69,12 @@ def adjust_relative_paths(content: str) -> str:
 
     if ROOT_FROM_TARGET not in ("", "."):
         adjusted = re.sub(
-            r'"(src[^"]*)"',
+            r'"(src/[^"]*)"',
             lambda m: f'"{_join_root(m.group(1))}"',
             adjusted,
         )
         adjusted = re.sub(
-            r'"(tests[^"]*)"',
+            r'"(tests/[^"]*)"',
             lambda m: f'"{_join_root(m.group(1))}"',
             adjusted,
         )
