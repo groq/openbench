@@ -239,6 +239,7 @@ from .evals.medqa import medqa  # noqa: F401, E402
 from .evals.mgsm import mgsm, mgsm_en, mgsm_latin, mgsm_non_latin  # noqa: F401, E402
 from .evals.mmlu import mmlu  # noqa: F401, E402
 from .evals.mmlu_pro import mmlu_pro  # noqa: F401, E402
+from .evals.multichallenge import multichallenge  # noqa: F401, E402
 from .evals.mrcr import openai_mrcr, openai_mrcr_2n, openai_mrcr_4n, openai_mrcr_8n  # noqa: F401, E402
 from .evals.mmstar import mmstar  # noqa: F401, E402
 from .evals.musr import musr  # noqa: F401, E402
@@ -345,10 +346,43 @@ from .evals.arabic_exams import (  # noqa: F401, E402
     arabic_exams,
     arabic_exams_accounting_university,
     arabic_exams_arabic_language_general,
+    arabic_exams_arabic_language_grammar,
+    arabic_exams_arabic_language_high_school,
+    arabic_exams_arabic_language_middle_school,
+    arabic_exams_arabic_language_primary_school,
+    arabic_exams_biology_high_school,
+    arabic_exams_civics_high_school,
+    arabic_exams_civics_middle_school,
     arabic_exams_computer_science_high_school,
+    arabic_exams_computer_science_middle_school,
+    arabic_exams_computer_science_primary_school,
     arabic_exams_computer_science_university,
+    arabic_exams_driving_test,
+    arabic_exams_economics_high_school,
+    arabic_exams_economics_middle_school,
+    arabic_exams_economics_university,
+    arabic_exams_general_knowledge,
+    arabic_exams_general_knowledge_middle_school,
+    arabic_exams_general_knowledge_primary_school,
+    arabic_exams_geography_high_school,
+    arabic_exams_geography_middle_school,
+    arabic_exams_geography_primary_school,
+    arabic_exams_history_high_school,
+    arabic_exams_history_middle_school,
+    arabic_exams_history_primary_school,
     arabic_exams_islamic_studies_general,
-    arabic_exams_math_high_school,
+    arabic_exams_islamic_studies_high_school,
+    arabic_exams_islamic_studies_middle_school,
+    arabic_exams_islamic_studies_primary_school,
+    arabic_exams_law_professional,
+    arabic_exams_management_university,
+    arabic_exams_math_primary_school,
+    arabic_exams_natural_science_middle_school,
+    arabic_exams_natural_science_primary_school,
+    arabic_exams_philosophy_high_school,
     arabic_exams_physics_high_school,
+    arabic_exams_political_science_university,
+    arabic_exams_social_science_middle_school,
+    arabic_exams_social_science_primary_school,
 )
 from .evals.legalsupport import legalsupport  # noqa: F401, E402
