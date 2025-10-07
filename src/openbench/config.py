@@ -4,6 +4,7 @@ Only contains human-written metadata that cannot be extracted from code.
 Everything else (epochs, temperature, etc.) comes from the actual task definitions.
 """
 
+from dataclasses import dataclass
 from functools import lru_cache
 import importlib
 import importlib.util
@@ -26,17 +27,6 @@ def _load_entry_point_benchmarks() -> dict[str, BenchmarkMetadata]:
 
     External packages can register benchmarks by adding to their pyproject.toml:
 
-@dataclass
-class EvalPreset:
-    """Preset configuration for running multiple benchmarks as a group."""
-
-    name: str  # Human-readable display name
-    description: str  # Description of the preset
-    benchmarks: List[str]  # List of benchmark IDs to run
-
-
-# Benchmark metadata - minimal, no duplication
-BENCHMARKS = {
     [project.entry-points."openbench.benchmarks"]
     my_benchmark = "my_package.benchmarks:get_benchmark_metadata"
 
@@ -88,6 +78,15 @@ BENCHMARKS = {
         logger.warning(f"Failed to load entry points: {e}")
 
     return discovered
+
+
+@dataclass
+class EvalPreset:
+    """Preset configuration for running multiple benchmarks as a group."""
+
+    name: str  # Human-readable display name
+    description: str  # Description of the preset
+    benchmarks: List[str]  # List of benchmark IDs to run
 
 
 # Built-in benchmark metadata - minimal, no duplication
@@ -4342,6 +4341,7 @@ _BUILTIN_BENCHMARKS = {
         function_name="cybench",
     ),
 }
+
 
 def _normalize_benchmark_key(name: str) -> str:
     """Normalize benchmark keys so '-' and '_' are treated the same."""
