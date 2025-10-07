@@ -4529,87 +4529,9 @@ def get_eval_metadata(path_like: str) -> BenchmarkMetadata | None:
         return None
 
 
-# Eval presets - collections of benchmarks that can be run together
+# Eval presets - categorical collections of benchmarks that can be run together
+# Note: Family benchmarks (bigbench, agieval, etc.) will be migrated to aggregate dataset approach
 EVAL_PRESETS = {
-    "bigbench": EvalPreset(
-        name="BigBench Suite",
-        description="All 121 BigBench multiple-choice tasks testing diverse language model capabilities",
-        benchmarks=[name for name in BENCHMARKS.keys() if name.startswith("bigbench_")],
-    ),
-    "bigbench-lite": EvalPreset(
-        name="BigBench Lite",
-        description="Curated subset of 18 representative BigBench tasks (BBL) for efficient evaluation",
-        benchmarks=[
-            "bigbench_bbq_lite_json",
-            "bigbench_code_line_description",
-            "bigbench_conceptual_combinations",
-            "bigbench_emoji_movie",
-            "bigbench_formal_fallacies_syllogisms_negation",
-            "bigbench_hindu_knowledge",
-            "bigbench_known_unknowns",
-            "bigbench_language_identification",
-            "bigbench_logic_grid_puzzle",
-            "bigbench_logical_deduction",
-            "bigbench_misconceptions_russian",
-            "bigbench_novel_concepts",
-            "bigbench_play_dialog_same_or_different",
-            "bigbench_strange_stories",
-            "bigbench_strategyqa",
-            "bigbench_symbol_interpretation",
-            "bigbench_vitaminc_fact_verification",
-            "bigbench_winowhy",
-        ],
-    ),
-    "bbl": EvalPreset(
-        name="BigBench Lite (BBL)",
-        description="Alias for bigbench-lite - 18 representative BigBench tasks",
-        benchmarks=[
-            "bigbench_bbq_lite_json",
-            "bigbench_code_line_description",
-            "bigbench_conceptual_combinations",
-            "bigbench_emoji_movie",
-            "bigbench_formal_fallacies_syllogisms_negation",
-            "bigbench_hindu_knowledge",
-            "bigbench_known_unknowns",
-            "bigbench_language_identification",
-            "bigbench_logic_grid_puzzle",
-            "bigbench_logical_deduction",
-            "bigbench_misconceptions_russian",
-            "bigbench_novel_concepts",
-            "bigbench_play_dialog_same_or_different",
-            "bigbench_strange_stories",
-            "bigbench_strategyqa",
-            "bigbench_symbol_interpretation",
-            "bigbench_vitaminc_fact_verification",
-            "bigbench_winowhy",
-        ],
-    ),
-    "bbh": EvalPreset(
-        name="BigBench Hard",
-        description="18 challenging BigBench tasks requiring multi-step reasoning",
-        benchmarks=[name for name in BENCHMARKS.keys() if name.startswith("bbh_")],
-    ),
-    "agieval": EvalPreset(
-        name="AGIEval Suite",
-        description="18 human-centric academic exam questions testing general cognitive abilities",
-        benchmarks=[name for name in BENCHMARKS.keys() if name.startswith("agieval_")],
-    ),
-    "ethics": EvalPreset(
-        name="ETHICS Suite",
-        description="Moral reasoning evaluation across 5 fundamental ethical dimensions",
-        benchmarks=[
-            "ethics_commonsense",
-            "ethics_deontology",
-            "ethics_justice",
-            "ethics_utilitarianism",
-            "ethics_virtue",
-        ],
-    ),
-    "blimp": EvalPreset(
-        name="BLiMP Suite",
-        description="67 linguistic minimal pairs testing grammatical knowledge",
-        benchmarks=[name for name in BENCHMARKS.keys() if name.startswith("blimp_")],
-    ),
     "coding": EvalPreset(
         name="Coding Suite",
         description="Core coding benchmarks including HumanEval, MBPP, and multi-language Exercism tasks",
@@ -4635,17 +4557,6 @@ EVAL_PRESETS = {
             "piqa",
         ],
     ),
-    "arc-suite": EvalPreset(
-        name="ARC Suite",
-        description="Abstraction and Reasoning Corpus challenges and question-answering tasks",
-        benchmarks=[
-            "arc_agi",
-            "arc_agi_1",
-            "arc_agi_2",
-            "arc_challenge",
-            "arc_easy",
-        ],
-    ),
     "math-competitions": EvalPreset(
         name="Math Competitions",
         description="High school and college math competition problems (AIME, HMMT)",
@@ -4660,43 +4571,6 @@ EVAL_PRESETS = {
             "hmmt_feb_2023",
             "hmmt_feb_2024",
             "hmmt_feb_2025",
-        ],
-    ),
-    "glue": EvalPreset(
-        name="GLUE Benchmark",
-        description="General Language Understanding Evaluation - 10 diverse NLU tasks",
-        benchmarks=[
-            "glue_cola",
-            "glue_mnli",
-            "glue_mnli_mismatched",
-            "glue_mrpc",
-            "glue_qnli",
-            "glue_qqp",
-            "glue_rte",
-            "glue_sst2",
-            "glue_stsb",
-            "glue_wnli",
-        ],
-    ),
-    "superglue": EvalPreset(
-        name="SuperGLUE Benchmark",
-        description="More challenging language understanding tasks beyond GLUE",
-        benchmarks=[
-            "cb",
-            "copa",
-            "multirc",
-            "rte_superglue",
-            "wic",
-            "wsc",
-        ],
-    ),
-    "mrcr": EvalPreset(
-        name="MRCR (Long Context)",
-        description="Memory Recall with Contextual Retrieval across million-token contexts",
-        benchmarks=[
-            "openai_mrcr_2n",
-            "openai_mrcr_4n",
-            "openai_mrcr_8n",
         ],
     ),
     "multilingual": EvalPreset(
@@ -4725,16 +4599,6 @@ EVAL_PRESETS = {
             "openai_mrcr_4n",
             "openai_mrcr_8n",
             "qasper_ll",
-        ],
-    ),
-    "cybersecurity": EvalPreset(
-        name="Cybersecurity Suite",
-        description="CTI-Bench tasks evaluating cyber threat intelligence capabilities",
-        benchmarks=[
-            "cti_bench_ate",
-            "cti_bench_mcq",
-            "cti_bench_rcm",
-            "cti_bench_vsp",
         ],
     ),
     "medical": EvalPreset(
