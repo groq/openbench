@@ -11,6 +11,11 @@ repos:
         files: ^src/
   - repo: local
     hooks:
+      - id: sync-pyproject
+        name: sync packages/pyproject.toml
+        entry: .venv/bin/python scripts/sync_pyproject.py
+        language: system
+        pass_filenames: false
       - id: mypy
         name: mypy
         entry: .venv/bin/mypy

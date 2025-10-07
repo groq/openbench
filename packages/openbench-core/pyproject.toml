@@ -1,0 +1,129 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openbench"
+version = "0.4.1"
+requires-python = ">=3.10"
+description = "openbench - open source, replicable, and standardized evaluation infrastructure"
+readme = "../../README.md"
+license = {text = "MIT"}
+authors = [
+    { name="Aarush Sah" },
+    { name="Groq" }
+]
+dependencies = [
+    "datasets>=3.6.0",
+    "groq>=0.30.0",
+    "inspect-ai==0.3.125",
+    "inspect-cyber==0.1.0",
+    "openai>=1.99.7",
+    "pillow>=10.0.0",
+    "jsonschema>=4.23.0",
+    "mcp>=1.13.1",
+    "platformdirs>=4.0.0",
+    "pydantic-settings>=2.9.1",
+    "scipy>=1.15.3",
+    "tiktoken>=0.11.0",
+    "typer>=0.15.3",
+]
+
+[project.urls]
+Homepage = "https://github.com/groq/openbench"
+Repository = "https://github.com/groq/openbench"
+
+[project.entry-points.inspect_ai]
+openbench = "openbench._registry"
+
+[tool.setuptools]
+package-dir = {"" = "../../src"}
+
+[tool.setuptools.packages.find]
+where = ["../../src"]
+include = ["openbench*"]
+
+[tool.setuptools.package-data]
+"openbench.evals.cybench" = [
+    "README.md",
+    "build-images.sh",
+    "push_images.sh",
+    "agent_sandbox/**",
+    "challenges/**",
+]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra -q --strict-markers"
+testpaths = ["../../tests"]
+pythonpath = ["../../src", "../.."]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "integration: marks tests that require external services (deselect with '-m \"not integration\"')",
+]
+
+[tool.ruff]
+  extend-exclude = [
+      "../../src/openbench/evals/cybench/challenges",
+      "../../src/openbench/evals/cybench/agent_sandbox",
+  ]
+
+[tool.coverage.run]
+source = ["../../src/openbench"]
+omit = ["../../tests/*", "**/__init__.py", "**/conftest.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+precision = 2
+show_missing = true
+
+[tool.uv.sources]
+scicode = { git = "https://github.com/TheFloatingString/SciCode-fork.git", rev = "4f20d721ba3e2227196262083b9b7a70484d54f7" }
+
+[dependency-groups]
+dev = [
+    "mypy>=1.15.0",
+    "pre-commit>=4.2.0",
+    "pytest>=8.3.5",
+    "pytest-asyncio==0.24.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.11.9",
+    "types-jsonschema>=4.0.0",
+    "types-pyyaml>=6.0.12.20250809",
+]
+scicode = [
+    "scicode",
+]
+jsonschemabench = [
+    "jsonschema>=4.23.0",
+]
+ifeval = [
+    "langdetect>=1.0.9",
+    "nltk>=3.9.1",
+]
+
+[tool.mypy]
+exclude = [
+    "../../src/openbench/evals/cybench/challenges",
+    "../../src/openbench/evals/cybench/agent_sandbox",
+]
+
+[[tool.mypy.overrides]]
+module = [
+    "openbench.evals.cybench.challenges.*",
+]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = [
+    "openbench.evals.cybench.agent_sandbox.*",
+]
+ignore_errors = true
