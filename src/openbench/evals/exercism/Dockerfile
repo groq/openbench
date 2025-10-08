@@ -29,11 +29,7 @@ ENV PATH="/root/.cargo/bin:/root/.local/bin:${PATH}"
 # Common setup
 WORKDIR /workspace
 
-# Agent-specific installation
-RUN npm install -g opencode-ai
-
-# Runtime setup
-# No runtime setup required
+# Agent-specific and run time installation is handled by DockerManager
 
 # Default command
 CMD ["tail", "-f", "/dev/null"]
