@@ -36,6 +36,7 @@ Citation:
 from inspect_ai import Task, task
 from openbench.utils.mcq import MCQEval, MCQSample
 from openbench.utils.text import create_dynamic_multiple_choice_prompt
+from typing import Optional
 
 # Monkey-patch to fix compatibility issue with datasets library 3.x
 # BigBench dataset metadata uses deprecated 'List' type instead of 'Sequence'
@@ -49,7 +50,7 @@ except ImportError:
     pass  # datasets library not available, patch not needed
 
 
-def record_to_mcq_sample_bigbench(record: dict) -> MCQSample:
+def record_to_mcq_sample_bigbench(record: dict) -> Optional[MCQSample]:
     """Convert a BigBench record to an OpenBench MCQSample.
 
     BigBench tasks have a consistent structure:
@@ -62,6 +63,9 @@ def record_to_mcq_sample_bigbench(record: dict) -> MCQSample:
     1. Extract the question from inputs (everything before "choice:")
     2. Use multiple_choice_targets as the choices
     3. Find the correct answer from multiple_choice_scores
+
+    Returns:
+        MCQSample if valid, None if the record should be skipped (e.g., empty prompt).
     """
     # Extract question - everything before the first "choice:" line
     inputs_text = record["inputs"]
@@ -112,6 +116,10 @@ def record_to_mcq_sample_bigbench(record: dict) -> MCQSample:
 
     # Create the prompt
     prompt = create_dynamic_multiple_choice_prompt(question, choices)
+
+    # Skip samples with empty prompts (validation will fail on empty input strings)
+    if not prompt or not prompt.strip():
+        return None
 
     return MCQSample(
         input=prompt,
