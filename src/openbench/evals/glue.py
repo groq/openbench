@@ -14,7 +14,7 @@ Note: BoolQ is already implemented separately in boolq.py and is not included he
 Sample usage:
 ```bash
 bench eval copa --model "groq/llama-3.1-8b-instant"
-bench eval rte_superglue --model "groq/llama-3.1-8b-instant"
+bench eval rte --model "groq/llama-3.1-8b-instant"
 ```
 
 The prompts are based on the lighteval implementations:
