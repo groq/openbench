@@ -59,37 +59,32 @@ export const CatalogTable = () => {
   const [category, setCategory] = useState("all")
   const [tag, setTag] = useState("all")
   const [includeAlpha, setIncludeAlpha] = useState(false)
-  const [showType, setShowType] = useState("all")
   const [sortKey, setSortKey] = useState("name")
   const [sortDir, setSortDir] = useState("asc")
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(20)
 
   const data = useMemo(() => {
-    // Benchmarks
     const benchmarks = (benchmarksData || []).map((r) => ({
-      type: 'benchmark',
       name: String(r?.name ?? "").trim(),
       description: String(r?.description ?? "").trim(),
       category: String(r?.category ?? "").trim(),
       tags: Array.isArray(r?.tags) ? r.tags.map((t) => String(t).trim()).filter(Boolean) : [],
       function_name: String(r?.function_name ?? "").trim(),
       is_alpha: Boolean(r?.is_alpha),
-      benchmark_count: null,
+      is_group: false,
+      benchmark_count: 0,
     }))
-
-    // Eval groups
     const groups = (evalGroupsData || []).map((g) => ({
-      type: 'group',
       name: String(g?.name ?? "").trim(),
       description: String(g?.description ?? "").trim(),
-      category: 'eval-group',
-      tags: ['eval-group', 'family'],
+      category: String(g?.category ?? "").trim(),
+      tags: Array.isArray(g?.tags) ? g.tags.map((t) => String(t).trim()).filter(Boolean) : [],
       function_name: String(g?.id ?? "").trim(),
       is_alpha: false,
+      is_group: true,
       benchmark_count: Number(g?.benchmark_count ?? 0),
     }))
-
     return [...benchmarks, ...groups]
   }, [])
 
@@ -116,12 +111,8 @@ export const CatalogTable = () => {
     const byCategory = (r) => (category === "all" ? true : r.category === category)
     const byTag = (r) => (tag === "all" ? true : r.tags.includes(tag))
     const byAlpha = (r) => (includeAlpha ? true : !r.is_alpha)
-    const byType = (r) => (showType === "all" ? true :
-      (showType === "benchmarks" && r.type === 'benchmark') ||
-      (showType === "groups" && r.type === 'group')
-    )
-    return data.filter((r) => byQuery(r) && byCategory(r) && byTag(r) && byAlpha(r) && byType(r))
-  }, [data, query, category, tag, includeAlpha, showType])
+    return data.filter((r) => byQuery(r) && byCategory(r) && byTag(r) && byAlpha(r))
+  }, [data, query, category, tag, includeAlpha])
 
   const sorted = useMemo(() => {
     const s = [...filtered]
@@ -140,7 +131,7 @@ export const CatalogTable = () => {
   const startIdx = (currentPage - 1) * pageSize
   const pageRows = sorted.slice(startIdx, startIdx + pageSize)
 
-  useEffect(() => { setPage(1) }, [query, category, tag, includeAlpha, showType, pageSize])
+  useEffect(() => { setPage(1) }, [query, category, tag, includeAlpha, pageSize])
 
   const toggleSort = (key) => {
     if (key === sortKey) setSortDir((d) => (d === "asc" ? "desc" : "asc"))
@@ -153,19 +144,10 @@ export const CatalogTable = () => {
 
   return (
     <div>
-      <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+      <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <label htmlFor="benchmarks-search" className="flex flex-col gap-1">
           <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">Search</span>
           <input id="benchmarks-search" name="search" type="search" autoComplete="off" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search name, description, tags…" aria-label="Global search" className="w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm" />
-        </label>
-
-        <label htmlFor="benchmarks-type" className="flex flex-col gap-1">
-          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">Type</span>
-          <select id="benchmarks-type" name="type" value={showType} onChange={(e) => setShowType(e.target.value)} aria-label="Filter by type" className="w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm">
-            <option value="all">All</option>
-            <option value="benchmarks">Benchmarks only</option>
-            <option value="groups">Groups only</option>
-          </select>
         </label>
 
         <label htmlFor="benchmarks-category" className="flex flex-col gap-1">
@@ -217,14 +199,7 @@ export const CatalogTable = () => {
             ) : (
               pageRows.map((r) => (
                 <tr key={r.function_name} className="border-t border-zinc-200 dark:border-zinc-800 align-top">
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-zinc-900 dark:text-zinc-100">{r.name}</span>
-                      {r.is_alpha && (<span className="inline-flex items-center rounded bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">alpha</span>)}
-                      {r.type === 'group' && (<span className="inline-flex items-center rounded bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">Group</span>)}
-                    </div>
-                    {r.type === 'group' && r.benchmark_count && (<div className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">{r.benchmark_count} benchmarks</div>)}
-                  </td>
+                  <td className="px-4 py-3"><div className="flex items-center gap-2"><span className="font-medium text-zinc-900 dark:text-zinc-100">{r.name}</span>{r.is_alpha && (<span className="inline-flex items-center rounded bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">alpha</span>)}{r.is_group && (<span className="inline-flex items-center rounded bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">group</span>)}</div>{r.is_group && r.benchmark_count > 0 && (<div className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">{r.benchmark_count} benchmarks</div>)}</td>
                   <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{r.description}</td>
                   <td className="px-4 py-3"><span className="inline-flex rounded-md bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-xs text-zinc-700 dark:text-zinc-300">{r.category}</span></td>
                   <td className="px-4 py-3"><div className="flex flex-wrap gap-1.5">{r.tags.map((t) => (<span key={t} className="inline-flex rounded-md bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-xs text-zinc-700 dark:text-zinc-300">{t}</span>))}</div></td>
