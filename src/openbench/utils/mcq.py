@@ -136,26 +136,30 @@ def MCQEval(
                 samples.append(sample)
         except ValueError as e:
             # Validation error - skip this record with warning
+            record_id = record.get(
+                "idx", record.get("id", f"record_{skipped_count + 1}")
+            )
             skipped_count += 1
-            record_id = record.get("idx", record.get("id", f"record_{skipped_count}"))
             warnings.warn(
-                f"Skipping invalid MCQ record (id={record_id}) in {name}: {e}",
+                f"Skipping invalid MCQ record (id={record_id}): {e}",
                 UserWarning,
                 stacklevel=2,
             )
         except Exception as e:
             # Unexpected error - skip but warn about it
+            record_id = record.get(
+                "idx", record.get("id", f"record_{skipped_count + 1}")
+            )
             skipped_count += 1
-            record_id = record.get("idx", record.get("id", f"record_{skipped_count}"))
             warnings.warn(
-                f"Unexpected error processing MCQ record (id={record_id}) in {name}: {e}",
+                f"Unexpected error processing MCQ record (id={record_id}): {e}",
                 UserWarning,
                 stacklevel=2,
             )
 
     if skipped_count > 0:
         warnings.warn(
-            f"Skipped {skipped_count} invalid record(s) in {name}. "
+            f"Skipped {skipped_count} invalid MCQ record(s). "
             f"Proceeding with {len(samples)} valid samples.",
             UserWarning,
             stacklevel=2,

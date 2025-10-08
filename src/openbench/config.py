@@ -4938,6 +4938,15 @@ _BUILTIN_BENCHMARKS = {
         function_name="arabic_exams_math_primary_school",
         subtask=True,
     ),
+    "arabic_exams_math_high_school": BenchmarkMetadata(
+        name="Arabic Exams: Math (High School)",
+        description="Arabic MMLU - Math questions from high school exams",
+        category="domain-specific",
+        tags=["multiple-choice", "arabic", "math", "high-school"],
+        module_path="openbench.evals.arabic_exams",
+        function_name="arabic_exams_math_high_school",
+        subtask=True,
+    ),
     "arabic_exams_physics_high_school": BenchmarkMetadata(
         name="Arabic Exams: Physics (High School)",
         description="Arabic MMLU - Physics questions from high school exams",
@@ -6094,6 +6103,7 @@ EVAL_GROUPS = {
             "arabic_exams_islamic_studies_primary_school",
             "arabic_exams_law_professional",
             "arabic_exams_management_university",
+            "arabic_exams_math_high_school",
             "arabic_exams_math_primary_school",
             "arabic_exams_natural_science_middle_school",
             "arabic_exams_natural_science_primary_school",
