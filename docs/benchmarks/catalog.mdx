@@ -223,7 +223,7 @@ export const CatalogTable = () => {
                       {r.is_alpha && (<span className="inline-flex items-center rounded bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">alpha</span>)}
                       {r.type === 'group' && (<span className="inline-flex items-center rounded bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">Group</span>)}
                     </div>
-                    {r.benchmark_count && (<div className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">{r.benchmark_count} benchmarks</div>)}
+                    {r.type === 'group' && r.benchmark_count && (<div className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">{r.benchmark_count} benchmarks</div>)}
                   </td>
                   <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{r.description}</td>
                   <td className="px-4 py-3"><span className="inline-flex rounded-md bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-xs text-zinc-700 dark:text-zinc-300">{r.category}</span></td>
