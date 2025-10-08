@@ -81,11 +81,11 @@ def _load_entry_point_benchmarks() -> dict[str, BenchmarkMetadata]:
 
 
 @dataclass
-class EvalPreset:
-    """Preset configuration for running multiple benchmarks as a group."""
+class EvalGroup:
+    """Group configuration for running multiple benchmarks as a group."""
 
     name: str  # Human-readable display name
-    description: str  # Description of the preset
+    description: str  # Description of the group
     benchmarks: List[str]  # List of benchmark IDs to run
 
 
@@ -162,6 +162,133 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmlu",
         function_name="mmmlu",
     ),
+    # MMMLU language-specific tasks
+    "mmmlu_ar_xy": BenchmarkMetadata(
+        name="MMMLU (Arabic)",
+        description="MMLU in Arabic (AR_XY)",
+        category="core",
+        tags=["multiple-choice", "knowledge", "multilingual", "mmmlu"],
+        module_path="openbench.evals.mmmlu",
+        function_name="mmmlu_ar_xy",
+        subtask=True,
+    ),
+    "mmmlu_bn_bd": BenchmarkMetadata(
+        name="MMMLU (Bengali)",
+        description="MMLU in Bengali (BN_BD)",
+        category="core",
+        tags=["multiple-choice", "knowledge", "multilingual", "mmmlu"],
+        module_path="openbench.evals.mmmlu",
+        function_name="mmmlu_bn_bd",
+        subtask=True,
+    ),
+    "mmmlu_de_de": BenchmarkMetadata(
+        name="MMMLU (German)",
+        description="MMLU in German (DE_DE)",
+        category="core",
+        tags=["multiple-choice", "knowledge", "multilingual", "mmmlu"],
+        module_path="openbench.evals.mmmlu",
+        function_name="mmmlu_de_de",
+        subtask=True,
+    ),
+    "mmmlu_es_la": BenchmarkMetadata(
+        name="MMMLU (Spanish)",
+        description="MMLU in Spanish Latin America (ES_LA)",
+        category="core",
+        tags=["multiple-choice", "knowledge", "multilingual", "mmmlu"],
+        module_path="openbench.evals.mmmlu",
+        function_name="mmmlu_es_la",
+        subtask=True,
+    ),
+    "mmmlu_fr_fr": BenchmarkMetadata(
+        name="MMMLU (French)",
+        description="MMLU in French (FR_FR)",
+        category="core",
+        tags=["multiple-choice", "knowledge", "multilingual", "mmmlu"],
+        module_path="openbench.evals.mmmlu",
+        function_name="mmmlu_fr_fr",
+        subtask=True,
+    ),
+    "mmmlu_hi_in": BenchmarkMetadata(
+        name="MMMLU (Hindi)",
+        description="MMLU in Hindi (HI_IN)",
+        category="core",
+        tags=["multiple-choice", "knowledge", "multilingual", "mmmlu"],
+        module_path="openbench.evals.mmmlu",
+        function_name="mmmlu_hi_in",
+        subtask=True,
+    ),
+    "mmmlu_id_id": BenchmarkMetadata(
+        name="MMMLU (Indonesian)",
+        description="MMLU in Indonesian (ID_ID)",
+        category="core",
+        tags=["multiple-choice", "knowledge", "multilingual", "mmmlu"],
+        module_path="openbench.evals.mmmlu",
+        function_name="mmmlu_id_id",
+        subtask=True,
+    ),
+    "mmmlu_it_it": BenchmarkMetadata(
+        name="MMMLU (Italian)",
+        description="MMLU in Italian (IT_IT)",
+        category="core",
+        tags=["multiple-choice", "knowledge", "multilingual", "mmmlu"],
+        module_path="openbench.evals.mmmlu",
+        function_name="mmmlu_it_it",
+        subtask=True,
+    ),
+    "mmmlu_ja_jp": BenchmarkMetadata(
+        name="MMMLU (Japanese)",
+        description="MMLU in Japanese (JA_JP)",
+        category="core",
+        tags=["multiple-choice", "knowledge", "multilingual", "mmmlu"],
+        module_path="openbench.evals.mmmlu",
+        function_name="mmmlu_ja_jp",
+        subtask=True,
+    ),
+    "mmmlu_ko_kr": BenchmarkMetadata(
+        name="MMMLU (Korean)",
+        description="MMLU in Korean (KO_KR)",
+        category="core",
+        tags=["multiple-choice", "knowledge", "multilingual", "mmmlu"],
+        module_path="openbench.evals.mmmlu",
+        function_name="mmmlu_ko_kr",
+        subtask=True,
+    ),
+    "mmmlu_pt_br": BenchmarkMetadata(
+        name="MMMLU (Portuguese)",
+        description="MMLU in Portuguese Brazil (PT_BR)",
+        category="core",
+        tags=["multiple-choice", "knowledge", "multilingual", "mmmlu"],
+        module_path="openbench.evals.mmmlu",
+        function_name="mmmlu_pt_br",
+        subtask=True,
+    ),
+    "mmmlu_zh_cn": BenchmarkMetadata(
+        name="MMMLU (Chinese)",
+        description="MMLU in Chinese (ZH_CN)",
+        category="core",
+        tags=["multiple-choice", "knowledge", "multilingual", "mmmlu"],
+        module_path="openbench.evals.mmmlu",
+        function_name="mmmlu_zh_cn",
+        subtask=True,
+    ),
+    "mmmlu_sw_ke": BenchmarkMetadata(
+        name="MMMLU (Swahili)",
+        description="MMLU in Swahili (SW_KE)",
+        category="core",
+        tags=["multiple-choice", "knowledge", "multilingual", "mmmlu"],
+        module_path="openbench.evals.mmmlu",
+        function_name="mmmlu_sw_ke",
+        subtask=True,
+    ),
+    "mmmlu_yo_ng": BenchmarkMetadata(
+        name="MMMLU (Yoruba)",
+        description="MMLU in Yoruba (YO_NG)",
+        category="core",
+        tags=["multiple-choice", "knowledge", "multilingual", "mmmlu"],
+        module_path="openbench.evals.mmmlu",
+        function_name="mmmlu_yo_ng",
+        subtask=True,
+    ),
     "openai_mrcr": BenchmarkMetadata(
         name="OpenAI MRCR (Full)",
         description="Memory-Recall with Contextual Retrieval - long-context evaluation that measures recall of 2, 4, and 8 needles across million-token contexts",
@@ -177,6 +304,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["long-context", "retrieval", "needle", "sequence-matching"],
         module_path="openbench.evals.mrcr",
         function_name="openai_mrcr_2n",
+        subtask=True,
     ),
     "openai_mrcr_4n": BenchmarkMetadata(
         name="OpenAI MRCR (4 Needles)",
@@ -185,6 +313,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["long-context", "retrieval", "needle", "sequence-matching"],
         module_path="openbench.evals.mrcr",
         function_name="openai_mrcr_4n",
+        subtask=True,
     ),
     "openai_mrcr_8n": BenchmarkMetadata(
         name="OpenAI MRCR (8 Needles)",
@@ -193,6 +322,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["long-context", "retrieval", "needle", "sequence-matching"],
         module_path="openbench.evals.mrcr",
         function_name="openai_mrcr_8n",
+        subtask=True,
     ),
     "gpqa_diamond": BenchmarkMetadata(
         name="GPQA Diamond",
@@ -234,6 +364,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["coding", "python", "execution", "docker"],
         module_path="openbench.evals.exercism.exercism",
         function_name="exercism_python",
+        subtask=True,
     ),
     "exercism_javascript": BenchmarkMetadata(
         name="Exercism (JavaScript)",
@@ -242,6 +373,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["coding", "javascript", "execution", "docker"],
         module_path="openbench.evals.exercism.exercism",
         function_name="exercism_javascript",
+        subtask=True,
     ),
     "exercism_go": BenchmarkMetadata(
         name="Exercism (Go)",
@@ -250,6 +382,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["coding", "go", "execution", "docker"],
         module_path="openbench.evals.exercism.exercism",
         function_name="exercism_go",
+        subtask=True,
     ),
     "exercism_java": BenchmarkMetadata(
         name="Exercism (Java)",
@@ -258,6 +391,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["coding", "java", "execution", "docker"],
         module_path="openbench.evals.exercism.exercism",
         function_name="exercism_java",
+        subtask=True,
     ),
     "exercism_rust": BenchmarkMetadata(
         name="Exercism (Rust)",
@@ -266,6 +400,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["coding", "rust", "execution", "docker"],
         module_path="openbench.evals.exercism.exercism",
         function_name="exercism_rust",
+        subtask=True,
     ),
     "ifeval": BenchmarkMetadata(
         name="Instruction Following",
@@ -388,6 +523,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["knowledge", "reasoning", "text-only", "graded", "frontier"],
         module_path="openbench.evals.hle",
         function_name="hle_text",
+        subtask=True,
     ),
     "mmstar": BenchmarkMetadata(
         name="MMStar",
@@ -412,6 +548,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["medical", "dialogue", "graded", "rubric-based", "hard"],
         module_path="openbench.evals.healthbench",
         function_name="healthbench_hard",
+        subtask=True,
     ),
     "healthbench_consensus": BenchmarkMetadata(
         name="HealthBench Consensus",
@@ -420,6 +557,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["medical", "dialogue", "graded", "rubric-based", "consensus"],
         module_path="openbench.evals.healthbench",
         function_name="healthbench_consensus",
+        subtask=True,
     ),
     "mgsm": BenchmarkMetadata(
         name="MGSM",
@@ -436,6 +574,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["math", "english", "reasoning", "chain-of-thought"],
         module_path="openbench.evals.mgsm",
         function_name="mgsm_en",
+        subtask=True,
     ),
     "mgsm_latin": BenchmarkMetadata(
         name="MGSM Latin Script",
@@ -444,6 +583,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["math", "multilingual", "latin-script", "reasoning", "chain-of-thought"],
         module_path="openbench.evals.mgsm",
         function_name="mgsm_latin",
+        subtask=True,
     ),
     "mgsm_non_latin": BenchmarkMetadata(
         name="MGSM Non-Latin Script",
@@ -458,6 +598,97 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.mgsm",
         function_name="mgsm_non_latin",
+        subtask=True,
+    ),
+    "mgsm_de": BenchmarkMetadata(
+        name="MGSM (German)",
+        description="Multilingual Grade School Math in German",
+        category="math",
+        tags=["math", "reasoning", "multilingual", "mgsm"],
+        module_path="openbench.evals.mgsm",
+        function_name="mgsm_de",
+        subtask=True,
+    ),
+    "mgsm_es": BenchmarkMetadata(
+        name="MGSM (Spanish)",
+        description="Multilingual Grade School Math in Spanish",
+        category="math",
+        tags=["math", "reasoning", "multilingual", "mgsm"],
+        module_path="openbench.evals.mgsm",
+        function_name="mgsm_es",
+        subtask=True,
+    ),
+    "mgsm_fr": BenchmarkMetadata(
+        name="MGSM (French)",
+        description="Multilingual Grade School Math in French",
+        category="math",
+        tags=["math", "reasoning", "multilingual", "mgsm"],
+        module_path="openbench.evals.mgsm",
+        function_name="mgsm_fr",
+        subtask=True,
+    ),
+    "mgsm_sw": BenchmarkMetadata(
+        name="MGSM (Swahili)",
+        description="Multilingual Grade School Math in Swahili",
+        category="math",
+        tags=["math", "reasoning", "multilingual", "mgsm"],
+        module_path="openbench.evals.mgsm",
+        function_name="mgsm_sw",
+        subtask=True,
+    ),
+    "mgsm_bn": BenchmarkMetadata(
+        name="MGSM (Bengali)",
+        description="Multilingual Grade School Math in Bengali",
+        category="math",
+        tags=["math", "reasoning", "multilingual", "mgsm"],
+        module_path="openbench.evals.mgsm",
+        function_name="mgsm_bn",
+        subtask=True,
+    ),
+    "mgsm_ja": BenchmarkMetadata(
+        name="MGSM (Japanese)",
+        description="Multilingual Grade School Math in Japanese",
+        category="math",
+        tags=["math", "reasoning", "multilingual", "mgsm"],
+        module_path="openbench.evals.mgsm",
+        function_name="mgsm_ja",
+        subtask=True,
+    ),
+    "mgsm_ru": BenchmarkMetadata(
+        name="MGSM (Russian)",
+        description="Multilingual Grade School Math in Russian",
+        category="math",
+        tags=["math", "reasoning", "multilingual", "mgsm"],
+        module_path="openbench.evals.mgsm",
+        function_name="mgsm_ru",
+        subtask=True,
+    ),
+    "mgsm_te": BenchmarkMetadata(
+        name="MGSM (Telugu)",
+        description="Multilingual Grade School Math in Telugu",
+        category="math",
+        tags=["math", "reasoning", "multilingual", "mgsm"],
+        module_path="openbench.evals.mgsm",
+        function_name="mgsm_te",
+        subtask=True,
+    ),
+    "mgsm_th": BenchmarkMetadata(
+        name="MGSM (Thai)",
+        description="Multilingual Grade School Math in Thai",
+        category="math",
+        tags=["math", "reasoning", "multilingual", "mgsm"],
+        module_path="openbench.evals.mgsm",
+        function_name="mgsm_th",
+        subtask=True,
+    ),
+    "mgsm_zh": BenchmarkMetadata(
+        name="MGSM (Chinese)",
+        description="Multilingual Grade School Math in Chinese",
+        category="math",
+        tags=["math", "reasoning", "multilingual", "mgsm"],
+        module_path="openbench.evals.mgsm",
+        function_name="mgsm_zh",
+        subtask=True,
     ),
     "drop": BenchmarkMetadata(
         name="DROP",
@@ -495,8 +726,18 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.math",
         function_name="math_500",
+        subtask=True,
     ),
     # Math competitions
+    # MathArena family aggregate
+    "matharena": BenchmarkMetadata(
+        name="MathArena",
+        description="Aggregate of 11 math competition tasks",
+        category="math",
+        tags=["family", "aggregate", "math", "competition"],
+        module_path="openbench.evals.family_aggregate",
+        function_name="matharena",
+    ),
     "aime_2023_I": BenchmarkMetadata(
         name="AIME 2023 I",
         description="American Invitational Mathematics Examination 2023 (First)",
@@ -504,6 +745,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["math", "competition", "aime", "2023"],
         module_path="openbench.evals.matharena.aime_2023_I.aime_2023_I",
         function_name="aime_2023_I",
+        subtask=True,
     ),
     "aime_2023_II": BenchmarkMetadata(
         name="AIME 2023 II",
@@ -512,6 +754,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["math", "competition", "aime", "2023"],
         module_path="openbench.evals.matharena.aime_2023_II.aime_2023_II",
         function_name="aime_2023_II",
+        subtask=True,
     ),
     "aime_2024": BenchmarkMetadata(
         name="AIME 2024",
@@ -520,6 +763,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["math", "competition", "aime", "2024", "combined"],
         module_path="openbench.evals.matharena.aime_2024.aime_2024",
         function_name="aime_2024",
+        subtask=True,
     ),
     "aime_2024_I": BenchmarkMetadata(
         name="AIME 2024 I",
@@ -528,6 +772,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["math", "competition", "aime", "2024"],
         module_path="openbench.evals.matharena.aime_2024_I.aime_2024_I",
         function_name="aime_2024_I",
+        subtask=True,
     ),
     "aime_2024_II": BenchmarkMetadata(
         name="AIME 2024 II",
@@ -536,6 +781,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["math", "competition", "aime", "2024"],
         module_path="openbench.evals.matharena.aime_2024_II.aime_2024_II",
         function_name="aime_2024_II",
+        subtask=True,
     ),
     "aime_2025": BenchmarkMetadata(
         name="AIME 2025",
@@ -544,6 +790,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["math", "competition", "aime", "2025"],
         module_path="openbench.evals.matharena.aime_2025.aime_2025",
         function_name="aime_2025",
+        subtask=True,
     ),
     "aime_2025_II": BenchmarkMetadata(
         name="AIME 2025 II",
@@ -552,6 +799,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["math", "competition", "aime", "2025"],
         module_path="openbench.evals.matharena.aime_2025_II.aime_2025_II",
         function_name="aime_2025_II",
+        subtask=True,
     ),
     "brumo_2025": BenchmarkMetadata(
         name="BRUMO 2025",
@@ -560,6 +808,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["math", "competition", "olympiad", "2025"],
         module_path="openbench.evals.matharena.brumo_2025.brumo_2025",
         function_name="brumo_2025",
+        subtask=True,
     ),
     "hmmt_feb_2023": BenchmarkMetadata(
         name="HMMT Feb 2023",
@@ -568,6 +817,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["math", "competition", "hmmt", "2023"],
         module_path="openbench.evals.matharena.hmmt_feb_2023.hmmt_feb_2023",
         function_name="hmmt_feb_2023",
+        subtask=True,
     ),
     "hmmt_feb_2024": BenchmarkMetadata(
         name="HMMT Feb 2024",
@@ -576,6 +826,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["math", "competition", "hmmt", "2024"],
         module_path="openbench.evals.matharena.hmmt_feb_2024.hmmt_feb_2024",
         function_name="hmmt_feb_2024",
+        subtask=True,
     ),
     "hmmt_feb_2025": BenchmarkMetadata(
         name="HMMT Feb 2025",
@@ -584,6 +835,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["math", "competition", "hmmt", "2025"],
         module_path="openbench.evals.matharena.hmmt_feb_2025.hmmt_feb_2025",
         function_name="hmmt_feb_2025",
+        subtask=True,
     ),
     "global_mmlu": BenchmarkMetadata(
         name="Global-MMLU (42 Languages)",
@@ -601,6 +853,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_amharic",
+        subtask=True,
     ),
     "global_mmlu_arabic": BenchmarkMetadata(
         name="Global-MMLU: Arabic",
@@ -609,6 +862,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_arabic",
+        subtask=True,
     ),
     "global_mmlu_bengali": BenchmarkMetadata(
         name="Global-MMLU: Bengali",
@@ -617,6 +871,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_bengali",
+        subtask=True,
     ),
     "global_mmlu_czech": BenchmarkMetadata(
         name="Global-MMLU: Czech",
@@ -625,6 +880,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_czech",
+        subtask=True,
     ),
     "global_mmlu_german": BenchmarkMetadata(
         name="Global-MMLU: German",
@@ -633,6 +889,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_german",
+        subtask=True,
     ),
     "global_mmlu_greek": BenchmarkMetadata(
         name="Global-MMLU: Greek",
@@ -641,6 +898,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_greek",
+        subtask=True,
     ),
     "global_mmlu_english": BenchmarkMetadata(
         name="Global-MMLU: English",
@@ -649,6 +907,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_english",
+        subtask=True,
     ),
     "global_mmlu_spanish": BenchmarkMetadata(
         name="Global-MMLU: Spanish",
@@ -657,6 +916,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_spanish",
+        subtask=True,
     ),
     "global_mmlu_persian": BenchmarkMetadata(
         name="Global-MMLU: Persian",
@@ -665,6 +925,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_persian",
+        subtask=True,
     ),
     "global_mmlu_filipino": BenchmarkMetadata(
         name="Global-MMLU: Filipino",
@@ -673,6 +934,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_filipino",
+        subtask=True,
     ),
     "global_mmlu_french": BenchmarkMetadata(
         name="Global-MMLU: French",
@@ -681,6 +943,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_french",
+        subtask=True,
     ),
     "global_mmlu_hausa": BenchmarkMetadata(
         name="Global-MMLU: Hausa",
@@ -689,6 +952,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_hausa",
+        subtask=True,
     ),
     "global_mmlu_hebrew": BenchmarkMetadata(
         name="Global-MMLU: Hebrew",
@@ -697,6 +961,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_hebrew",
+        subtask=True,
     ),
     "global_mmlu_hindi": BenchmarkMetadata(
         name="Global-MMLU: Hindi",
@@ -705,6 +970,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_hindi",
+        subtask=True,
     ),
     "global_mmlu_indonesian": BenchmarkMetadata(
         name="Global-MMLU: Indonesian",
@@ -713,6 +979,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_indonesian",
+        subtask=True,
     ),
     "global_mmlu_igbo": BenchmarkMetadata(
         name="Global-MMLU: Igbo",
@@ -721,6 +988,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_igbo",
+        subtask=True,
     ),
     "global_mmlu_italian": BenchmarkMetadata(
         name="Global-MMLU: Italian",
@@ -729,6 +997,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_italian",
+        subtask=True,
     ),
     "global_mmlu_japanese": BenchmarkMetadata(
         name="Global-MMLU: Japanese",
@@ -737,6 +1006,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_japanese",
+        subtask=True,
     ),
     "global_mmlu_korean": BenchmarkMetadata(
         name="Global-MMLU: Korean",
@@ -745,6 +1015,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_korean",
+        subtask=True,
     ),
     "global_mmlu_kyrgyz": BenchmarkMetadata(
         name="Global-MMLU: Kyrgyz",
@@ -753,6 +1024,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_kyrgyz",
+        subtask=True,
     ),
     "global_mmlu_lithuanian": BenchmarkMetadata(
         name="Global-MMLU: Lithuanian",
@@ -761,6 +1033,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_lithuanian",
+        subtask=True,
     ),
     "global_mmlu_malagasy": BenchmarkMetadata(
         name="Global-MMLU: Malagasy",
@@ -769,6 +1042,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_malagasy",
+        subtask=True,
     ),
     "global_mmlu_malay": BenchmarkMetadata(
         name="Global-MMLU: Malay",
@@ -777,6 +1051,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_malay",
+        subtask=True,
     ),
     "global_mmlu_nepali": BenchmarkMetadata(
         name="Global-MMLU: Nepali",
@@ -785,6 +1060,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_nepali",
+        subtask=True,
     ),
     "global_mmlu_dutch": BenchmarkMetadata(
         name="Global-MMLU: Dutch",
@@ -793,6 +1069,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_dutch",
+        subtask=True,
     ),
     "global_mmlu_chichewa": BenchmarkMetadata(
         name="Global-MMLU: Chichewa",
@@ -801,6 +1078,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_chichewa",
+        subtask=True,
     ),
     "global_mmlu_polish": BenchmarkMetadata(
         name="Global-MMLU: Polish",
@@ -809,6 +1087,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_polish",
+        subtask=True,
     ),
     "global_mmlu_portuguese": BenchmarkMetadata(
         name="Global-MMLU: Portuguese",
@@ -817,6 +1096,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_portuguese",
+        subtask=True,
     ),
     "global_mmlu_romanian": BenchmarkMetadata(
         name="Global-MMLU: Romanian",
@@ -825,6 +1105,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_romanian",
+        subtask=True,
     ),
     "global_mmlu_russian": BenchmarkMetadata(
         name="Global-MMLU: Russian",
@@ -833,6 +1114,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_russian",
+        subtask=True,
     ),
     "global_mmlu_sinhala": BenchmarkMetadata(
         name="Global-MMLU: Sinhala",
@@ -841,6 +1123,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_sinhala",
+        subtask=True,
     ),
     "global_mmlu_shona": BenchmarkMetadata(
         name="Global-MMLU: Shona",
@@ -849,6 +1132,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_shona",
+        subtask=True,
     ),
     "global_mmlu_somali": BenchmarkMetadata(
         name="Global-MMLU: Somali",
@@ -857,6 +1141,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_somali",
+        subtask=True,
     ),
     "global_mmlu_serbian": BenchmarkMetadata(
         name="Global-MMLU: Serbian",
@@ -865,6 +1150,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_serbian",
+        subtask=True,
     ),
     "global_mmlu_swedish": BenchmarkMetadata(
         name="Global-MMLU: Swedish",
@@ -873,6 +1159,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_swedish",
+        subtask=True,
     ),
     "global_mmlu_swahili": BenchmarkMetadata(
         name="Global-MMLU: Swahili",
@@ -881,6 +1168,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_swahili",
+        subtask=True,
     ),
     "global_mmlu_telugu": BenchmarkMetadata(
         name="Global-MMLU: Telugu",
@@ -889,6 +1177,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_telugu",
+        subtask=True,
     ),
     "global_mmlu_turkish": BenchmarkMetadata(
         name="Global-MMLU: Turkish",
@@ -897,6 +1186,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_turkish",
+        subtask=True,
     ),
     "global_mmlu_ukrainian": BenchmarkMetadata(
         name="Global-MMLU: Ukrainian",
@@ -905,6 +1195,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_ukrainian",
+        subtask=True,
     ),
     "global_mmlu_vietnamese": BenchmarkMetadata(
         name="Global-MMLU: Vietnamese",
@@ -913,6 +1204,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_vietnamese",
+        subtask=True,
     ),
     "global_mmlu_yoruba": BenchmarkMetadata(
         name="Global-MMLU: Yoruba",
@@ -921,6 +1213,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_yoruba",
+        subtask=True,
     ),
     "global_mmlu_chinese": BenchmarkMetadata(
         name="Global-MMLU: Chinese",
@@ -929,9 +1222,18 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "multilingual", "cultural-adaptation", "global-mmlu"],
         module_path="openbench.evals.global_mmlu",
         function_name="global_mmlu_chinese",
+        subtask=True,
     ),
-    # Note: bigbench() and bigbench_lite() removed - use individual tasks instead
-    # e.g., bigbench_arithmetic, bigbench_strategyqa, etc.
+    # BIG-Bench family aggregate
+    "bigbench": BenchmarkMetadata(
+        name="BIG-Bench",
+        description="Aggregate of 121 BIG-Bench tasks for comprehensive language model evaluation",
+        category="bigbench",
+        tags=["family", "aggregate", "reasoning", "bigbench"],
+        module_path="openbench.evals.family_aggregate",
+        function_name="bigbench",
+    ),
+    # BIG-Bench individual tasks
     "bigbench_anachronisms": BenchmarkMetadata(
         name="BigBench: Anachronisms",
         description="BigBench MCQ task: anachronisms",
@@ -939,6 +1241,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_anachronisms",
+        subtask=True,
     ),
     "bigbench_analogical_similarity": BenchmarkMetadata(
         name="BigBench: Analogical Similarity",
@@ -947,6 +1250,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_analogical_similarity",
+        subtask=True,
     ),
     "bigbench_analytic_entailment": BenchmarkMetadata(
         name="BigBench: Analytic Entailment",
@@ -955,6 +1259,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_analytic_entailment",
+        subtask=True,
     ),
     "bigbench_arithmetic": BenchmarkMetadata(
         name="BigBench: Arithmetic",
@@ -963,6 +1268,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_arithmetic",
+        subtask=True,
     ),
     "bigbench_authorship_verification": BenchmarkMetadata(
         name="BigBench: Authorship Verification",
@@ -971,6 +1277,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_authorship_verification",
+        subtask=True,
     ),
     "bigbench_bbq_lite_json": BenchmarkMetadata(
         name="BigBench: Bbq Lite Json",
@@ -979,6 +1286,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_bbq_lite_json",
+        subtask=True,
     ),
     "bigbench_causal_judgment": BenchmarkMetadata(
         name="BigBench: Causal Judgment",
@@ -987,6 +1295,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_causal_judgment",
+        subtask=True,
     ),
     "bigbench_cause_and_effect": BenchmarkMetadata(
         name="BigBench: Cause And Effect",
@@ -995,6 +1304,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_cause_and_effect",
+        subtask=True,
     ),
     "bigbench_checkmate_in_one": BenchmarkMetadata(
         name="BigBench: Checkmate In One",
@@ -1003,6 +1313,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_checkmate_in_one",
+        subtask=True,
     ),
     "bigbench_cifar10_classification": BenchmarkMetadata(
         name="BigBench: Cifar10 Classification",
@@ -1011,6 +1322,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_cifar10_classification",
+        subtask=True,
     ),
     "bigbench_code_line_description": BenchmarkMetadata(
         name="BigBench: Code Line Description",
@@ -1019,6 +1331,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_code_line_description",
+        subtask=True,
     ),
     "bigbench_color": BenchmarkMetadata(
         name="BigBench: Color",
@@ -1027,6 +1340,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_color",
+        subtask=True,
     ),
     "bigbench_common_morpheme": BenchmarkMetadata(
         name="BigBench: Common Morpheme",
@@ -1035,6 +1349,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_common_morpheme",
+        subtask=True,
     ),
     "bigbench_conceptual_combinations": BenchmarkMetadata(
         name="BigBench: Conceptual Combinations",
@@ -1043,6 +1358,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_conceptual_combinations",
+        subtask=True,
     ),
     "bigbench_contextual_parametric_knowledge_conflicts": BenchmarkMetadata(
         name="BigBench: Contextual Parametric Knowledge Conflicts",
@@ -1051,6 +1367,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_contextual_parametric_knowledge_conflicts",
+        subtask=True,
     ),
     "bigbench_crash_blossom": BenchmarkMetadata(
         name="BigBench: Crash Blossom",
@@ -1059,6 +1376,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_crash_blossom",
+        subtask=True,
     ),
     "bigbench_crass_ai": BenchmarkMetadata(
         name="BigBench: Crass Ai",
@@ -1067,6 +1385,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_crass_ai",
+        subtask=True,
     ),
     "bigbench_cryobiology_spanish": BenchmarkMetadata(
         name="BigBench: Cryobiology Spanish",
@@ -1075,6 +1394,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_cryobiology_spanish",
+        subtask=True,
     ),
     "bigbench_cs_algorithms": BenchmarkMetadata(
         name="BigBench: Cs Algorithms",
@@ -1083,6 +1403,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_cs_algorithms",
+        subtask=True,
     ),
     "bigbench_dark_humor_detection": BenchmarkMetadata(
         name="BigBench: Dark Humor Detection",
@@ -1091,6 +1412,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_dark_humor_detection",
+        subtask=True,
     ),
     "bigbench_date_understanding": BenchmarkMetadata(
         name="BigBench: Date Understanding",
@@ -1099,6 +1421,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_date_understanding",
+        subtask=True,
     ),
     "bigbench_disambiguation_qa": BenchmarkMetadata(
         name="BigBench: Disambiguation Qa",
@@ -1107,6 +1430,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_disambiguation_qa",
+        subtask=True,
     ),
     "bigbench_discourse_marker_prediction": BenchmarkMetadata(
         name="BigBench: Discourse Marker Prediction",
@@ -1115,6 +1439,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_discourse_marker_prediction",
+        subtask=True,
     ),
     "bigbench_dyck_languages": BenchmarkMetadata(
         name="BigBench: Dyck Languages",
@@ -1123,6 +1448,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_dyck_languages",
+        subtask=True,
     ),
     "bigbench_elementary_math_qa": BenchmarkMetadata(
         name="BigBench: Elementary Math Qa",
@@ -1131,6 +1457,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_elementary_math_qa",
+        subtask=True,
     ),
     "bigbench_emoji_movie": BenchmarkMetadata(
         name="BigBench: Emoji Movie",
@@ -1139,6 +1466,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_emoji_movie",
+        subtask=True,
     ),
     "bigbench_emojis_emotion_prediction": BenchmarkMetadata(
         name="BigBench: Emojis Emotion Prediction",
@@ -1147,6 +1475,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_emojis_emotion_prediction",
+        subtask=True,
     ),
     "bigbench_empirical_judgments": BenchmarkMetadata(
         name="BigBench: Empirical Judgments",
@@ -1155,6 +1484,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_empirical_judgments",
+        subtask=True,
     ),
     "bigbench_english_proverbs": BenchmarkMetadata(
         name="BigBench: English Proverbs",
@@ -1163,6 +1493,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_english_proverbs",
+        subtask=True,
     ),
     "bigbench_english_russian_proverbs": BenchmarkMetadata(
         name="BigBench: English Russian Proverbs",
@@ -1171,6 +1502,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_english_russian_proverbs",
+        subtask=True,
     ),
     "bigbench_entailed_polarity": BenchmarkMetadata(
         name="BigBench: Entailed Polarity",
@@ -1179,6 +1511,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_entailed_polarity",
+        subtask=True,
     ),
     "bigbench_entailed_polarity_hindi": BenchmarkMetadata(
         name="BigBench: Entailed Polarity Hindi",
@@ -1187,6 +1520,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_entailed_polarity_hindi",
+        subtask=True,
     ),
     "bigbench_epistemic_reasoning": BenchmarkMetadata(
         name="BigBench: Epistemic Reasoning",
@@ -1195,6 +1529,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_epistemic_reasoning",
+        subtask=True,
     ),
     "bigbench_evaluating_information_essentiality": BenchmarkMetadata(
         name="BigBench: Evaluating Information Essentiality",
@@ -1203,6 +1538,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_evaluating_information_essentiality",
+        subtask=True,
     ),
     "bigbench_fact_checker": BenchmarkMetadata(
         name="BigBench: Fact Checker",
@@ -1211,6 +1547,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_fact_checker",
+        subtask=True,
     ),
     "bigbench_fantasy_reasoning": BenchmarkMetadata(
         name="BigBench: Fantasy Reasoning",
@@ -1219,6 +1556,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_fantasy_reasoning",
+        subtask=True,
     ),
     "bigbench_figure_of_speech_detection": BenchmarkMetadata(
         name="BigBench: Figure Of Speech Detection",
@@ -1227,6 +1565,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_figure_of_speech_detection",
+        subtask=True,
     ),
     "bigbench_formal_fallacies_syllogisms_negation": BenchmarkMetadata(
         name="BigBench: Formal Fallacies Syllogisms Negation",
@@ -1235,6 +1574,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_formal_fallacies_syllogisms_negation",
+        subtask=True,
     ),
     "bigbench_general_knowledge": BenchmarkMetadata(
         name="BigBench: General Knowledge",
@@ -1243,6 +1583,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_general_knowledge",
+        subtask=True,
     ),
     "bigbench_geometric_shapes": BenchmarkMetadata(
         name="BigBench: Geometric Shapes",
@@ -1251,6 +1592,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_geometric_shapes",
+        subtask=True,
     ),
     "bigbench_goal_step_wikihow": BenchmarkMetadata(
         name="BigBench: Goal Step Wikihow",
@@ -1259,6 +1601,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_goal_step_wikihow",
+        subtask=True,
     ),
     "bigbench_gre_reading_comprehension": BenchmarkMetadata(
         name="BigBench: Gre Reading Comprehension",
@@ -1267,6 +1610,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_gre_reading_comprehension",
+        subtask=True,
     ),
     "bigbench_hhh_alignment": BenchmarkMetadata(
         name="BigBench: Hhh Alignment",
@@ -1275,6 +1619,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_hhh_alignment",
+        subtask=True,
     ),
     "bigbench_hindu_knowledge": BenchmarkMetadata(
         name="BigBench: Hindu Knowledge",
@@ -1283,6 +1628,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_hindu_knowledge",
+        subtask=True,
     ),
     "bigbench_hinglish_toxicity": BenchmarkMetadata(
         name="BigBench: Hinglish Toxicity",
@@ -1291,6 +1637,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_hinglish_toxicity",
+        subtask=True,
     ),
     "bigbench_human_organs_senses": BenchmarkMetadata(
         name="BigBench: Human Organs Senses",
@@ -1299,6 +1646,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_human_organs_senses",
+        subtask=True,
     ),
     "bigbench_hyperbaton": BenchmarkMetadata(
         name="BigBench: Hyperbaton",
@@ -1307,6 +1655,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_hyperbaton",
+        subtask=True,
     ),
     "bigbench_identify_math_theorems": BenchmarkMetadata(
         name="BigBench: Identify Math Theorems",
@@ -1315,6 +1664,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_identify_math_theorems",
+        subtask=True,
     ),
     "bigbench_identify_odd_metaphor": BenchmarkMetadata(
         name="BigBench: Identify Odd Metaphor",
@@ -1323,6 +1673,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_identify_odd_metaphor",
+        subtask=True,
     ),
     "bigbench_implicatures": BenchmarkMetadata(
         name="BigBench: Implicatures",
@@ -1331,6 +1682,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_implicatures",
+        subtask=True,
     ),
     "bigbench_implicit_relations": BenchmarkMetadata(
         name="BigBench: Implicit Relations",
@@ -1339,6 +1691,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_implicit_relations",
+        subtask=True,
     ),
     "bigbench_indic_cause_and_effect": BenchmarkMetadata(
         name="BigBench: Indic Cause And Effect",
@@ -1347,6 +1700,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_indic_cause_and_effect",
+        subtask=True,
     ),
     "bigbench_intent_recognition": BenchmarkMetadata(
         name="BigBench: Intent Recognition",
@@ -1355,6 +1709,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_intent_recognition",
+        subtask=True,
     ),
     "bigbench_international_phonetic_alphabet_nli": BenchmarkMetadata(
         name="BigBench: International Phonetic Alphabet Nli",
@@ -1363,6 +1718,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_international_phonetic_alphabet_nli",
+        subtask=True,
     ),
     "bigbench_intersect_geometry": BenchmarkMetadata(
         name="BigBench: Intersect Geometry",
@@ -1371,6 +1727,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_intersect_geometry",
+        subtask=True,
     ),
     "bigbench_irony_identification": BenchmarkMetadata(
         name="BigBench: Irony Identification",
@@ -1379,6 +1736,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_irony_identification",
+        subtask=True,
     ),
     "bigbench_kanji_ascii": BenchmarkMetadata(
         name="BigBench: Kanji Ascii",
@@ -1387,6 +1745,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_kanji_ascii",
+        subtask=True,
     ),
     "bigbench_kannada": BenchmarkMetadata(
         name="BigBench: Kannada",
@@ -1395,6 +1754,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_kannada",
+        subtask=True,
     ),
     "bigbench_key_value_maps": BenchmarkMetadata(
         name="BigBench: Key Value Maps",
@@ -1403,6 +1763,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_key_value_maps",
+        subtask=True,
     ),
     "bigbench_known_unknowns": BenchmarkMetadata(
         name="BigBench: Known Unknowns",
@@ -1411,6 +1772,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_known_unknowns",
+        subtask=True,
     ),
     "bigbench_language_identification": BenchmarkMetadata(
         name="BigBench: Language Identification",
@@ -1419,6 +1781,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_language_identification",
+        subtask=True,
     ),
     "bigbench_logic_grid_puzzle": BenchmarkMetadata(
         name="BigBench: Logic Grid Puzzle",
@@ -1427,6 +1790,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_logic_grid_puzzle",
+        subtask=True,
     ),
     "bigbench_logical_args": BenchmarkMetadata(
         name="BigBench: Logical Args",
@@ -1435,6 +1799,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_logical_args",
+        subtask=True,
     ),
     "bigbench_logical_deduction": BenchmarkMetadata(
         name="BigBench: Logical Deduction",
@@ -1443,6 +1808,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_logical_deduction",
+        subtask=True,
     ),
     "bigbench_logical_fallacy_detection": BenchmarkMetadata(
         name="BigBench: Logical Fallacy Detection",
@@ -1451,6 +1817,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_logical_fallacy_detection",
+        subtask=True,
     ),
     "bigbench_logical_sequence": BenchmarkMetadata(
         name="BigBench: Logical Sequence",
@@ -1459,6 +1826,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_logical_sequence",
+        subtask=True,
     ),
     "bigbench_mathematical_induction": BenchmarkMetadata(
         name="BigBench: Mathematical Induction",
@@ -1467,6 +1835,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_mathematical_induction",
+        subtask=True,
     ),
     "bigbench_medical_questions_russian": BenchmarkMetadata(
         name="BigBench: Medical Questions Russian",
@@ -1475,6 +1844,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_medical_questions_russian",
+        subtask=True,
     ),
     "bigbench_metaphor_boolean": BenchmarkMetadata(
         name="BigBench: Metaphor Boolean",
@@ -1483,6 +1853,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_metaphor_boolean",
+        subtask=True,
     ),
     "bigbench_metaphor_understanding": BenchmarkMetadata(
         name="BigBench: Metaphor Understanding",
@@ -1491,6 +1862,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_metaphor_understanding",
+        subtask=True,
     ),
     "bigbench_minute_mysteries_qa": BenchmarkMetadata(
         name="BigBench: Minute Mysteries Qa",
@@ -1499,6 +1871,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_minute_mysteries_qa",
+        subtask=True,
     ),
     "bigbench_misconceptions": BenchmarkMetadata(
         name="BigBench: Misconceptions",
@@ -1507,6 +1880,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_misconceptions",
+        subtask=True,
     ),
     "bigbench_misconceptions_russian": BenchmarkMetadata(
         name="BigBench: Misconceptions Russian",
@@ -1515,6 +1889,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_misconceptions_russian",
+        subtask=True,
     ),
     "bigbench_mnist_ascii": BenchmarkMetadata(
         name="BigBench: Mnist Ascii",
@@ -1523,6 +1898,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_mnist_ascii",
+        subtask=True,
     ),
     "bigbench_moral_permissibility": BenchmarkMetadata(
         name="BigBench: Moral Permissibility",
@@ -1531,6 +1907,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_moral_permissibility",
+        subtask=True,
     ),
     "bigbench_movie_dialog_same_or_different": BenchmarkMetadata(
         name="BigBench: Movie Dialog Same Or Different",
@@ -1539,6 +1916,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_movie_dialog_same_or_different",
+        subtask=True,
     ),
     "bigbench_movie_recommendation": BenchmarkMetadata(
         name="BigBench: Movie Recommendation",
@@ -1547,6 +1925,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_movie_recommendation",
+        subtask=True,
     ),
     "bigbench_navigate": BenchmarkMetadata(
         name="BigBench: Navigate",
@@ -1555,6 +1934,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_navigate",
+        subtask=True,
     ),
     "bigbench_nonsense_words_grammar": BenchmarkMetadata(
         name="BigBench: Nonsense Words Grammar",
@@ -1563,6 +1943,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_nonsense_words_grammar",
+        subtask=True,
     ),
     "bigbench_novel_concepts": BenchmarkMetadata(
         name="BigBench: Novel Concepts",
@@ -1571,6 +1952,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_novel_concepts",
+        subtask=True,
     ),
     "bigbench_odd_one_out": BenchmarkMetadata(
         name="BigBench: Odd One Out",
@@ -1579,6 +1961,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_odd_one_out",
+        subtask=True,
     ),
     "bigbench_parsinlu_qa": BenchmarkMetadata(
         name="BigBench: Parsinlu Qa",
@@ -1587,6 +1970,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_parsinlu_qa",
+        subtask=True,
     ),
     "bigbench_penguins_in_a_table": BenchmarkMetadata(
         name="BigBench: Penguins In A Table",
@@ -1595,6 +1979,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_penguins_in_a_table",
+        subtask=True,
     ),
     "bigbench_periodic_elements": BenchmarkMetadata(
         name="BigBench: Periodic Elements",
@@ -1603,6 +1988,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_periodic_elements",
+        subtask=True,
     ),
     "bigbench_persian_idioms": BenchmarkMetadata(
         name="BigBench: Persian Idioms",
@@ -1611,6 +1997,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_persian_idioms",
+        subtask=True,
     ),
     "bigbench_phrase_relatedness": BenchmarkMetadata(
         name="BigBench: Phrase Relatedness",
@@ -1619,6 +2006,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_phrase_relatedness",
+        subtask=True,
     ),
     "bigbench_physical_intuition": BenchmarkMetadata(
         name="BigBench: Physical Intuition",
@@ -1627,6 +2015,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_physical_intuition",
+        subtask=True,
     ),
     "bigbench_physics": BenchmarkMetadata(
         name="BigBench: Physics",
@@ -1635,6 +2024,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_physics",
+        subtask=True,
     ),
     "bigbench_play_dialog_same_or_different": BenchmarkMetadata(
         name="BigBench: Play Dialog Same Or Different",
@@ -1643,6 +2033,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_play_dialog_same_or_different",
+        subtask=True,
     ),
     "bigbench_presuppositions_as_nli": BenchmarkMetadata(
         name="BigBench: Presuppositions As Nli",
@@ -1651,6 +2042,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_presuppositions_as_nli",
+        subtask=True,
     ),
     "bigbench_question_selection": BenchmarkMetadata(
         name="BigBench: Question Selection",
@@ -1659,6 +2051,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_question_selection",
+        subtask=True,
     ),
     "bigbench_real_or_fake_text": BenchmarkMetadata(
         name="BigBench: Real Or Fake Text",
@@ -1667,6 +2060,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_real_or_fake_text",
+        subtask=True,
     ),
     "bigbench_reasoning_about_colored_objects": BenchmarkMetadata(
         name="BigBench: Reasoning About Colored Objects",
@@ -1675,6 +2069,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_reasoning_about_colored_objects",
+        subtask=True,
     ),
     "bigbench_rhyming": BenchmarkMetadata(
         name="BigBench: Rhyming",
@@ -1683,6 +2078,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_rhyming",
+        subtask=True,
     ),
     "bigbench_riddle_sense": BenchmarkMetadata(
         name="BigBench: Riddle Sense",
@@ -1691,6 +2087,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_riddle_sense",
+        subtask=True,
     ),
     "bigbench_ruin_names": BenchmarkMetadata(
         name="BigBench: Ruin Names",
@@ -1699,6 +2096,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_ruin_names",
+        subtask=True,
     ),
     "bigbench_salient_translation_error_detection": BenchmarkMetadata(
         name="BigBench: Salient Translation Error Detection",
@@ -1707,6 +2105,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_salient_translation_error_detection",
+        subtask=True,
     ),
     "bigbench_sentence_ambiguity": BenchmarkMetadata(
         name="BigBench: Sentence Ambiguity",
@@ -1715,6 +2114,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_sentence_ambiguity",
+        subtask=True,
     ),
     "bigbench_similarities_abstraction": BenchmarkMetadata(
         name="BigBench: Similarities Abstraction",
@@ -1723,6 +2123,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_similarities_abstraction",
+        subtask=True,
     ),
     "bigbench_simple_ethical_questions": BenchmarkMetadata(
         name="BigBench: Simple Ethical Questions",
@@ -1731,6 +2132,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_simple_ethical_questions",
+        subtask=True,
     ),
     "bigbench_snarks": BenchmarkMetadata(
         name="BigBench: Snarks",
@@ -1739,6 +2141,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_snarks",
+        subtask=True,
     ),
     "bigbench_social_iqa": BenchmarkMetadata(
         name="BigBench: Social Iqa",
@@ -1747,6 +2150,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_social_iqa",
+        subtask=True,
     ),
     "bigbench_social_support": BenchmarkMetadata(
         name="BigBench: Social Support",
@@ -1755,6 +2159,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_social_support",
+        subtask=True,
     ),
     "bigbench_sports_understanding": BenchmarkMetadata(
         name="BigBench: Sports Understanding",
@@ -1763,6 +2168,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_sports_understanding",
+        subtask=True,
     ),
     "bigbench_strange_stories": BenchmarkMetadata(
         name="BigBench: Strange Stories",
@@ -1771,6 +2177,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_strange_stories",
+        subtask=True,
     ),
     "bigbench_strategyqa": BenchmarkMetadata(
         name="BigBench: Strategyqa",
@@ -1779,6 +2186,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_strategyqa",
+        subtask=True,
     ),
     "bigbench_suicide_risk": BenchmarkMetadata(
         name="BigBench: Suicide Risk",
@@ -1787,6 +2195,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_suicide_risk",
+        subtask=True,
     ),
     "bigbench_swahili_english_proverbs": BenchmarkMetadata(
         name="BigBench: Swahili English Proverbs",
@@ -1795,6 +2204,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_swahili_english_proverbs",
+        subtask=True,
     ),
     "bigbench_swedish_to_german_proverbs": BenchmarkMetadata(
         name="BigBench: Swedish To German Proverbs",
@@ -1803,6 +2213,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_swedish_to_german_proverbs",
+        subtask=True,
     ),
     "bigbench_symbol_interpretation": BenchmarkMetadata(
         name="BigBench: Symbol Interpretation",
@@ -1811,6 +2222,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_symbol_interpretation",
+        subtask=True,
     ),
     "bigbench_temporal_sequences": BenchmarkMetadata(
         name="BigBench: Temporal Sequences",
@@ -1819,6 +2231,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_temporal_sequences",
+        subtask=True,
     ),
     "bigbench_timedial": BenchmarkMetadata(
         name="BigBench: Timedial",
@@ -1827,6 +2240,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_timedial",
+        subtask=True,
     ),
     "bigbench_tracking_shuffled_objects": BenchmarkMetadata(
         name="BigBench: Tracking Shuffled Objects",
@@ -1835,6 +2249,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_tracking_shuffled_objects",
+        subtask=True,
     ),
     "bigbench_understanding_fables": BenchmarkMetadata(
         name="BigBench: Understanding Fables",
@@ -1843,6 +2258,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_understanding_fables",
+        subtask=True,
     ),
     "bigbench_undo_permutation": BenchmarkMetadata(
         name="BigBench: Undo Permutation",
@@ -1851,6 +2267,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_undo_permutation",
+        subtask=True,
     ),
     "bigbench_unit_conversion": BenchmarkMetadata(
         name="BigBench: Unit Conversion",
@@ -1859,6 +2276,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_unit_conversion",
+        subtask=True,
     ),
     "bigbench_unit_interpretation": BenchmarkMetadata(
         name="BigBench: Unit Interpretation",
@@ -1867,6 +2285,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_unit_interpretation",
+        subtask=True,
     ),
     "bigbench_vitaminc_fact_verification": BenchmarkMetadata(
         name="BigBench: Vitaminc Fact Verification",
@@ -1875,6 +2294,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_vitaminc_fact_verification",
+        subtask=True,
     ),
     "bigbench_what_is_the_tao": BenchmarkMetadata(
         name="BigBench: What Is The Tao",
@@ -1883,6 +2303,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_what_is_the_tao",
+        subtask=True,
     ),
     "bigbench_which_wiki_edit": BenchmarkMetadata(
         name="BigBench: Which Wiki Edit",
@@ -1891,6 +2312,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_which_wiki_edit",
+        subtask=True,
     ),
     "bigbench_winowhy": BenchmarkMetadata(
         name="BigBench: Winowhy",
@@ -1899,9 +2321,18 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench"],
         module_path="openbench.evals.bigbench",
         function_name="bigbench_winowhy",
+        subtask=True,
     ),
-    # Note: bbh() function exists for programmatic access but not CLI due to list[Task] return type
-    # Use individual tasks: bbh_causal_judgment, bbh_date_understanding, etc.
+    # BIG-Bench Hard family aggregate
+    "bbh": BenchmarkMetadata(
+        name="BIG-Bench Hard",
+        description="Aggregate of 18 challenging BIG-Bench tasks that require multi-step reasoning",
+        category="core",
+        tags=["family", "aggregate", "reasoning", "bigbench", "chain-of-thought"],
+        module_path="openbench.evals.family_aggregate",
+        function_name="bbh",
+    ),
+    # BBH individual tasks
     "bbh_causal_judgment": BenchmarkMetadata(
         name="BBH: Causal Judgment",
         description="BigBench Hard - Causal judgment reasoning",
@@ -1909,6 +2340,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench", "chain-of-thought"],
         module_path="openbench.evals.bigbench_hard",
         function_name="bbh_causal_judgment",
+        subtask=True,
     ),
     "bbh_date_understanding": BenchmarkMetadata(
         name="BBH: Date Understanding",
@@ -1917,6 +2349,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench", "chain-of-thought"],
         module_path="openbench.evals.bigbench_hard",
         function_name="bbh_date_understanding",
+        subtask=True,
     ),
     "bbh_disambiguation_qa": BenchmarkMetadata(
         name="BBH: Disambiguation QA",
@@ -1925,6 +2358,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench", "chain-of-thought"],
         module_path="openbench.evals.bigbench_hard",
         function_name="bbh_disambiguation_qa",
+        subtask=True,
     ),
     "bbh_geometric_shapes": BenchmarkMetadata(
         name="BBH: Geometric Shapes",
@@ -1939,6 +2373,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.bigbench_hard",
         function_name="bbh_geometric_shapes",
+        subtask=True,
     ),
     "bbh_logical_deduction_five_objects": BenchmarkMetadata(
         name="BBH: Logical Deduction (5 Objects)",
@@ -1947,6 +2382,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench", "chain-of-thought", "logic"],
         module_path="openbench.evals.bigbench_hard",
         function_name="bbh_logical_deduction_five_objects",
+        subtask=True,
     ),
     "bbh_logical_deduction_seven_objects": BenchmarkMetadata(
         name="BBH: Logical Deduction (7 Objects)",
@@ -1955,6 +2391,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench", "chain-of-thought", "logic"],
         module_path="openbench.evals.bigbench_hard",
         function_name="bbh_logical_deduction_seven_objects",
+        subtask=True,
     ),
     "bbh_logical_deduction_three_objects": BenchmarkMetadata(
         name="BBH: Logical Deduction (3 Objects)",
@@ -1963,6 +2400,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench", "chain-of-thought", "logic"],
         module_path="openbench.evals.bigbench_hard",
         function_name="bbh_logical_deduction_three_objects",
+        subtask=True,
     ),
     "bbh_movie_recommendation": BenchmarkMetadata(
         name="BBH: Movie Recommendation",
@@ -1971,6 +2409,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench", "chain-of-thought"],
         module_path="openbench.evals.bigbench_hard",
         function_name="bbh_movie_recommendation",
+        subtask=True,
     ),
     "bbh_navigate": BenchmarkMetadata(
         name="BBH: Navigate",
@@ -1985,6 +2424,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.bigbench_hard",
         function_name="bbh_navigate",
+        subtask=True,
     ),
     "bbh_reasoning_about_colored_objects": BenchmarkMetadata(
         name="BBH: Reasoning About Colored Objects",
@@ -1993,6 +2433,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench", "chain-of-thought"],
         module_path="openbench.evals.bigbench_hard",
         function_name="bbh_reasoning_about_colored_objects",
+        subtask=True,
     ),
     "bbh_ruin_names": BenchmarkMetadata(
         name="BBH: Ruin Names",
@@ -2007,6 +2448,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.bigbench_hard",
         function_name="bbh_ruin_names",
+        subtask=True,
     ),
     "bbh_salient_translation_error_detection": BenchmarkMetadata(
         name="BBH: Salient Translation Error Detection",
@@ -2021,6 +2463,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.bigbench_hard",
         function_name="bbh_salient_translation_error_detection",
+        subtask=True,
     ),
     "bbh_snarks": BenchmarkMetadata(
         name="BBH: Snarks",
@@ -2035,6 +2478,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.bigbench_hard",
         function_name="bbh_snarks",
+        subtask=True,
     ),
     "bbh_sports_understanding": BenchmarkMetadata(
         name="BBH: Sports Understanding",
@@ -2043,6 +2487,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "reasoning", "bigbench", "chain-of-thought", "sports"],
         module_path="openbench.evals.bigbench_hard",
         function_name="bbh_sports_understanding",
+        subtask=True,
     ),
     "bbh_temporal_sequences": BenchmarkMetadata(
         name="BBH: Temporal Sequences",
@@ -2057,6 +2502,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.bigbench_hard",
         function_name="bbh_temporal_sequences",
+        subtask=True,
     ),
     "bbh_tracking_shuffled_objects_five_objects": BenchmarkMetadata(
         name="BBH: Tracking Shuffled Objects (5 Objects)",
@@ -2071,6 +2517,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.bigbench_hard",
         function_name="bbh_tracking_shuffled_objects_five_objects",
+        subtask=True,
     ),
     "bbh_tracking_shuffled_objects_seven_objects": BenchmarkMetadata(
         name="BBH: Tracking Shuffled Objects (7 Objects)",
@@ -2085,6 +2532,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.bigbench_hard",
         function_name="bbh_tracking_shuffled_objects_seven_objects",
+        subtask=True,
     ),
     "bbh_tracking_shuffled_objects_three_objects": BenchmarkMetadata(
         name="BBH: Tracking Shuffled Objects (3 Objects)",
@@ -2099,6 +2547,16 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.bigbench_hard",
         function_name="bbh_tracking_shuffled_objects_three_objects",
+        subtask=True,
+    ),
+    # BIG-Bench Lite (alias for BBH)
+    "bbl": BenchmarkMetadata(
+        name="BIG-Bench Lite",
+        description="BIG-Bench Lite - 18 selected BBH tasks (alias for BBH)",
+        category="core",
+        tags=["family", "aggregate", "reasoning", "bigbench", "chain-of-thought"],
+        module_path="openbench.evals.family_aggregate",
+        function_name="bbl",
     ),
     "medmcqa": BenchmarkMetadata(
         name="MedMCQA",
@@ -2139,6 +2597,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "medical", "healthcare", "english"],
         module_path="openbench.evals.headqa",
         function_name="headqa_en",
+        subtask=True,
     ),
     "headqa_es": BenchmarkMetadata(
         name="HeadQA (Spanish)",
@@ -2147,6 +2606,22 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "medical", "healthcare", "spanish"],
         module_path="openbench.evals.headqa",
         function_name="headqa_es",
+        subtask=True,
+    ),
+    # ARC family aggregate
+    "arc": BenchmarkMetadata(
+        name="ARC",
+        description="Aggregate of 2 ARC difficulty levels",
+        category="core",
+        tags=[
+            "family",
+            "aggregate",
+            "multiple-choice",
+            "science",
+            "commonsense-reasoning",
+        ],
+        module_path="openbench.evals.family_aggregate",
+        function_name="arc",
     ),
     "arc_easy": BenchmarkMetadata(
         name="ARC-Easy",
@@ -2155,6 +2630,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "science", "commonsense-reasoning"],
         module_path="openbench.evals.arc",
         function_name="arc_easy",
+        subtask=True,
     ),
     "arc_challenge": BenchmarkMetadata(
         name="ARC-Challenge",
@@ -2163,6 +2639,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "science", "commonsense-reasoning"],
         module_path="openbench.evals.arc",
         function_name="arc_challenge",
+        subtask=True,
     ),
     "boolq": BenchmarkMetadata(
         name="BoolQ",
@@ -2229,6 +2706,15 @@ _BUILTIN_BENCHMARKS = {
         function_name="scicode",
         is_alpha=True,
     ),
+    # CTI-Bench family aggregate
+    "cti_bench": BenchmarkMetadata(
+        name="CTI-Bench",
+        description="Aggregate of 4 CTI-Bench tasks",
+        category="cybersecurity",
+        tags=["family", "aggregate", "cybersecurity"],
+        module_path="openbench.evals.family_aggregate",
+        function_name="cti_bench",
+    ),
     "cti_bench_ate": BenchmarkMetadata(
         name="CTI-Bench ATE",
         description="Extracting MITRE ATT&CK techniques from malware and threat descriptions",
@@ -2236,6 +2722,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["extraction", "cybersecurity"],
         module_path="openbench.evals.cti_bench",
         function_name="cti_bench_ate",
+        subtask=True,
     ),
     "cti_bench_mcq": BenchmarkMetadata(
         name="CTI-Bench MCQ",
@@ -2244,6 +2731,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "cybersecurity", "knowledge"],
         module_path="openbench.evals.cti_bench",
         function_name="cti_bench_mcq",
+        subtask=True,
     ),
     "cti_bench_rcm": BenchmarkMetadata(
         name="CTI-Bench RCM",
@@ -2252,6 +2740,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["classification", "cybersecurity"],
         module_path="openbench.evals.cti_bench",
         function_name="cti_bench_rcm",
+        subtask=True,
     ),
     "cti_bench_vsp": BenchmarkMetadata(
         name="CTI-Bench VSP",
@@ -2260,6 +2749,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["regression", "cybersecurity"],
         module_path="openbench.evals.cti_bench",
         function_name="cti_bench_vsp",
+        subtask=True,
     ),
     "rootly_gmcq": BenchmarkMetadata(
         name="GMCQ",
@@ -2303,6 +2793,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_art",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_biology": BenchmarkMetadata(
         name="MMMU Biology",
@@ -2312,6 +2803,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_biology",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_chemistry": BenchmarkMetadata(
         name="MMMU Chemistry",
@@ -2321,6 +2813,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_chemistry",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_math": BenchmarkMetadata(
         name="MMMU Math",
@@ -2330,6 +2823,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_math",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_physics": BenchmarkMetadata(
         name="MMMU Physics",
@@ -2339,6 +2833,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_physics",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_accounting": BenchmarkMetadata(
         name="MMMU Accounting",
@@ -2348,6 +2843,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_accounting",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_agriculture": BenchmarkMetadata(
         name="MMMU Agriculture",
@@ -2357,6 +2853,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_agriculture",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_architecture_and_engineering": BenchmarkMetadata(
         name="MMMU Architecture and Engineering",
@@ -2373,6 +2870,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_architecture_and_engineering",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_art_theory": BenchmarkMetadata(
         name="MMMU Art Theory",
@@ -2382,6 +2880,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_art_theory",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_basic_medical_science": BenchmarkMetadata(
         name="MMMU Basic Medical Science",
@@ -2398,6 +2897,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_basic_medical_science",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_clinical_medicine": BenchmarkMetadata(
         name="MMMU Clinical Medicine",
@@ -2414,6 +2914,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_clinical_medicine",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_design": BenchmarkMetadata(
         name="MMMU Design",
@@ -2430,6 +2931,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_design",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_diagnostics_and_laboratory_medicine": BenchmarkMetadata(
         name="MMMU Diagnostics and Laboratory Medicine",
@@ -2446,6 +2948,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_diagnostics_and_laboratory_medicine",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_electronics": BenchmarkMetadata(
         name="MMMU Electronics",
@@ -2462,6 +2965,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_electronics",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_energy_and_power": BenchmarkMetadata(
         name="MMMU Energy and Power",
@@ -2478,6 +2982,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_energy_and_power",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_finance": BenchmarkMetadata(
         name="MMMU Finance",
@@ -2494,6 +2999,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_finance",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_geography": BenchmarkMetadata(
         name="MMMU Geography",
@@ -2510,6 +3016,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_geography",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_history": BenchmarkMetadata(
         name="MMMU History",
@@ -2526,6 +3033,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_history",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_literature": BenchmarkMetadata(
         name="MMMU Literature",
@@ -2542,6 +3050,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_literature",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_manage": BenchmarkMetadata(
         name="MMMU Management",
@@ -2558,6 +3067,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_manage",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_marketing": BenchmarkMetadata(
         name="MMMU Marketing",
@@ -2574,6 +3084,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_marketing",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_materials": BenchmarkMetadata(
         name="MMMU Materials",
@@ -2590,6 +3101,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_materials",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_mechanical_engineering": BenchmarkMetadata(
         name="MMMU Mechanical Engineering",
@@ -2606,6 +3118,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_mechanical_engineering",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_music": BenchmarkMetadata(
         name="MMMU Music",
@@ -2615,6 +3128,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_music",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_pharmacy": BenchmarkMetadata(
         name="MMMU Pharmacy",
@@ -2631,6 +3145,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_pharmacy",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_public_health": BenchmarkMetadata(
         name="MMMU Public Health",
@@ -2647,6 +3162,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_public_health",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_sociology": BenchmarkMetadata(
         name="MMMU Sociology",
@@ -2663,6 +3179,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_sociology",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_mcq": BenchmarkMetadata(
         name="MMMU MCQ",
@@ -2672,6 +3189,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_mcq",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_open": BenchmarkMetadata(
         name="MMMU Open",
@@ -2681,6 +3199,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu",
         function_name="mmmu_open",
         is_alpha=False,
+        subtask=True,
     ),
     "mmmu_pro": BenchmarkMetadata(
         name="MMMU-Pro",
@@ -2705,6 +3224,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmmu_pro",
         function_name="mmmu_pro_vision",
         is_alpha=False,
+        subtask=True,
     ),
     "arc_agi": BenchmarkMetadata(
         name="ARC-AGI",
@@ -2735,6 +3255,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.arc_agi",
         function_name="arc_agi_1",
+        subtask=True,
     ),
     "arc_agi_2": BenchmarkMetadata(
         name="ARC-AGI-2",
@@ -2750,6 +3271,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.arc_agi",
         function_name="arc_agi_2",
+        subtask=True,
     ),
     "livemcpbench": BenchmarkMetadata(
         name="LiveMCPBench",
@@ -2775,6 +3297,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "nli", "adversarial", "reasoning"],
         module_path="openbench.evals.anli",
         function_name="anli_r1",
+        subtask=True,
     ),
     "anli_r2": BenchmarkMetadata(
         name="ANLI Round 2",
@@ -2783,6 +3306,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "nli", "adversarial", "reasoning"],
         module_path="openbench.evals.anli",
         function_name="anli_r2",
+        subtask=True,
     ),
     "anli_r3": BenchmarkMetadata(
         name="ANLI Round 3",
@@ -2791,6 +3315,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "nli", "adversarial", "reasoning"],
         module_path="openbench.evals.anli",
         function_name="anli_r3",
+        subtask=True,
     ),
     "copa": BenchmarkMetadata(
         name="COPA",
@@ -2799,30 +3324,40 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "superglue", "nli", "reasoning"],
         module_path="openbench.evals.glue",
         function_name="copa",
+        subtask=True,
     ),
-    "rte_superglue": BenchmarkMetadata(
+    "rte": BenchmarkMetadata(
         name="RTE (SuperGLUE)",
         description="Recognizing Textual Entailment from SuperGLUE",
         category="glue",
         tags=["multiple-choice", "superglue", "nli", "reasoning"],
         module_path="openbench.evals.glue",
-        function_name="rte_superglue",
+        function_name="rte",
+        subtask=True,
     ),
     "wic": BenchmarkMetadata(
         name="WiC",
         description="Word in Context - word sense disambiguation",
         category="glue",
-        tags=["multiple-choice", "superglue", "nli", "reasoning"],
+        tags=["multiple-choice", "superglue", "nli", "wsd", "reasoning"],
         module_path="openbench.evals.glue",
         function_name="wic",
+        subtask=True,
     ),
     "wsc": BenchmarkMetadata(
         name="WSC",
         description="Winograd Schema Challenge - coreference resolution",
         category="glue",
-        tags=["multiple-choice", "superglue", "nli", "reasoning"],
+        tags=[
+            "multiple-choice",
+            "superglue",
+            "nli",
+            "reasoning",
+            "coreference-resolution",
+        ],
         module_path="openbench.evals.glue",
         function_name="wsc",
+        subtask=True,
     ),
     "cb": BenchmarkMetadata(
         name="CommitmentBank",
@@ -2831,6 +3366,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "superglue", "nli", "reasoning"],
         module_path="openbench.evals.glue",
         function_name="cb",
+        subtask=True,
     ),
     "multirc": BenchmarkMetadata(
         name="MultiRC",
@@ -2839,10 +3375,11 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "superglue", "nli", "reasoning"],
         module_path="openbench.evals.glue",
         function_name="multirc",
+        subtask=True,
     ),
     "superglue": BenchmarkMetadata(
         name="SuperGLUE (All Tasks)",
-        description="SuperGLUE benchmark suite - run any subset by name (copa, rte, wic, wsc, cb, multirc)",
+        description="SuperGLUE benchmark suite - run any subset by name (boolq, cb, copa, multirc, rte, wic, wsc)",
         category="glue",
         tags=["multiple-choice", "superglue", "nli", "reasoning"],
         module_path="openbench.evals.glue",
@@ -2863,6 +3400,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "glue", "nli"],
         module_path="openbench.evals.glue_standard",
         function_name="glue_cola",
+        subtask=True,
     ),
     "glue_sst2": BenchmarkMetadata(
         name="GLUE: SST-2",
@@ -2871,6 +3409,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "glue", "nli"],
         module_path="openbench.evals.glue_standard",
         function_name="glue_sst2",
+        subtask=True,
     ),
     "glue_mrpc": BenchmarkMetadata(
         name="GLUE: MRPC",
@@ -2879,6 +3418,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "glue", "nli"],
         module_path="openbench.evals.glue_standard",
         function_name="glue_mrpc",
+        subtask=True,
     ),
     "glue_qqp": BenchmarkMetadata(
         name="GLUE: QQP",
@@ -2887,6 +3427,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "glue", "nli"],
         module_path="openbench.evals.glue_standard",
         function_name="glue_qqp",
+        subtask=True,
     ),
     "glue_stsb": BenchmarkMetadata(
         name="GLUE: STS-B",
@@ -2895,6 +3436,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "glue", "nli"],
         module_path="openbench.evals.glue_standard",
         function_name="glue_stsb",
+        subtask=True,
     ),
     "glue_mnli": BenchmarkMetadata(
         name="GLUE: MNLI",
@@ -2903,6 +3445,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "glue", "nli"],
         module_path="openbench.evals.glue_standard",
         function_name="glue_mnli",
+        subtask=True,
     ),
     "glue_mnli_mismatched": BenchmarkMetadata(
         name="GLUE: MNLI-MM",
@@ -2911,6 +3454,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "glue", "nli"],
         module_path="openbench.evals.glue_standard",
         function_name="glue_mnli_mismatched",
+        subtask=True,
     ),
     "glue_qnli": BenchmarkMetadata(
         name="GLUE: QNLI",
@@ -2919,6 +3463,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "glue", "nli"],
         module_path="openbench.evals.glue_standard",
         function_name="glue_qnli",
+        subtask=True,
     ),
     "glue_rte": BenchmarkMetadata(
         name="GLUE: RTE",
@@ -2927,6 +3472,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "glue", "nli"],
         module_path="openbench.evals.glue_standard",
         function_name="glue_rte",
+        subtask=True,
     ),
     "glue_wnli": BenchmarkMetadata(
         name="GLUE: WNLI",
@@ -2935,6 +3481,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "glue", "nli"],
         module_path="openbench.evals.glue_standard",
         function_name="glue_wnli",
+        subtask=True,
     ),
     # Cross-lingual Understanding benchmarks
     "xcopa": BenchmarkMetadata(
@@ -2958,6 +3505,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xcopa",
         function_name="xcopa_et",
+        subtask=True,
     ),
     "xcopa_ht": BenchmarkMetadata(
         name="XCOPA: Haitian Creole",
@@ -2972,6 +3520,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xcopa",
         function_name="xcopa_ht",
+        subtask=True,
     ),
     "xcopa_id": BenchmarkMetadata(
         name="XCOPA: Indonesian",
@@ -2986,6 +3535,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xcopa",
         function_name="xcopa_id",
+        subtask=True,
     ),
     "xcopa_it": BenchmarkMetadata(
         name="XCOPA: Italian",
@@ -3000,6 +3550,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xcopa",
         function_name="xcopa_it",
+        subtask=True,
     ),
     "xcopa_qu": BenchmarkMetadata(
         name="XCOPA: Quechua",
@@ -3014,6 +3565,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xcopa",
         function_name="xcopa_qu",
+        subtask=True,
     ),
     "xcopa_sw": BenchmarkMetadata(
         name="XCOPA: Swahili",
@@ -3028,6 +3580,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xcopa",
         function_name="xcopa_sw",
+        subtask=True,
     ),
     "xcopa_ta": BenchmarkMetadata(
         name="XCOPA: Tamil",
@@ -3042,6 +3595,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xcopa",
         function_name="xcopa_ta",
+        subtask=True,
     ),
     "xcopa_th": BenchmarkMetadata(
         name="XCOPA: Thai",
@@ -3056,6 +3610,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xcopa",
         function_name="xcopa_th",
+        subtask=True,
     ),
     "xcopa_tr": BenchmarkMetadata(
         name="XCOPA: Turkish",
@@ -3070,6 +3625,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xcopa",
         function_name="xcopa_tr",
+        subtask=True,
     ),
     "xcopa_vi": BenchmarkMetadata(
         name="XCOPA: Vietnamese",
@@ -3084,6 +3640,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xcopa",
         function_name="xcopa_vi",
+        subtask=True,
     ),
     "xcopa_zh": BenchmarkMetadata(
         name="XCOPA: Chinese",
@@ -3098,6 +3655,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xcopa",
         function_name="xcopa_zh",
+        subtask=True,
     ),
     "xstorycloze": BenchmarkMetadata(
         name="XStoryCloze (11 Languages)",
@@ -3120,6 +3678,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xstorycloze",
         function_name="xstorycloze_en",
+        subtask=True,
     ),
     "xstorycloze_ru": BenchmarkMetadata(
         name="XStoryCloze: Russian",
@@ -3134,6 +3693,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xstorycloze",
         function_name="xstorycloze_ru",
+        subtask=True,
     ),
     "xstorycloze_zh": BenchmarkMetadata(
         name="XStoryCloze: Chinese",
@@ -3148,6 +3708,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xstorycloze",
         function_name="xstorycloze_zh",
+        subtask=True,
     ),
     "xstorycloze_es": BenchmarkMetadata(
         name="XStoryCloze: Spanish",
@@ -3162,6 +3723,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xstorycloze",
         function_name="xstorycloze_es",
+        subtask=True,
     ),
     "xstorycloze_ar": BenchmarkMetadata(
         name="XStoryCloze: Arabic",
@@ -3176,6 +3738,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xstorycloze",
         function_name="xstorycloze_ar",
+        subtask=True,
     ),
     "xstorycloze_hi": BenchmarkMetadata(
         name="XStoryCloze: Hindi",
@@ -3190,6 +3753,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xstorycloze",
         function_name="xstorycloze_hi",
+        subtask=True,
     ),
     "xstorycloze_id": BenchmarkMetadata(
         name="XStoryCloze: Indonesian",
@@ -3204,6 +3768,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xstorycloze",
         function_name="xstorycloze_id",
+        subtask=True,
     ),
     "xstorycloze_te": BenchmarkMetadata(
         name="XStoryCloze: Telugu",
@@ -3218,6 +3783,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xstorycloze",
         function_name="xstorycloze_te",
+        subtask=True,
     ),
     "xstorycloze_sw": BenchmarkMetadata(
         name="XStoryCloze: Swahili",
@@ -3232,6 +3798,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xstorycloze",
         function_name="xstorycloze_sw",
+        subtask=True,
     ),
     "xstorycloze_eu": BenchmarkMetadata(
         name="XStoryCloze: Basque",
@@ -3246,6 +3813,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xstorycloze",
         function_name="xstorycloze_eu",
+        subtask=True,
     ),
     "xstorycloze_my": BenchmarkMetadata(
         name="XStoryCloze: Burmese",
@@ -3260,6 +3828,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xstorycloze",
         function_name="xstorycloze_my",
+        subtask=True,
     ),
     "xwinograd": BenchmarkMetadata(
         name="XWinograd (6 Languages)",
@@ -3282,6 +3851,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xwinograd",
         function_name="xwinograd_en",
+        subtask=True,
     ),
     "xwinograd_fr": BenchmarkMetadata(
         name="XWinograd: French",
@@ -3296,6 +3866,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xwinograd",
         function_name="xwinograd_fr",
+        subtask=True,
     ),
     "xwinograd_jp": BenchmarkMetadata(
         name="XWinograd: Japanese",
@@ -3310,6 +3881,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xwinograd",
         function_name="xwinograd_jp",
+        subtask=True,
     ),
     "xwinograd_pt": BenchmarkMetadata(
         name="XWinograd: Portuguese",
@@ -3324,6 +3896,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xwinograd",
         function_name="xwinograd_pt",
+        subtask=True,
     ),
     "xwinograd_ru": BenchmarkMetadata(
         name="XWinograd: Russian",
@@ -3338,6 +3911,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xwinograd",
         function_name="xwinograd_ru",
+        subtask=True,
     ),
     "xwinograd_zh": BenchmarkMetadata(
         name="XWinograd: Chinese",
@@ -3352,6 +3926,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.xwinograd",
         function_name="xwinograd_zh",
+        subtask=True,
     ),  # Knowledge QA benchmarks
     "logiqa": BenchmarkMetadata(
         name="LogiQA",
@@ -3401,6 +3976,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_adjunct_island",
+        subtask=True,
     ),
     "blimp_anaphor_gender_agreement": BenchmarkMetadata(
         name="BLiMP: Anaphor gender agreement",
@@ -3409,6 +3985,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_anaphor_gender_agreement",
+        subtask=True,
     ),
     "blimp_anaphor_number_agreement": BenchmarkMetadata(
         name="BLiMP: Anaphor number agreement",
@@ -3417,6 +3994,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_anaphor_number_agreement",
+        subtask=True,
     ),
     "blimp_animate_subject_passive": BenchmarkMetadata(
         name="BLiMP: Animate subject in passive constructions",
@@ -3425,6 +4003,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_animate_subject_passive",
+        subtask=True,
     ),
     "blimp_animate_subject_trans": BenchmarkMetadata(
         name="BLiMP: Animate subject in transitive constructions",
@@ -3433,6 +4012,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_animate_subject_trans",
+        subtask=True,
     ),
     "blimp_causative": BenchmarkMetadata(
         name="BLiMP: Causative constructions",
@@ -3441,6 +4021,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_causative",
+        subtask=True,
     ),
     "blimp_complex_NP_island": BenchmarkMetadata(
         name="BLiMP: Complex NP island effects",
@@ -3449,6 +4030,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_complex_NP_island",
+        subtask=True,
     ),
     "blimp_coordinate_structure_constraint_complex_left_branch": BenchmarkMetadata(
         name="BLiMP: Coordinate structure constraint - complex left branch",
@@ -3457,6 +4039,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_coordinate_structure_constraint_complex_left_branch",
+        subtask=True,
     ),
     "blimp_coordinate_structure_constraint_object_extraction": BenchmarkMetadata(
         name="BLiMP: Coordinate structure constraint - object extraction",
@@ -3465,6 +4048,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_coordinate_structure_constraint_object_extraction",
+        subtask=True,
     ),
     "blimp_determiner_noun_agreement_1": BenchmarkMetadata(
         name="BLiMP: Determiner-noun agreement (1)",
@@ -3473,6 +4057,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_determiner_noun_agreement_1",
+        subtask=True,
     ),
     "blimp_determiner_noun_agreement_2": BenchmarkMetadata(
         name="BLiMP: Determiner-noun agreement (2)",
@@ -3481,6 +4066,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_determiner_noun_agreement_2",
+        subtask=True,
     ),
     "blimp_determiner_noun_agreement_irregular_1": BenchmarkMetadata(
         name="BLiMP: Determiner-noun agreement with irregular nouns (1)",
@@ -3489,6 +4075,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_determiner_noun_agreement_irregular_1",
+        subtask=True,
     ),
     "blimp_determiner_noun_agreement_irregular_2": BenchmarkMetadata(
         name="BLiMP: Determiner-noun agreement with irregular nouns (2)",
@@ -3497,6 +4084,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_determiner_noun_agreement_irregular_2",
+        subtask=True,
     ),
     "blimp_determiner_noun_agreement_with_adj_2": BenchmarkMetadata(
         name="BLiMP: Determiner-noun agreement with adjective (2)",
@@ -3505,6 +4093,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_determiner_noun_agreement_with_adj_2",
+        subtask=True,
     ),
     "blimp_determiner_noun_agreement_with_adj_irregular_1": BenchmarkMetadata(
         name="BLiMP: Determiner-noun agreement with adjective and irregular nouns (1)",
@@ -3513,6 +4102,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_determiner_noun_agreement_with_adj_irregular_1",
+        subtask=True,
     ),
     "blimp_determiner_noun_agreement_with_adj_irregular_2": BenchmarkMetadata(
         name="BLiMP: Determiner-noun agreement with adjective and irregular nouns (2)",
@@ -3521,6 +4111,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_determiner_noun_agreement_with_adj_irregular_2",
+        subtask=True,
     ),
     "blimp_determiner_noun_agreement_with_adjective_1": BenchmarkMetadata(
         name="BLiMP: Determiner-noun agreement with adjective (1)",
@@ -3529,6 +4120,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_determiner_noun_agreement_with_adjective_1",
+        subtask=True,
     ),
     "blimp_distractor_agreement_relational_noun": BenchmarkMetadata(
         name="BLiMP: Distractor agreement with relational nouns",
@@ -3537,6 +4129,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_distractor_agreement_relational_noun",
+        subtask=True,
     ),
     "blimp_distractor_agreement_relative_clause": BenchmarkMetadata(
         name="BLiMP: Distractor agreement in relative clauses",
@@ -3545,6 +4138,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_distractor_agreement_relative_clause",
+        subtask=True,
     ),
     "blimp_drop_argument": BenchmarkMetadata(
         name="BLiMP: Dropped argument",
@@ -3553,6 +4147,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_drop_argument",
+        subtask=True,
     ),
     "blimp_ellipsis_n_bar_1": BenchmarkMetadata(
         name="BLiMP: N-bar ellipsis (1)",
@@ -3561,6 +4156,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_ellipsis_n_bar_1",
+        subtask=True,
     ),
     "blimp_ellipsis_n_bar_2": BenchmarkMetadata(
         name="BLiMP: N-bar ellipsis (2)",
@@ -3569,6 +4165,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_ellipsis_n_bar_2",
+        subtask=True,
     ),
     "blimp_existential_there_object_raising": BenchmarkMetadata(
         name="BLiMP: Existential 'there' with object raising",
@@ -3577,6 +4174,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_existential_there_object_raising",
+        subtask=True,
     ),
     "blimp_existential_there_quantifiers_1": BenchmarkMetadata(
         name="BLiMP: Existential 'there' with quantifiers (1)",
@@ -3585,6 +4183,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_existential_there_quantifiers_1",
+        subtask=True,
     ),
     "blimp_existential_there_quantifiers_2": BenchmarkMetadata(
         name="BLiMP: Existential 'there' with quantifiers (2)",
@@ -3593,6 +4192,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_existential_there_quantifiers_2",
+        subtask=True,
     ),
     "blimp_existential_there_subject_raising": BenchmarkMetadata(
         name="BLiMP: Existential 'there' with subject raising",
@@ -3601,6 +4201,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_existential_there_subject_raising",
+        subtask=True,
     ),
     "blimp_expletive_it_object_raising": BenchmarkMetadata(
         name="BLiMP: Expletive 'it' with object raising",
@@ -3609,6 +4210,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_expletive_it_object_raising",
+        subtask=True,
     ),
     "blimp_inchoative": BenchmarkMetadata(
         name="BLiMP: Inchoative constructions",
@@ -3617,6 +4219,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_inchoative",
+        subtask=True,
     ),
     "blimp_intransitive": BenchmarkMetadata(
         name="BLiMP: Intransitive verbs",
@@ -3625,6 +4228,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_intransitive",
+        subtask=True,
     ),
     "blimp_irregular_past_participle_adjectives": BenchmarkMetadata(
         name="BLiMP: Irregular past participles as adjectives",
@@ -3633,6 +4237,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_irregular_past_participle_adjectives",
+        subtask=True,
     ),
     "blimp_irregular_past_participle_verbs": BenchmarkMetadata(
         name="BLiMP: Irregular past participles in verbs",
@@ -3641,6 +4246,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_irregular_past_participle_verbs",
+        subtask=True,
     ),
     "blimp_irregular_plural_subject_verb_agreement_1": BenchmarkMetadata(
         name="BLiMP: Subject-verb agreement with irregular plurals (1)",
@@ -3649,6 +4255,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_irregular_plural_subject_verb_agreement_1",
+        subtask=True,
     ),
     "blimp_irregular_plural_subject_verb_agreement_2": BenchmarkMetadata(
         name="BLiMP: Subject-verb agreement with irregular plurals (2)",
@@ -3657,6 +4264,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_irregular_plural_subject_verb_agreement_2",
+        subtask=True,
     ),
     "blimp_left_branch_island_echo_question": BenchmarkMetadata(
         name="BLiMP: Left branch island effects in echo questions",
@@ -3665,6 +4273,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_left_branch_island_echo_question",
+        subtask=True,
     ),
     "blimp_left_branch_island_simple_question": BenchmarkMetadata(
         name="BLiMP: Left branch island effects in simple questions",
@@ -3673,6 +4282,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_left_branch_island_simple_question",
+        subtask=True,
     ),
     "blimp_matrix_question_npi_licensor_present": BenchmarkMetadata(
         name="BLiMP: Matrix question NPI licensor present",
@@ -3681,6 +4291,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_matrix_question_npi_licensor_present",
+        subtask=True,
     ),
     "blimp_npi_present_1": BenchmarkMetadata(
         name="BLiMP: Negative polarity items present (1)",
@@ -3689,6 +4300,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_npi_present_1",
+        subtask=True,
     ),
     "blimp_npi_present_2": BenchmarkMetadata(
         name="BLiMP: Negative polarity items present (2)",
@@ -3697,6 +4309,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_npi_present_2",
+        subtask=True,
     ),
     "blimp_only_npi_licensor_present": BenchmarkMetadata(
         name="BLiMP: 'Only' as NPI licensor",
@@ -3705,6 +4318,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_only_npi_licensor_present",
+        subtask=True,
     ),
     "blimp_only_npi_scope": BenchmarkMetadata(
         name="BLiMP: 'Only' NPI scope",
@@ -3713,6 +4327,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_only_npi_scope",
+        subtask=True,
     ),
     "blimp_passive_1": BenchmarkMetadata(
         name="BLiMP: Passive constructions (1)",
@@ -3721,6 +4336,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_passive_1",
+        subtask=True,
     ),
     "blimp_passive_2": BenchmarkMetadata(
         name="BLiMP: Passive constructions (2)",
@@ -3729,6 +4345,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_passive_2",
+        subtask=True,
     ),
     "blimp_principle_A_c_command": BenchmarkMetadata(
         name="BLiMP: Binding Principle A - c-command",
@@ -3737,6 +4354,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_principle_A_c_command",
+        subtask=True,
     ),
     "blimp_principle_A_case_1": BenchmarkMetadata(
         name="BLiMP: Binding Principle A - case (1)",
@@ -3745,6 +4363,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_principle_A_case_1",
+        subtask=True,
     ),
     "blimp_principle_A_case_2": BenchmarkMetadata(
         name="BLiMP: Binding Principle A - case (2)",
@@ -3753,6 +4372,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_principle_A_case_2",
+        subtask=True,
     ),
     "blimp_principle_A_domain_1": BenchmarkMetadata(
         name="BLiMP: Binding Principle A - domain (1)",
@@ -3761,6 +4381,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_principle_A_domain_1",
+        subtask=True,
     ),
     "blimp_principle_A_domain_2": BenchmarkMetadata(
         name="BLiMP: Binding Principle A - domain (2)",
@@ -3769,6 +4390,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_principle_A_domain_2",
+        subtask=True,
     ),
     "blimp_principle_A_domain_3": BenchmarkMetadata(
         name="BLiMP: Binding Principle A - domain (3)",
@@ -3777,6 +4399,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_principle_A_domain_3",
+        subtask=True,
     ),
     "blimp_principle_A_reconstruction": BenchmarkMetadata(
         name="BLiMP: Binding Principle A - reconstruction",
@@ -3785,6 +4408,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_principle_A_reconstruction",
+        subtask=True,
     ),
     "blimp_regular_plural_subject_verb_agreement_1": BenchmarkMetadata(
         name="BLiMP: Subject-verb agreement with regular plurals (1)",
@@ -3793,6 +4417,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_regular_plural_subject_verb_agreement_1",
+        subtask=True,
     ),
     "blimp_regular_plural_subject_verb_agreement_2": BenchmarkMetadata(
         name="BLiMP: Subject-verb agreement with regular plurals (2)",
@@ -3801,6 +4426,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_regular_plural_subject_verb_agreement_2",
+        subtask=True,
     ),
     "blimp_sentential_negation_npi_licensor_present": BenchmarkMetadata(
         name="BLiMP: Sentential negation as NPI licensor",
@@ -3809,6 +4435,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_sentential_negation_npi_licensor_present",
+        subtask=True,
     ),
     "blimp_sentential_negation_npi_scope": BenchmarkMetadata(
         name="BLiMP: Sentential negation NPI scope",
@@ -3817,6 +4444,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_sentential_negation_npi_scope",
+        subtask=True,
     ),
     "blimp_sentential_subject_island": BenchmarkMetadata(
         name="BLiMP: Sentential subject island effects",
@@ -3825,6 +4453,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_sentential_subject_island",
+        subtask=True,
     ),
     "blimp_superlative_quantifiers_1": BenchmarkMetadata(
         name="BLiMP: Superlative quantifiers (1)",
@@ -3833,6 +4462,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_superlative_quantifiers_1",
+        subtask=True,
     ),
     "blimp_superlative_quantifiers_2": BenchmarkMetadata(
         name="BLiMP: Superlative quantifiers (2)",
@@ -3841,6 +4471,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_superlative_quantifiers_2",
+        subtask=True,
     ),
     "blimp_tough_vs_raising_1": BenchmarkMetadata(
         name="BLiMP: Tough vs raising constructions (1)",
@@ -3849,6 +4480,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_tough_vs_raising_1",
+        subtask=True,
     ),
     "blimp_tough_vs_raising_2": BenchmarkMetadata(
         name="BLiMP: Tough vs raising constructions (2)",
@@ -3857,6 +4489,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_tough_vs_raising_2",
+        subtask=True,
     ),
     "blimp_transitive": BenchmarkMetadata(
         name="BLiMP: Transitive verbs",
@@ -3865,6 +4498,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_transitive",
+        subtask=True,
     ),
     "blimp_wh_island": BenchmarkMetadata(
         name="BLiMP: Wh-island effects",
@@ -3873,6 +4507,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_wh_island",
+        subtask=True,
     ),
     "blimp_wh_questions_object_gap": BenchmarkMetadata(
         name="BLiMP: Wh-questions with object gap",
@@ -3881,6 +4516,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_wh_questions_object_gap",
+        subtask=True,
     ),
     "blimp_wh_questions_subject_gap": BenchmarkMetadata(
         name="BLiMP: Wh-questions with subject gap",
@@ -3889,6 +4525,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_wh_questions_subject_gap",
+        subtask=True,
     ),
     "blimp_wh_questions_subject_gap_long_distance": BenchmarkMetadata(
         name="BLiMP: Wh-questions with long-distance subject gap",
@@ -3897,6 +4534,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_wh_questions_subject_gap_long_distance",
+        subtask=True,
     ),
     "blimp_wh_vs_that_no_gap": BenchmarkMetadata(
         name="BLiMP: Wh vs that complementizers without gap",
@@ -3905,6 +4543,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_wh_vs_that_no_gap",
+        subtask=True,
     ),
     "blimp_wh_vs_that_no_gap_long_distance": BenchmarkMetadata(
         name="BLiMP: Wh vs that complementizers without gap (long-distance)",
@@ -3913,6 +4552,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_wh_vs_that_no_gap_long_distance",
+        subtask=True,
     ),
     "blimp_wh_vs_that_with_gap": BenchmarkMetadata(
         name="BLiMP: Wh vs that complementizers with gap",
@@ -3921,6 +4561,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_wh_vs_that_with_gap",
+        subtask=True,
     ),
     "blimp_wh_vs_that_with_gap_long_distance": BenchmarkMetadata(
         name="BLiMP: Wh vs that complementizers with gap (long-distance)",
@@ -3929,8 +4570,18 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "linguistics", "grammar", "syntax", "blimp"],
         module_path="openbench.evals.blimp",
         function_name="blimp_wh_vs_that_with_gap_long_distance",
+        subtask=True,
     ),
     # Reading Comprehension benchmarks
+    # RACE family aggregate
+    "race": BenchmarkMetadata(
+        name="RACE",
+        description="Reading comprehension from middle and high school English exams (combined)",
+        category="reading-comprehension",
+        tags=["multiple-choice", "reading-comprehension", "english-exam"],
+        module_path="openbench.evals.race",
+        function_name="race",
+    ),
     "race_high": BenchmarkMetadata(
         name="RACE-High",
         description="High school level reading comprehension from English exams for Chinese students - passages with multiple questions",
@@ -3943,6 +4594,21 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.race",
         function_name="race_high",
+        subtask=True,
+    ),
+    "race_middle": BenchmarkMetadata(
+        name="RACE-Middle",
+        description="Middle school level reading comprehension from English exams for Chinese students",
+        category="reading-comprehension",
+        tags=[
+            "multiple-choice",
+            "reading-comprehension",
+            "english-exam",
+            "middle-school",
+        ],
+        module_path="openbench.evals.race",
+        function_name="race_middle",
+        subtask=True,
     ),
     "qa4mre": BenchmarkMetadata(
         name="QA4MRE (All Years)",
@@ -3965,6 +4631,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.qa4mre",
         function_name="qa4mre_2011",
+        subtask=True,
     ),
     "qa4mre_2012": BenchmarkMetadata(
         name="QA4MRE 2012",
@@ -3979,6 +4646,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.qa4mre",
         function_name="qa4mre_2012",
+        subtask=True,
     ),
     "qa4mre_2013": BenchmarkMetadata(
         name="QA4MRE 2013",
@@ -3993,6 +4661,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.qa4mre",
         function_name="qa4mre_2013",
+        subtask=True,
     ),
     "qasper_ll": BenchmarkMetadata(
         name="QASPER (Binary MCQ)",
@@ -4023,6 +4692,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "ethics", "moral-reasoning", "justice", "ethics"],
         module_path="openbench.evals.ethics",
         function_name="ethics_justice",
+        subtask=True,
     ),
     "ethics_deontology": BenchmarkMetadata(
         name="ETHICS: Deontology",
@@ -4031,6 +4701,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "ethics", "moral-reasoning", "deontology", "ethics"],
         module_path="openbench.evals.ethics",
         function_name="ethics_deontology",
+        subtask=True,
     ),
     "ethics_virtue": BenchmarkMetadata(
         name="ETHICS: Virtue",
@@ -4039,6 +4710,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "ethics", "moral-reasoning", "virtue", "ethics"],
         module_path="openbench.evals.ethics",
         function_name="ethics_virtue",
+        subtask=True,
     ),
     "ethics_utilitarianism": BenchmarkMetadata(
         name="ETHICS: Utilitarianism",
@@ -4053,6 +4725,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.ethics",
         function_name="ethics_utilitarianism",
+        subtask=True,
     ),
     "ethics_commonsense": BenchmarkMetadata(
         name="ETHICS: Commonsense",
@@ -4061,6 +4734,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "ethics", "moral-reasoning", "commonsense", "ethics"],
         module_path="openbench.evals.ethics",
         function_name="ethics_commonsense",
+        subtask=True,
     ),
     "social_iqa": BenchmarkMetadata(
         name="Social IQA",
@@ -4099,6 +4773,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "algebra", "reasoning", "math", "agieval"],
         module_path="openbench.evals.agieval",
         function_name="agieval_aqua_rat",
+        subtask=True,
     ),
     "agieval_logiqa_en": BenchmarkMetadata(
         name="AGIEval: LogiQA (English)",
@@ -4107,6 +4782,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "logic", "reasoning", "english", "agieval"],
         module_path="openbench.evals.agieval",
         function_name="agieval_logiqa_en",
+        subtask=True,
     ),
     "agieval_logiqa_zh": BenchmarkMetadata(
         name="AGIEval: LogiQA (Chinese)",
@@ -4115,6 +4791,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "logic", "reasoning", "chinese", "agieval"],
         module_path="openbench.evals.agieval",
         function_name="agieval_logiqa_zh",
+        subtask=True,
     ),
     "agieval_lsat_ar": BenchmarkMetadata(
         name="AGIEval: LSAT Analytical Reasoning",
@@ -4123,6 +4800,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "law", "analytical-reasoning", "lsat", "agieval"],
         module_path="openbench.evals.agieval",
         function_name="agieval_lsat_ar",
+        subtask=True,
     ),
     "agieval_lsat_lr": BenchmarkMetadata(
         name="AGIEval: LSAT Logical Reasoning",
@@ -4131,6 +4809,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "law", "logical-reasoning", "lsat", "agieval"],
         module_path="openbench.evals.agieval",
         function_name="agieval_lsat_lr",
+        subtask=True,
     ),
     "agieval_lsat_rc": BenchmarkMetadata(
         name="AGIEval: LSAT Reading Comprehension",
@@ -4139,6 +4818,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "law", "reading-comprehension", "lsat", "agieval"],
         module_path="openbench.evals.agieval",
         function_name="agieval_lsat_rc",
+        subtask=True,
     ),
     "agieval_sat_en": BenchmarkMetadata(
         name="AGIEval: SAT English",
@@ -4147,6 +4827,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "sat", "english", "reading", "agieval"],
         module_path="openbench.evals.agieval",
         function_name="agieval_sat_en",
+        subtask=True,
     ),
     "agieval_sat_en_without_passage": BenchmarkMetadata(
         name="AGIEval: SAT English (No Passage)",
@@ -4155,6 +4836,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "sat", "english", "grammar", "agieval"],
         module_path="openbench.evals.agieval",
         function_name="agieval_sat_en_without_passage",
+        subtask=True,
     ),
     "agieval_sat_math": BenchmarkMetadata(
         name="AGIEval: SAT Math",
@@ -4163,6 +4845,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "sat", "mathematics", "problem-solving", "agieval"],
         module_path="openbench.evals.agieval",
         function_name="agieval_sat_math",
+        subtask=True,
     ),
     "agieval_gaokao_biology": BenchmarkMetadata(
         name="AGIEval: Gaokao Biology",
@@ -4171,6 +4854,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "gaokao", "biology", "science", "agieval"],
         module_path="openbench.evals.agieval",
         function_name="agieval_gaokao_biology",
+        subtask=True,
     ),
     "agieval_gaokao_chemistry": BenchmarkMetadata(
         name="AGIEval: Gaokao Chemistry",
@@ -4179,6 +4863,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "gaokao", "chemistry", "science", "agieval"],
         module_path="openbench.evals.agieval",
         function_name="agieval_gaokao_chemistry",
+        subtask=True,
     ),
     "agieval_gaokao_chinese": BenchmarkMetadata(
         name="AGIEval: Gaokao Chinese",
@@ -4187,6 +4872,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "gaokao", "chinese", "language", "agieval"],
         module_path="openbench.evals.agieval",
         function_name="agieval_gaokao_chinese",
+        subtask=True,
     ),
     "agieval_gaokao_english": BenchmarkMetadata(
         name="AGIEval: Gaokao English",
@@ -4195,6 +4881,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "gaokao", "english", "language", "agieval"],
         module_path="openbench.evals.agieval",
         function_name="agieval_gaokao_english",
+        subtask=True,
     ),
     "agieval_gaokao_geography": BenchmarkMetadata(
         name="AGIEval: Gaokao Geography",
@@ -4203,6 +4890,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "gaokao", "geography", "social-studies", "agieval"],
         module_path="openbench.evals.agieval",
         function_name="agieval_gaokao_geography",
+        subtask=True,
     ),
     "agieval_gaokao_history": BenchmarkMetadata(
         name="AGIEval: Gaokao History",
@@ -4211,6 +4899,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "gaokao", "history", "social-studies", "agieval"],
         module_path="openbench.evals.agieval",
         function_name="agieval_gaokao_history",
+        subtask=True,
     ),
     "agieval_gaokao_mathqa": BenchmarkMetadata(
         name="AGIEval: Gaokao Math",
@@ -4219,6 +4908,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "gaokao", "mathematics", "problem-solving", "agieval"],
         module_path="openbench.evals.agieval",
         function_name="agieval_gaokao_mathqa",
+        subtask=True,
     ),
     "agieval_gaokao_physics": BenchmarkMetadata(
         name="AGIEval: Gaokao Physics",
@@ -4227,6 +4917,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "gaokao", "physics", "science", "agieval"],
         module_path="openbench.evals.agieval",
         function_name="agieval_gaokao_physics",
+        subtask=True,
     ),
     "legalsupport": BenchmarkMetadata(
         name="LegalSupport",
@@ -4251,6 +4942,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "accounting", "university"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_accounting_university",
+        subtask=True,
     ),
     "arabic_exams_arabic_language_general": BenchmarkMetadata(
         name="Arabic Exams: Arabic Language (General)",
@@ -4259,6 +4951,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "language", "general"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_arabic_language_general",
+        subtask=True,
     ),
     "arabic_exams_computer_science_high_school": BenchmarkMetadata(
         name="Arabic Exams: Computer Science (High School)",
@@ -4267,6 +4960,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "computer-science", "high-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_computer_science_high_school",
+        subtask=True,
     ),
     "arabic_exams_computer_science_university": BenchmarkMetadata(
         name="Arabic Exams: Computer Science (University)",
@@ -4275,6 +4969,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "computer-science", "university"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_computer_science_university",
+        subtask=True,
     ),
     "arabic_exams_islamic_studies_general": BenchmarkMetadata(
         name="Arabic Exams: Islamic Studies (General)",
@@ -4283,6 +4978,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "islamic-studies", "general"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_islamic_studies_general",
+        subtask=True,
     ),
     "arabic_exams_math_primary_school": BenchmarkMetadata(
         name="Arabic Exams: Math (Primary School)",
@@ -4291,6 +4987,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "math", "primary-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_math_primary_school",
+        subtask=True,
     ),
     "arabic_exams_physics_high_school": BenchmarkMetadata(
         name="Arabic Exams: Physics (High School)",
@@ -4299,6 +4996,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "physics", "high-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_physics_high_school",
+        subtask=True,
     ),
     # Arabic Language (additional subsets)
     "arabic_exams_arabic_language_grammar": BenchmarkMetadata(
@@ -4308,6 +5006,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "language", "grammar"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_arabic_language_grammar",
+        subtask=True,
     ),
     "arabic_exams_arabic_language_high_school": BenchmarkMetadata(
         name="Arabic Exams: Arabic Language (High School)",
@@ -4316,6 +5015,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "language", "high-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_arabic_language_high_school",
+        subtask=True,
     ),
     "arabic_exams_arabic_language_middle_school": BenchmarkMetadata(
         name="Arabic Exams: Arabic Language (Middle School)",
@@ -4324,6 +5024,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "language", "middle-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_arabic_language_middle_school",
+        subtask=True,
     ),
     "arabic_exams_arabic_language_primary_school": BenchmarkMetadata(
         name="Arabic Exams: Arabic Language (Primary School)",
@@ -4332,6 +5033,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "language", "primary-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_arabic_language_primary_school",
+        subtask=True,
     ),
     # Biology
     "arabic_exams_biology_high_school": BenchmarkMetadata(
@@ -4341,6 +5043,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "biology", "high-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_biology_high_school",
+        subtask=True,
     ),
     # Civics
     "arabic_exams_civics_high_school": BenchmarkMetadata(
@@ -4350,6 +5053,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "civics", "high-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_civics_high_school",
+        subtask=True,
     ),
     "arabic_exams_civics_middle_school": BenchmarkMetadata(
         name="Arabic Exams: Civics (Middle School)",
@@ -4358,6 +5062,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "civics", "middle-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_civics_middle_school",
+        subtask=True,
     ),
     # Computer Science (additional subsets)
     "arabic_exams_computer_science_middle_school": BenchmarkMetadata(
@@ -4367,6 +5072,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "computer-science", "middle-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_computer_science_middle_school",
+        subtask=True,
     ),
     "arabic_exams_computer_science_primary_school": BenchmarkMetadata(
         name="Arabic Exams: Computer Science (Primary School)",
@@ -4375,6 +5081,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "computer-science", "primary-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_computer_science_primary_school",
+        subtask=True,
     ),
     # Driving Test
     "arabic_exams_driving_test": BenchmarkMetadata(
@@ -4384,6 +5091,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "driving"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_driving_test",
+        subtask=True,
     ),
     # Economics
     "arabic_exams_economics_high_school": BenchmarkMetadata(
@@ -4393,6 +5101,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "economics", "high-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_economics_high_school",
+        subtask=True,
     ),
     "arabic_exams_economics_middle_school": BenchmarkMetadata(
         name="Arabic Exams: Economics (Middle School)",
@@ -4401,6 +5110,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "economics", "middle-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_economics_middle_school",
+        subtask=True,
     ),
     "arabic_exams_economics_university": BenchmarkMetadata(
         name="Arabic Exams: Economics (University)",
@@ -4409,6 +5119,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "economics", "university"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_economics_university",
+        subtask=True,
     ),
     # General Knowledge
     "arabic_exams_general_knowledge": BenchmarkMetadata(
@@ -4418,6 +5129,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "general-knowledge"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_general_knowledge",
+        subtask=True,
     ),
     "arabic_exams_general_knowledge_middle_school": BenchmarkMetadata(
         name="Arabic Exams: General Knowledge (Middle School)",
@@ -4426,6 +5138,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "general-knowledge", "middle-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_general_knowledge_middle_school",
+        subtask=True,
     ),
     "arabic_exams_general_knowledge_primary_school": BenchmarkMetadata(
         name="Arabic Exams: General Knowledge (Primary School)",
@@ -4434,6 +5147,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "general-knowledge", "primary-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_general_knowledge_primary_school",
+        subtask=True,
     ),
     # Geography
     "arabic_exams_geography_high_school": BenchmarkMetadata(
@@ -4443,6 +5157,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "geography", "high-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_geography_high_school",
+        subtask=True,
     ),
     "arabic_exams_geography_middle_school": BenchmarkMetadata(
         name="Arabic Exams: Geography (Middle School)",
@@ -4451,6 +5166,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "geography", "middle-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_geography_middle_school",
+        subtask=True,
     ),
     "arabic_exams_geography_primary_school": BenchmarkMetadata(
         name="Arabic Exams: Geography (Primary School)",
@@ -4459,6 +5175,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "geography", "primary-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_geography_primary_school",
+        subtask=True,
     ),
     # History
     "arabic_exams_history_high_school": BenchmarkMetadata(
@@ -4468,6 +5185,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "history", "high-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_history_high_school",
+        subtask=True,
     ),
     "arabic_exams_history_middle_school": BenchmarkMetadata(
         name="Arabic Exams: History (Middle School)",
@@ -4476,6 +5194,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "history", "middle-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_history_middle_school",
+        subtask=True,
     ),
     "arabic_exams_history_primary_school": BenchmarkMetadata(
         name="Arabic Exams: History (Primary School)",
@@ -4484,6 +5203,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "history", "primary-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_history_primary_school",
+        subtask=True,
     ),
     # Islamic Studies (additional subsets)
     "arabic_exams_islamic_studies_high_school": BenchmarkMetadata(
@@ -4493,6 +5213,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "islamic-studies", "high-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_islamic_studies_high_school",
+        subtask=True,
     ),
     "arabic_exams_islamic_studies_middle_school": BenchmarkMetadata(
         name="Arabic Exams: Islamic Studies (Middle School)",
@@ -4501,6 +5222,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "islamic-studies", "middle-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_islamic_studies_middle_school",
+        subtask=True,
     ),
     "arabic_exams_islamic_studies_primary_school": BenchmarkMetadata(
         name="Arabic Exams: Islamic Studies (Primary School)",
@@ -4509,6 +5231,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "islamic-studies", "primary-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_islamic_studies_primary_school",
+        subtask=True,
     ),
     # Law
     "arabic_exams_law_professional": BenchmarkMetadata(
@@ -4518,6 +5241,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "law", "professional"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_law_professional",
+        subtask=True,
     ),
     # Management
     "arabic_exams_management_university": BenchmarkMetadata(
@@ -4527,6 +5251,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "management", "university"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_management_university",
+        subtask=True,
     ),
     # Natural Science
     "arabic_exams_natural_science_middle_school": BenchmarkMetadata(
@@ -4536,6 +5261,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "natural-science", "middle-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_natural_science_middle_school",
+        subtask=True,
     ),
     "arabic_exams_natural_science_primary_school": BenchmarkMetadata(
         name="Arabic Exams: Natural Science (Primary School)",
@@ -4544,6 +5270,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "natural-science", "primary-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_natural_science_primary_school",
+        subtask=True,
     ),
     # Philosophy
     "arabic_exams_philosophy_high_school": BenchmarkMetadata(
@@ -4553,6 +5280,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "philosophy", "high-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_philosophy_high_school",
+        subtask=True,
     ),
     # Political Science
     "arabic_exams_political_science_university": BenchmarkMetadata(
@@ -4562,6 +5290,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "political-science", "university"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_political_science_university",
+        subtask=True,
     ),
     # Social Science
     "arabic_exams_social_science_middle_school": BenchmarkMetadata(
@@ -4571,6 +5300,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "social-science", "middle-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_social_science_middle_school",
+        subtask=True,
     ),
     "arabic_exams_social_science_primary_school": BenchmarkMetadata(
         name="Arabic Exams: Social Science (Primary School)",
@@ -4579,6 +5309,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["multiple-choice", "arabic", "social-science", "primary-school"],
         module_path="openbench.evals.arabic_exams",
         function_name="arabic_exams_social_science_primary_school",
+        subtask=True,
     ),
     "otis_mock_aime": BenchmarkMetadata(
         name="MockAIME (2024-2025)",
@@ -4595,6 +5326,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["aime", "problem-solving", "math", "2024"],
         module_path="openbench.evals.mockaime",
         function_name="otis_mock_aime_2024",
+        subtask=True,
     ),
     "otis_mock_aime_2025": BenchmarkMetadata(
         name="MockAIME (2025)",
@@ -4603,6 +5335,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["aime", "problem-solving", "math", "2025"],
         module_path="openbench.evals.mockaime",
         function_name="otis_mock_aime_2025",
+        subtask=True,
     ),
     "cybench": BenchmarkMetadata(
         name="CyBench",
@@ -4952,37 +5685,516 @@ def get_eval_metadata(path_like: str) -> BenchmarkMetadata | None:
         return None
 
 
-# Eval presets - categorical collections of benchmarks that can be run together
-# Note: Family benchmarks (bigbench, agieval, etc.) will be migrated to aggregate dataset approach
-EVAL_PRESETS = {
-    "coding": EvalPreset(
-        name="Coding Suite",
-        description="Core coding benchmarks including HumanEval, MBPP, and multi-language Exercism tasks",
+# Eval groups - family benchmark collections that can be expanded
+EVAL_GROUPS = {
+    "bigbench": EvalGroup(
+        name="BIG-Bench",
+        description="Aggregate of 121 BIG-Bench tasks for comprehensive language model evaluation",
         benchmarks=[
-            "humaneval",
-            "mbpp",
-            "exercism_python",
-            "exercism_javascript",
+            "bigbench_anachronisms",
+            "bigbench_analogical_similarity",
+            "bigbench_analytic_entailment",
+            "bigbench_arithmetic",
+            "bigbench_authorship_verification",
+            "bigbench_bbq_lite_json",
+            "bigbench_causal_judgment",
+            "bigbench_cause_and_effect",
+            "bigbench_checkmate_in_one",
+            "bigbench_cifar10_classification",
+            "bigbench_code_line_description",
+            "bigbench_color",
+            "bigbench_common_morpheme",
+            "bigbench_conceptual_combinations",
+            "bigbench_contextual_parametric_knowledge_conflicts",
+            "bigbench_crash_blossom",
+            "bigbench_crass_ai",
+            "bigbench_cryobiology_spanish",
+            "bigbench_cs_algorithms",
+            "bigbench_dark_humor_detection",
+            "bigbench_date_understanding",
+            "bigbench_disambiguation_qa",
+            "bigbench_discourse_marker_prediction",
+            "bigbench_dyck_languages",
+            "bigbench_elementary_math_qa",
+            "bigbench_emoji_movie",
+            "bigbench_emojis_emotion_prediction",
+            "bigbench_empirical_judgments",
+            "bigbench_english_proverbs",
+            "bigbench_english_russian_proverbs",
+            "bigbench_entailed_polarity",
+            "bigbench_entailed_polarity_hindi",
+            "bigbench_epistemic_reasoning",
+            "bigbench_evaluating_information_essentiality",
+            "bigbench_fact_checker",
+            "bigbench_fantasy_reasoning",
+            "bigbench_figure_of_speech_detection",
+            "bigbench_formal_fallacies_syllogisms_negation",
+            "bigbench_general_knowledge",
+            "bigbench_geometric_shapes",
+            "bigbench_goal_step_wikihow",
+            "bigbench_gre_reading_comprehension",
+            "bigbench_hhh_alignment",
+            "bigbench_hindu_knowledge",
+            "bigbench_hinglish_toxicity",
+            "bigbench_human_organs_senses",
+            "bigbench_hyperbaton",
+            "bigbench_identify_math_theorems",
+            "bigbench_identify_odd_metaphor",
+            "bigbench_implicatures",
+            "bigbench_implicit_relations",
+            "bigbench_indic_cause_and_effect",
+            "bigbench_intent_recognition",
+            "bigbench_international_phonetic_alphabet_nli",
+            "bigbench_intersect_geometry",
+            "bigbench_irony_identification",
+            "bigbench_kanji_ascii",
+            "bigbench_kannada",
+            "bigbench_key_value_maps",
+            "bigbench_known_unknowns",
+            "bigbench_language_identification",
+            "bigbench_logic_grid_puzzle",
+            "bigbench_logical_args",
+            "bigbench_logical_deduction",
+            "bigbench_logical_fallacy_detection",
+            "bigbench_logical_sequence",
+            "bigbench_mathematical_induction",
+            "bigbench_medical_questions_russian",
+            "bigbench_metaphor_boolean",
+            "bigbench_metaphor_understanding",
+            "bigbench_minute_mysteries_qa",
+            "bigbench_misconceptions",
+            "bigbench_misconceptions_russian",
+            "bigbench_mnist_ascii",
+            "bigbench_moral_permissibility",
+            "bigbench_movie_dialog_same_or_different",
+            "bigbench_movie_recommendation",
+            "bigbench_navigate",
+            "bigbench_nonsense_words_grammar",
+            "bigbench_novel_concepts",
+            "bigbench_odd_one_out",
+            "bigbench_parsinlu_qa",
+            "bigbench_penguins_in_a_table",
+            "bigbench_periodic_elements",
+            "bigbench_persian_idioms",
+            "bigbench_phrase_relatedness",
+            "bigbench_physical_intuition",
+            "bigbench_physics",
+            "bigbench_play_dialog_same_or_different",
+            "bigbench_presuppositions_as_nli",
+            "bigbench_question_selection",
+            "bigbench_real_or_fake_text",
+            "bigbench_reasoning_about_colored_objects",
+            "bigbench_rhyming",
+            "bigbench_riddle_sense",
+            "bigbench_ruin_names",
+            "bigbench_salient_translation_error_detection",
+            "bigbench_sentence_ambiguity",
+            "bigbench_similarities_abstraction",
+            "bigbench_simple_ethical_questions",
+            "bigbench_snarks",
+            "bigbench_social_iqa",
+            "bigbench_social_support",
+            "bigbench_sports_understanding",
+            "bigbench_strange_stories",
+            "bigbench_strategyqa",
+            "bigbench_suicide_risk",
+            "bigbench_swahili_english_proverbs",
+            "bigbench_swedish_to_german_proverbs",
+            "bigbench_symbol_interpretation",
+            "bigbench_temporal_sequences",
+            "bigbench_timedial",
+            "bigbench_tracking_shuffled_objects",
+            "bigbench_understanding_fables",
+            "bigbench_undo_permutation",
+            "bigbench_unit_conversion",
+            "bigbench_unit_interpretation",
+            "bigbench_vitaminc_fact_verification",
+            "bigbench_what_is_the_tao",
+            "bigbench_which_wiki_edit",
+            "bigbench_winowhy",
+        ],
+    ),
+    "bbh": EvalGroup(
+        name="BIG-Bench Hard",
+        description="Aggregate of 18 challenging BIG-Bench tasks that require multi-step reasoning",
+        benchmarks=[
+            "bbh_causal_judgment",
+            "bbh_date_understanding",
+            "bbh_disambiguation_qa",
+            "bbh_geometric_shapes",
+            "bbh_logical_deduction_five_objects",
+            "bbh_logical_deduction_seven_objects",
+            "bbh_logical_deduction_three_objects",
+            "bbh_movie_recommendation",
+            "bbh_navigate",
+            "bbh_reasoning_about_colored_objects",
+            "bbh_ruin_names",
+            "bbh_salient_translation_error_detection",
+            "bbh_snarks",
+            "bbh_sports_understanding",
+            "bbh_temporal_sequences",
+            "bbh_tracking_shuffled_objects_five_objects",
+            "bbh_tracking_shuffled_objects_seven_objects",
+            "bbh_tracking_shuffled_objects_three_objects",
+        ],
+    ),
+    "agieval": EvalGroup(
+        name="AGIEval",
+        description="Aggregate of 17 AGIEval exam tasks testing human-level reasoning across various domains",
+        benchmarks=[
+            "agieval_aqua_rat",
+            "agieval_gaokao_biology",
+            "agieval_gaokao_chemistry",
+            "agieval_gaokao_chinese",
+            "agieval_gaokao_english",
+            "agieval_gaokao_geography",
+            "agieval_gaokao_history",
+            "agieval_gaokao_mathqa",
+            "agieval_gaokao_physics",
+            "agieval_logiqa_en",
+            "agieval_logiqa_zh",
+            "agieval_lsat_ar",
+            "agieval_lsat_lr",
+            "agieval_lsat_rc",
+            "agieval_sat_en",
+            "agieval_sat_en_without_passage",
+            "agieval_sat_math",
+        ],
+    ),
+    "ethics": EvalGroup(
+        name="ETHICS",
+        description="Aggregate of 5 ETHICS moral reasoning tasks",
+        benchmarks=[
+            "ethics_commonsense",
+            "ethics_deontology",
+            "ethics_justice",
+            "ethics_utilitarianism",
+            "ethics_virtue",
+        ],
+    ),
+    "blimp": EvalGroup(
+        name="BLiMP",
+        description="Aggregate of 67 BLiMP linguistic tasks",
+        benchmarks=[
+            "blimp_adjunct_island",
+            "blimp_anaphor_gender_agreement",
+            "blimp_anaphor_number_agreement",
+            "blimp_animate_subject_passive",
+            "blimp_animate_subject_trans",
+            "blimp_causative",
+            "blimp_complex_NP_island",
+            "blimp_coordinate_structure_constraint_complex_left_branch",
+            "blimp_coordinate_structure_constraint_object_extraction",
+            "blimp_determiner_noun_agreement_1",
+            "blimp_determiner_noun_agreement_2",
+            "blimp_determiner_noun_agreement_irregular_1",
+            "blimp_determiner_noun_agreement_irregular_2",
+            "blimp_determiner_noun_agreement_with_adj_2",
+            "blimp_determiner_noun_agreement_with_adj_irregular_1",
+            "blimp_determiner_noun_agreement_with_adj_irregular_2",
+            "blimp_determiner_noun_agreement_with_adjective_1",
+            "blimp_distractor_agreement_relational_noun",
+            "blimp_distractor_agreement_relative_clause",
+            "blimp_drop_argument",
+            "blimp_ellipsis_n_bar_1",
+            "blimp_ellipsis_n_bar_2",
+            "blimp_existential_there_object_raising",
+            "blimp_existential_there_quantifiers_1",
+            "blimp_existential_there_quantifiers_2",
+            "blimp_existential_there_subject_raising",
+            "blimp_expletive_it_object_raising",
+            "blimp_inchoative",
+            "blimp_intransitive",
+            "blimp_irregular_past_participle_adjectives",
+            "blimp_irregular_past_participle_verbs",
+            "blimp_irregular_plural_subject_verb_agreement_1",
+            "blimp_irregular_plural_subject_verb_agreement_2",
+            "blimp_left_branch_island_echo_question",
+            "blimp_left_branch_island_simple_question",
+            "blimp_matrix_question_npi_licensor_present",
+            "blimp_npi_present_1",
+            "blimp_npi_present_2",
+            "blimp_only_npi_licensor_present",
+            "blimp_only_npi_scope",
+            "blimp_passive_1",
+            "blimp_passive_2",
+            "blimp_principle_A_c_command",
+            "blimp_principle_A_case_1",
+            "blimp_principle_A_case_2",
+            "blimp_principle_A_domain_1",
+            "blimp_principle_A_domain_2",
+            "blimp_principle_A_domain_3",
+            "blimp_principle_A_reconstruction",
+            "blimp_regular_plural_subject_verb_agreement_1",
+            "blimp_regular_plural_subject_verb_agreement_2",
+            "blimp_sentential_negation_npi_licensor_present",
+            "blimp_sentential_negation_npi_scope",
+            "blimp_sentential_subject_island",
+            "blimp_superlative_quantifiers_1",
+            "blimp_superlative_quantifiers_2",
+            "blimp_tough_vs_raising_1",
+            "blimp_tough_vs_raising_2",
+            "blimp_transitive",
+            "blimp_wh_island",
+            "blimp_wh_questions_object_gap",
+            "blimp_wh_questions_subject_gap",
+            "blimp_wh_questions_subject_gap_long_distance",
+            "blimp_wh_vs_that_no_gap",
+            "blimp_wh_vs_that_no_gap_long_distance",
+            "blimp_wh_vs_that_with_gap",
+            "blimp_wh_vs_that_with_gap_long_distance",
+        ],
+    ),
+    "glue": EvalGroup(
+        name="GLUE",
+        description="Aggregate of 10 GLUE NLU tasks",
+        benchmarks=[
+            "glue_cola",
+            "glue_mnli",
+            "glue_mnli_mismatched",
+            "glue_mrpc",
+            "glue_qnli",
+            "glue_qqp",
+            "glue_rte",
+            "glue_sst2",
+            "glue_stsb",
+            "glue_wnli",
+        ],
+    ),
+    "global_mmlu": EvalGroup(
+        name="Global-MMLU",
+        description="Aggregate of 42 Global-MMLU language tasks",
+        benchmarks=[
+            "global_mmlu_amharic",
+            "global_mmlu_arabic",
+            "global_mmlu_bengali",
+            "global_mmlu_chichewa",
+            "global_mmlu_chinese",
+            "global_mmlu_czech",
+            "global_mmlu_dutch",
+            "global_mmlu_english",
+            "global_mmlu_filipino",
+            "global_mmlu_french",
+            "global_mmlu_german",
+            "global_mmlu_greek",
+            "global_mmlu_hausa",
+            "global_mmlu_hebrew",
+            "global_mmlu_hindi",
+            "global_mmlu_igbo",
+            "global_mmlu_indonesian",
+            "global_mmlu_italian",
+            "global_mmlu_japanese",
+            "global_mmlu_korean",
+            "global_mmlu_kyrgyz",
+            "global_mmlu_lithuanian",
+            "global_mmlu_malagasy",
+            "global_mmlu_malay",
+            "global_mmlu_nepali",
+            "global_mmlu_persian",
+            "global_mmlu_polish",
+            "global_mmlu_portuguese",
+            "global_mmlu_romanian",
+            "global_mmlu_russian",
+            "global_mmlu_serbian",
+            "global_mmlu_shona",
+            "global_mmlu_sinhala",
+            "global_mmlu_somali",
+            "global_mmlu_spanish",
+            "global_mmlu_swahili",
+            "global_mmlu_swedish",
+            "global_mmlu_telugu",
+            "global_mmlu_turkish",
+            "global_mmlu_ukrainian",
+            "global_mmlu_vietnamese",
+            "global_mmlu_yoruba",
+        ],
+    ),
+    "xcopa": EvalGroup(
+        name="XCOPA",
+        description="Aggregate of 11 XCOPA language tasks",
+        benchmarks=[
+            "xcopa_et",
+            "xcopa_ht",
+            "xcopa_id",
+            "xcopa_it",
+            "xcopa_qu",
+            "xcopa_sw",
+            "xcopa_ta",
+            "xcopa_th",
+            "xcopa_tr",
+            "xcopa_vi",
+            "xcopa_zh",
+        ],
+    ),
+    "xstorycloze": EvalGroup(
+        name="XStoryCloze",
+        description="Aggregate of 11 XStoryCloze tasks",
+        benchmarks=[
+            "xstorycloze_ar",
+            "xstorycloze_en",
+            "xstorycloze_es",
+            "xstorycloze_eu",
+            "xstorycloze_hi",
+            "xstorycloze_id",
+            "xstorycloze_my",
+            "xstorycloze_ru",
+            "xstorycloze_sw",
+            "xstorycloze_te",
+            "xstorycloze_zh",
+        ],
+    ),
+    "xwinograd": EvalGroup(
+        name="XWinograd",
+        description="Aggregate of 6 XWinograd tasks",
+        benchmarks=[
+            "xwinograd_en",
+            "xwinograd_fr",
+            "xwinograd_jp",
+            "xwinograd_pt",
+            "xwinograd_ru",
+            "xwinograd_zh",
+        ],
+    ),
+    "mgsm": EvalGroup(
+        name="MGSM",
+        description="Multilingual Grade School Math across 11 languages",
+        benchmarks=[
+            "mgsm_en",
+            "mgsm_de",
+            "mgsm_es",
+            "mgsm_fr",
+            "mgsm_sw",
+            "mgsm_bn",
+            "mgsm_ja",
+            "mgsm_ru",
+            "mgsm_te",
+            "mgsm_th",
+            "mgsm_zh",
+            "mgsm_latin",
+            "mgsm_non_latin",
+        ],
+    ),
+    "mmmu": EvalGroup(
+        name="MMMU",
+        description="Aggregate of 29+ MMMU subject tasks",
+        benchmarks=[
+            "mmmu_accounting",
+            "mmmu_agriculture",
+            "mmmu_architecture_and_engineering",
+            "mmmu_art",
+            "mmmu_art_theory",
+            "mmmu_basic_medical_science",
+            "mmmu_biology",
+            "mmmu_chemistry",
+            "mmmu_clinical_medicine",
+            "mmmu_design",
+            "mmmu_diagnostics_and_laboratory_medicine",
+            "mmmu_electronics",
+            "mmmu_energy_and_power",
+            "mmmu_finance",
+            "mmmu_geography",
+            "mmmu_history",
+            "mmmu_literature",
+            "mmmu_manage",
+            "mmmu_marketing",
+            "mmmu_materials",
+            "mmmu_math",
+            "mmmu_mcq",
+            "mmmu_mechanical_engineering",
+            "mmmu_music",
+            "mmmu_open",
+            "mmmu_pharmacy",
+            "mmmu_physics",
+            "mmmu_public_health",
+            "mmmu_sociology",
+        ],
+    ),
+    "arabic_exams": EvalGroup(
+        name="Arabic Exams",
+        description="Aggregate of 40+ Arabic exam tasks",
+        benchmarks=[
+            "arabic_exams_accounting_university",
+            "arabic_exams_arabic_language_general",
+            "arabic_exams_arabic_language_grammar",
+            "arabic_exams_arabic_language_high_school",
+            "arabic_exams_arabic_language_middle_school",
+            "arabic_exams_arabic_language_primary_school",
+            "arabic_exams_biology_high_school",
+            "arabic_exams_civics_high_school",
+            "arabic_exams_civics_middle_school",
+            "arabic_exams_computer_science_high_school",
+            "arabic_exams_computer_science_middle_school",
+            "arabic_exams_computer_science_primary_school",
+            "arabic_exams_computer_science_university",
+            "arabic_exams_driving_test",
+            "arabic_exams_economics_high_school",
+            "arabic_exams_economics_middle_school",
+            "arabic_exams_economics_university",
+            "arabic_exams_general_knowledge",
+            "arabic_exams_general_knowledge_middle_school",
+            "arabic_exams_general_knowledge_primary_school",
+            "arabic_exams_geography_high_school",
+            "arabic_exams_geography_middle_school",
+            "arabic_exams_geography_primary_school",
+            "arabic_exams_history_high_school",
+            "arabic_exams_history_middle_school",
+            "arabic_exams_history_primary_school",
+            "arabic_exams_islamic_studies_general",
+            "arabic_exams_islamic_studies_high_school",
+            "arabic_exams_islamic_studies_middle_school",
+            "arabic_exams_islamic_studies_primary_school",
+            "arabic_exams_law_professional",
+            "arabic_exams_management_university",
+            "arabic_exams_math_primary_school",
+            "arabic_exams_natural_science_middle_school",
+            "arabic_exams_natural_science_primary_school",
+            "arabic_exams_philosophy_high_school",
+            "arabic_exams_physics_high_school",
+            "arabic_exams_political_science_university",
+            "arabic_exams_social_science_middle_school",
+            "arabic_exams_social_science_primary_school",
+        ],
+    ),
+    "exercism": EvalGroup(
+        name="Exercism",
+        description="Aggregate of 5 Exercism coding tasks",
+        benchmarks=[
             "exercism_go",
             "exercism_java",
+            "exercism_javascript",
+            "exercism_python",
             "exercism_rust",
         ],
     ),
-    "reasoning": EvalPreset(
-        name="Reasoning Suite",
-        description="Core reasoning benchmarks including MMLU, GPQA, ARC, and HellaSwag",
+    "anli": EvalGroup(
+        name="ANLI",
+        description="Aggregate of 3 ANLI rounds",
         benchmarks=[
-            "mmlu",
-            "gpqa",
-            "arc_challenge",
-            "hellaswag",
-            "winogrande",
-            "piqa",
+            "anli_r1",
+            "anli_r2",
+            "anli_r3",
         ],
     ),
-    "math-competitions": EvalPreset(
-        name="Math Competitions",
-        description="High school and college math competition problems (AIME, HMMT)",
+    "healthbench": EvalGroup(
+        name="HealthBench",
+        description="Aggregate of HealthBench tasks",
+        benchmarks=[
+            "healthbench_consensus",
+            "healthbench_hard",
+        ],
+    ),
+    "openai_mrcr": EvalGroup(
+        name="OpenAI MRCR",
+        description="Aggregate of 3 MRCR needle tasks",
+        benchmarks=[
+            "openai_mrcr_2n",
+            "openai_mrcr_4n",
+            "openai_mrcr_8n",
+        ],
+    ),
+    "matharena": EvalGroup(
+        name="MathArena",
+        description="Aggregate of 11 math competition tasks",
         benchmarks=[
             "aime_2023_I",
             "aime_2023_II",
@@ -4991,59 +6203,102 @@ EVAL_PRESETS = {
             "aime_2024_II",
             "aime_2025",
             "aime_2025_II",
+            "brumo_2025",
             "hmmt_feb_2023",
             "hmmt_feb_2024",
             "hmmt_feb_2025",
         ],
     ),
-    "multilingual": EvalPreset(
-        name="Multilingual Suite",
-        description="Cross-lingual benchmarks testing language understanding across diverse languages",
+    "qa4mre": EvalGroup(
+        name="QA4MRE",
+        description="Aggregate of 3 QA4MRE years",
         benchmarks=[
-            name
-            for name in BENCHMARKS.keys()
-            if any(
-                name.startswith(p)
-                for p in [
-                    "xcopa_",
-                    "xwinograd_",
-                    "xstorycloze_",
-                    "global_mmlu_",
-                    "mgsm_",
-                ]
-            )
+            "qa4mre_2011",
+            "qa4mre_2012",
+            "qa4mre_2013",
         ],
     ),
-    "long-context": EvalPreset(
-        name="Long Context Suite",
-        description="Benchmarks testing long-context capabilities and retrieval",
+    "otis_mock_aime": EvalGroup(
+        name="OTIS Mock AIME",
+        description="Aggregate of 2 Mock AIME years",
         benchmarks=[
-            "openai_mrcr_2n",
-            "openai_mrcr_4n",
-            "openai_mrcr_8n",
-            "qasper_ll",
+            "otis_mock_aime_2024",
+            "otis_mock_aime_2025",
         ],
     ),
-    "medical": EvalPreset(
-        name="Medical & Healthcare Suite",
-        description="Medical knowledge and healthcare dialogue evaluation benchmarks",
+    "cti_bench": EvalGroup(
+        name="CTI-Bench",
+        description="Aggregate of 4 CTI-Bench tasks",
         benchmarks=[
-            "healthbench",
-            "healthbench_hard",
-            "healthbench_consensus",
-            "medmcqa",
-            "medqa",
-            "pubmedqa",
+            "cti_bench_ate",
+            "cti_bench_mcq",
+            "cti_bench_rcm",
+            "cti_bench_vsp",
         ],
     ),
-    "vision": EvalPreset(
-        name="Vision & Multimodal Suite",
-        description="Core multimodal benchmarks testing vision-language understanding",
+    "bbl": EvalGroup(
+        name="BIG-Bench Lite",
+        description="BIG-Bench Lite - 18 selected BBH tasks",
         benchmarks=[
-            "mmstar",
-            "mmmu",
-            "mmmu_pro",
-            "mmmu_pro_vision",
+            "bbh_causal_judgment",
+            "bbh_date_understanding",
+            "bbh_disambiguation_qa",
+            "bbh_geometric_shapes",
+            "bbh_logical_deduction_five_objects",
+            "bbh_logical_deduction_seven_objects",
+            "bbh_logical_deduction_three_objects",
+            "bbh_movie_recommendation",
+            "bbh_navigate",
+            "bbh_reasoning_about_colored_objects",
+            "bbh_ruin_names",
+            "bbh_salient_translation_error_detection",
+            "bbh_snarks",
+            "bbh_sports_understanding",
+            "bbh_temporal_sequences",
+            "bbh_tracking_shuffled_objects_five_objects",
+            "bbh_tracking_shuffled_objects_seven_objects",
+            "bbh_tracking_shuffled_objects_three_objects",
+        ],
+    ),
+    "math": EvalGroup(
+        name="MATH Dataset",
+        description="MATH dataset variants for mathematical problem solving",
+        benchmarks=[
+            "math",
+            "math_500",
+        ],
+    ),
+    "mmmlu": EvalGroup(
+        name="MMMLU",
+        description="MMLU in 14 languages",
+        benchmarks=[
+            "mmmlu_ar_xy",
+            "mmmlu_bn_bd",
+            "mmmlu_de_de",
+            "mmmlu_es_la",
+            "mmmlu_fr_fr",
+            "mmmlu_hi_in",
+            "mmmlu_id_id",
+            "mmmlu_it_it",
+            "mmmlu_ja_jp",
+            "mmmlu_ko_kr",
+            "mmmlu_pt_br",
+            "mmmlu_zh_cn",
+            "mmmlu_sw_ke",
+            "mmmlu_yo_ng",
+        ],
+    ),
+    "superglue": EvalGroup(
+        name="SuperGLUE",
+        description="SuperGLUE benchmark with 6 NLU tasks",
+        benchmarks=[
+            "boolq",
+            "cb",
+            "copa",
+            "multirc",
+            "rte",
+            "wic",
+            "wsc",
         ],
     ),
 }

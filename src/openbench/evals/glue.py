@@ -216,7 +216,7 @@ SUPERGLUE_SUBSET_CONFIG = {
         "converter": record_to_mcq_sample_copa,
     },
     "rte": {
-        "task_name": "rte_superglue",
+        "task_name": "rte",
         "dataset_subset": "rte",
         "converter": record_to_mcq_sample_rte,
     },
@@ -290,7 +290,7 @@ def copa(split: str = "validation") -> Task:
 
 
 @task
-def rte_superglue(split: str = "validation") -> Task:
+def rte(split: str = "validation") -> Task:
     """
     RTE: Recognizing Textual Entailment (SuperGLUE)
 

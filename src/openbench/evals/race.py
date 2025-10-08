@@ -5,14 +5,15 @@ RACE is a large-scale reading comprehension dataset with passages and questions
 from English exams for Chinese students in middle and high school. The dataset
 contains over 28,000 passages and nearly 100,000 questions.
 
-This implementation includes RACE-High (high school level passages).
+This implementation includes RACE-High, RACE-Middle, and RACE-All.
 
-Dataset: EleutherAI/race
+Dataset: ehovy/race
 Paper: https://arxiv.org/abs/1704.04683
 
 Sample usage:
 ```bash
 bench eval race_high --model "openrouter/openai/gpt-oss-120b" -M only=groq
+bench eval race  # Runs all 3 variants via family aggregate
 ```
 
 Citation:
@@ -103,7 +104,7 @@ def race_high(split: str = "test") -> Task:
 
     # Load dataset and expand samples (one article -> multiple questions)
     dataset = hf_dataset(
-        "EleutherAI/race",
+        "ehovy/race",
         split=split,
         sample_fields=record_to_samples,
         auto_id=True,
@@ -112,6 +113,64 @@ def race_high(split: str = "test") -> Task:
 
     return Task(
         name="race_high",
+        dataset=dataset,
+        solver=[generate()],
+        scorer=create_mcq_scorer()(),
+        config=GenerateConfig(),
+    )
+
+
+@task
+def race_middle(split: str = "test") -> Task:
+    """Evaluate RACE-Middle reading comprehension benchmark."""
+    from inspect_ai.dataset import hf_dataset
+    from inspect_ai.solver import generate
+    from inspect_ai.model import GenerateConfig
+    from openbench.scorers.mcq import create_mcq_scorer
+
+    valid_splits = ["train", "validation", "test"]
+    if split not in valid_splits:
+        raise ValueError(f"Invalid split '{split}'. Must be one of {valid_splits}")
+
+    dataset = hf_dataset(
+        "ehovy/race",
+        split=split,
+        sample_fields=record_to_samples,
+        auto_id=True,
+        name="middle",
+    )
+
+    return Task(
+        name="race_middle",
+        dataset=dataset,
+        solver=[generate()],
+        scorer=create_mcq_scorer()(),
+        config=GenerateConfig(),
+    )
+
+
+@task
+def race(split: str = "test") -> Task:
+    """Evaluate RACE reading comprehension benchmark (middle + high combined)."""
+    from inspect_ai.dataset import hf_dataset
+    from inspect_ai.solver import generate
+    from inspect_ai.model import GenerateConfig
+    from openbench.scorers.mcq import create_mcq_scorer
+
+    valid_splits = ["train", "validation", "test"]
+    if split not in valid_splits:
+        raise ValueError(f"Invalid split '{split}'. Must be one of {valid_splits}")
+
+    dataset = hf_dataset(
+        "ehovy/race",
+        split=split,
+        sample_fields=record_to_samples,
+        auto_id=True,
+        name="all",
+    )
+
+    return Task(
+        name="race",
         dataset=dataset,
         solver=[generate()],
         scorer=create_mcq_scorer()(),

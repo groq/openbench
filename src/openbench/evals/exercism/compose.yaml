@@ -1,12 +1,19 @@
-## Auto-generated at runtime by DockerManager.generate_eval_files()
 services:
   default:
-    build:
+    build: 
       context: .
       tags:
+        - openbench-opencode:c1b94dcf
     init: true
     command: tail -f /dev/null
     networks: [eval_net]
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+
+
 
 networks:
   eval_net: { driver: bridge, internal: false }
+
+
