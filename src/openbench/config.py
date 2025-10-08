@@ -439,6 +439,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.musr",
         function_name="musr_murder_mysteries",
+        subtask=True,
     ),
     "musr_object_placements": BenchmarkMetadata(
         name="MuSR Object Placements",
@@ -453,6 +454,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.musr",
         function_name="musr_object_placements",
+        subtask=True,
     ),
     "musr_team_allocation": BenchmarkMetadata(
         name="MuSR Team Allocation",
@@ -467,6 +469,7 @@ _BUILTIN_BENCHMARKS = {
         ],
         module_path="openbench.evals.musr",
         function_name="musr_team_allocation",
+        subtask=True,
     ),
     "supergpqa": BenchmarkMetadata(
         name="SuperGPQA",
