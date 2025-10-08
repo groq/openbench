@@ -733,14 +733,6 @@ _BUILTIN_BENCHMARKS = {
     ),
     # Math competitions
     # MathArena family aggregate
-    "matharena": BenchmarkMetadata(
-        name="MathArena",
-        description="Aggregate of 11 math competition tasks",
-        category="math",
-        tags=["family", "aggregate", "math", "competition"],
-        module_path="openbench.evals.family_aggregate",
-        function_name="matharena",
-    ),
     "aime_2023_I": BenchmarkMetadata(
         name="AIME 2023 I",
         description="American Invitational Mathematics Examination 2023 (First)",
@@ -1228,14 +1220,6 @@ _BUILTIN_BENCHMARKS = {
         subtask=True,
     ),
     # BIG-Bench family aggregate
-    "bigbench": BenchmarkMetadata(
-        name="BIG-Bench",
-        description="Aggregate of 121 BIG-Bench tasks for comprehensive language model evaluation",
-        category="bigbench",
-        tags=["family", "aggregate", "reasoning", "bigbench"],
-        module_path="openbench.evals.family_aggregate",
-        function_name="bigbench",
-    ),
     # BIG-Bench individual tasks
     "bigbench_anachronisms": BenchmarkMetadata(
         name="BigBench: Anachronisms",
@@ -2327,14 +2311,6 @@ _BUILTIN_BENCHMARKS = {
         subtask=True,
     ),
     # BIG-Bench Hard family aggregate
-    "bbh": BenchmarkMetadata(
-        name="BIG-Bench Hard",
-        description="Aggregate of 18 challenging BIG-Bench tasks that require multi-step reasoning",
-        category="core",
-        tags=["family", "aggregate", "reasoning", "bigbench", "chain-of-thought"],
-        module_path="openbench.evals.family_aggregate",
-        function_name="bbh",
-    ),
     # BBH individual tasks
     "bbh_causal_judgment": BenchmarkMetadata(
         name="BBH: Causal Judgment",
@@ -2553,14 +2529,6 @@ _BUILTIN_BENCHMARKS = {
         subtask=True,
     ),
     # BIG-Bench Lite (alias for BBH)
-    "bbl": BenchmarkMetadata(
-        name="BIG-Bench Lite",
-        description="BIG-Bench Lite - 18 selected BBH tasks (alias for BBH)",
-        category="core",
-        tags=["family", "aggregate", "reasoning", "bigbench", "chain-of-thought"],
-        module_path="openbench.evals.family_aggregate",
-        function_name="bbl",
-    ),
     "medmcqa": BenchmarkMetadata(
         name="MedMCQA",
         description="Medical multiple-choice questions from Indian medical entrance exams (AIIMS & NEET PG)",
@@ -2612,20 +2580,6 @@ _BUILTIN_BENCHMARKS = {
         subtask=True,
     ),
     # ARC family aggregate
-    "arc": BenchmarkMetadata(
-        name="ARC",
-        description="Aggregate of 2 ARC difficulty levels",
-        category="core",
-        tags=[
-            "family",
-            "aggregate",
-            "multiple-choice",
-            "science",
-            "commonsense-reasoning",
-        ],
-        module_path="openbench.evals.family_aggregate",
-        function_name="arc",
-    ),
     "arc_easy": BenchmarkMetadata(
         name="ARC-Easy",
         description="AI2 Reasoning Challenge - Easy questions from grade-school science exams",
@@ -2710,14 +2664,6 @@ _BUILTIN_BENCHMARKS = {
         is_alpha=True,
     ),
     # CTI-Bench family aggregate
-    "cti_bench": BenchmarkMetadata(
-        name="CTI-Bench",
-        description="Aggregate of 4 CTI-Bench tasks",
-        category="cybersecurity",
-        tags=["family", "aggregate", "cybersecurity"],
-        module_path="openbench.evals.family_aggregate",
-        function_name="cti_bench",
-    ),
     "cti_bench_ate": BenchmarkMetadata(
         name="CTI-Bench ATE",
         description="Extracting MITRE ATT&CK techniques from malware and threat descriptions",
