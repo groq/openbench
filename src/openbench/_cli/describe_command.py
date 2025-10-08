@@ -8,24 +8,83 @@ from rich.table import Table
 from rich.box import ROUNDED
 
 from openbench.eval_config import get_eval_config
-from openbench.config import get_all_benchmarks
+from openbench.config import get_all_benchmarks, EVAL_GROUPS
 from openbench._cli.utils import get_category_display_name
+
+
+def describe_eval_group(name: str, console: Console) -> None:
+    """Show detailed information about an eval group."""
+    group = EVAL_GROUPS[name]
+
+    # Header
+    console.print()
+    console.print(
+        Panel(
+            f"[bold blue]{group.name}[/bold blue] [dim](Eval Group)[/dim]",
+            expand=False,
+            box=ROUNDED,
+        )
+    )
+
+    # Group metadata
+    console.print("\n[bold yellow]Group Information[/bold yellow]")
+    console.print("─" * 60)
+
+    info_table = Table(show_header=False, show_lines=False, padding=(0, 2), box=None)
+    info_table.add_column("Property", style="cyan", width=15)
+    info_table.add_column("Value", style="white")
+
+    info_table.add_row("Description", group.description)
+    info_table.add_row("Benchmarks", f"{len(group.benchmarks)} tasks")
+    info_table.add_row("Command", f"[bold]bench eval {name}[/bold]")
+
+    console.print(info_table)
+
+    # List constituent benchmarks
+    console.print("\n[bold yellow]Benchmark Subtasks[/bold yellow]")
+    console.print("─" * 60)
+
+    # Show first 15 benchmarks
+    display_limit = 15
+    for benchmark in group.benchmarks[:display_limit]:
+        console.print(f"  • {benchmark}")
+
+    if len(group.benchmarks) > display_limit:
+        remaining = len(group.benchmarks) - display_limit
+        console.print(f"  [dim]... and {remaining} more[/dim]")
+
+    # Footer
+    console.print()
+    console.print(
+        f"[dim]Run all {len(group.benchmarks)} benchmarks with: "
+        f"[bold]bench eval {name}[/bold][/dim]"
+    )
+    console.print()
 
 
 def describe_eval(name: str) -> None:
     """Show detailed information about a specific evaluation."""
     console = Console()
 
+    # Check if it's an eval group first
+    if name in EVAL_GROUPS:
+        describe_eval_group(name, console)
+        return
+
     if name not in get_all_benchmarks():
         console.print(f"\n[red]Unknown evaluation: {name}[/red]")
 
-        # Suggest similar names
-        all_names = list(get_all_benchmarks().keys())
+        # Suggest similar names from both benchmarks and groups
+        all_benchmarks = list(get_all_benchmarks().keys())
+        all_groups = list(EVAL_GROUPS.keys())
+        all_names = all_benchmarks + all_groups
         similar = [n for n in all_names if name.lower() in n.lower()]
         if similar:
             console.print("\nDid you mean one of these?")
             for s in similar[:5]:
-                console.print(f"   • {s}")
+                # Indicate if it's a group
+                suffix = " (group)" if s in EVAL_GROUPS else ""
+                console.print(f"   • {s}{suffix}")
         console.print()
         return
 
