@@ -119,7 +119,9 @@ def validate_model_role(model_role: Optional[str]) -> Dict[str, str | Model]:
         raise typer.BadParameter(str(e))
 
 
-def expand_eval_groups(benchmarks: List[str]) -> Tuple[List[str], List[str]]:
+def expand_eval_groups(
+    benchmarks: List[str],
+) -> Tuple[List[str], dict[str, List[str]]]:
     """Expand eval group identifiers into their constituent benchmarks.
 
     Group names are normalized to handle - and _ interchangeably
@@ -129,16 +131,16 @@ def expand_eval_groups(benchmarks: List[str]) -> Tuple[List[str], List[str]]:
         benchmarks: List of benchmark names and/or group identifiers
 
     Returns:
-        Tuple of (all_expanded_benchmarks, group_only_benchmarks):
+        Tuple of (all_expanded_benchmarks, groups):
         - all_expanded_benchmarks: All benchmarks including groups and individual tasks
-        - group_only_benchmarks: Only benchmarks that came from group expansion
+        - groups: Dict mapping group display name to list of benchmark names
 
     Example:
         expand_eval_groups(["bigbench", "mmlu"])
-        -> (["bigbench_arithmetic", "bigbench_...", "mmlu"], ["bigbench_arithmetic", "bigbench_..."])
+        -> (["bigbench_arithmetic", "bigbench_...", "mmlu"], {"BIG-Bench": ["bigbench_arithmetic", ...]})
     """
     all_expanded = []
-    group_only = []
+    groups = {}  # group_name -> list of benchmark names
 
     for benchmark in benchmarks:
         # Normalize: Try both with underscores and hyphens for compatibility
@@ -159,24 +161,26 @@ def expand_eval_groups(benchmarks: List[str]) -> Tuple[List[str], List[str]]:
                 f"📦 Expanding group '{benchmark}' -> {len(group.benchmarks)} benchmarks"
             )
             all_expanded.extend(group.benchmarks)
-            group_only.extend(group.benchmarks)
+            # Store with display name as key
+            groups[group.name] = group.benchmarks
         else:
             # Regular benchmark name (not a group)
             all_expanded.append(benchmark)
 
-    return all_expanded, group_only
+    return all_expanded, groups
 
 
 def display_group_summary(
-    group_benchmarks: List[str], eval_logs: List[EvalLog]
+    group_name: str, group_benchmarks: List[str], eval_logs: List[EvalLog]
 ) -> None:
-    """Display aggregate metrics for group benchmarks.
+    """Display aggregate metrics for a single group.
 
     Args:
-        group_benchmarks: List of benchmark names that came from group expansion
+        group_name: Display name of the group (e.g., "BIG-Bench", "BBH")
+        group_benchmarks: List of benchmark names in this group
         eval_logs: List of evaluation logs from all benchmarks
     """
-    # Filter to only logs from group benchmarks
+    # Filter to only logs from this group's benchmarks
     group_logs = [log for log in eval_logs if log.eval.task in group_benchmarks]
 
     if not group_logs:
@@ -241,7 +245,7 @@ def display_group_summary(
 
     # Display summary
     typer.echo("\n" + "=" * 60)
-    typer.echo("📊 GROUP SUMMARY")
+    typer.echo(f"📊 GROUP SUMMARY - {group_name}")
     typer.echo("=" * 60)
     typer.echo(f"Total benchmarks:    {len(group_logs)}")
     typer.echo(f"Total samples:       {total_samples:,}")
@@ -533,7 +537,7 @@ def run_eval(
         validate_model_name(model_name)
 
     # Expand eval groups into individual benchmarks
-    expanded_benchmarks, group_benchmarks = expand_eval_groups(benchmarks)
+    expanded_benchmarks, groups = expand_eval_groups(benchmarks)
 
     # Load tasks from registry
     tasks = []
@@ -601,8 +605,10 @@ def run_eval(
             typer.echo("Evaluation complete!")
 
             # Display group summary if groups were used
-            if group_benchmarks:
-                display_group_summary(group_benchmarks, eval_logs)
+            # Display separate summary for each group
+            if groups:
+                for group_name, group_benchmarks in groups.items():
+                    display_group_summary(group_name, group_benchmarks, eval_logs)
 
             if hub_repo:
                 from openbench._cli.export import export_logs_to_hub
