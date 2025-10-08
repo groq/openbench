@@ -36,7 +36,6 @@ Citation:
 from inspect_ai import Task, task
 from inspect_ai.dataset import Sample, json_dataset
 from inspect_ai.solver import generate, system_message
-from inspect_ai.scorer import match
 from typing import Any
 
 
@@ -201,7 +200,7 @@ def breakpoint_remove() -> Task:
             ),
             generate(),
         ],
-        scorer=match(),  # Placeholder - will need custom scorer for actual evaluation
+        scorer=None,  # No automatic scoring - outputs must be manually evaluated or tested
     )
 
 
@@ -231,5 +230,5 @@ def breakpoint_discovery() -> Task:
             ),
             generate(),
         ],
-        scorer=match(),  # Placeholder - will need custom scorer for actual evaluation
+        scorer=None,  # No automatic scoring - outputs must be manually evaluated or tested
     )
