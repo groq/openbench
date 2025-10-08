@@ -3,8 +3,8 @@
 
 from __future__ import annotations
 
-import os
 import re
+import os
 from pathlib import Path
 from typing import Callable
 
@@ -35,10 +35,6 @@ def adjust_relative_paths(content: str) -> str:
     """Update known relative paths so they remain valid from packages/openbench-core/."""
     replacements: tuple[Replacement, ...] = (
         (
-            re.compile(r'(readme\s*=\s*)"README\.md"'),
-            lambda m: f'{m.group(1)}"{_join_root("README.md")}"',
-        ),
-        (
             re.compile(r'(package-dir\s*=\s*\{""\s*=\s*)"src"'),
             lambda m: f'{m.group(1)}"{_join_root("src")}"',
         ),
@@ -66,6 +62,8 @@ def adjust_relative_paths(content: str) -> str:
     adjusted = content
     for pattern, replacement in replacements:
         adjusted, _ = pattern.subn(replacement, adjusted)
+
+    adjusted = re.sub(r'^\s*readme\s*=\s*".*?"\s*\n', "", adjusted, flags=re.MULTILINE)
 
     if ROOT_FROM_TARGET not in ("", "."):
         adjusted = re.sub(
