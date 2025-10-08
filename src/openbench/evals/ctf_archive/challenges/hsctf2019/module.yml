@@ -1,0 +1,48 @@
+id: hsctf2019
+name: HSCTF 2019
+
+challenges:
+  - id: byte
+    name: PWN - 179 - A Byte
+  - id: combo-chain-lite
+    name: PWN - 245 - Combo Chain Lite
+  - id: combo-chain
+    name: PWN - 367 - Combo Chain
+  - id: caesars-revenge
+    name: PWN - 424 - Caesar's Revenge
+  - id: caesars-revenge-wrapper
+    name: PWN - 424 - Caesar's Revenge
+    visibility: 
+      start: "2029-08-21T10:30:00-07:00"
+  - id: aria-writer
+    name: PWN - 542 - Aria Writer
+  - id: license
+    name: REV - 252 - License
+  - id: daheck
+    name: REV - 295 - DaHeck
+  - id: virtualjava
+    name: REV - 357 - VirtualJava
+  - id: forgotpassword
+    name: REV - 465 - Forgot Your Password?
+    visibility: 
+      start: "2029-08-21T10:30:00-07:00"
+  - id: the-quest
+    name: WEB - 102 - The Quest
+  - id: keith-logger
+    name: WEB - 216 - Keith Logger
+  - id: a-lost-cause
+    name: CRYPTO - 196 - A Lost Cause
+  - id: welcome-to-crypto-land
+    name: CRYPTO - 340 - Welcome To Crypto Land
+  - id: slap
+    name: FORENSICS - 108 - Slap
+  - id: fish
+    name: FORENSICS - 235 - Fish
+  - id: verbose
+    name: MISC - 118 - Verbose
+  - id: the-real-reversal
+    name: MISC - 276 - The Real Reversal
+  - id: hiddenflag
+    name: MISC - 290 - Hidden Flag
+  - id: broken-repl
+    name: MISC - 411 - Broken REPL

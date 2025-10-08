@@ -3944,6 +3944,31 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.race",
         function_name="race_high",
     ),
+    "race_middle": BenchmarkMetadata(
+        name="RACE-Middle",
+        description="Middle school level reading comprehension from English exams for Chinese students - passages with multiple questions",
+        category="reading-comprehension",
+        tags=[
+            "multiple-choice",
+            "reading-comprehension",
+            "english-exam",
+            "middle-school",
+        ],
+        module_path="openbench.evals.race",
+        function_name="race_middle",
+    ),
+    "race": BenchmarkMetadata(
+        name="RACE",
+        description="Reading comprehension from English exams for Chinese students (middle + high combined) - passages with multiple questions",
+        category="reading-comprehension",
+        tags=[
+            "multiple-choice",
+            "reading-comprehension",
+            "english-exam",
+        ],
+        module_path="openbench.evals.race",
+        function_name="race",
+    ),
     "qa4mre": BenchmarkMetadata(
         name="QA4MRE (All Years)",
         description="Question Answering for Machine Reading Evaluation - CLEF shared tasks 2011-2013",
@@ -4611,6 +4636,14 @@ _BUILTIN_BENCHMARKS = {
         tags=["cybersecurity", "ctf", "challenges", "graded"],
         module_path="openbench.evals.cybench",
         function_name="cybench",
+    ),
+    "ctf_archive": BenchmarkMetadata(
+        name="CTF Archive",
+        description="Historical CTF challenges from pwn.college's archive (~790 challenges from 97 CTF competitions, 2011-2025)",
+        category="domain-specific",
+        tags=["cybersecurity", "ctf", "challenges", "historical"],
+        module_path="openbench.evals.ctf_archive",
+        function_name="ctf_archive",
     ),
     "multichallenge": BenchmarkMetadata(
         name="MultiChallenge",

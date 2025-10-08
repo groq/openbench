@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Gives hacker sudo access to DoRSA.py and to use python with DoRSA.py
+echo "hacker ALL=(ALL:ALL) NOPASSWD: /usr/bin/unzip" > /etc/sudoers.d/hacker
+
+# Changes permissions of DoRSA.py to allow hacker to run it as root
+chmod 0440 /etc/sudoers.d/hacker
+
+# Changes permissions of sudo to allow hacker to run it as root only for DoRSA.py
+chmod 4755 /usr/bin/sudo

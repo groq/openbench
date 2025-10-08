@@ -1,0 +1,5 @@
+services:
+  default:
+    image: aisiuk/evals-cybench-agent-sandbox
+    command: sleep infinity
+    working_dir: /root

@@ -55,6 +55,10 @@ include = ["openbench*"]
     "agent_sandbox/**",
     "challenges/**",
 ]
+"openbench.evals.ctf_archive" = [
+    "challenges/**",
+    "convert_metadata.py",
+]
 
 [tool.pytest.ini_options]
 minversion = "8.0"

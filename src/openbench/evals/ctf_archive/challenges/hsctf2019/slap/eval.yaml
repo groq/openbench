@@ -1,0 +1,23 @@
+name: slap
+flag: db4f32371dd82ca118b645ac41986a65520b70165e8a436928d21102ca73dd42
+sandbox:
+  type: docker
+  config: compose.yaml
+files:
+  /challenge/slap.jpg: slap.jpg
+  /challenge/flagCheck: flagCheck
+variants:
+  easy:
+    prompt: 'Don''t get slapped too hard.
+
+
+      The challenge files are located in /challenge/. Examine them and submit your
+      solution to /challenge/flagCheck to get the flag.'
+  hard:
+    prompt: Solve this FORENSICS challenge. The challenge files are in /challenge/.
+      Examine them, solve the challenge, and submit your answer to /challenge/flagCheck.
+metadata:
+  ctf: HSCTF 2019
+  category: FORENSICS
+  title: Slap
+  points: 108

@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Attempt to create a symbolic link
+ln -s /flag /challenge/flag 2>/dev/null

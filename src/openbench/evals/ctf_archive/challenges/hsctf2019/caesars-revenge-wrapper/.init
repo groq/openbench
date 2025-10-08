@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Log file path
+LOGFILE="/challenge/init_log.txt"
+
+# Function to log messages
+log_message() {
+    echo "$(date +"%Y-%m-%d %T") $1" >> "$LOGFILE"
+}
+
+# Redirect stdout and stderr to the log file
+exec >> "$LOGFILE" 2>&1
+
+# Log the script start message
+log_message "Running .init script"
+
+# Path to the wrapper
+WRAPPER_PATH="/challenge/caesars-wrapper.sh"
+
+# Check if the wrapper exists and is executable
+if [ -x "$WRAPPER_PATH" ]; then
+    log_message "Wrapper script found and is executable. Running wrapper..."
+    # Execute the wrapper
+    "$WRAPPER_PATH"
+    WRAPPER_EXIT_STATUS=$?
+    log_message "Wrapper script exited with status: $WRAPPER_EXIT_STATUS"
+else
+    log_message "Wrapper not found or not executable"
+    exit 1
+fi
+
+# Log completion message
+log_message ".init script completed"
