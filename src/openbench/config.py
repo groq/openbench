@@ -100,6 +100,24 @@ _BUILTIN_BENCHMARKS = {
         function_name="mbpp",
         is_alpha=False,
     ),
+    "breakpoint_remove": BenchmarkMetadata(
+        name="Breakpoint (Remove Mode)",
+        description="Code repair benchmark - reconstruct deleted function bodies based on test failures and repository context (498 problems)",
+        category="code",
+        tags=["code", "debugging", "repair", "reasoning", "system-level"],
+        module_path="openbench.evals.breakpoint",
+        function_name="breakpoint_remove",
+        is_alpha=False,
+    ),
+    "breakpoint_discovery": BenchmarkMetadata(
+        name="Breakpoint (Discovery Mode)",
+        description="Code repair benchmark - locate and fix subtle bugs in corrupted code (269 problems)",
+        category="code",
+        tags=["code", "debugging", "repair", "reasoning", "system-level"],
+        module_path="openbench.evals.breakpoint",
+        function_name="breakpoint_discovery",
+        is_alpha=False,
+    ),
     # Graphwalks benchmarks (alpha)
     "clockbench": BenchmarkMetadata(
         name="ClockBench",
