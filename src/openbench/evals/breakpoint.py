@@ -35,8 +35,11 @@ Citation:
 
 from inspect_ai import Task, task
 from inspect_ai.dataset import Sample, json_dataset
-from inspect_ai.solver import generate, system_message
+from inspect_ai.solver import system_message
 from typing import Any
+
+from openbench.solvers.breakpoint_solver import breakpoint_solver
+from openbench.scorers.breakpoint_scorer import breakpoint_scorer
 
 
 # HuggingFace dataset URLs
@@ -99,11 +102,15 @@ Your task is to reconstruct the missing function body. Provide only the complete
         target="",  # No ground truth available
         id=f"{repo.get('name', 'unknown')}_{function_name}",
         metadata={
-            "repo": repo.get("name"),
+            "repo_name": repo.get("name"),
+            "repo_url": repo.get("url"),
+            "repo_commit": repo.get("commit"),
             "fpath": fpath,
             "function_name": function_name,
-            "test_command": repo.get("test_command"),
+            "test_command": repo.get("test_command", "pytest"),
+            "baseline_failures": test_info.get("failed", 1),
             "mode": "remove",
+            "corruption_code": None,
         },
     )
 
@@ -164,11 +171,15 @@ Your task is to identify and fix the bug. Provide the corrected function impleme
         target="",  # No ground truth available
         id=f"{repo.get('name', 'unknown')}_{function_name}",
         metadata={
-            "repo": repo.get("name"),
+            "repo_name": repo.get("name"),
+            "repo_url": repo.get("url"),
+            "repo_commit": repo.get("commit"),
             "fpath": fpath,
             "function_name": function_name,
-            "test_command": repo.get("test_command"),
+            "test_command": repo.get("test_command", "pytest"),
+            "baseline_failures": test_info.get("failed", 1),
             "corruption_score": corruption.get("score", 0),
+            "corruption_code": corruption.get("code"),
             "mode": "discovery",
         },
     )
@@ -198,9 +209,10 @@ def breakpoint_remove() -> Task:
                 "Analyze the problem carefully, consider the test failures, and provide "
                 "a complete, working implementation."
             ),
-            generate(),
+            breakpoint_solver(),
         ],
-        scorer=None,  # No automatic scoring - outputs must be manually evaluated or tested
+        scorer=breakpoint_scorer(),
+        sandbox="local",
     )
 
 
@@ -228,7 +240,8 @@ def breakpoint_discovery() -> Task:
                 "Analyze the corrupted code carefully, identify the bug, and provide "
                 "a corrected implementation."
             ),
-            generate(),
+            breakpoint_solver(),
         ],
-        scorer=None,  # No automatic scoring - outputs must be manually evaluated or tested
+        scorer=breakpoint_scorer(),
+        sandbox="local",
     )
