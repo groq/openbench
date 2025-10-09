@@ -180,17 +180,21 @@ def display_group_summary(
         group_benchmarks: List of benchmark names in this group
         eval_logs: List of evaluation logs from all benchmarks
     """
+
     # Filter to only logs from this group's benchmarks
     # Handle both 'benchmark' and 'openbench/benchmark' task name formats
     def task_matches_benchmark(task_name: str, benchmark_name: str) -> bool:
         """Check if task name matches benchmark, handling namespace prefixes."""
         # Strip namespace prefix if present (e.g., 'openbench/smt_algebra' -> 'smt_algebra')
-        task_base = task_name.split('/')[-1] if '/' in task_name else task_name
+        task_base = task_name.split("/")[-1] if "/" in task_name else task_name
         return task_base == benchmark_name
 
     group_logs = [
-        log for log in eval_logs
-        if any(task_matches_benchmark(log.eval.task, bench) for bench in group_benchmarks)
+        log
+        for log in eval_logs
+        if any(
+            task_matches_benchmark(log.eval.task, bench) for bench in group_benchmarks
+        )
     ]
 
     if not group_logs:
@@ -205,9 +209,6 @@ def display_group_summary(
         if log.results:
             completed_samples += log.results.completed_samples
 
-            # Always count all samples for consistency
-            total_samples += log.results.completed_samples
-
             # Extract accuracy from EvalScore.metrics (correct API per inspect_ai)
             # log.results.scores is a list of EvalScore objects, each with a .metrics dict
             accuracy_value = None
@@ -221,8 +222,10 @@ def display_group_summary(
                             )
                             break
 
-            # Calculate correct count based on accuracy (or 0 if no accuracy found)
+            # Only include benchmarks with accuracy in aggregate calculation
+            # This prevents skewing results when mixing benchmark types
             if accuracy_value is not None:
+                total_samples += log.results.completed_samples
                 # Extract numeric value if it's an EvalMetric object
                 numeric_value = float(
                     accuracy_value.value
@@ -231,7 +234,6 @@ def display_group_summary(
                 )
                 correct = int(numeric_value * log.results.completed_samples)
                 total_correct += correct
-            # If accuracy not found, treat as 0 correct (already initialized to 0)
 
     # Only display if we have data
     if total_samples == 0:
