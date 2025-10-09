@@ -181,7 +181,17 @@ def display_group_summary(
         eval_logs: List of evaluation logs from all benchmarks
     """
     # Filter to only logs from this group's benchmarks
-    group_logs = [log for log in eval_logs if log.eval.task in group_benchmarks]
+    # Handle both 'benchmark' and 'openbench/benchmark' task name formats
+    def task_matches_benchmark(task_name: str, benchmark_name: str) -> bool:
+        """Check if task name matches benchmark, handling namespace prefixes."""
+        # Strip namespace prefix if present (e.g., 'openbench/smt_algebra' -> 'smt_algebra')
+        task_base = task_name.split('/')[-1] if '/' in task_name else task_name
+        return task_base == benchmark_name
+
+    group_logs = [
+        log for log in eval_logs
+        if any(task_matches_benchmark(log.eval.task, bench) for bench in group_benchmarks)
+    ]
 
     if not group_logs:
         return
@@ -194,13 +204,24 @@ def display_group_summary(
     for log in group_logs:
         if log.results:
             completed_samples += log.results.completed_samples
+            accuracy_value = None
 
-            # Try to extract accuracy metric to calculate correct count
-            if log.results.scores:
+            # Try to extract accuracy from top-level metrics (modern @scorer pattern)
+            if hasattr(log.results, "metrics") and log.results.metrics:
+                # Check if metrics is a list
+                if isinstance(log.results.metrics, list):
+                    for metric in log.results.metrics:
+                        if hasattr(metric, "name") and metric.name == "accuracy":
+                            accuracy_value = metric.value
+                            break
+                # Check if metrics is a dict
+                elif isinstance(log.results.metrics, dict) and "accuracy" in log.results.metrics:
+                    metric = log.results.metrics["accuracy"]
+                    accuracy_value = metric.value if hasattr(metric, "value") else metric
+
+            # Fallback: Try to extract accuracy from individual scores (legacy pattern)
+            if accuracy_value is None and log.results.scores:
                 for score in log.results.scores:
-                    # Look for accuracy in various possible locations
-                    accuracy_value = None
-
                     # Check if score.metrics is a dict with "accuracy" key
                     if hasattr(score, "metrics") and isinstance(score.metrics, dict):
                         if "accuracy" in score.metrics:
@@ -208,27 +229,28 @@ def display_group_summary(
                             accuracy_value = (
                                 metric.value if hasattr(metric, "value") else metric
                             )
+                            break
 
-                    # Fallback: check score.value directly (for simple scorers)
+                    # Check score.value directly (for simple scorers)
                     elif (
                         hasattr(score, "name")
                         and score.name == "accuracy"
                         and hasattr(score, "value")
                     ):
                         accuracy_value = score.value
-
-                    # If we found accuracy, calculate correct count
-                    if accuracy_value is not None:
-                        # Extract numeric value if it's an EvalMetric object
-                        numeric_value = float(
-                            accuracy_value.value
-                            if hasattr(accuracy_value, "value")
-                            else accuracy_value
-                        )
-                        correct = int(numeric_value * log.results.completed_samples)
-                        total_correct += correct
-                        total_samples += log.results.completed_samples
                         break
+
+            # If we found accuracy, calculate correct count
+            if accuracy_value is not None:
+                # Extract numeric value if it's an EvalMetric object
+                numeric_value = float(
+                    accuracy_value.value
+                    if hasattr(accuracy_value, "value")
+                    else accuracy_value
+                )
+                correct = int(numeric_value * log.results.completed_samples)
+                total_correct += correct
+                total_samples += log.results.completed_samples
 
     # Only display if we have data
     if total_samples == 0:
