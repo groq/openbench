@@ -206,23 +206,10 @@ def display_group_summary(
             completed_samples += log.results.completed_samples
             accuracy_value = None
 
-            # Try to extract accuracy from top-level metrics (modern @scorer pattern)
-            if hasattr(log.results, "metrics") and log.results.metrics:
-                # Check if metrics is a list
-                if isinstance(log.results.metrics, list):
-                    for metric in log.results.metrics:
-                        if hasattr(metric, "name") and metric.name == "accuracy":
-                            accuracy_value = metric.value
-                            break
-                # Check if metrics is a dict
-                elif isinstance(log.results.metrics, dict) and "accuracy" in log.results.metrics:
-                    metric = log.results.metrics["accuracy"]
-                    accuracy_value = metric.value if hasattr(metric, "value") else metric
-
-            # Fallback: Try to extract accuracy from individual scores (legacy pattern)
-            if accuracy_value is None and log.results.scores:
+            # Extract accuracy from EvalScore.metrics (correct API per inspect_ai)
+            # log.results.scores is a list of EvalScore objects, each with a .metrics dict
+            if log.results.scores:
                 for score in log.results.scores:
-                    # Check if score.metrics is a dict with "accuracy" key
                     if hasattr(score, "metrics") and isinstance(score.metrics, dict):
                         if "accuracy" in score.metrics:
                             metric = score.metrics["accuracy"]
@@ -230,15 +217,6 @@ def display_group_summary(
                                 metric.value if hasattr(metric, "value") else metric
                             )
                             break
-
-                    # Check score.value directly (for simple scorers)
-                    elif (
-                        hasattr(score, "name")
-                        and score.name == "accuracy"
-                        and hasattr(score, "value")
-                    ):
-                        accuracy_value = score.value
-                        break
 
             # If we found accuracy, calculate correct count
             if accuracy_value is not None:
