@@ -2188,7 +2188,6 @@ dependencies = [
     { name = "datasets" },
     { name = "groq" },
     { name = "inspect-ai" },
-    { name = "inspect-cyber" },
     { name = "jsonschema" },
     { name = "mcp" },
     { name = "openai" },
@@ -2201,6 +2200,9 @@ dependencies = [
 ]
 
 [package.dev-dependencies]
+cybench = [
+    { name = "inspect-cyber" },
+]
 dev = [
     { name = "mypy" },
     { name = "pre-commit" },
@@ -2227,7 +2229,6 @@ requires-dist = [
     { name = "datasets", specifier = ">=3.6.0" },
     { name = "groq", specifier = ">=0.30.0" },
     { name = "inspect-ai", specifier = "==0.3.125" },
-    { name = "inspect-cyber", specifier = "==0.1.0" },
     { name = "jsonschema", specifier = ">=4.23.0" },
     { name = "mcp", specifier = ">=1.13.1" },
     { name = "openai", specifier = ">=1.99.7" },
@@ -2240,6 +2241,7 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
+cybench = [{ name = "inspect-cyber", specifier = "==0.1.0" }]
 dev = [
     { name = "mypy", specifier = ">=1.15.0" },
     { name = "pre-commit", specifier = ">=4.2.0" },
