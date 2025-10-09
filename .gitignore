@@ -18,3 +18,6 @@ logs/
 local-prompts.md
 .env
 build/
+
+# CTF Archive challenges (stored on HuggingFace)
+src/openbench/evals/ctf_archive/challenges/

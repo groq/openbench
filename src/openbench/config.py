@@ -4639,9 +4639,9 @@ _BUILTIN_BENCHMARKS = {
     ),
     "ctf_archive": BenchmarkMetadata(
         name="CTF Archive",
-        description="Historical CTF challenges from pwn.college's archive (~790 challenges from 97 CTF competitions, 2011-2025)",
+        description="Historical CTF challenges from pwn.college's archive. 261 challenges with verified flags from 45 CTFs (2011-2024) spanning crypto, web, pwn, rev, forensics, and misc categories.",
         category="domain-specific",
-        tags=["cybersecurity", "ctf", "challenges", "historical"],
+        tags=["cybersecurity", "ctf", "challenges", "historical", "alpha"],
         module_path="openbench.evals.ctf_archive",
         function_name="ctf_archive",
     ),
