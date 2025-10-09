@@ -87,6 +87,7 @@ class EvalGroup:
     name: str  # Human-readable display name
     description: str  # Description of the group
     benchmarks: List[str]  # List of benchmark IDs to run
+    tags: List[str]  # Descriptive tags for categorization
 
 
 # Built-in benchmark metadata - minimal, no duplication
@@ -6151,6 +6152,13 @@ EVAL_GROUPS = {
     "bigbench": EvalGroup(
         name="BIG-Bench",
         description="Aggregate of 121 BIG-Bench tasks for comprehensive language model evaluation",
+        tags=[
+            "eval-group",
+            "reasoning",
+            "language",
+            "comprehensive",
+            "multiple-choice",
+        ],
         benchmarks=[
             "bigbench_anachronisms",
             "bigbench_analogical_similarity",
@@ -6278,6 +6286,7 @@ EVAL_GROUPS = {
     "bbh": EvalGroup(
         name="BIG-Bench Hard",
         description="Aggregate of 18 challenging BIG-Bench tasks that require multi-step reasoning",
+        tags=["eval-group", "reasoning", "challenging", "chain-of-thought"],
         benchmarks=[
             "bbh_causal_judgment",
             "bbh_date_understanding",
@@ -6302,6 +6311,7 @@ EVAL_GROUPS = {
     "agieval": EvalGroup(
         name="AGIEval",
         description="Aggregate of 17 AGIEval exam tasks testing human-level reasoning across various domains",
+        tags=["eval-group", "academic", "reasoning", "graduate-level", "exams"],
         benchmarks=[
             "agieval_aqua_rat",
             "agieval_gaokao_biology",
@@ -6325,6 +6335,7 @@ EVAL_GROUPS = {
     "ethics": EvalGroup(
         name="ETHICS",
         description="Aggregate of 5 ETHICS moral reasoning tasks",
+        tags=["eval-group", "ethics", "social", "reasoning"],
         benchmarks=[
             "ethics_commonsense",
             "ethics_deontology",
@@ -6336,6 +6347,7 @@ EVAL_GROUPS = {
     "blimp": EvalGroup(
         name="BLiMP",
         description="Aggregate of 67 BLiMP linguistic tasks",
+        tags=["eval-group", "linguistics", "grammar", "acceptability"],
         benchmarks=[
             "blimp_adjunct_island",
             "blimp_anaphor_gender_agreement",
@@ -6409,6 +6421,7 @@ EVAL_GROUPS = {
     "glue": EvalGroup(
         name="GLUE",
         description="Aggregate of 10 GLUE NLU tasks",
+        tags=["eval-group", "nlu", "language-understanding", "benchmark-suite"],
         benchmarks=[
             "glue_cola",
             "glue_mnli",
@@ -6425,6 +6438,7 @@ EVAL_GROUPS = {
     "global_mmlu": EvalGroup(
         name="Global-MMLU",
         description="Aggregate of 42 Global-MMLU language tasks",
+        tags=["eval-group", "knowledge", "multilingual", "multiple-choice"],
         benchmarks=[
             "global_mmlu_amharic",
             "global_mmlu_arabic",
@@ -6473,6 +6487,7 @@ EVAL_GROUPS = {
     "xcopa": EvalGroup(
         name="XCOPA",
         description="Aggregate of 11 XCOPA language tasks",
+        tags=["eval-group", "multilingual", "reasoning", "commonsense"],
         benchmarks=[
             "xcopa_et",
             "xcopa_ht",
@@ -6490,6 +6505,7 @@ EVAL_GROUPS = {
     "xstorycloze": EvalGroup(
         name="XStoryCloze",
         description="Aggregate of 11 XStoryCloze tasks",
+        tags=["eval-group", "multilingual", "reasoning", "story-completion"],
         benchmarks=[
             "xstorycloze_ar",
             "xstorycloze_en",
@@ -6507,6 +6523,7 @@ EVAL_GROUPS = {
     "xwinograd": EvalGroup(
         name="XWinograd",
         description="Aggregate of 6 XWinograd tasks",
+        tags=["eval-group", "multilingual", "reasoning", "coreference"],
         benchmarks=[
             "xwinograd_en",
             "xwinograd_fr",
@@ -6519,6 +6536,7 @@ EVAL_GROUPS = {
     "mgsm": EvalGroup(
         name="MGSM",
         description="Multilingual Grade School Math across 11 languages",
+        tags=["eval-group", "math", "multilingual", "reasoning"],
         benchmarks=[
             "mgsm_en",
             "mgsm_de",
@@ -6538,6 +6556,7 @@ EVAL_GROUPS = {
     "mmmu": EvalGroup(
         name="MMMU",
         description="Aggregate of 29+ MMMU subject tasks",
+        tags=["eval-group", "multimodal", "multiple-choice", "understanding"],
         benchmarks=[
             "mmmu_accounting",
             "mmmu_agriculture",
@@ -6573,6 +6592,7 @@ EVAL_GROUPS = {
     "arabic_exams": EvalGroup(
         name="Arabic Exams",
         description="Aggregate of 40+ Arabic exam tasks",
+        tags=["eval-group", "arabic", "multilingual", "academic", "exams"],
         benchmarks=[
             "arabic_exams_accounting_university",
             "arabic_exams_arabic_language_general",
@@ -6619,6 +6639,7 @@ EVAL_GROUPS = {
     "exercism": EvalGroup(
         name="Exercism",
         description="Aggregate of 5 Exercism coding tasks",
+        tags=["eval-group", "code", "programming", "multi-language"],
         benchmarks=[
             "exercism_go",
             "exercism_java",
@@ -6630,6 +6651,7 @@ EVAL_GROUPS = {
     "anli": EvalGroup(
         name="ANLI",
         description="Aggregate of 3 ANLI rounds",
+        tags=["eval-group", "nli", "reasoning", "adversarial"],
         benchmarks=[
             "anli_r1",
             "anli_r2",
@@ -6639,6 +6661,7 @@ EVAL_GROUPS = {
     "healthbench": EvalGroup(
         name="HealthBench",
         description="Aggregate of HealthBench tasks",
+        tags=["eval-group", "medical", "health", "domain-specific"],
         benchmarks=[
             "healthbench_consensus",
             "healthbench_hard",
@@ -6647,6 +6670,7 @@ EVAL_GROUPS = {
     "openai_mrcr": EvalGroup(
         name="OpenAI MRCR",
         description="Aggregate of 3 MRCR needle tasks",
+        tags=["eval-group", "reasoning", "multi-step"],
         benchmarks=[
             "openai_mrcr_2n",
             "openai_mrcr_4n",
@@ -6656,6 +6680,7 @@ EVAL_GROUPS = {
     "matharena": EvalGroup(
         name="MathArena",
         description="Aggregate of 11 math competition tasks",
+        tags=["eval-group", "math", "problem-solving", "competition"],
         benchmarks=[
             "aime_2023_I",
             "aime_2023_II",
@@ -6673,6 +6698,7 @@ EVAL_GROUPS = {
     "qa4mre": EvalGroup(
         name="QA4MRE",
         description="Aggregate of 3 QA4MRE years",
+        tags=["eval-group", "reading-comprehension", "question-answering"],
         benchmarks=[
             "qa4mre_2011",
             "qa4mre_2012",
@@ -6682,6 +6708,7 @@ EVAL_GROUPS = {
     "otis_mock_aime": EvalGroup(
         name="OTIS Mock AIME",
         description="Aggregate of 2 Mock AIME years",
+        tags=["eval-group", "math", "competition", "challenging"],
         benchmarks=[
             "otis_mock_aime_2024",
             "otis_mock_aime_2025",
@@ -6690,6 +6717,7 @@ EVAL_GROUPS = {
     "cti_bench": EvalGroup(
         name="CTI-Bench",
         description="Aggregate of 4 CTI-Bench tasks",
+        tags=["eval-group", "cybersecurity", "specialized"],
         benchmarks=[
             "cti_bench_ate",
             "cti_bench_mcq",
@@ -6700,6 +6728,7 @@ EVAL_GROUPS = {
     "bbl": EvalGroup(
         name="BIG-Bench Lite",
         description="BIG-Bench Lite - 18 selected BBH tasks",
+        tags=["eval-group", "linguistics", "acceptability"],
         benchmarks=[
             "bbh_causal_judgment",
             "bbh_date_understanding",
@@ -6721,16 +6750,10 @@ EVAL_GROUPS = {
             "bbh_tracking_shuffled_objects_three_objects",
         ],
     ),
-    "math": EvalGroup(
-        name="MATH Dataset",
-        description="MATH dataset variants for mathematical problem solving",
-        benchmarks=[
-            "math_500",
-        ],
-    ),
     "mmmlu": EvalGroup(
         name="MMMLU",
         description="MMLU in 14 languages",
+        tags=["eval-group", "knowledge", "multilingual", "multiple-choice"],
         benchmarks=[
             "mmmlu_ar_xy",
             "mmmlu_bn_bd",
@@ -6751,6 +6774,7 @@ EVAL_GROUPS = {
     "superglue": EvalGroup(
         name="SuperGLUE",
         description="SuperGLUE benchmark with 6 NLU tasks",
+        tags=["eval-group", "nlu", "language-understanding", "benchmark-suite"],
         benchmarks=[
             "boolq",
             "cb",

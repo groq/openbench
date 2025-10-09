@@ -76,7 +76,7 @@ def normalize_eval_group(group_id: str, group: Any) -> Dict[str, Any]:
         "name": name.strip(),
         "description": description.strip(),
         "category": "eval-group",
-        "tags": ["eval-group"],
+        "tags": group.tags if hasattr(group, "tags") else ["eval-group"],
         "id": group_id,
         "benchmark_count": len(benchmarks),
         "benchmarks": benchmarks,
