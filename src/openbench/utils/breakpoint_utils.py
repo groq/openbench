@@ -21,17 +21,28 @@ def extract_function_info(source: str, function_name: str) -> dict[str, Any]:
     """
     Extract metadata about a function from source code using AST.
 
+    Args:
+        source: Source code to parse
+        function_name: Name of function to find. May include class prefix
+                      (e.g., "Checker.checkDeadScopes" or "checkDeadScopes")
+
     Returns dict with:
     - func_start: Line where function/decorator starts (0-indexed)
     - func_def_end: Line where docstring ends (where body should start)
     - node_end_lineno: Original function end line
     - indent: Number of spaces for indentation
     """
+    # Strip class prefix if present (e.g., "Checker.checkDeadScopes" → "checkDeadScopes")
+    # This handles method names that include the class name in the dataset
+    method_name = (
+        function_name.split(".")[-1] if "." in function_name else function_name
+    )
+
     tree = ast.parse(source)
     lines = source.split("\n")
 
     for node in ast.walk(tree):
-        if isinstance(node, ast.FunctionDef) and node.name == function_name:
+        if isinstance(node, ast.FunctionDef) and node.name == method_name:
             # Find decorators
             decorator_start = node.lineno - 1  # 0-indexed
             if node.decorator_list:
@@ -62,7 +73,11 @@ def extract_function_info(source: str, function_name: str) -> dict[str, Any]:
                 "indent": indent,
             }
 
-    raise ValueError(f"Function '{function_name}' not found in source")
+    # Use original function_name in error for clarity
+    raise ValueError(
+        f"Function '{function_name}' not found in source "
+        f"(searched for method name '{method_name}')"
+    )
 
 
 def remove_functions_in_file(file_path: str, function_to_remove: str) -> dict[str, Any]:
