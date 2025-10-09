@@ -259,7 +259,6 @@ def display_group_summary(
             )
         return
 
-    total_incorrect = total_samples - total_correct
     aggregate_accuracy = total_correct / total_samples if total_samples > 0 else 0.0
 
     # Display summary
@@ -268,13 +267,17 @@ def display_group_summary(
     typer.echo("=" * 60)
     typer.echo(f"Total benchmarks:    {len(group_logs)}")
     typer.echo(f"Total samples:       {total_samples:,}")
-    # Handle both integer and float values for correct/incorrect
+
+    # Handle display based on whether scores are binary (0/1) or continuous (0.0-1.0)
     if total_correct == int(total_correct):
+        # Binary scores: display as simple counts
+        total_incorrect = int(total_samples - total_correct)
         typer.echo(f"Correct:             {int(total_correct):,}")
-        typer.echo(f"Incorrect:           {int(total_incorrect):,}")
+        typer.echo(f"Incorrect:           {total_incorrect:,}")
     else:
-        typer.echo(f"Correct:             {total_correct:.2f}")
-        typer.echo(f"Incorrect:           {total_incorrect:.2f}")
+        # Continuous scores: display weighted average only (avoid misleading "incorrect" count)
+        typer.echo(f"Average score:       {aggregate_accuracy:.4f}")
+
     typer.echo(f"Aggregate accuracy:  {aggregate_accuracy:.2%}")
     typer.echo("=" * 60 + "\n")
 
