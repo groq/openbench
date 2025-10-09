@@ -190,14 +190,17 @@ def insert_function_code(
     # Reconstruct: lines before + new code + lines after
     new_lines = []
     for i, line in enumerate(old_lines):
-        if i == start_line:
-            # Insert new function code
+        if i < start_line:
+            # Keep lines before function
+            new_lines.append(line)
+        elif i == start_line:
+            # Replace old function start with new complete function
             new_lines.append(adjusted_fn + "\n")
-        elif start_line <= i <= end_skip_range:
-            # Skip old function lines
+        elif i <= end_skip_range:
+            # Skip remaining old function lines (start_line+1 to end_skip_range)
             pass
         else:
-            # Keep other lines
+            # Keep lines after function
             new_lines.append(line)
 
     # Write back
