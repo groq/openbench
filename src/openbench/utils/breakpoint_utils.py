@@ -102,12 +102,16 @@ def remove_functions_in_file(file_path: str, function_to_remove: str) -> dict[st
     info = extract_function_info(source, function_to_remove)
 
     # Build new content: keep everything up to docstring end, add pass, skip rest
-    def_end = info["func_def_end"]
+    def_end = info["func_def_end"]  # 1-indexed: line where docstring ends
+    node_end = info["node_end_lineno"]  # 1-indexed: line where function ends
     new_indent = " " * (info["indent"] + 4)
     pass_line = f"{new_indent}pass"
 
     # Reconstruct file
-    new_lines = lines[:def_end] + [pass_line] + lines[info["node_end_lineno"] :]
+    # AST line numbers are 1-indexed, but lines array is 0-indexed
+    # To keep up to and including 1-indexed line N: use lines[:N]
+    # To skip 1-indexed lines up to and including line N: use lines[N:]
+    new_lines = lines[:def_end] + [pass_line] + lines[node_end:]
 
     # Write back
     with open(file_path, "w", encoding="utf-8") as f:
