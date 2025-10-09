@@ -16,7 +16,6 @@ dependencies = [
     "datasets>=3.6.0",
     "groq>=0.30.0",
     "inspect-ai==0.3.125",
-    "inspect-cyber==0.1.0",
     "openai>=1.99.7",
     "pillow>=10.0.0",
     "jsonschema>=4.23.0",
@@ -107,6 +106,9 @@ jsonschemabench = [
 ifeval = [
     "langdetect>=1.0.9",
     "nltk>=3.9.1",
+]
+cybench = [
+    "inspect-cyber==0.1.0",
 ]
 
 [tool.mypy]
