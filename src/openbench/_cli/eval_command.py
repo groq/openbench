@@ -182,12 +182,22 @@ def display_group_summary(
     """
     # Filter to only logs from this group's benchmarks
     # Handle task names that may have module prefix (e.g., "openbench/breakpoint_remove")
-    group_logs = [
-        log
-        for log in eval_logs
-        if log.eval.task in group_benchmarks
-        or log.eval.task.split("/")[-1] in group_benchmarks
-    ]
+    group_logs = []
+    for log in eval_logs:
+        if not hasattr(log, "eval") or not hasattr(log.eval, "task"):
+            continue
+        task_name = log.eval.task
+        if not isinstance(task_name, str):
+            continue
+        # Check exact match first
+        if task_name in group_benchmarks:
+            group_logs.append(log)
+            continue
+        # Check if task name has module prefix and base name matches
+        if "/" in task_name:
+            base_name = task_name.split("/")[-1]
+            if base_name in group_benchmarks:
+                group_logs.append(log)
 
     if not group_logs:
         return

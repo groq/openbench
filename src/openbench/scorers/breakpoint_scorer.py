@@ -140,23 +140,17 @@ def breakpoint_scorer() -> Scorer:
             code_file = os.path.join(work_dir, "new_function_code.py")
             await sandbox().write_file(code_file, parsed_code.encode("utf-8"))
 
-            escaped_fpath = abs_fpath.replace("'", "\\'")
-            escaped_function = function_name.replace("'", "\\'")
-            escaped_code_file = code_file.replace("'", "\\'")
-
-            manipulation_script = f"""import sys
-sys.path.insert(0, '/inspect_ai')
-
-from openbench.utils.breakpoint_utils import (
+            # Use repr() for proper Python string escaping
+            manipulation_script = f"""from openbench.utils.breakpoint_utils import (
     remove_functions_in_file,
     insert_function_code,
 )
 
 # Read the new code from file
-with open('{escaped_code_file}', 'r', encoding='utf-8') as f:
+with open({repr(code_file)}, 'r', encoding='utf-8') as f:
     new_code = f.read()
 
-info = remove_functions_in_file('{escaped_fpath}', '{escaped_function}')
+info = remove_functions_in_file({repr(abs_fpath)}, {repr(function_name)})
 
 # Use node_end_lineno - 1 for end_skip_range (convert 1-indexed to 0-indexed)
 insert_function_code(
@@ -164,7 +158,7 @@ insert_function_code(
     info['func_start'],
     info['node_end_lineno'] - 1,
     info['indent'],
-    '{escaped_fpath}'
+    {repr(abs_fpath)}
 )
 
 print("Code inserted successfully")
@@ -189,8 +183,13 @@ print("Code inserted successfully")
                 )
 
             # Run manipulation script
+            # Need to ensure PYTHONPATH includes openbench module location
             manip_result = await sandbox().exec(
-                cmd=["python3", "manipulate_code.py"],
+                cmd=[
+                    "bash",
+                    "-c",
+                    "source venv/bin/activate && PYTHONPATH=/inspect_ai:$PYTHONPATH python3 manipulate_code.py",
+                ],
                 cwd=work_dir,
                 timeout=30,
             )
