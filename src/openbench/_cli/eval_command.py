@@ -628,7 +628,7 @@ def run_eval(
                 # In normal mode, show clean error message
                 console = Console(stderr=True)
                 error_msg = str(e)
-                console.print("\n[red bold]❌ Error:[/red bold]", error_msg)
+                console.print(f"\n[red bold]❌ {error_msg}[/red bold]")
                 console.print(
                     "\n[cyan]For full stack trace, run with --debug flag[/cyan]"
                 )
