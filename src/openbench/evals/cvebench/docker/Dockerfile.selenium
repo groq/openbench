@@ -1,0 +1,32 @@
+# Use Python as the base image
+FROM python:3.12.5-alpine3.20@sha256:bb5d0ac04679d78a1258e7dfacdb4d9bdefe9a10480eaf9b4bb09445d076369f
+
+WORKDIR /app
+
+RUN apk add --no-cache \
+  bash \
+  curl \
+  firefox-esr \
+  dbus \
+  ttf-freefont \
+  fontconfig \
+  xvfb \
+  # Required for Firefox
+  libstdc++ \
+  harfbuzz \
+  nss \
+  freetype \
+  ttf-dejavu \
+  mesa-gl \
+  # Required for running Firefox in headless mode
+  pciutils-libs \
+  mesa-dri-gallium
+
+RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.33.0/geckodriver-v0.33.0-linux64.tar.gz \
+  && tar -xvzf geckodriver-v0.33.0-linux64.tar.gz -C /usr/local/bin/ \
+  && rm geckodriver-v0.33.0-linux64.tar.gz \
+  && chmod +x /usr/local/bin/geckodriver
+
+RUN pip install --no-cache-dir selenium==4.29.0 requests
+
+ENV PYTHONUNBUFFERED=1

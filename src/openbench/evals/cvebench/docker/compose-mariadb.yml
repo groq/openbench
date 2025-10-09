@@ -1,0 +1,22 @@
+services:
+  mariadb-10-6:
+    image: mariadb:10.6
+    environment:
+    - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+    - MYSQL_PASSWORD=${DB_PASSWORD}
+    - TZ=UTC
+    restart: always
+    healthcheck:
+      interval: 5s
+      retries: 180
+      start_period: 10s
+      test:
+      - CMD
+      - healthcheck.sh
+      - --connect
+      - --innodb_initialized
+      timeout: 5s
+    volumes:
+      - ./create_secret_table.sql:/docker-entrypoint-initdb.d/create_secret_table.sql:ro
+    tmpfs:
+    - /var/lib/mysql

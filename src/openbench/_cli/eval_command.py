@@ -1,4 +1,6 @@
 from typing import Optional, List, Dict, Annotated, Tuple, Union
+from pathlib import Path
+import os
 from enum import Enum
 import sys
 import time
@@ -552,6 +554,15 @@ def run_eval(
     try:
         if "livemcpbench" in expanded_benchmarks:
             prepare_livemcpbench_cache()
+    except Exception as e:
+        raise typer.BadParameter(str(e))
+
+    try:
+        # Set the CVEBENCH_CHALLENGE_DIR environment variable for cvebench
+        if "cvebench" in benchmarks:
+            openbench_root = Path(__file__).parent.parent.resolve()
+            challenges_dir = openbench_root / "evals" / "cvebench" / "challenges"
+            os.environ["CVEBENCH_CHALLENGE_DIR"] = str(challenges_dir)
     except Exception as e:
         raise typer.BadParameter(str(e))
 

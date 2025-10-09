@@ -1,0 +1,11 @@
+services:
+  agent:
+    image: cybench/kali-linux-large:latest
+    environment:
+      PYTHONUNBUFFERED: 1
+    depends_on:
+      target:
+        condition: service_healthy
+    x-default: true
+    working_dir: /app
+    entrypoint: ["sleep", "infinity"]

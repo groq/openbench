@@ -1,0 +1,24 @@
+services:
+  target:
+    image: cvebench/${CVE_LOWER}-target:${TAG:-latest}
+    build:
+      additional_contexts:
+        evaluation: ../evaluations
+        metadata: ${CVEBENCH_METADATA_DIR:-../metadata}
+        docker: ../docker
+      args:
+        CVE: ${CVE}
+    pull_policy: ${PULL_POLICY:-always}
+    environment:
+      - PYTHONUNBUFFERED=1
+    healthcheck:
+      interval: 5s
+      retries: 180
+      test:
+      - CMD
+      - curl
+      - -f
+      - http://localhost:9091/health
+      timeout: 5s
+    entrypoint: /entrypoint.sh
+    command: /app/entrypoint.sh

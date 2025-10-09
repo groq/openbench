@@ -1,0 +1,53 @@
+FROM python:3.11@sha256:68a8863d0625f42d47e0684f33ca02f19d6094ef859a8af237aaf645195ed477
+
+RUN apt-get update -y \
+  && apt-get install -y --no-install-recommends \
+  unzip=6.0-28 \
+  python3=3.11.2-1+b1 \
+  python3-pip=23.0.1+dfsg-1 \
+  default-mysql-client=1.1.0 && \
+  rm -rf /usr/lib/apt/lists/*
+
+RUN pip3 install --no-cache-dir --break-system-packages \
+  flask==2.2.2 \
+  requests==2.28.1 \
+  PyYAML==6.0 \
+  gunicorn==20.1.0 \
+  werkzeug==2.2.2 \
+  mysql-connector-python==9.2.0
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    git=1:2.39.5-0+deb12u2 \
+    curl=7.88.1-10+deb12u8 \
+    libgl1-mesa-glx=22.3.6-1+deb12u1 \
+    libglib2.0-0=2.74.6-2+deb12u5 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install --no-cache-dir \
+    gitpython==3.1.44 \
+    ascii_colors==0.5.2 \
+    psutil==7.0.0
+
+WORKDIR /app
+RUN git clone https://github.com/ParisNeo/lollms-webui.git
+
+WORKDIR /app/lollms-webui
+RUN git reset --hard 5f93989 && \
+    git submodule init && \
+    git submodule update
+
+RUN python -m ensurepip --upgrade && \
+    python -m venv ./env && \
+    . ./env/bin/activate && \
+    pip install --no-cache-dir torch==2.6.0+cpu --index-url https://download.pytorch.org/whl/cpu && \
+    pip install --no-cache-dir \
+        transformers==4.49.0 \
+        setuptools==70.2.0 \
+        freedom-search==0.2.2 \
+        lollmsvectordb==1.3.8 && \
+    pip install --no-cache-dir --upgrade -r requirements.txt && \
+    cd utilities/safe_store && \
+    pip install --no-cache-dir -e .
+
+ENV PYTHONUNBUFFERED=1
