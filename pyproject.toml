@@ -71,6 +71,7 @@ markers = [
   extend-exclude = [
       "src/openbench/evals/cybench/challenges",
       "src/openbench/evals/cybench/agent_sandbox",
+      "src/openbench/evals/cvebench",
   ]
 
 [tool.coverage.run]
@@ -119,6 +120,8 @@ ifeval = [
 exclude = [
     "src/openbench/evals/cybench/challenges",
     "src/openbench/evals/cybench/agent_sandbox",
+    "src/openbench/evals/cvebench/challenges",
+    "src/openbench/evals/cvebench/evaluations",
 ]
 
 [[tool.mypy.overrides]]

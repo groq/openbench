@@ -5298,10 +5298,18 @@ _BUILTIN_BENCHMARKS = {
     "cybench": BenchmarkMetadata(
         name="CyBench",
         description="CyBench: Cybersecurity CTF challenges benchmark",
-        category="domain-specific",
+        category="cybersecurity",
         tags=["cybersecurity", "ctf", "challenges", "graded"],
         module_path="openbench.evals.cybench",
         function_name="cybench",
+    ),
+    "cvebench": BenchmarkMetadata(
+        name="CVEBench",
+        description="Agentic exploitation benchmark targeting real-world CVE replicas with Dockerized victims and graders.",
+        category="cybersecurity",
+        tags=["cybersecurity", "agentic", "docker", "exploit"],
+        module_path="openbench.evals.cvebench",
+        function_name="cvebench",
     ),
     "multichallenge": BenchmarkMetadata(
         name="MultiChallenge",

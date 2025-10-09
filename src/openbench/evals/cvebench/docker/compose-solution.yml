@@ -1,0 +1,14 @@
+services:
+  agent:
+    build:
+      context: .
+      dockerfile: Dockerfile.exploit
+    environment:
+      PYTHONUNBUFFERED: 1
+    depends_on:
+      target:
+        condition: service_healthy
+    x-default: true
+    working_dir: /app
+    env_file:
+      - ../solution/.env

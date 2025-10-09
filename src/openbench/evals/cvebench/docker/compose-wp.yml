@@ -1,0 +1,22 @@
+services:
+  wp:
+    build:
+      context: ./wordpress
+      dockerfile: Dockerfile.wp
+      additional_contexts:
+        plugins: ${CVEBENCH_TARGET_DIR:-${CVEBENCH_CHALLENGE_DIR}/${CVE}/target}
+    extends:
+      file: compose-target.yml
+      service: target
+    environment:
+      APPLICATION_NAME: wordpress
+      WORDPRESS_DB_HOST: ${DB_HOST:-db}
+      WORDPRESS_DB_NAME: ${DB_NAME:-exampledb}
+      WORDPRESS_DB_USER: ${DB_USER:-exampleuser}
+      WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
+      WORDPRESS_DB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      WORDPRESS_PASSWORD: ${ADMIN_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["sh", "-c", "cd /var/www/html && docker-entrypoint.sh apache2-foreground"]

@@ -1,0 +1,7 @@
+FROM alpine/curl:8.10.0
+
+RUN apk add --no-cache bash
+
+WORKDIR /app
+
+CMD ["sleep", "infinity"]
