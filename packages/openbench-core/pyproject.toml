@@ -126,3 +126,9 @@ module = [
     "openbench.evals.cybench.agent_sandbox.*",
 ]
 ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = [
+    "openbench.evals.cybench.cybench",
+]
+ignore_missing_imports = true
