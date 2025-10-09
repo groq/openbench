@@ -108,7 +108,9 @@ Your task is to reconstruct the missing function body. Provide only the complete
             "fpath": fpath,
             "function_name": function_name,
             "test_command": repo.get("test_command", "pytest"),
-            "baseline_failures": test_info.get("failed", 1),
+            "baseline_failures": max(
+                test_info.get("failed", 1), 1
+            ),  # Ensure at least 1 to avoid division by zero
             "mode": "remove",
             "corruption_code": None,
         },
@@ -177,7 +179,9 @@ Your task is to identify and fix the bug. Provide the corrected function impleme
             "fpath": fpath,
             "function_name": function_name,
             "test_command": repo.get("test_command", "pytest"),
-            "baseline_failures": test_info.get("failed", 1),
+            "baseline_failures": max(
+                test_info.get("failed", 1), 1
+            ),  # Ensure at least 1 to avoid division by zero
             "corruption_score": corruption.get("score", 0),
             "corruption_code": corruption.get("code"),
             "mode": "discovery",

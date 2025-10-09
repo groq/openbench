@@ -37,7 +37,9 @@ def breakpoint_scorer() -> Scorer:
         fpath: str = metadata.get("fpath", "")
         function_name: str = metadata.get("function_name", "")
         test_command: str = metadata.get("test_command", "pytest")
-        baseline_failures: int = int(metadata.get("baseline_failures", 1))
+        baseline_failures: int = max(
+            int(metadata.get("baseline_failures", 1)), 1
+        )  # Ensure at least 1 to avoid division by zero
         parsed_code: str | None = metadata.get("parsed_function_code")
 
         # Check if we have the model's code
