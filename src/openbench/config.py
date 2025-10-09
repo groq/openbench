@@ -6278,4 +6278,9 @@ EVAL_GROUPS = {
             "wsc",
         ],
     ),
+    "breakpoint": EvalGroup(
+        name="Breakpoint",
+        description="Code repair benchmark with remove (498 problems) and discovery (269 problems) modes",
+        benchmarks=["breakpoint_remove", "breakpoint_discovery"],
+    ),
 }

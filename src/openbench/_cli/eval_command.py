@@ -181,14 +181,22 @@ def display_group_summary(
         eval_logs: List of evaluation logs from all benchmarks
     """
     # Filter to only logs from this group's benchmarks
-    group_logs = [log for log in eval_logs if log.eval.task in group_benchmarks]
+    # Handle task names that may have module prefix (e.g., "openbench/breakpoint_remove")
+    group_logs = [
+        log
+        for log in eval_logs
+        if log.eval.task in group_benchmarks
+        or log.eval.task.split("/")[-1] in group_benchmarks
+    ]
 
     if not group_logs:
         return
 
     # Aggregate metrics
     total_samples = 0
-    total_correct = 0
+    total_correct = (
+        0.0  # Use float to support both binary (0/1) and continuous (0.0-1.0) scores
+    )
     completed_samples = 0
 
     for log in group_logs:
@@ -217,7 +225,7 @@ def display_group_summary(
                     ):
                         accuracy_value = score.value
 
-                    # If we found accuracy, calculate correct count
+                    # If we found accuracy, calculate weighted contribution
                     if accuracy_value is not None:
                         # Extract numeric value if it's an EvalMetric object
                         numeric_value = float(
@@ -225,8 +233,9 @@ def display_group_summary(
                             if hasattr(accuracy_value, "value")
                             else accuracy_value
                         )
-                        correct = int(numeric_value * log.results.completed_samples)
-                        total_correct += correct
+                        # For continuous scores (0.0-1.0), keep as weighted sum
+                        # This works for both binary (0/1) and continuous scores
+                        total_correct += numeric_value * log.results.completed_samples
                         total_samples += log.results.completed_samples
                         break
 
@@ -249,8 +258,13 @@ def display_group_summary(
     typer.echo("=" * 60)
     typer.echo(f"Total benchmarks:    {len(group_logs)}")
     typer.echo(f"Total samples:       {total_samples:,}")
-    typer.echo(f"Correct:             {total_correct:,}")
-    typer.echo(f"Incorrect:           {total_incorrect:,}")
+    # Handle both integer and float values for correct/incorrect
+    if total_correct == int(total_correct):
+        typer.echo(f"Correct:             {int(total_correct):,}")
+        typer.echo(f"Incorrect:           {int(total_incorrect):,}")
+    else:
+        typer.echo(f"Correct:             {total_correct:.2f}")
+        typer.echo(f"Incorrect:           {total_incorrect:.2f}")
     typer.echo(f"Aggregate accuracy:  {aggregate_accuracy:.2%}")
     typer.echo("=" * 60 + "\n")
 
