@@ -136,16 +136,13 @@ def breakpoint_scorer() -> Scorer:
             # Step 6: Copy file to temp location for manipulation
             # (We can't use Python functions directly in sandbox, so we'll use shell commands)
 
-            # Write a Python script to manipulate the code
-            # Escape the code for Python string literal (no shell escaping needed)
-            # We'll write the code to a separate file to avoid quoting issues
+            # Write the code to a file in the sandbox to avoid quoting issues
             code_file = os.path.join(work_dir, "new_function_code.py")
-            with open(code_file, "w", encoding="utf-8") as f:
-                f.write(parsed_code)
+            await sandbox().write_file(code_file, parsed_code.encode("utf-8"))
 
             escaped_fpath = abs_fpath.replace("'", "\\'")
             escaped_function = function_name.replace("'", "\\'")
-            escaped_code_file = str(code_file).replace("'", "\\'")
+            escaped_code_file = code_file.replace("'", "\\'")
 
             manipulation_script = f"""import sys
 sys.path.insert(0, '/inspect_ai')
