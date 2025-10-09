@@ -2,8 +2,25 @@ from typing import Callable
 from inspect_ai.scorer import scorer, accuracy, stderr, Score, Target, std
 from inspect_ai.model import Model, get_model, ChatMessageUser
 from inspect_ai.solver import TaskState
-from openbench.utils.text import SMT_GRADER_PROMPT
 from openbench.metrics import grouped
+
+
+SMT_GRADER_PROMPT = """
+You are a mathematics expert tasked with grading Stanford Math Tournament solutions. You will be given:
+
+A student's complete solution with their reasoning
+The correct answer
+
+Grade the student solution as either CORRECT or INCORRECT, based on whether the student's final answer matches the correct answer.
+Only respond with a single word: either "CORRECT" or "INCORRECT".
+
+Student Solution:
+{response}
+
+Correct Answer:
+{correct_answer}
+
+Grade (CORRECT/INCORRECT):""".strip()
 
 
 @scorer(

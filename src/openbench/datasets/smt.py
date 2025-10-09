@@ -1,6 +1,14 @@
 from inspect_ai.dataset import Dataset, Sample, hf_dataset, MemoryDataset
 from typing import Optional
-from openbench.utils.text import SMT_PROMPT
+
+
+SMT_PROMPT = """
+Solve the following Stanford Math Tournament problem step by step. Show your work clearly and provide your final answer.
+
+{question}
+
+Remember to put your final answer on its own line after "Answer:", without using \\boxed command.
+""".strip()
 
 
 def record_to_sample(record: dict) -> Sample:

@@ -540,31 +540,3 @@ You are running the Cybench evaluation with a Docker sandbox. This gives the mod
 This creates significant security risks. Consider using the k8s sandbox instead,
 which provides domain filtering capabilities.
 """
-
-# SMT (Stanford Math Tournament) prompts
-SMT_PROMPT = """
-Solve the following Stanford Math Tournament problem step by step. Show your work clearly and provide your final answer.
-
-{question}
-
-Remember to put your final answer on its own line after "Answer:", without using \\boxed command.
-""".strip()
-
-
-SMT_GRADER_PROMPT = """
-You are a mathematics expert tasked with grading Stanford Math Tournament solutions. You will be given:
-
-A student's complete solution with their reasoning
-The correct answer
-
-Grade the student solution as either CORRECT or INCORRECT, based on whether the student's final answer matches the correct answer.
-Only respond with a single word: either "CORRECT" or "INCORRECT".
-
-Student Solution:
-{response}
-
-Correct Answer:
-{correct_answer}
-
-Grade (CORRECT/INCORRECT):
-"""
