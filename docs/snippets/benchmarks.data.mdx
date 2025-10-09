@@ -3684,6 +3684,34 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "Breakpoint (Discovery Mode)",
+    "description": "Code repair benchmark - locate and fix subtle bugs in corrupted code (269 problems)",
+    "category": "code",
+    "tags": [
+      "code",
+      "debugging",
+      "repair",
+      "reasoning",
+      "system-level"
+    ],
+    "function_name": "breakpoint_discovery",
+    "is_alpha": false
+  },
+  {
+    "name": "Breakpoint (Remove Mode)",
+    "description": "Code repair benchmark - reconstruct deleted function bodies based on test failures and repository context (498 problems)",
+    "category": "code",
+    "tags": [
+      "code",
+      "debugging",
+      "repair",
+      "reasoning",
+      "system-level"
+    ],
+    "function_name": "breakpoint_remove",
+    "is_alpha": false
+  },
+  {
     "name": "BrowseComp",
     "description": "A Simple Yet Challenging Benchmark for Browsing Agents - evaluates model performance on browsing-related tasks",
     "category": "core",
@@ -7283,6 +7311,20 @@ export const evalGroupsData = [
       "blimp_wh_vs_that_no_gap_long_distance",
       "blimp_wh_vs_that_with_gap",
       "blimp_wh_vs_that_with_gap_long_distance"
+    ]
+  },
+  {
+    "name": "Breakpoint",
+    "description": "Code repair benchmark with remove (498 problems) and discovery (269 problems) modes",
+    "category": "eval-group",
+    "tags": [
+      "eval-group"
+    ],
+    "id": "breakpoint",
+    "benchmark_count": 2,
+    "benchmarks": [
+      "breakpoint_remove",
+      "breakpoint_discovery"
     ]
   },
   {
