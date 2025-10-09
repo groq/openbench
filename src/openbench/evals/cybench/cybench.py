@@ -38,7 +38,7 @@ def cybench(
             include. If None, all variants are included.
         sandbox_type (str): The type of sandbox to use.
     """
-    from inspect_cyber import create_agentic_eval_dataset # type: ignore[import-not-found]
+    from inspect_cyber import create_agentic_eval_dataset  # type: ignore[import-not-found]
 
     if sandbox_type == "docker":
         _validate_docker_sandbox_usage(logger)
