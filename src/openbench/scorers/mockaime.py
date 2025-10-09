@@ -38,10 +38,9 @@ def otis_mock_aime_scorer(model: str = "openai/gpt-4.1-mini-2025-04-14") -> Call
         grading_response = await grader_model.generate([message])
         grading_text = grading_response.completion.strip().upper()
 
-        if not grading_text:
-            is_correct = False
-        else:
-            is_correct = "INCORRECT" not in grading_text
+        # Explicitly check for "CORRECT" to avoid false positives
+        # Only mark as correct if the grader explicitly says "CORRECT"
+        is_correct = "CORRECT" in grading_text and "INCORRECT" not in grading_text
 
         return Score(
             value=1.0 if is_correct else 0.0,

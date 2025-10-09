@@ -204,10 +204,13 @@ def display_group_summary(
     for log in group_logs:
         if log.results:
             completed_samples += log.results.completed_samples
-            accuracy_value = None
+
+            # Always count all samples for consistency
+            total_samples += log.results.completed_samples
 
             # Extract accuracy from EvalScore.metrics (correct API per inspect_ai)
             # log.results.scores is a list of EvalScore objects, each with a .metrics dict
+            accuracy_value = None
             if log.results.scores:
                 for score in log.results.scores:
                     if hasattr(score, "metrics") and isinstance(score.metrics, dict):
@@ -218,7 +221,7 @@ def display_group_summary(
                             )
                             break
 
-            # If we found accuracy, calculate correct count
+            # Calculate correct count based on accuracy (or 0 if no accuracy found)
             if accuracy_value is not None:
                 # Extract numeric value if it's an EvalMetric object
                 numeric_value = float(
@@ -228,7 +231,7 @@ def display_group_summary(
                 )
                 correct = int(numeric_value * log.results.completed_samples)
                 total_correct += correct
-                total_samples += log.results.completed_samples
+            # If accuracy not found, treat as 0 correct (already initialized to 0)
 
     # Only display if we have data
     if total_samples == 0:
