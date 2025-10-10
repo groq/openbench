@@ -865,6 +865,19 @@ BENCHMARKS = {
         function_name="mmmu_sociology",
         is_alpha=False,
     ),
+    "slide_vqa": BenchmarkMetadata(
+        name="SlideVQA",
+        description="Goes through slides and answers questions as well as tracing the source of the answer.",
+        category="core",
+        tags=[
+            "image",
+            "Q&A",
+            "source-tracing"
+        ],
+        module_path="openbench.evals.slide_vqa",
+        function_name="slide_vqa",
+        is_alpha=False,
+    ),
 }
 
 
