@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.1](https://github.com/groq/openbench/compare/v0.5.0...v0.5.1) (2025-10-10)
+
+
+### Bug Fixes
+
+* broken link ([#247](https://github.com/groq/openbench/issues/247)) ([5ef66e0](https://github.com/groq/openbench/commit/5ef66e0908652b4becf11b6d3a8b5497656f9c40))
+
+
+### Chores
+
+* update lockfile ([dff1bd9](https://github.com/groq/openbench/commit/dff1bd92e47bd9d4770da4a46f9ccfb3e90f83b2))
+
 ## [0.5.0](https://github.com/groq/openbench/compare/v0.4.1...v0.5.0) (2025-10-10)
 
 
