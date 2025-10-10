@@ -1,0 +1,203 @@
+---
+title: "Release Notes - v0.5.0"
+description: "OpenBench 0.5.0: ARC-AGI, 350+ new evals, plugins, provider routing, coding harnesses, tool-calling, and more"
+---
+
+## Overview
+
+OpenBench 0.5.0 is our biggest release yet. We added 350+ evaluations, partnered with the ARC Prize Foundation to add ARC-AGI, introduced a plugin system for external benchmarks, improved provider routing (OpenRouter) and Groq support, shipped coding harnesses you can mix and match (Exercism alpha), added a tool-calling benchmark (LiveMCPBench), and made a raft of developer-experience upgrades.
+
+Highlights
+- ARC-AGI (with ARC Prize Foundation) — non-linguistic, compositional reasoning
+- 350+ new/expanded evals: Global-MMLU(42), GLUE/SuperGLUE, BLiMP, AGIEval, Arabic Exams(41), BBH(18), and more
+- Plugins for external benchmarks (dash/underscore-insensitive; override built-ins)
+- Coding (alpha): Exercism multi-language problems + multiple harnesses (aider/roo/claude/opencode)
+- Tool-calling via LiveMCPBench (evaluate reliable structured tool use)
+- Provider routing (OpenRouter); Groq provider with reasoning support + rich telemetry
+- DevX: JSON logs, HF Hub export, cache/view commands, improved results panels, `run_eval` returns logs
+
+Links
+- Benchmarks Catalog → /benchmarks/catalog
+- Extending OpenBench (plugins) → /development/extending
+- CLI Overview → /cli/overview
+- Providers → /providers
+
+## ARC-AGI (with ARC Prize Foundation)
+
+ARC-AGI focuses on “fluid intelligence”: abstraction, transformation, and rule discovery beyond textual prior knowledge.
+
+Why it matters
+- Complements text benchmarks (MMLU/BBH) with non-linguistic reasoning
+- Helps surface true generalization capability
+- Deterministic seeds and clear scoring for reproducibility
+
+How to run
+```bash
+bench eval arc_agi --model groq/llama-3.3-70b
+bench eval arc_agi_1 --model openai/gpt-4o
+bench eval arc_agi_2 --model openrouter/deepseek/deepseek-chat-v3.1
+```
+
+Tips
+- Iterate quickly with `--limit` and control generation with `--temperature`, `--top-p`, and `--seed`
+- Export JSON logs with `--log-format json` for downstream analysis
+
+## 350+ New/Expanded Evaluations
+
+Big expansion across breadth and languages:
+- Global-MMLU (42 languages) + composite task
+- GLUE/SuperGLUE MCQ tasks (COPA, RTE, WiC, WSC, CB, MultiRC); BoolQ remains separate
+- BLiMP (68 linguistic tasks); AGIEval (18 tasks)
+- Arabic Exams (41 subsets)
+- Reading comprehension: RACE, QA4MRE, QASPER, DROP
+- Knowledge QA: TruthfulQA, LogiQA, SciQ, MathQA
+- Code: Exercism (Python/JS/Go/Java/Rust), HumanEval, MBPP
+- Multimodal: MMMU + MMMU Pro (MCQ/open/vision), MMMLU (multilingual MMLU), MMStar
+- Math: MathArena (AIME/HMMT/BRUMO 2023→2025), MATH/MATH-500, MGSM; Otis Mock AIME 2024/2025
+- BBH (18 tasks); additional BigBench suite tasks
+
+Browse everything in the Catalog → /benchmarks/catalog
+
+## Plugins: External Benchmarks (Override-Capable)
+
+Register third-party benchmarks via Python entry points — and optionally override built-ins, no forks required.
+
+pyproject.toml
+```toml
+[project.entry-points."openbench.benchmarks"]
+my_benchmark = "my_pkg.bench:get_benchmark_metadata"
+```
+
+Metadata function
+```python
+from openbench.utils import BenchmarkMetadata
+
+def get_benchmark_metadata():
+    return BenchmarkMetadata(
+        name="My Bench",
+        description="A custom benchmark",
+        category="community",
+        tags=["custom", "reasoning"],
+        module_path="my_pkg.bench_impl",
+        function_name="my_benchmark",
+    )
+```
+
+Behavior
+- CLI is dash/underscore-insensitive (e.g., `mmlu-pro` == `mmlu_pro`)
+- Entry points are merged after built-ins; keys differing only by `-` vs `_` are treated as the same; your entry point’s spelling wins
+- Best for internal extensions, patched datasets, or alternative scoring
+
+Learn more → /development/extending
+
+## Coding Benchmark (Alpha): Exercism + Harness Mixing
+
+Exercism evaluates code agents on real problems with unit tests (multi-language): Python, JavaScript, Go, Java, Rust.
+
+Harnesses
+- `aider`, `roo`, `claude`, `opencode`
+- Mix and match harnesses with any model to find the best combo
+
+Examples
+```bash
+# Python with aider
+bench eval exercism_python --code-agent aider --model groq/llama-3.3-70b
+
+# Go with Roo (requires OpenRouter model IDs)
+bench eval exercism_go --code-agent roo \
+  --model openrouter/anthropic/claude-sonnet-4-20250514
+```
+
+Under the hood
+- Dockerized execution and unit tests for each submission
+- Rich logs; export JSON (`--log-format json`) and push to Hub (`--hub-repo`)
+- We’ll publish research soon on harness × model interactions
+
+## Tool-Calling: LiveMCPBench
+
+Evaluate how reliably a model plans and orchestrates tools end-to-end.
+
+Run it
+```bash
+bench eval livemcpbench --model openai/gpt-4o
+```
+
+Tips
+- Concurrency: `--max-connections`
+- Timeouts: `--timeout`
+- Fast iteration: `--limit`
+- Caching: OpenBench prepares embeddings/data before the run and cleans up afterward; keep the root with `--keep-livemcp-root`
+- Logs: Use `--log-format json` + `--hub-repo username/openbench-logs` to compare runs
+
+## Provider Routing & Groq Enhancements
+
+OpenRouter provider
+- Fine-grained routing controls: `only`, `order`, `allow_fallbacks`, `ignore`, `sort`, `max_price`, `quantizations`, `require_parameters`, `data_collection`
+- Pass via model args; comma-separated values are accepted
+
+Example
+```bash
+bench eval mmlu \
+  --model openrouter/openai/gpt-4o \
+  -M only=groq,openai -M order=openai,groq -M allow_fallbacks=true \
+  -M sort=price -M quantizations=int8
+```
+
+Groq provider
+- Adds `reasoning_effort`, request IDs, detailed usage/timing metadata, executed tools, and OpenBench user-agent tagging
+
+## Developer Experience
+
+- JSON logs: `--log-format json` alongside `.eval` logs
+- Push results/stats/samples to the Hub: `--hub-repo` (see /cli/eval)
+- Cache utilities: `bench cache info|ls|clear` for `~/.openbench` (see /cli/cache)
+- `bench view` to browse logs (see /cli/view)
+- Results panel: total time + sample duration (avg/p95/p50)
+- Programmatic: `from openbench import run_eval` returns logs
+
+## MultiChallenge (Judge-Based)
+
+- Strict judge model (structured YES/NO verdicts), robust parsing
+- Aggregates per-axis pass rates and an overall score
+- Supports truncating conversations via `max_turns`
+
+## Breaking & Behavior Changes
+
+- Default model is now `groq/openai/gpt-oss-20b`. If you relied on an older default, set `--model` explicitly
+- Roo code-agent requires OpenRouter model IDs (`openrouter/<vendor>/<model>`)
+- Benchmark names are dash/underscore-insensitive; external plugins can override built-ins by normalized name
+- BigBench/BBH are run as individual tasks (no aggregator command in final state)
+
+## Quickstarts
+
+ARC-AGI
+```bash
+bench eval arc_agi --model groq/llama-3.3-70b
+```
+
+Global-MMLU / Arabic Exams
+```bash
+bench eval global_mmlu_english --model openai/gpt-4o
+bench eval arabic_exams_general_knowledge --model groq/llama-3.3-70b
+```
+
+Exercism (alpha)
+```bash
+bench eval exercism_python --code-agent aider --model groq/llama-3.3-70b
+```
+
+MultiChallenge
+```bash
+bench eval multichallenge --model openai/gpt-4o --limit 50
+```
+
+Push logs to Hub
+```bash
+bench eval mmlu --model groq/llama-3.3-70b --hub-repo username/openbench-logs
+```
+
+## Thanks
+
+Huge thanks to the ARC Prize Foundation and our community of contributors and partners. 0.5.0 aims to help you measure what matters — with clarity, breadth, and speed.
+
+Star us on GitHub → https://github.com/groq/openbench
