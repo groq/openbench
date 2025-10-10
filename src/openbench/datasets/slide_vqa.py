@@ -2,7 +2,9 @@ from inspect_ai.dataset import Dataset, Sample, hf_dataset
 from inspect_ai.model import ChatMessageUser, ContentText, ContentImage
 from typing import List, Union, cast, Any
 import base64
+import os
 from openbench.utils.image import detect_image_mime_type
+from huggingface_hub import login
 
 
 def record_to_sample(record: dict) -> Sample:
@@ -54,6 +56,7 @@ def get_dataset(split: str = "test") -> Dataset:
     Returns:
         Dataset with SlideVQA questions and answers
     """
+    login(token=os.getenv("HF_API_KEY"))
     return hf_dataset(
         path="NTT-hil-insight/SlideVQA",
         split=split,
