@@ -181,8 +181,22 @@ def display_group_summary(
         group_benchmarks: List of benchmark names in this group
         eval_logs: List of evaluation logs from all benchmarks
     """
+
     # Filter to only logs from this group's benchmarks
-    group_logs = [log for log in eval_logs if log.eval.task in group_benchmarks]
+    # Handle both 'benchmark' and 'openbench/benchmark' task name formats
+    def task_matches_benchmark(task_name: str, benchmark_name: str) -> bool:
+        """Check if task name matches benchmark, handling namespace prefixes."""
+        # Strip namespace prefix if present (e.g., 'openbench/smt_algebra' -> 'smt_algebra')
+        task_base = task_name.split("/")[-1] if "/" in task_name else task_name
+        return task_base == benchmark_name
+
+    group_logs = [
+        log
+        for log in eval_logs
+        if any(
+            task_matches_benchmark(log.eval.task, bench) for bench in group_benchmarks
+        )
+    ]
 
     if not group_logs:
         return
@@ -196,40 +210,31 @@ def display_group_summary(
         if log.results:
             completed_samples += log.results.completed_samples
 
-            # Try to extract accuracy metric to calculate correct count
+            # Extract accuracy from EvalScore.metrics (correct API per inspect_ai)
+            # log.results.scores is a list of EvalScore objects, each with a .metrics dict
+            accuracy_value = None
             if log.results.scores:
                 for score in log.results.scores:
-                    # Look for accuracy in various possible locations
-                    accuracy_value = None
-
-                    # Check if score.metrics is a dict with "accuracy" key
                     if hasattr(score, "metrics") and isinstance(score.metrics, dict):
                         if "accuracy" in score.metrics:
                             metric = score.metrics["accuracy"]
                             accuracy_value = (
                                 metric.value if hasattr(metric, "value") else metric
                             )
+                            break
 
-                    # Fallback: check score.value directly (for simple scorers)
-                    elif (
-                        hasattr(score, "name")
-                        and score.name == "accuracy"
-                        and hasattr(score, "value")
-                    ):
-                        accuracy_value = score.value
-
-                    # If we found accuracy, calculate correct count
-                    if accuracy_value is not None:
-                        # Extract numeric value if it's an EvalMetric object
-                        numeric_value = float(
-                            accuracy_value.value
-                            if hasattr(accuracy_value, "value")
-                            else accuracy_value
-                        )
-                        correct = int(numeric_value * log.results.completed_samples)
-                        total_correct += correct
-                        total_samples += log.results.completed_samples
-                        break
+            # Only include benchmarks with accuracy in aggregate calculation
+            # This prevents skewing results when mixing benchmark types
+            if accuracy_value is not None:
+                total_samples += log.results.completed_samples
+                # Extract numeric value if it's an EvalMetric object
+                numeric_value = float(
+                    accuracy_value.value
+                    if hasattr(accuracy_value, "value")
+                    else accuracy_value
+                )
+                correct = int(numeric_value * log.results.completed_samples)
+                total_correct += correct
 
     # Only display if we have data
     if total_samples == 0:
