@@ -8,7 +8,7 @@ from inspect_ai.model import (
     ChatMessage,
 )
 from pydantic import BeforeValidator
-from inspect_ai.dataset import Sample, csv_dataset, hf_dataset, json_dataset
+from inspect_ai.dataset import Sample
 from inspect_ai.solver import generate, system_message
 from inspect_ai import Task, Epochs
 from openbench.scorers.mcq import create_mcq_scorer
@@ -101,33 +101,65 @@ def MCQEval(
     Returns:
         Task: Configured Inspect AI task with dataset, solver, scorer, config, and epochs.
     """
+    # Load the raw dataset first to enable filtering
     if dataset_type == "hf":
         if split is None:
             raise ValueError("For dataset_type='hf', you must provide split")
-        dataset = hf_dataset(
-            dataset_path,
-            split=split,
-            sample_fields=record_to_mcq_sample,
-            auto_id=auto_id,
-            name=subset_name,  # subset name
-            **(dataset_kwargs or {}),
+        from datasets import load_dataset as hf_load_dataset  # type: ignore
+
+        raw_dataset = hf_load_dataset(
+            dataset_path, name=subset_name, split=split, trust_remote_code=True
         )
     elif dataset_type == "csv":
-        dataset = csv_dataset(
-            csv_file=dataset_path,
-            sample_fields=record_to_mcq_sample,
-            auto_id=auto_id,
-            **(dataset_kwargs or {}),
-        )
+        import pandas as pd  # type: ignore
+
+        df = pd.read_csv(dataset_path)
+        raw_dataset = df.to_dict("records")
     elif dataset_type == "json":
-        dataset = json_dataset(
-            json_file=dataset_path,
-            sample_fields=record_to_mcq_sample,
-            auto_id=auto_id,
-            **(dataset_kwargs or {}),
-        )
+        import json as json_lib
+
+        with open(dataset_path) as f:
+            raw_dataset = json_lib.load(f)
     else:
         raise ValueError(f"Unsupported dataset type: {dataset_type}")
+
+    # Filter and convert records to samples with error handling
+    import warnings
+
+    samples = []
+    skipped_count = 0
+
+    for record in raw_dataset:
+        try:
+            sample = record_to_mcq_sample(record)
+            if sample is not None:
+                samples.append(sample)
+        except ValueError as e:
+            # Validation error - skip this record with warning
+            skipped_count += 1
+            record_id = record.get("idx", record.get("id", f"record_{skipped_count}"))
+            warnings.warn(
+                f"Skipping invalid MCQ record (id={record_id}) in {name}: {e}",
+                UserWarning,
+                stacklevel=2,
+            )
+        except Exception as e:
+            # Unexpected error - skip but warn about it
+            skipped_count += 1
+            record_id = record.get("idx", record.get("id", f"record_{skipped_count}"))
+            warnings.warn(
+                f"Unexpected error processing MCQ record (id={record_id}) in {name}: {e}",
+                UserWarning,
+                stacklevel=2,
+            )
+
+    if skipped_count > 0:
+        warnings.warn(
+            f"Skipped {skipped_count} invalid record(s) in {name}. "
+            f"Proceeding with {len(samples)} valid samples.",
+            UserWarning,
+            stacklevel=2,
+        )
 
     solver = [generate()]
     if prompt_template:
@@ -140,7 +172,7 @@ def MCQEval(
 
     return Task(
         name=name,
-        dataset=dataset,
+        dataset=samples,
         solver=solver,
         scorer=scorer,
         config=config if config else GenerateConfig(),
