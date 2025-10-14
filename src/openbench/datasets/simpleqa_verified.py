@@ -4,17 +4,10 @@ Reference: https://www.kaggle.com/datasets/deepmind/simpleqa-verified
 """
 
 import kagglehub  # type: ignore[import-untyped]
-from inspect_ai.dataset import Dataset, csv_dataset, Sample, MemoryDataset
+from inspect_ai.dataset import Dataset, csv_dataset, MemoryDataset
 import os
 
-
-def record_to_sample(record: dict) -> Sample:
-    """Convert a SimpleQA Verified CSV record to an Inspect Sample."""
-    return Sample(
-        input=record["problem"],
-        target=record["answer"],
-        metadata={"metadata": record.get("metadata", "")},
-    )
+from openbench.datasets.simpleqa import record_to_sample
 
 
 def get_dataset() -> Dataset:

@@ -67,6 +67,24 @@ def test_basic_humaneval():
     assert result.exit_code == 0
 
 
+def test_basic_simpleqa_verified():
+    """Test basic SimpleQA Verified evaluation with Groq grader."""
+    result = runner.invoke(
+        app,
+        [
+            "eval",
+            "simpleqa_verified",
+            "--limit",
+            "2",
+            "--model",
+            "groq/llama-3.1-8b-instant",
+            "-T",
+            "grader_model=groq/llama-3.1-70b-versatile",
+        ],
+    )
+    assert result.exit_code == 0
+
+
 def test_invalid_benchmark():
     """Test invalid benchmark name."""
     result = runner.invoke(

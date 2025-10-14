@@ -250,6 +250,7 @@ from .evals.prost import prost  # noqa: F401, E402
 from .evals.scicode import scicode  # noqa: F401, E402
 from .evals.swag import swag  # noqa: F401, E402
 from .evals.simpleqa import simpleqa  # noqa: F401, E402
+from .evals.simpleqa_verified import simpleqa_verified  # noqa: F401, E402
 from .evals.tumlu import tumlu  # noqa: F401, E402
 from .evals.winogrande import winogrande  # noqa: F401, E402
 from .evals.wsc273 import wsc273  # noqa: F401, E402
