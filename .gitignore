@@ -19,3 +19,4 @@ local-prompts.md
 .env
 build/
 **/build/
+**/data/
