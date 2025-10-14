@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version >= '3.13'",
@@ -1508,6 +1508,21 @@ wheels = [
 ]
 
 [[package]]
+name = "kagglehub"
+version = "0.3.13"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+    { name = "pyyaml" },
+    { name = "requests" },
+    { name = "tqdm" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1c/12/e13c1c8b203535b15dacc420c0f1596dda67463175ff1e4404af21815bdd/kagglehub-0.3.13.tar.gz", hash = "sha256:d3c8b6250627d665096cd91a9487559bf5ed61be607eaf63d14511b20eea646e", size = 113694, upload-time = "2025-08-26T16:17:33.486Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a4/8e/4077b08b95a1f8302c694a8b399bd413815fbe89045c41e6e08cd7d9439a/kagglehub-0.3.13-py3-none-any.whl", hash = "sha256:e00dec8b81396cbad9c7b5eb62a33cf8ae27da26227abd196ed8f054c845ca00", size = 68257, upload-time = "2025-08-26T16:17:32.13Z" },
+]
+
+[[package]]
 name = "kiwisolver"
 version = "1.4.9"
 source = { registry = "https://pypi.org/simple" }
@@ -2220,6 +2235,9 @@ jsonschemabench = [
 scicode = [
     { name = "scicode" },
 ]
+simpleqa-verified = [
+    { name = "kagglehub" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -2254,6 +2272,7 @@ ifeval = [
 ]
 jsonschemabench = [{ name = "jsonschema", specifier = ">=4.23.0" }]
 scicode = [{ name = "scicode", git = "https://github.com/TheFloatingString/SciCode-fork.git?rev=4f20d721ba3e2227196262083b9b7a70484d54f7" }]
+simpleqa-verified = [{ name = "kagglehub", specifier = ">=0.3.4" }]
 
 [[package]]
 name = "openbench-cyber"

@@ -487,6 +487,14 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.simpleqa",
         function_name="simpleqa",
     ),
+    "simpleqa_verified": BenchmarkMetadata(
+        name="SimpleQA Verified",
+        description="Rigorously curated benchmark from Google DeepMind measuring short-form factuality with improved data quality, addressing noisy labels, topical biases, and question redundancy",
+        category="core",
+        tags=["factuality", "question-answering", "graded"],
+        module_path="openbench.evals.simpleqa_verified",
+        function_name="simpleqa_verified",
+    ),
     "tumlu": BenchmarkMetadata(
         name="TUMLU",
         description="TUMLU is a comprehensive, multilingual, and natively developed language understanding benchmark specifically designed for Turkic languages.",
