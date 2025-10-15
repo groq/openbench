@@ -1,0 +1,1 @@
+gctf{always_check_for_duplicate_primes}

@@ -1,0 +1,163 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Cancel in-progress runs when a new run is queued on the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Set environment variables for consistency
+env:
+  UV_CACHE_TTL_SECONDS: 604800  # 1 week
+  UV_HTTP_TIMEOUT: 600  # 10 minutes
+
+jobs:
+  # Single job for linting and type checking to reduce overhead
+  quality-checks:
+    name: Quality Checks (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12"]  # Use latest for quality checks
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          enable-cache: true
+          cache-dependency-glob: |
+            **/pyproject.toml
+            **/uv.lock
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: uv sync --group dev
+
+      - name: Cache pre-commit
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
+          restore-keys: |
+            pre-commit-${{ runner.os }}-
+
+      - name: Run pre-commit hooks (all files)
+        run: uv run pre-commit run --all-files --show-diff-on-failure --color always
+
+  test:
+    name: Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          enable-cache: true
+          cache-dependency-glob: |
+            **/pyproject.toml
+            **/uv.lock
+
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: uv sync --group dev
+
+      - name: Run unit tests with coverage
+        run: |
+          uv run pytest -m "not integration" --cov=openbench --cov-report=term-missing
+
+  integration-test:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          enable-cache: true
+          cache-dependency-glob: |
+            **/pyproject.toml
+            **/uv.lock
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --group dev
+
+      - name: Run integration tests
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          uv run pytest -m integration -v
+        if: env.GROQ_API_KEY != ''
+
+  # Security scanning with pip-audit
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --group dev
+
+      - name: Run security audit
+        run: |
+          uv pip install pip-audit
+          uv run pip-audit --desc
+        continue-on-error: true  # Don't fail the build on vulnerabilities
+
+  # All checks must pass
+  all-checks:
+    name: All Checks Pass
+    runs-on: ubuntu-latest
+    needs: [quality-checks, test, integration-test, security]
+    if: always()
+    steps:
+      - name: Verify all checks passed
+        run: |
+          # Quality checks and test must always pass
+          if [[ "${{ needs.quality-checks.result }}" != "success" || 
+                "${{ needs.test.result }}" != "success" ]]; then
+            echo "One or more required checks failed"
+            exit 1
+          fi
+          
+          # Integration test can be skipped (for external PRs) or must succeed
+          if [[ "${{ needs.integration-test.result }}" != "success" && 
+                "${{ needs.integration-test.result }}" != "skipped" ]]; then
+            echo "Integration tests failed"
+            exit 1
+          fi
+          
+          # Security is continue-on-error, so we don't check it
+          echo "All required checks passed!"

@@ -1,0 +1,50 @@
+---
+title: "SimpleQA - Short-Form Factuality Evaluation"
+description: "Measuring short-form factuality in large language models with simple Q&A pairs"
+---
+
+## Overview
+
+SimpleQA is a benchmark designed to measure short-form factuality in large language models through simple question-and-answer pairs. The benchmark focuses on evaluating how accurately models can provide factual information in concise responses, making it an essential tool for assessing the reliability of AI systems in knowledge-based applications.
+
+## Key Features
+
+- **Factuality Focus**: Specifically designed to test factual accuracy rather than reasoning or creativity
+- **Short-Form Responses**: Evaluates concise, direct answers to factual questions
+- **Model-Graded Evaluation**: Uses advanced models to assess response quality and accuracy
+- **Diverse Topics**: Covers a wide range of factual domains and knowledge areas
+- **Real-World Relevance**: Questions reflect the types of factual queries users commonly ask
+
+
+## Usage
+
+Run SimpleQA evaluation with:
+
+```bash
+bench eval simpleqa
+```
+
+## Scoring
+
+SimpleQA uses model-graded evaluation to provide multiple scoring metrics:
+
+- **Overall Accuracy**: Percentage of questions answered correctly
+- **Domain-Specific Scores**: Performance breakdown by topic area
+- **Factual Accuracy**: Verification against reliable sources
+- **Response Quality**: Assessment of answer completeness and clarity
+- **Consistency**: Reliability across similar question types
+
+## Dataset Information
+
+- **Question Count**: 4,326 short-form factual questions
+- **Question Categories**:
+  - **Historical Facts** - Important dates, events, and historical figures
+  - **Scientific Knowledge** - Basic principles, discoveries, and terminology
+  - **Geography & Demographics** - Capitals, populations, and geographic features
+  - **Arts & Culture** - Famous works, artists, and cultural movements
+  - **Current Events & General Knowledge** - Recent news and common facts
+
+## Resources
+
+- **Paper**: [SimpleQA: A Simple, Scalable Benchmark for Short-Form Factuality](https://arxiv.org/abs/2408.13003)
+- **Code**: [OpenAI simple-evals](https://github.com/openai/simple-evals)

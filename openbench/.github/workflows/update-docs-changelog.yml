@@ -1,0 +1,57 @@
+name: Update Changelog Docs
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'CHANGELOG.md'
+
+permissions:
+  contents: write
+
+jobs:
+  update-changelog:
+    name: Update Changelog Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run export_changelog.py
+        run: uv run python scripts/export_changelog.py
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet docs/changelog.mdx; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No changes to changelog docs"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Changes detected in changelog docs"
+          fi
+
+      - name: Commit and push changes
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/changelog.mdx
+          git commit -m "chore: update changelog docs [skip ci]"
+          git push origin main

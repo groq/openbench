@@ -1,0 +1,26 @@
+{
+    "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+    "packages": {
+      ".": {
+        "release-type": "python",
+        "package-name": "openbench",
+        "include-v-in-tag": true,
+        "include-component-in-tag": false,
+        "changelog-path": "CHANGELOG.md",
+        "bump-minor-pre-major": true,
+        "bump-patch-for-minor-pre-major": true,
+        "pull-request-title-pattern": "chore: release ${component} ${version}",
+        "pull-request-header": "### Conventional Commits Only\n\nThis PR includes only changes from conventional commits. Non-conventional commits are automatically excluded.",
+        "changelog-sections": [
+          { "type": "feat", "section": "Features" },
+          { "type": "fix", "section": "Bug Fixes" },
+          { "type": "docs", "section": "Documentation" },
+          { "type": "chore", "section": "Chores" },
+          { "type": "refactor", "section": "Refactor" },
+          { "type": "test", "section": "Tests" },
+          { "type": "ci", "section": "CI" }
+        ]
+      }
+    }
+  }
+  

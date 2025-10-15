@@ -1,0 +1,55 @@
+---
+title: "GraphWalks - Graph Reasoning Evaluation"
+description: "Multi-hop reasoning on graphs testing both BFS traversal and parent finding capabilities"
+---
+
+## Overview
+
+GraphWalks evaluates language models' ability to perform multi-hop reasoning on graph structures. The benchmark tests fundamental graph traversal capabilities including Breadth-First Search (BFS) navigation and parent node identification, challenging models to understand and navigate complex relational structures.
+
+## Key Features
+
+- **Graph Reasoning**: Tests understanding of graph structures and relationships
+- **Multi-Hop Navigation**: Requires reasoning across multiple connected nodes
+- **Long-Context Processing**: Challenges models with extended relational information
+- **Dual Task Types**: Both BFS traversal and parent finding tasks
+- **Scalable Complexity**: Graphs of varying sizes and complexity levels
+
+
+## Usage
+
+Run GraphWalks evaluation with:
+
+```bash
+bench eval graphwalks
+```
+
+## Scoring
+
+GraphWalks evaluates performance across multiple dimensions:
+
+- **Overall Accuracy**: Success rate across all graph reasoning tasks
+- **Task-Specific Scores**: Separate metrics for BFS and parent finding
+- **Complexity Breakdown**: Performance by graph size and structure
+- **Reasoning Quality**: Assessment of problem-solving methodology and step-by-step logic
+- **Scalability Index**: How well performance maintains with increasing complexity
+
+## Dataset Information
+
+- **Task Types**: Breadth-First Search (BFS) and Parent Finding challenges
+- **Graph Structures**: Simple paths, tree structures, cyclic graphs, dense/sparse networks  
+- **Scale Variations**: Small (10-50 nodes), medium (50-200 nodes), large (200+ nodes) graphs
+- **Generation**: Algorithmically generated graphs ensuring diversity
+
+## Applications
+
+GraphWalks is particularly valuable for evaluating models intended for:
+
+- **Knowledge Graphs** - Semantic reasoning, query processing, link prediction, entity resolution
+- **Social Network Analysis** - Relationship mapping, influence tracking, community detection
+- **System Architecture** - Dependency analysis, network topology, fault tracing, resource planning
+
+## Resources
+
+- **Paper**: [Introducing GPT-4.1 in the API](https://openai.com/index/gpt-4-1/)
+- **Dataset**: [openai/graphwalks](https://huggingface.co/datasets/openai/graphwalks)

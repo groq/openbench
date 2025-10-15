@@ -1,0 +1,53 @@
+---
+title: "bench view"
+description: "View and analyze previous evaluation results"
+---
+
+## Overview
+
+The `bench view` command displays results from previous evaluations, allowing you to analyze performance, compare models, and track progress over time.
+
+## Usage
+
+```bash
+bench view [options]
+```
+
+## Options
+
+| Option | Description |
+|--------|-------------|
+| `--log-dir` | Log directory to view (defaults to ./logs) |
+| `--recursive` <br /> --no-recursive` | Include all logs in log_dir recursively |
+| `--host` | CP/IP host for server |
+| `--port` | TCP/IP port for server |
+| `--log-level` | Set the log level |
+
+## Examples
+
+### View Latest Result
+
+```bash
+bench view
+```
+
+Example Evaluation Logs Summary:
+
+``` x localhost
+| Task      |       Model        | Score | Status |         Completed        |                            File Name                           |
+|-----------|--------------------|-------|--------|--------------------------|----------------------------------------------------------------|
+| mmlu      | openai/o3-mini     | 0.82  |    ✓   | Sat Aug 16 2025 10:39 PM | 2025-08-16T22-39-13-04-00_mmlu_g5QsKYFFAR7zNSuMMs9a85.eval     |
+| humaneval | anthropic/claude-3 | 0.74  |    ✓   | Fri Aug 16 2025 03:22 PM | 2025-08-16T15-22-41-08-00_humaneval_k2mNpR8vLx3wQfE7Hs4B2.eval |
+| gpqa      | groq/llama-3.3-70b | 0.43  |    ✓   | Thu Aug 04 2025 11:45 AM | 2025-08-04T11-45-09-12-00_gpqa_diamond_v9XzTpL5Kj8rY3mQ7.eval |
+| math      | openai/gpt-4o      | 0.67  |    ✓   | Wed Aug 03 2025 08:15 AM | 2025-08-03T08-15-32-07-00_math_u4JhWq2NvL6xKc9PzM8sA1.eval    |
+| simpleqa  | openai/gpt-4o-mini | 0.58  |    ⚠   | Tue Jul 07 2025 05:30 PM | 2025-07-07T17-30-18-05-00_simpleqa_b7FgRp3XvK2nY9jQ6L.eval    |
+| ...       | ...                | ...   |  ...   | ...                      | ...                                                            |
+```
+
+Each entry in the evaluation logs summary can be expanded to show a detailed evaluation breakdown:
+<img
+  src="/images/bench_view_eval.png"
+  alt="Detailed Evaluation Breakdown"
+  height="300"
+  className="rounded-lg"
+/>

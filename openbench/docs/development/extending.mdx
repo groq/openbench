@@ -1,0 +1,280 @@
+---
+title: "Extending openbench"
+description: "Create and distribute custom benchmarks as Python packages"
+---
+
+## Overview
+
+openbench supports a plugin system via Python entry points, allowing you to:
+
+- **Distribute custom benchmarks** as standalone Python packages
+- **Override built-in benchmarks** with patched or enhanced versions
+- **Share benchmarks** across teams without modifying openbench source
+- **Version control benchmark implementations** independently
+
+External packages register benchmarks through `pyproject.toml` entry points. Once installed, they appear in `bench list` and work seamlessly with all CLI commands.
+
+## Quick Start
+
+### 1. Create Your Package Structure
+
+```bash
+my-benchmark-package/
+├── src/
+│   └── my_benchmarks/
+│       ├── __init__.py
+│       ├── metadata.py      # BenchmarkMetadata definitions
+│       └── my_eval.py        # Task implementation
+├── pyproject.toml
+└── README.md
+```
+
+### 2. Define Your Benchmark
+
+```python src/my_benchmarks/my_eval.py
+from inspect_ai import Task, task
+from inspect_ai.dataset import Sample, MemoryDataset
+from inspect_ai.scorer import match
+from inspect_ai.solver import generate
+
+@task
+def my_custom_benchmark():
+    """My custom evaluation task."""
+    # Define your dataset
+    samples = [
+        Sample(
+            input="What is 2+2?",
+            target="4",
+        ),
+        # ... more samples
+    ]
+
+    return Task(
+        dataset=MemoryDataset(samples=samples, name="my_custom_benchmark"),
+        solver=[generate()],
+        scorer=match(),
+        name="my_custom_benchmark",
+    )
+```
+
+### 3. Create Benchmark Metadata
+
+```python src/my_benchmarks/metadata.py
+from openbench.utils import BenchmarkMetadata
+
+def get_benchmark_metadata():
+    """Return benchmark metadata for entry point registration."""
+    return BenchmarkMetadata(
+        name="My Custom Benchmark",
+        description="A custom benchmark for evaluating X",
+        category="community",
+        tags=["custom", "math", "reasoning"],
+        module_path="my_benchmarks.my_eval",
+        function_name="my_custom_benchmark",
+        is_alpha=False,
+    )
+```
+
+### 4. Register Entry Point
+
+```toml pyproject.toml
+[project]
+name = "my-benchmark-package"
+version = "0.1.0"
+dependencies = [
+    "openbench>=0.4.1",
+]
+
+[project.entry-points."openbench.benchmarks"]
+my_custom_benchmark = "my_benchmarks.metadata:get_benchmark_metadata"
+```
+
+### 5. Install and Use
+
+```bash
+# Install your package
+pip install my-benchmark-package
+
+# Your benchmark now appears in openbench
+bench list
+bench describe my_custom_benchmark
+bench eval my_custom_benchmark --model groq/llama-3.1-70b
+```
+
+## Entry Point Specifications
+
+### Single Benchmark Registration
+
+Register one benchmark with the entry point name:
+
+```toml pyproject.toml
+[project.entry-points."openbench.benchmarks"]
+my_benchmark = "my_pkg.metadata:get_single_benchmark"
+```
+
+```python my_pkg/metadata.py
+from openbench.utils import BenchmarkMetadata
+
+def get_single_benchmark() -> BenchmarkMetadata:
+    """Entry point function that returns benchmark metadata."""
+    return BenchmarkMetadata(
+        name="My Benchmark",
+        description="...",
+        category="community",
+        tags=["custom"],
+        module_path="my_pkg.eval",
+        function_name="my_benchmark",
+    )
+```
+
+<Note>
+Entry points should reference a **callable function** that returns `BenchmarkMetadata` or `dict[str, BenchmarkMetadata]`.
+The function will be called automatically when loading entry points.
+</Note>
+
+### Multiple Benchmarks Registration
+
+Register multiple benchmarks from one entry point:
+
+```toml pyproject.toml
+[project.entry-points."openbench.benchmarks"]
+my_suite = "my_pkg.metadata:get_benchmark_suite"
+```
+
+```python my_pkg/metadata.py
+from openbench.utils import BenchmarkMetadata
+
+def get_benchmark_suite() -> dict[str, BenchmarkMetadata]:
+    """Return multiple benchmarks."""
+    return {
+        "benchmark_a": BenchmarkMetadata(
+            name="Benchmark A",
+            description="First benchmark in suite",
+            category="community",
+            tags=["suite", "part-a"],
+            module_path="my_pkg.benchmark_a",
+            function_name="benchmark_a",
+        ),
+        "benchmark_b": BenchmarkMetadata(
+            name="Benchmark B",
+            description="Second benchmark in suite",
+            category="community",
+            tags=["suite", "part-b"],
+            module_path="my_pkg.benchmark_b",
+            function_name="benchmark_b",
+        ),
+    }
+```
+
+## BenchmarkMetadata Fields
+
+<ParamField path="name" type="string" required>
+  Human-readable display name shown in `bench list` and `bench describe`
+</ParamField>
+
+<ParamField path="description" type="string" required>
+  Detailed description of what the benchmark evaluates
+</ParamField>
+
+<ParamField path="category" type="string" required>
+  Category for grouping. Common values: `"core"`, `"community"`, `"math"`, `"cybersecurity"`
+</ParamField>
+
+<ParamField path="tags" type="List[str]" required>
+  Tags for searchability (e.g., `["multiple-choice", "reasoning", "knowledge"]`)
+</ParamField>
+
+<ParamField path="module_path" type="string" required>
+  Python import path to the module containing the task function (e.g., `"my_pkg.evals.mmlu"`)
+</ParamField>
+
+<ParamField path="function_name" type="string" required>
+  Name of the `@task` decorated function to load (e.g., `"mmlu"`)
+</ParamField>
+
+<ParamField path="is_alpha" type="bool" default={false}>
+  Mark as experimental/alpha. Requires `--alpha` flag to run.
+</ParamField>
+
+## Overriding Built-in Benchmarks
+
+Entry points are merged **after** built-in benchmarks, allowing you to override them.
+This is useful for:
+
+- **Fixing dataset bugs** discovered in production
+- **Adding custom splits** or subsets
+- **Swapping scoring implementations** (e.g., using a different grader model)
+- **Patching behavior** without waiting for upstream fixes
+
+<Warning>
+Overriding built-ins can break reproducibility. Pin your dependencies and document
+any overrides clearly.
+</Warning>
+
+### Example: Override MMLU with Custom Version
+
+```toml pyproject.toml
+[project.entry-points."openbench.benchmarks"]
+mmlu = "my_pkg.custom_mmlu:get_metadata"
+```
+
+```python my_pkg/custom_mmlu.py
+from openbench.utils import BenchmarkMetadata
+from inspect_ai import Task, task
+from inspect_ai.dataset import csv_dataset
+
+@task
+def custom_mmlu():
+    """MMLU with fixed dataset URL."""
+    return Task(
+        dataset=csv_dataset("https://my-server.com/fixed-mmlu.csv"),
+        # ... rest of implementation
+        name="mmlu",
+    )
+
+def get_metadata() -> BenchmarkMetadata:
+    return BenchmarkMetadata(
+        name="MMLU (Fixed)",
+        description="MMLU with corrected dataset",
+        category="core",
+        tags=["multiple-choice", "knowledge", "patched"],
+        module_path="my_pkg.custom_mmlu",
+        function_name="custom_mmlu",
+    )
+```
+
+After installing this package, `bench eval mmlu` will use your custom version.
+
+## Troubleshooting
+
+### Benchmark Not Appearing
+
+If your benchmark doesn't show up in `bench list`:
+
+1. **Verify installation**: `pip list | grep my-benchmark-package`
+2. **Check entry point registration**:
+   ```bash
+   python -c "from importlib.metadata import entry_points; print([ep for ep in entry_points()['openbench.benchmarks']])"
+   ```
+3. **Check for errors**: Look for warnings in CLI output
+4. **Verify metadata function**: Ensure it returns `BenchmarkMetadata` or `dict[str, BenchmarkMetadata]`
+
+### Import Errors
+
+If you see `ModuleNotFoundError`:
+
+- Ensure `module_path` in `BenchmarkMetadata` is correct
+- Check that your package is properly installed
+- Verify the task function exists and is decorated with `@task`
+
+### Override Not Working
+
+If your override isn't taking effect:
+
+- Entry points are loaded at package import time
+- Restart your Python session / reinstall the package
+- Check that the entry point name exactly matches the built-in name
+
+<Tip>
+For questions or help, open an issue on [GitHub](https://github.com/groq/openbench/issues).
+</Tip>
