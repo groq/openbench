@@ -1,0 +1,41 @@
+name: Dependency Check
+
+on:
+  schedule:
+    # Run every Monday at 9 AM PST
+    - cron: '0 17 * * 1'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  check-dependencies:
+    name: Check for Outdated Dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Check for outdated packages
+        run: |
+          echo "## Checking for outdated packages..."
+          uv pip list --outdated || true
+          
+      - name: Create issue if dependencies are outdated
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'Dependencies are outdated',
+              body: 'The dependency check workflow found outdated packages. Please review and update.',
+              labels: ['dependencies', 'maintenance']
+            })

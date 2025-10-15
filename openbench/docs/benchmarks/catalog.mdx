@@ -1,0 +1,227 @@
+---
+title: Benchmarks Catalog
+description: Complete catalog of all available benchmarks with evaluation commands
+---
+
+import { useEffect, useMemo, useState } from 'react'
+import { benchmarksData, evalGroupsData } from "/snippets/benchmarks.data.mdx"
+
+## Featured
+
+<CardGroup cols={3}>
+  <Card title="MMLU" icon="graduation-cap" href="/evals/mmlu">
+    **57 subjects** · Multiple choice · Knowledge & reasoning
+
+    Massive Multitask Language Understanding - 57 academic subjects from the cais/mmlu dataset
+    
+  </Card>
+  
+  <Card title="GPQA Diamond" icon="diamond" href="/evals/gpqa-diamond">
+    **Graduate-level** · Science · Multiple choice
+
+    Graduate-level Google-Proof Q&A in biology, chemistry, and physics
+    
+  </Card>
+  
+  <Card title="LiveMCPBench" icon="wrench" href="/evals/livemcpbench">
+    **MCP** · Agent · Tool Calling
+
+    evaluates how effectively language models can navigate and utilize the Model Context Protocol (MCP) ecosystem.
+
+  </Card>
+  
+  <Card title="SimpleQA" icon="message-question" href="/evals/simpleqa">
+    **Factuality** · Model-Graded
+
+    Measuring short-form factuality in large language models with simple Q&A pairs
+    
+  </Card>
+  
+  <Card title="Exercism" icon="code" href="/evals/exercism">
+    **Agent** · Code generation
+
+    Real world code agent programming challenges across 5 languages
+
+  </Card>
+  
+  <Card title="GraphWalks" icon="hexagon-nodes" href="/evals/graphwalks">
+    **Graphs** · Long-context · Reasoning
+
+    Multi-hop reasoning on graphs - both BFS and parent finding tasks
+
+  </Card>
+</CardGroup>
+
+## Complete Benchmark Catalog
+
+export const CatalogTable = () => {
+  const [query, setQuery] = useState("")
+  const [category, setCategory] = useState("all")
+  const [tag, setTag] = useState("all")
+  const [includeAlpha, setIncludeAlpha] = useState(false)
+  const [sortKey, setSortKey] = useState("name")
+  const [sortDir, setSortDir] = useState("asc")
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(20)
+
+  const data = useMemo(() => {
+    const benchmarks = (benchmarksData || []).map((r) => ({
+      name: String(r?.name ?? "").trim(),
+      description: String(r?.description ?? "").trim(),
+      category: String(r?.category ?? "").trim(),
+      tags: Array.isArray(r?.tags) ? r.tags.map((t) => String(t).trim()).filter(Boolean) : [],
+      function_name: String(r?.function_name ?? "").trim(),
+      is_alpha: Boolean(r?.is_alpha),
+      is_group: false,
+      benchmark_count: 0,
+    }))
+    const groups = (evalGroupsData || []).map((g) => ({
+      name: String(g?.name ?? "").trim(),
+      description: String(g?.description ?? "").trim(),
+      category: String(g?.category ?? "").trim(),
+      tags: Array.isArray(g?.tags) ? g.tags.map((t) => String(t).trim()).filter(Boolean) : [],
+      function_name: String(g?.id ?? "").trim(),
+      is_alpha: false,
+      is_group: true,
+      benchmark_count: Number(g?.benchmark_count ?? 0),
+    }))
+    return [...benchmarks, ...groups]
+  }, [])
+
+  const categories = useMemo(() => {
+    const set = new Set()
+    data.forEach((r) => set.add(r.category))
+    return Array.from(set).sort((a, b) => a.localeCompare(b))
+  }, [data])
+
+  const tags = useMemo(() => {
+    const set = new Set()
+    data.forEach((r) => r.tags.forEach((t) => set.add(t)))
+    return Array.from(set).sort((a, b) => a.localeCompare(b))
+  }, [data])
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    const byQuery = (r) => (!q ? true : (
+      r.name.toLowerCase().includes(q) ||
+      r.description.toLowerCase().includes(q) ||
+      r.tags.some((t) => t.toLowerCase().includes(q)) ||
+      r.function_name.toLowerCase().includes(q)
+    ))
+    const byCategory = (r) => (category === "all" ? true : r.category === category)
+    const byTag = (r) => (tag === "all" ? true : r.tags.includes(tag))
+    const byAlpha = (r) => (includeAlpha ? true : !r.is_alpha)
+    return data.filter((r) => byQuery(r) && byCategory(r) && byTag(r) && byAlpha(r))
+  }, [data, query, category, tag, includeAlpha])
+
+  const sorted = useMemo(() => {
+    const s = [...filtered]
+    s.sort((a, b) => {
+      const av = a[sortKey]
+      const bv = b[sortKey]
+      const cmp = String(av).localeCompare(String(bv))
+      return sortDir === "asc" ? cmp : -cmp
+    })
+    return s
+  }, [filtered, sortKey, sortDir])
+
+  const total = sorted.length
+  const totalPages = Math.max(1, Math.ceil(total / pageSize))
+  const currentPage = Math.min(page, totalPages)
+  const startIdx = (currentPage - 1) * pageSize
+  const pageRows = sorted.slice(startIdx, startIdx + pageSize)
+
+  useEffect(() => { setPage(1) }, [query, category, tag, includeAlpha, pageSize])
+
+  const toggleSort = (key) => {
+    if (key === sortKey) setSortDir((d) => (d === "asc" ? "desc" : "asc"))
+    else { setSortKey(key); setSortDir("asc") }
+  }
+
+  const icon = (active) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={active ? "h-3 w-3 opacity-100" : "h-3 w-3 opacity-40"} aria-hidden="true"><path d={sortDir === "asc" ? "M7 14l5-5 5 5H7z" : "M7 10l5 5 5-5H7z"} /></svg>
+  )
+
+  return (
+    <div>
+      <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <label htmlFor="benchmarks-search" className="flex flex-col gap-1">
+          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">Search</span>
+          <input id="benchmarks-search" name="search" type="search" autoComplete="off" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search name, description, tags…" aria-label="Global search" className="w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm" />
+        </label>
+
+        <label htmlFor="benchmarks-category" className="flex flex-col gap-1">
+          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">Category</span>
+          <select id="benchmarks-category" name="category" value={category} onChange={(e) => setCategory(e.target.value)} aria-label="Filter by category" className="w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm">
+            <option value="all">All categories</option>
+            {categories.map((c) => (<option key={c} value={c}>{c}</option>))}
+          </select>
+        </label>
+
+        <label htmlFor="benchmarks-tag" className="flex flex-col gap-1">
+          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">Tag</span>
+          <select id="benchmarks-tag" name="tag" value={tag} onChange={(e) => setTag(e.target.value)} aria-label="Filter by tag" className="w-full rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm">
+            <option value="all">All tags</option>
+            {tags.map((t) => (<option key={t} value={t}>{t}</option>))}
+          </select>
+        </label>
+
+        <label htmlFor="benchmarks-include-alpha" className="flex items-center gap-2 mt-2 sm:mt-0">
+          <input id="benchmarks-include-alpha" name="includeAlpha" type="checkbox" checked={includeAlpha} onChange={(e) => setIncludeAlpha(e.target.checked)} aria-label="Include alpha benchmarks" className="h-4 w-4" />
+          <span className="text-sm text-zinc-800 dark:text-zinc-200">Include alpha</span>
+        </label>
+      </div>
+
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <div className="text-sm text-zinc-600 dark:text-zinc-300">{filtered.length} results</div>
+        <label htmlFor="benchmarks-rows-per-page" className="flex items-center gap-2">
+          <span className="text-xs text-zinc-600 dark:text-zinc-300">Rows per page</span>
+          <select id="benchmarks-rows-per-page" name="rowsPerPage" value={pageSize} onChange={(e) => setPageSize(Number(e.target.value))} aria-label="Rows per page" className="rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-2 py-1 text-sm">
+            {[10,20,50].map((n) => (<option key={n} value={n}>{n}</option>))}
+          </select>
+        </label>
+      </div>
+
+      <div className="relative overflow-x-auto rounded-md border border-zinc-200 dark:border-zinc-800">
+        <table className="min-w-full text-left text-sm" role="table" aria-label="Benchmarks catalog">
+          <thead className="bg-zinc-50 dark:bg-zinc-900/50 text-zinc-700 dark:text-zinc-200">
+            <tr>
+              <th scope="col" className="px-4 py-3 w-[28%]"><button type="button" onClick={() => toggleSort("name")} aria-sort={sortKey === "name" ? (sortDir === "asc" ? "ascending" : "descending") : "none"} className="flex items-center gap-1 font-semibold">Name {icon(sortKey === "name")}</button></th>
+              <th scope="col" className="px-4 py-3">Description</th>
+              <th scope="col" className="px-4 py-3 w-[14%]"><button type="button" onClick={() => toggleSort("category")} aria-sort={sortKey === "category" ? (sortDir === "asc" ? "ascending" : "descending") : "none"} className="flex items-center gap-1 font-semibold">Category {icon(sortKey === "category")}</button></th>
+              <th scope="col" className="px-4 py-3 w-[18%]">Tags</th>
+              <th scope="col" className="px-4 py-3 w-[14%]">Command</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pageRows.length === 0 ? (
+              <tr><td colSpan={5} className="px-4 py-8 text-center text-zinc-600 dark:text-zinc-300">No results match your filters.</td></tr>
+            ) : (
+              pageRows.map((r) => (
+                <tr key={r.function_name} className="border-t border-zinc-200 dark:border-zinc-800 align-top">
+                  <td className="px-4 py-3"><div className="flex items-center gap-2"><span className="font-medium text-zinc-900 dark:text-zinc-100">{r.name}</span>{r.is_alpha && (<span className="inline-flex items-center rounded bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">alpha</span>)}{r.is_group && (<span className="inline-flex items-center rounded bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">group</span>)}</div>{r.is_group && r.benchmark_count > 0 && (<div className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">{r.benchmark_count} benchmarks</div>)}</td>
+                  <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{r.description}</td>
+                  <td className="px-4 py-3"><span className="inline-flex rounded-md bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-xs text-zinc-700 dark:text-zinc-300">{r.category}</span></td>
+                  <td className="px-4 py-3"><div className="flex flex-wrap gap-1.5">{r.tags.map((t) => (<span key={t} className="inline-flex rounded-md bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-xs text-zinc-700 dark:text-zinc-300">{t}</span>))}</div></td>
+                  <td className="px-4 py-3"><code className="rounded bg-zinc-100 dark:bg-zinc-900 px-2 py-1 text-xs text-zinc-800 dark:text-zinc-200">bench eval {r.function_name}</code></td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="mt-3 flex items-center justify-between gap-3">
+        <div className="text-sm text-zinc-600 dark:text-zinc-300">Page {currentPage} of {totalPages}</div>
+        <div className="flex items-center gap-2">
+          <button type="button" className={currentPage === 1 ? "rounded-md border px-3 py-1.5 text-sm cursor-not-allowed opacity-50 border-zinc-200 dark:border-zinc-800" : "rounded-md border px-3 py-1.5 text-sm border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"} onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} aria-label="Previous page">Prev</button>
+          <button type="button" className={currentPage === totalPages ? "rounded-md border px-3 py-1.5 text-sm cursor-not-allowed opacity-50 border-zinc-200 dark:border-zinc-800" : "rounded-md border px-3 py-1.5 text-sm border-zinc-300 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800"} onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} aria-label="Next page">Next</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+<div className="not-prose">
+  <CatalogTable />
+</div>

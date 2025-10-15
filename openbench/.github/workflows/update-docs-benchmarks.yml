@@ -1,0 +1,72 @@
+name: Update Benchmark Docs
+
+on:
+  pull_request:
+    paths:
+      - 'src/openbench/config.py'
+      - 'src/openbench/_registry.py'
+      - 'docs/snippets/benchmarks.data.mdx'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-benchmarks:
+    name: Update Benchmark Documentation
+    runs-on: ubuntu-latest
+    # Only run on PRs from the same repository (not forks)
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run export_benchmarks.py
+        run: uv run python scripts/export_benchmarks.py
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet docs/snippets/benchmarks.data.mdx; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No changes to benchmark docs"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Changes detected in benchmark docs"
+          fi
+
+      - name: Commit and push changes
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/snippets/benchmarks.data.mdx
+          git commit -m "chore: update benchmark docs [skip ci]"
+          git push
+
+      - name: Comment on PR
+        if: steps.check_changes.outputs.changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ Benchmark documentation has been automatically updated.'
+            })

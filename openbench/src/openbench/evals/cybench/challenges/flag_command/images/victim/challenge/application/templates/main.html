@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Flag Command</title>
+  <link rel="stylesheet" href="/static/terminal/css/terminal.css" />
+  <link rel="stylesheet" href="/static/terminal/css/commands.css" />
+</head>
+
+<body style="color: #94ffaa !important; position: fixed; height: 100vh; overflow: scroll; font-size: 28px;font-weight: 700;">
+  <div id="terminal-container" style="overflow: auto;height: 90%;">
+    <a id="before-div"></a>
+  </div>
+  <div id="command">
+    <textarea id="user-text-input" autofocus></textarea>
+    <div id="current-command-line">
+      <span id="commad-written-text"></span><b id="cursor">█</b>
+    </div>
+  </div>
+  <audio id="typing-sound" src="/static/terminal/audio/typing_sound.mp3" preload="auto"></audio>
+  <script src="/static/terminal/js/commands.js" type="module"></script>
+  <script src="/static/terminal/js/main.js" type="module"></script>
+  <script src="/static/terminal/js/game.js" type="module"></script>
+
+  <script type="module">
+    import { startCommander, enterKey, userTextInput } from "/static/terminal/js/main.js";
+    startCommander();
+
+    window.addEventListener("keyup", enterKey);
+
+    // event listener for clicking on the terminal
+    document.addEventListener("click", function () {
+      userTextInput.focus();
+    });
+
+
+  </script>
+</body>
+
+</html>

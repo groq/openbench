@@ -1,0 +1,119 @@
+@font-face {
+    font-family: ancient;
+    src: url(/font/Ancient_G_Written.ttf);
+}
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    overflow: hidden;
+    background-color: #306D68;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 100 100'%3E%3Crect x='0' y='0' width='46' height='46' fill-opacity='0.14' fill='%2300FFFC'/%3E%3C/svg%3E");
+}
+
+input:focus {
+    outline: none;
+}
+
+.fire {
+    text-align: center;
+    font-family: ancient, cursive;
+    top: 50%;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: rgb(0, 132, 255);
+    font-size: 15vmin;
+    outline: none;
+    text-shadow:
+        0 0 20px rgb(20, 33, 220),
+        0 0 20px rgb(20, 33, 220),
+        0 0 10px rgb(20, 33, 220),
+        5px -10px 10px rgb(0, 247, 255),
+        -5px -10px 10px rgb(0, 132, 255);
+    animation: 2s amazing infinite alternate linear;
+}
+
+.fire-form {
+    padding: 20px;
+}
+
+.fire-form-text {
+    color: #ffffff;
+    font-family: monospace;
+}
+
+.fire-form-input {
+    color: #ffffff;
+    padding: 10px;
+    border: none;
+    background-color: transparent;
+    border-bottom: 2px solid rgb(0, 247, 255);
+    transition-duration: 0.3s;
+}
+
+.fire-form-input:hover,
+.fire-form-input:focus {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.fire-form-button {
+    border: none;
+    font-family: monospace;
+    padding: 10px;
+    color: #ffffff;
+    background-color: #2672ca;
+    transition-duration: 0.3s;
+}
+
+.fire-form-button:hover {
+    background-color: #1d78ac;
+}
+
+@keyframes amazing {
+    0% {
+        text-shadow: 0 10px 20px rgb(20, 33, 220), 0 0 20px blue,
+            0 0 10px rgb(0, 247, 255),
+            0 0 10px rgb(0, 195, 255),
+            -5px -5px 5px rgb(0, 132, 255),
+            10px -10px 10px rgb(0, 132, 255);
+    }
+
+    25% {
+        text-shadow: 0 10px 20px rgb(20, 33, 220), 0 0 20px blue,
+            0 0 20px rgb(0, 247, 255),
+            -5px -5px 5px rgb(0, 132, 255),
+            5px -10px 10px rgb(0, 132, 255),
+            -5px -10px 10px rgb(0, 132, 255);
+    }
+
+    50% {
+        text-shadow: 0 10px 20px rgb(20, 33, 220), 0 0 20px blue,
+            0 0 10px rgb(0, 247, 255),
+            0 0 10px rgb(0, 195, 255),
+            -5px -5px 5px rgb(0, 132, 255),
+            10px -10px 10px rgb(0, 132, 255);
+    }
+
+    75% {
+        text-shadow: 0 10px 20px rgb(20, 33, 220), 0 0 20px blue,
+            0 0 20px rgb(0, 247, 255),
+            -5px -5px 5px rgb(0, 132, 255),
+            5px -10px 10px rgb(0, 132, 255),
+            -5px -10px 10px rgb(0, 132, 255);
+    }
+
+    100% {
+        text-shadow: 0 10px 20px rgb(20, 33, 220), 0 0 20px blue,
+            0 0 10px rgb(0, 247, 255),
+            0 0 10px rgb(0, 195, 255),
+            -5px -5px 5px rgb(0, 132, 255),
+            10px -10px 10px rgb(0, 132, 255);
+    }
+}

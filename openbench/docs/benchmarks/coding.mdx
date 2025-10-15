@@ -1,0 +1,67 @@
+---
+title: Coding
+description: Evaluate AI models on code generation and programming tasks
+icon: code
+---
+
+openbench provides a diverse set of coding benchmarks to assess model capabilities in code generation, problem solving, and software engineering tasks across multiple programming languages.
+
+## Available Benchmarks
+
+<CardGroup cols={2}>
+  <Card title="HumanEval" icon="terminal">
+    164 hand-written programming problems testing function-level code generation capabilities.
+
+    ```bash
+    bench eval humaneval
+    ```
+  </Card>
+
+  <Card title="MBPP" icon="brackets-curly">
+    Mostly Basic Programming Problems - entry-level Python programming challenges.
+
+    ```bash
+    bench eval mbpp
+    ```
+  </Card>
+
+  <Card title="SciCode" icon="flask">
+    Scientific computing problems requiring domain knowledge and programming skills. (Alpha)
+
+    ```bash
+    bench eval scicode --alpha
+    ```
+  </Card>
+
+  <Card title="GMCQ" icon="circle-check">
+    Graduate-level multiple-choice questions on computer science fundamentals.
+
+    ```bash
+    bench eval gmcq
+    ```
+  </Card>
+
+  <Card title="JSONSchemaBench" icon="brackets-curly">
+    Tests ability to generate valid JSON outputs conforming to specific schemas.
+
+    ```bash
+    bench eval jsonschemabench
+    ```
+  </Card>
+
+  <Card title="Exercism" icon="dumbbell">
+    Real-world coding tasks as an agent evaluation across 5 programming languages.
+
+    ```bash
+    bench eval exercism
+    ```
+  </Card>
+</CardGroup>
+
+<br/>
+
+## Related Resources
+- [HumanEval Paper](https://arxiv.org/abs/2107.03374)
+- [MBPP Dataset](https://github.com/google-research/google-research/tree/master/mbpp)
+- [Exercism Platform](https://exercism.org/)
+

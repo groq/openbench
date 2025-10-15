@@ -1,0 +1,55 @@
+---
+title: "SciCode - Scientific Computing Evaluation"
+description: "Scientific computing and programming challenges testing code generation for research applications"
+---
+
+## Overview
+
+SciCode is a specialized benchmark that evaluates language models' ability to generate code for scientific computing and research applications. The benchmark focuses on programming challenges that are commonly encountered in scientific research, testing both coding proficiency and understanding of scientific concepts and methodologies.
+
+## Key Features
+
+- **Scientific Focus**: Programming challenges specifically designed for scientific computing
+- **Research Applications**: Real-world problems from various scientific disciplines
+- **Code Generation**: Tests ability to write functional scientific code
+- **Multi-Disciplinary**: Covers multiple scientific domains and computational methods
+- **Practical Relevance**: Problems that mirror actual research computing needs
+
+
+## Usage
+
+Run SciCode evaluation with:
+
+```bash
+bench eval scicode
+```
+
+## Scoring
+
+SciCode evaluates generated code across multiple dimensions:
+
+- **Overall Success Rate**: Percentage of problems solved correctly
+- **Domain-Specific Performance**: Scores broken down by scientific field
+- **Correctness**: Functional accuracy, algorithm implementation, mathematical precision
+- **Code Quality**: Assessment of readability, efficiency, and best practices
+- **Execution Success**: Percentage of code that runs without errors
+- **Scientific Understanding**: Domain knowledge, method selection, parameter handling
+
+## Dataset Information
+
+- **Problem Count**: 338 scientific programming problems
+- **Scientific Domains**:
+  - **Physics & Engineering** - Numerical simulations, signal processing, computational physics
+  - **Biology & Bioinformatics** - Sequence analysis, phylogenetics, molecular dynamics
+  - **Chemistry & Materials Science** - Molecular analysis, reaction modeling, quantum chemistry
+  - **Mathematics & Statistics** - Numerical methods, statistical analysis, optimization
+  - **Data Science & Machine Learning** - Scientific data processing, modeling, visualization
+- **Challenge Types**:
+  - **Algorithm Implementation** - Numerical methods, data structures, optimization, simulation
+  - **Library Integration** - Scientific libraries (NumPy, SciPy), visualization, performance optimization
+  - **Research Workflows** - Data pipelines, reproducible code, testing, documentation
+
+## Resources
+
+- **Paper**: [SciCode: A Research Coding Benchmark Curated by Scientists](https://arxiv.org/abs/2407.13168)
+- **Dataset**: [SciCode1/SciCode](https://huggingface.co/datasets/SciCode1/SciCode)

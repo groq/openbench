@@ -1,0 +1,131 @@
+---
+title: "Quickstart"
+description: "Run your first benchmark evaluation in 3 easy steps."
+---
+
+## Your First Evaluation
+
+Let's run a complete benchmark evaluation from start to finish. We'll evaluate a model on MMLU, one of the most popular benchmarks for testing general knowledge.
+
+### Step 1: [Install openbench](/installation)
+
+<CodeGroup>
+```bash uv (recommended)
+# Install UV if you haven't already
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Create environment and install openbench
+
+uv venv
+source .venv/bin/activate
+uv pip install openbench
+
+```
+
+```bash pip
+python -m venv .venv
+source .venv/bin/activate
+pip install openbench
+```
+
+</CodeGroup>
+
+### Step 2: Set Your API Key
+
+Set environment variables:
+
+<Tabs>
+  <Tab title="Groq">
+    ```bash
+    export GROQ_API_KEY="gsk_..."
+    ```
+  </Tab>
+  <Tab title="OpenAI">
+    ```bash
+    export OPENAI_API_KEY="sk-..."
+    ```
+  </Tab>
+  <Tab title="Anthropic">
+    ```bash
+    export ANTHROPIC_API_KEY="sk-ant-..."
+    ```
+  </Tab>
+    <Tab title="OpenRouter">
+    ```bash
+    export OPENROUTER_API_KEY="sk-or-..."
+    ```
+  </Tab>
+</Tabs>
+Or create a `.env` file in your project directory:
+
+```bash .env
+# Model Provider API Keys
+GROQ_API_KEY="gsk_..."
+OPENAI_API_KEY="sk_..."
+ANTHROPIC_API_KEY="sk-ant-..."
+```  
+
+See [supported providers](/providers).
+
+### Step 3: Run Your First Benchmark
+
+```bash
+# Quick test with 10 questions
+bench eval mmlu --model groq/llama-3.3-70b-versatile --limit 10
+```
+
+<Info>
+The `--limit 10` flag runs only 10 questions for a quick test. Remove it to run the full benchmark (14,042 questions).
+Learn more about [configuration flags](/configuration#model-configuration).
+</Info>
+
+## Understanding the Output
+
+When you run a benchmark, you'll see:
+
+1. **Progress Bar**: Shows evaluation progress in real-time
+2. **Live Metrics**: Accuracy updates as questions are answered
+3. **Final Results**: Overall accuracy and benchmark-specific metrics
+4. **Log Location**: Where detailed results are saved
+
+Example Results:
+
+```
+╭────────────────────────────────────────────────────────────╮
+│mmlu (30 samples): openai/gpt-4.1                                                              │
+╰────────────────────────────────────────────────────────────╯
+timeout: 10000, max_connections: 10, temperature: 0.5, log_buffer: 10, dataset: mmlu_simple_eval                             
+                                                                                                                             
+total time:                0:00:11                                                                                           
+openai/gpt-4.1             12,220 tokens [I: 3,242, CW: 0, CR: 0, O: 8,978, R: 0]                                            
+                                                                                                                             
+mcq_scorer                                                                                                                   
+accuracy       0.900                                                                                                         
+stderr         0.056                                                                                                         
+std            0.305                                                                                                         
+stem_accuracy  0.900                                                                                                         
+stem_stderr    0.056                                                                                                         
+stem_std       0.305                                                                                                         
+                                                                                                                             
+Log: logs/2025-09-12T18-44-17-04-00_mmlu_KnXAbsNXcoQapiDi6PndUR.eval                                                         
+                                                                                                                             
+Evaluation complete!
+```
+
+## Viewing and Analyzing Results
+
+### Interactive Viewer
+
+Launch the web-based viewer for detailed sample-by-sample results with:
+
+```bash
+bench view
+```
+
+### Log Files
+
+Results are saved as .eval files in `./logs/`. The exact file path is denoted as part of the eval output:
+
+```
+Log: logs/2025-09-17T21-39-21-04-00_mmlu_kikHACevKMYey8r5iWEG96.eval  
+```
