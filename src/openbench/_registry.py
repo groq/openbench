@@ -309,6 +309,20 @@ from .evals import xwinograd  # noqa: F401, E402
 from .evals import agieval  # noqa: F401, E402
 
 # Ethics & Social Understanding benchmarks
+from .evals.bbq import (  # noqa: F401, E402
+    bbq,
+    bbq_age,
+    bbq_disability_status,
+    bbq_gender_identity,
+    bbq_nationality,
+    bbq_physical_appearance,
+    bbq_race_ethnicity,
+    bbq_race_x_ses,
+    bbq_race_x_gender,
+    bbq_religion,
+    bbq_ses,
+    bbq_sexual_orientation,
+)
 from .evals import ethics  # noqa: F401, E402
 from .evals import social_iqa  # noqa: F401, E402
 from .evals import toxigen  # noqa: F401, E402
