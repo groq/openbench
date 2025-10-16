@@ -1,11 +1,14 @@
 name: Update Changelog Docs
 
+# DISABLED: Changelog export is now handled in the Release Please PR
+# This workflow is kept for reference but will not run
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'CHANGELOG.md'
+  workflow_dispatch:  # Manual trigger only
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'CHANGELOG.md'
 
 permissions:
   contents: write
