@@ -7,7 +7,7 @@ description: "List all available benchmarks and their descriptions"
 
 The `bench list` command displays all available benchmarks in openbench, organized by category with brief descriptions.
 
-> Cybersecurity benchmarks are loaded from the optional `openbench-cyber` plugin. Install it with `uv pip install "openbench[cyber]"` if you do not see the `cybersecurity` category in your listing.
+> Cybersecurity benchmarks live in the separate `openbench-cyber` plugin. Because it contains live exploit payloads that trigger anti-malware tooling, you must install it manually after reviewing the risks: `uv pip install "openbench-cyber @ git+https://github.com/groq/openbench-cyber.git@d93522ba70392cdceddb83f762c78a68923e70da"`. Once installed, the `cybersecurity` category appears automatically.
 
 ## Usage
 

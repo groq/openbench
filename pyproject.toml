@@ -39,9 +39,6 @@ openbench = "openbench._cli:main"
 [project.entry-points.inspect_ai]
 openbench = "openbench._registry"
 
-[project.optional-dependencies]
-cyber = ["openbench-cyber @ git+https://github.com/groq/openbench-cyber.git@d93522ba70392cdceddb83f762c78a68923e70da"]
-
 [tool.setuptools]
 package-dir = {"" = "src"}
 
@@ -80,7 +77,6 @@ show_missing = true
 
 [tool.uv.sources]
 scicode = { git = "https://github.com/TheFloatingString/SciCode-fork.git", rev = "4f20d721ba3e2227196262083b9b7a70484d54f7" }
-openbench-cyber = { git = "https://github.com/groq/openbench-cyber.git", rev = "d93522ba70392cdceddb83f762c78a68923e70da" }
 
 [dependency-groups]
 dev = [
@@ -102,7 +98,4 @@ jsonschemabench = [
 ifeval = [
     "langdetect>=1.0.9",
     "nltk>=3.9.1",
-]
-cyber = [
-    "openbench-cyber @ git+https://github.com/groq/openbench-cyber.git@d93522ba70392cdceddb83f762c78a68923e70da",
 ]

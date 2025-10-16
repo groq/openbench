@@ -48,9 +48,9 @@ https://github.com/user-attachments/assets/e99e4628-f1f5-48e4-9df2-ae28b86168c2
 
 Some benchmark suites ship as standalone plugins so they can iterate independently from the core distribution. Install them alongside `openbench` with `uv pip` and they will automatically appear in `bench list` via the plugin entry point system.
 
-- `openbench-cyber`: adds the CTI-Bench family plus CyBench (agentic CTF challenges).
-  - Install directly from Git: `uv pip install "openbench-cyber @ git+https://github.com/groq/openbench-cyber.git@d93522ba70392cdceddb83f762c78a68923e70da"`
-  - Or use the optional dependency (which pins to the same commit): `uv pip install "openbench[cyber]"`
+- `openbench-cyber`: adds the CTI-Bench family plus CyBench (agentic CTF challenges). This plugin ships real exploit code and forensics artifacts that routinely trigger anti-malware scanners, so we require a deliberate, manual install after you read the security guidance.
+  - Install explicitly: `uv pip install "openbench-cyber @ git+https://github.com/groq/openbench-cyber.git@d93522ba70392cdceddb83f762c78a68923e70da"`
+  - Review the [plugin README](https://github.com/groq/openbench-cyber) for sandbox requirements and risk acknowledgements before using it.
 
 ## Using Different Providers
 

@@ -5,9 +5,9 @@ icon: shield
 ---
 
 
-> **Install the plugin:** `uv pip install "openbench[cyber]"` (or `uv pip install "openbench-cyber @ git+https://github.com/groq/openbench-cyber.git@d93522ba70392cdceddb83f762c78a68923e70da"`)
+> ⚠️ **Manual install required:** the `openbench-cyber` plugin packages real exploit code and forensic artifacts that many anti-malware tools flag. Review the risks, then install intentionally with `uv pip install "openbench-cyber @ git+https://github.com/groq/openbench-cyber.git@d93522ba70392cdceddb83f762c78a68923e70da"`.
 
-The cybersecurity benchmarks live in the optional **openbench-cyber** plugin. Once installed, these tasks automatically appear in `bench list`.
+The cybersecurity benchmarks live in the **openbench-cyber** plugin. Because of the sensitive payloads we do not ship it as a transitive dependency or optional extra—installing the plugin is an explicit opt-in. Once installed, these tasks automatically appear in `bench list`.
 
 The plugin currently ships the **CTI-Bench** suite for evaluating model performance on cyber threat intelligence tasks. CTI-Bench provides four benchmarks covering threat extraction, vulnerability classification, security knowledge, and risk assessment.
 
