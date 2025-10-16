@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.2](https://github.com/groq/openbench/compare/v0.5.1...v0.5.2) (2025-10-16)
+
+
+### Chores
+
+* require manual install for cyber plugin ([#252](https://github.com/groq/openbench/issues/252)) ([090f801](https://github.com/groq/openbench/commit/090f80123841d398a9f55577654a232b9bad8628))
+
 ## [0.5.1](https://github.com/groq/openbench/compare/v0.5.0...v0.5.1) (2025-10-16)
 
 
