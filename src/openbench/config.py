@@ -2663,43 +2663,6 @@ _BUILTIN_BENCHMARKS = {
         function_name="scicode",
         is_alpha=True,
     ),
-    # CTI-Bench family aggregate
-    "cti_bench_ate": BenchmarkMetadata(
-        name="CTI-Bench ATE",
-        description="Extracting MITRE ATT&CK techniques from malware and threat descriptions",
-        category="cybersecurity",
-        tags=["extraction", "cybersecurity"],
-        module_path="openbench.evals.cti_bench",
-        function_name="cti_bench_ate",
-        subtask=True,
-    ),
-    "cti_bench_mcq": BenchmarkMetadata(
-        name="CTI-Bench MCQ",
-        description="Multiple-choice questions evaluating understanding of CTI standards, threats, detection strategies, and best practices using authoritative sources like NIST and MITRE",
-        category="cybersecurity",
-        tags=["multiple-choice", "cybersecurity", "knowledge"],
-        module_path="openbench.evals.cti_bench",
-        function_name="cti_bench_mcq",
-        subtask=True,
-    ),
-    "cti_bench_rcm": BenchmarkMetadata(
-        name="CTI-Bench RCM",
-        description="Mapping CVE descriptions to CWE categories to evaluate vulnerability classification ability",
-        category="cybersecurity",
-        tags=["classification", "cybersecurity"],
-        module_path="openbench.evals.cti_bench",
-        function_name="cti_bench_rcm",
-        subtask=True,
-    ),
-    "cti_bench_vsp": BenchmarkMetadata(
-        name="CTI-Bench VSP",
-        description="Calculating CVSS scores from vulnerability descriptions to assess severity evaluation skills",
-        category="cybersecurity",
-        tags=["regression", "cybersecurity"],
-        module_path="openbench.evals.cti_bench",
-        function_name="cti_bench_vsp",
-        subtask=True,
-    ),
     "rootly_gmcq": BenchmarkMetadata(
         name="GMCQ",
         description="GitHub Multiple Choice Questions",
@@ -5295,14 +5258,6 @@ _BUILTIN_BENCHMARKS = {
         function_name="otis_mock_aime_2025",
         subtask=True,
     ),
-    "cybench": BenchmarkMetadata(
-        name="CyBench",
-        description="CyBench: Cybersecurity CTF challenges benchmark",
-        category="domain-specific",
-        tags=["cybersecurity", "ctf", "challenges", "graded"],
-        module_path="openbench.evals.cybench",
-        function_name="cybench",
-    ),
     "multichallenge": BenchmarkMetadata(
         name="MultiChallenge",
         description="Multi-turn conversational tasks requiring reasoning, instruction retention, and coherence.",
@@ -6183,16 +6138,6 @@ EVAL_GROUPS = {
         benchmarks=[
             "otis_mock_aime_2024",
             "otis_mock_aime_2025",
-        ],
-    ),
-    "cti_bench": EvalGroup(
-        name="CTI-Bench",
-        description="Aggregate of 4 CTI-Bench tasks",
-        benchmarks=[
-            "cti_bench_ate",
-            "cti_bench_mcq",
-            "cti_bench_rcm",
-            "cti_bench_vsp",
         ],
     ),
     "bbl": EvalGroup(

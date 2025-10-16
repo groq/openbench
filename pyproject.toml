@@ -39,21 +39,15 @@ openbench = "openbench._cli:main"
 [project.entry-points.inspect_ai]
 openbench = "openbench._registry"
 
+[project.optional-dependencies]
+cyber = ["openbench-cyber @ git+https://github.com/groq/openbench-cyber.git@d93522ba70392cdceddb83f762c78a68923e70da"]
+
 [tool.setuptools]
 package-dir = {"" = "src"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["openbench*"]
-
-[tool.setuptools.package-data]
-"openbench.evals.cybench" = [
-    "README.md",
-    "build-images.sh",
-    "push_images.sh",
-    "agent_sandbox/**",
-    "challenges/**",
-]
 
 [tool.pytest.ini_options]
 minversion = "8.0"
@@ -67,10 +61,6 @@ markers = [
 ]
 
 [tool.ruff]
-  extend-exclude = [
-      "src/openbench/evals/cybench/challenges",
-      "src/openbench/evals/cybench/agent_sandbox",
-  ]
 
 [tool.coverage.run]
 source = ["src/openbench"]
@@ -90,6 +80,7 @@ show_missing = true
 
 [tool.uv.sources]
 scicode = { git = "https://github.com/TheFloatingString/SciCode-fork.git", rev = "4f20d721ba3e2227196262083b9b7a70484d54f7" }
+openbench-cyber = { git = "https://github.com/groq/openbench-cyber.git", rev = "d93522ba70392cdceddb83f762c78a68923e70da" }
 
 [dependency-groups]
 dev = [
@@ -112,31 +103,6 @@ ifeval = [
     "langdetect>=1.0.9",
     "nltk>=3.9.1",
 ]
-cybench = [
-    "inspect-cyber==0.1.0",
+cyber = [
+    "openbench-cyber @ git+https://github.com/groq/openbench-cyber.git@d93522ba70392cdceddb83f762c78a68923e70da",
 ]
-
-
-[tool.mypy]
-exclude = [
-    "src/openbench/evals/cybench/challenges",
-    "src/openbench/evals/cybench/agent_sandbox",
-]
-
-[[tool.mypy.overrides]]
-module = [
-    "openbench.evals.cybench.challenges.*",
-]
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = [
-    "openbench.evals.cybench.agent_sandbox.*",
-]
-ignore_errors = true
-
-[[tool.mypy.overrides]]
-module = [
-    "openbench.evals.cybench.cybench",
-]
-ignore_missing_imports = true

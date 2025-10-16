@@ -5,7 +5,11 @@ icon: shield
 ---
 
 
-openbench currently includes the **CTI-Bench** suite for evaluating model performance on cyber threat intelligence tasks. CTI-Bench provides four benchmarks covering threat extraction, vulnerability classification, security knowledge, and risk assessment.
+> **Install the plugin:** `uv pip install "openbench[cyber]"` (or `uv pip install "openbench-cyber @ git+https://github.com/groq/openbench-cyber.git@d93522ba70392cdceddb83f762c78a68923e70da"`)
+
+The cybersecurity benchmarks live in the optional **openbench-cyber** plugin. Once installed, these tasks automatically appear in `bench list`.
+
+The plugin currently ships the **CTI-Bench** suite for evaluating model performance on cyber threat intelligence tasks. CTI-Bench provides four benchmarks covering threat extraction, vulnerability classification, security knowledge, and risk assessment.
 
 ## Available Benchmarks
 
@@ -42,7 +46,19 @@ openbench currently includes the **CTI-Bench** suite for evaluating model perfor
     ```
   </Card>
 </CardGroup>
-### More cybersecurity evals including CVE-Bench, CTF-Archive, and Cybench coming soon!
+
+### CyBench (CTF Challenges)
+
+`cybench` delivers end-to-end agentic CTF scenarios powered by [`inspect-cyber`](https://pypi.org/project/inspect-cyber/). Because the default sandbox grants elevated network access, you must acknowledge the risks before running:
+
+```bash
+export CYBENCH_ACKNOWLEDGE_RISKS=1
+bench eval cybench
+```
+
+<Tip>
+Pass `--sandbox k8s` to use a Kubernetes sandbox when the optional `inspect_k8s_sandbox` dependency is available.
+</Tip>
 
 <br/>
 

@@ -2199,9 +2199,14 @@ dependencies = [
     { name = "typer" },
 ]
 
+[package.optional-dependencies]
+cyber = [
+    { name = "openbench-cyber" },
+]
+
 [package.dev-dependencies]
-cybench = [
-    { name = "inspect-cyber" },
+cyber = [
+    { name = "openbench-cyber" },
 ]
 dev = [
     { name = "mypy" },
@@ -2232,6 +2237,7 @@ requires-dist = [
     { name = "jsonschema", specifier = ">=4.23.0" },
     { name = "mcp", specifier = ">=1.13.1" },
     { name = "openai", specifier = ">=1.99.7" },
+    { name = "openbench-cyber", marker = "extra == 'cyber'", git = "https://github.com/groq/openbench-cyber.git?rev=d93522ba70392cdceddb83f762c78a68923e70da" },
     { name = "pillow", specifier = ">=10.0.0" },
     { name = "platformdirs", specifier = ">=4.0.0" },
     { name = "pydantic-settings", specifier = ">=2.9.1" },
@@ -2239,9 +2245,10 @@ requires-dist = [
     { name = "tiktoken", specifier = ">=0.11.0" },
     { name = "typer", specifier = ">=0.15.3" },
 ]
+provides-extras = ["cyber"]
 
 [package.metadata.requires-dev]
-cybench = [{ name = "inspect-cyber", specifier = "==0.1.0" }]
+cyber = [{ name = "openbench-cyber", git = "https://github.com/groq/openbench-cyber.git?rev=d93522ba70392cdceddb83f762c78a68923e70da" }]
 dev = [
     { name = "mypy", specifier = ">=1.15.0" },
     { name = "pre-commit", specifier = ">=4.2.0" },
@@ -2258,6 +2265,15 @@ ifeval = [
 ]
 jsonschemabench = [{ name = "jsonschema", specifier = ">=4.23.0" }]
 scicode = [{ name = "scicode", git = "https://github.com/TheFloatingString/SciCode-fork.git?rev=4f20d721ba3e2227196262083b9b7a70484d54f7" }]
+
+[[package]]
+name = "openbench-cyber"
+version = "0.1.0"
+source = { git = "https://github.com/groq/openbench-cyber.git?rev=d93522ba70392cdceddb83f762c78a68923e70da#d93522ba70392cdceddb83f762c78a68923e70da" }
+dependencies = [
+    { name = "inspect-cyber" },
+    { name = "openbench" },
+]
 
 [[package]]
 name = "packaging"
