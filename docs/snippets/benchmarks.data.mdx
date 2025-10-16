@@ -1256,6 +1256,187 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "BBQ (Main Function)",
+    "description": "BBQ bias evaluation for a specific category - use individual category tasks instead",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa"
+    ],
+    "function_name": "bbq",
+    "is_alpha": false
+  },
+  {
+    "name": "BBQ: Age",
+    "description": "Evaluate age-related biases in question-answering",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa",
+      "age"
+    ],
+    "function_name": "bbq_age",
+    "is_alpha": false
+  },
+  {
+    "name": "BBQ: Disability Status",
+    "description": "Evaluate disability-related biases in question-answering",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa",
+      "disability"
+    ],
+    "function_name": "bbq_disability_status",
+    "is_alpha": false
+  },
+  {
+    "name": "BBQ: Gender Identity",
+    "description": "Evaluate gender identity-related biases in question-answering",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa",
+      "gender"
+    ],
+    "function_name": "bbq_gender_identity",
+    "is_alpha": false
+  },
+  {
+    "name": "BBQ: Nationality",
+    "description": "Evaluate nationality-related biases in question-answering",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa",
+      "nationality"
+    ],
+    "function_name": "bbq_nationality",
+    "is_alpha": false
+  },
+  {
+    "name": "BBQ: Physical Appearance",
+    "description": "Evaluate physical appearance-related biases in question-answering",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa",
+      "appearance"
+    ],
+    "function_name": "bbq_physical_appearance",
+    "is_alpha": false
+  },
+  {
+    "name": "BBQ: Race × Gender",
+    "description": "Evaluate intersectional race and gender biases",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa",
+      "race",
+      "gender"
+    ],
+    "function_name": "bbq_race_x_gender",
+    "is_alpha": false
+  },
+  {
+    "name": "BBQ: Race × SES",
+    "description": "Evaluate intersectional race and socioeconomic status biases",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa",
+      "race",
+      "ses"
+    ],
+    "function_name": "bbq_race_x_ses",
+    "is_alpha": false
+  },
+  {
+    "name": "BBQ: Race/Ethnicity",
+    "description": "Evaluate race and ethnicity-related biases in question-answering",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa",
+      "race"
+    ],
+    "function_name": "bbq_race_ethnicity",
+    "is_alpha": false
+  },
+  {
+    "name": "BBQ: Religion",
+    "description": "Evaluate religion-related biases in question-answering",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa",
+      "religion"
+    ],
+    "function_name": "bbq_religion",
+    "is_alpha": false
+  },
+  {
+    "name": "BBQ: Sexual Orientation",
+    "description": "Evaluate sexual orientation-related biases in question-answering",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa",
+      "sexual-orientation"
+    ],
+    "function_name": "bbq_sexual_orientation",
+    "is_alpha": false
+  },
+  {
+    "name": "BBQ: Socioeconomic Status",
+    "description": "Evaluate socioeconomic status-related biases in question-answering",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa",
+      "ses"
+    ],
+    "function_name": "bbq_ses",
+    "is_alpha": false
+  },
+  {
     "name": "BLiMP (67 Linguistic Phenomena)",
     "description": "Benchmark of Linguistic Minimal Pairs testing grammatical knowledge through minimal pair comparisons",
     "category": "linguistic",
@@ -6953,6 +7134,29 @@ export const evalGroupsData = [
       "arabic_exams_political_science_university",
       "arabic_exams_social_science_middle_school",
       "arabic_exams_social_science_primary_school"
+    ]
+  },
+  {
+    "name": "BBQ (Bias Benchmark for QA)",
+    "description": "Aggregate of 11 BBQ bias evaluation tasks across demographic categories",
+    "category": "eval-group",
+    "tags": [
+      "eval-group"
+    ],
+    "id": "bbq",
+    "benchmark_count": 11,
+    "benchmarks": [
+      "bbq_age",
+      "bbq_disability_status",
+      "bbq_gender_identity",
+      "bbq_nationality",
+      "bbq_physical_appearance",
+      "bbq_race_ethnicity",
+      "bbq_race_x_ses",
+      "bbq_race_x_gender",
+      "bbq_religion",
+      "bbq_ses",
+      "bbq_sexual_orientation"
     ]
   },
   {
