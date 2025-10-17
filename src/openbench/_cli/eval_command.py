@@ -1,4 +1,5 @@
 from typing import Optional, List, Dict, Annotated, Tuple, Union
+from rich.console import Console
 from enum import Enum
 import sys
 import time
@@ -630,12 +631,11 @@ def run_eval(
                 raise
             else:
                 # In normal mode, show clean error message
+                console = Console(stderr=True)
                 error_msg = str(e)
-                typer.secho(f"\n❌ Error: {error_msg}", fg=typer.colors.RED, err=True)
-                typer.secho(
-                    "\nFor full stack trace, run with --debug flag",
-                    fg=typer.colors.CYAN,
-                    err=True,
+                console.print(f"\n[red bold]❌ {error_msg}[/red bold]")
+                console.print(
+                    "\n[cyan]For full stack trace, run with --debug flag[/cyan]"
                 )
                 sys.exit(1)
     finally:

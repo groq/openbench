@@ -2182,13 +2182,12 @@ wheels = [
 
 [[package]]
 name = "openbench"
-version = "0.4.1"
+version = "0.5.1"
 source = { editable = "." }
 dependencies = [
     { name = "datasets" },
     { name = "groq" },
     { name = "inspect-ai" },
-    { name = "inspect-cyber" },
     { name = "jsonschema" },
     { name = "mcp" },
     { name = "openai" },
@@ -2227,7 +2226,6 @@ requires-dist = [
     { name = "datasets", specifier = ">=3.6.0" },
     { name = "groq", specifier = ">=0.30.0" },
     { name = "inspect-ai", specifier = "==0.3.125" },
-    { name = "inspect-cyber", specifier = "==0.1.0" },
     { name = "jsonschema", specifier = ">=4.23.0" },
     { name = "mcp", specifier = ">=1.13.1" },
     { name = "openai", specifier = ">=1.99.7" },
@@ -2256,6 +2254,15 @@ ifeval = [
 ]
 jsonschemabench = [{ name = "jsonschema", specifier = ">=4.23.0" }]
 scicode = [{ name = "scicode", git = "https://github.com/TheFloatingString/SciCode-fork.git?rev=4f20d721ba3e2227196262083b9b7a70484d54f7" }]
+
+[[package]]
+name = "openbench-cyber"
+version = "0.1.0"
+source = { git = "https://github.com/groq/openbench-cyber.git?rev=d93522ba70392cdceddb83f762c78a68923e70da#d93522ba70392cdceddb83f762c78a68923e70da" }
+dependencies = [
+    { name = "inspect-cyber" },
+    { name = "openbench" },
+]
 
 [[package]]
 name = "packaging"

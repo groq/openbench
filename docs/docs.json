@@ -24,6 +24,7 @@
           "configuration",
           "providers",
           "troubleshooting",
+          "release-notes",
           "changelog"
         ]
       },
@@ -31,6 +32,10 @@
         "group": "Benchmarks",
         "pages": [
           "benchmarks/catalog",
+          "benchmarks/knowledge",
+          "benchmarks/coding",
+          "benchmarks/math",
+          "benchmarks/reasoning",
           "benchmarks/cybersecurity"
         ]
       },

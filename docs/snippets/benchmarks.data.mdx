@@ -1256,6 +1256,187 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "BBQ (Main Function)",
+    "description": "BBQ bias evaluation for a specific category - use individual category tasks instead",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa"
+    ],
+    "function_name": "bbq",
+    "is_alpha": false
+  },
+  {
+    "name": "BBQ: Age",
+    "description": "Evaluate age-related biases in question-answering",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa",
+      "age"
+    ],
+    "function_name": "bbq_age",
+    "is_alpha": false
+  },
+  {
+    "name": "BBQ: Disability Status",
+    "description": "Evaluate disability-related biases in question-answering",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa",
+      "disability"
+    ],
+    "function_name": "bbq_disability_status",
+    "is_alpha": false
+  },
+  {
+    "name": "BBQ: Gender Identity",
+    "description": "Evaluate gender identity-related biases in question-answering",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa",
+      "gender"
+    ],
+    "function_name": "bbq_gender_identity",
+    "is_alpha": false
+  },
+  {
+    "name": "BBQ: Nationality",
+    "description": "Evaluate nationality-related biases in question-answering",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa",
+      "nationality"
+    ],
+    "function_name": "bbq_nationality",
+    "is_alpha": false
+  },
+  {
+    "name": "BBQ: Physical Appearance",
+    "description": "Evaluate physical appearance-related biases in question-answering",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa",
+      "appearance"
+    ],
+    "function_name": "bbq_physical_appearance",
+    "is_alpha": false
+  },
+  {
+    "name": "BBQ: Race × Gender",
+    "description": "Evaluate intersectional race and gender biases",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa",
+      "race",
+      "gender"
+    ],
+    "function_name": "bbq_race_x_gender",
+    "is_alpha": false
+  },
+  {
+    "name": "BBQ: Race × SES",
+    "description": "Evaluate intersectional race and socioeconomic status biases",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa",
+      "race",
+      "ses"
+    ],
+    "function_name": "bbq_race_x_ses",
+    "is_alpha": false
+  },
+  {
+    "name": "BBQ: Race/Ethnicity",
+    "description": "Evaluate race and ethnicity-related biases in question-answering",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa",
+      "race"
+    ],
+    "function_name": "bbq_race_ethnicity",
+    "is_alpha": false
+  },
+  {
+    "name": "BBQ: Religion",
+    "description": "Evaluate religion-related biases in question-answering",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa",
+      "religion"
+    ],
+    "function_name": "bbq_religion",
+    "is_alpha": false
+  },
+  {
+    "name": "BBQ: Sexual Orientation",
+    "description": "Evaluate sexual orientation-related biases in question-answering",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa",
+      "sexual-orientation"
+    ],
+    "function_name": "bbq_sexual_orientation",
+    "is_alpha": false
+  },
+  {
+    "name": "BBQ: Socioeconomic Status",
+    "description": "Evaluate socioeconomic status-related biases in question-answering",
+    "category": "ethics-social",
+    "tags": [
+      "multiple-choice",
+      "bias",
+      "fairness",
+      "social-bias",
+      "qa",
+      "ses"
+    ],
+    "function_name": "bbq_ses",
+    "is_alpha": false
+  },
+  {
     "name": "BLiMP (67 Linguistic Phenomena)",
     "description": "Benchmark of Linguistic Minimal Pairs testing grammatical knowledge through minimal pair comparisons",
     "category": "linguistic",
@@ -3710,51 +3891,6 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
-    "name": "CTI-Bench ATE",
-    "description": "Extracting MITRE ATT&CK techniques from malware and threat descriptions",
-    "category": "cybersecurity",
-    "tags": [
-      "extraction",
-      "cybersecurity"
-    ],
-    "function_name": "cti_bench_ate",
-    "is_alpha": false
-  },
-  {
-    "name": "CTI-Bench MCQ",
-    "description": "Multiple-choice questions evaluating understanding of CTI standards, threats, detection strategies, and best practices using authoritative sources like NIST and MITRE",
-    "category": "cybersecurity",
-    "tags": [
-      "multiple-choice",
-      "cybersecurity",
-      "knowledge"
-    ],
-    "function_name": "cti_bench_mcq",
-    "is_alpha": false
-  },
-  {
-    "name": "CTI-Bench RCM",
-    "description": "Mapping CVE descriptions to CWE categories to evaluate vulnerability classification ability",
-    "category": "cybersecurity",
-    "tags": [
-      "classification",
-      "cybersecurity"
-    ],
-    "function_name": "cti_bench_rcm",
-    "is_alpha": false
-  },
-  {
-    "name": "CTI-Bench VSP",
-    "description": "Calculating CVSS scores from vulnerability descriptions to assess severity evaluation skills",
-    "category": "cybersecurity",
-    "tags": [
-      "regression",
-      "cybersecurity"
-    ],
-    "function_name": "cti_bench_vsp",
-    "is_alpha": false
-  },
-  {
     "name": "ClockBench",
     "description": "Clock benchmark - time-based reasoning tasks",
     "category": "community",
@@ -3778,19 +3914,6 @@ export const benchmarksData = [
       "reasoning"
     ],
     "function_name": "cb",
-    "is_alpha": false
-  },
-  {
-    "name": "CyBench",
-    "description": "CyBench: Cybersecurity CTF challenges benchmark",
-    "category": "domain-specific",
-    "tags": [
-      "cybersecurity",
-      "ctf",
-      "challenges",
-      "graded"
-    ],
-    "function_name": "cybench",
     "is_alpha": false
   },
   {
@@ -7112,6 +7235,29 @@ export const evalGroupsData = [
     ]
   },
   {
+    "name": "BBQ (Bias Benchmark for QA)",
+    "description": "Aggregate of 11 BBQ bias evaluation tasks across demographic categories",
+    "category": "eval-group",
+    "tags": [
+      "eval-group"
+    ],
+    "id": "bbq",
+    "benchmark_count": 11,
+    "benchmarks": [
+      "bbq_age",
+      "bbq_disability_status",
+      "bbq_gender_identity",
+      "bbq_nationality",
+      "bbq_physical_appearance",
+      "bbq_race_ethnicity",
+      "bbq_race_x_ses",
+      "bbq_race_x_gender",
+      "bbq_religion",
+      "bbq_ses",
+      "bbq_sexual_orientation"
+    ]
+  },
+  {
     "name": "BIG-Bench",
     "description": "Aggregate of 121 BIG-Bench tasks for comprehensive language model evaluation",
     "category": "eval-group",
@@ -7381,22 +7527,6 @@ export const evalGroupsData = [
       "blimp_wh_vs_that_no_gap_long_distance",
       "blimp_wh_vs_that_with_gap",
       "blimp_wh_vs_that_with_gap_long_distance"
-    ]
-  },
-  {
-    "name": "CTI-Bench",
-    "description": "Aggregate of 4 CTI-Bench tasks",
-    "category": "eval-group",
-    "tags": [
-      "eval-group"
-    ],
-    "id": "cti_bench",
-    "benchmark_count": 4,
-    "benchmarks": [
-      "cti_bench_ate",
-      "cti_bench_mcq",
-      "cti_bench_rcm",
-      "cti_bench_vsp"
     ]
   },
   {

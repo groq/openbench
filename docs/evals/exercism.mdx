@@ -1,0 +1,115 @@
+---
+title: "Exercism - Multi-Language Code Agent Benchmark"
+description: "Real-world coding exercises evaluating code agents across 5 programming languages and multiple agent harnesses"
+---
+
+## Overview
+
+Exercism is a comprehensive coding benchmark that evaluates AI code agents' ability to solve real-world programming exercises across multiple programming languages. Based on the popular [Exercism platform](https://exercism.org/), this evaluation tests not just code generation capabilities, but the full coding workflow including reading specifications, navigating file systems, implementing solutions, and passing test suites.
+
+The benchmark places agents in realistic development environments where they must read instructions, understand existing code structures, and modify multiple files to create working solutions—mirroring actual software development workflows.
+
+## Key Features
+
+- **Multi-Language Support**: Tests coding capabilities across 5 programming languages:
+  - Python
+  - JavaScript
+  - Go
+  - Java
+  - Rust
+  
+- **Multiple Code Agent Harnesses**: Evaluate models across different code agent frameworks on identical tasks for fair comparison:
+  - **Aider** - AI-powered pair programming tool with git integration
+  - **OpenCode** - OpenAI-compatible code generation tool
+  - **Claude** - Claude-based code editor with file system access
+  - **Roo** - VS Code extension with interactive development
+
+- **Realistic Development Environment**: Agents work in full file system workspaces with multiple files, build configurations, and test suites
+
+- **Language-Specific Testing**: Each language uses its native testing framework and build tools
+
+- **Comprehensive Evaluation**: Tests the complete coding workflow from understanding specifications to passing automated tests
+
+## Usage
+
+Run Exercism evaluation across all languages with the default code agent (opencode):
+
+```bash
+bench eval exercism
+```
+
+Specify a different code agent:
+
+```bash
+bench eval exercism --code-agent aider
+bench eval exercism --code-agent claude
+bench eval exercism --code-agent roo
+```
+
+Evaluate with a specific model:
+
+```bash
+bench eval exercism --code-agent opencode --model groq/gpt-oss-120b
+```
+
+Run evaluation for a single language:
+
+```bash
+bench eval exercism_python
+```
+
+## Dataset Information
+
+The Exercism dataset provides a realistic coding environment for each task, structured to mirror real software development projects.
+
+### Workspace Structure
+
+Each exercise places the agent in a complete project workspace:
+
+```
+/workspace/{language}/{task_name}/
+├── INSTRUCTIONS.md          # Exercise description and requirements
+├── {source_files}           # Implementation files to modify
+└── {test_files}             # Test suite to verify solution
+```
+
+### Task Format
+
+Agents receive:
+1. **Instructions**: A prompt describing the coding task and requirements
+2. **File System Context**: Complete access to all project files
+3. **Development Environment**: A sandboxed Docker environment with all necessary language tools and dependencies installed
+
+### Workflow
+
+For each task, the agent must:
+1. Read and understand the INSTRUCTIONS.md file
+2. Navigate the project structure to find relevant files
+3. Analyze existing code and tests to understand requirements
+4. Implement the solution by modifying source files
+5. Ensure the implementation passes all automated tests
+
+## Scoring
+
+Exercism uses test-based scoring where success is determined by passing the automated test suite for each exercise.
+
+### Success Criteria
+
+A task is considered successful if and only if:
+1. The test command executes without errors (exit code 0)
+2. All tests in the test suite pass
+3. No compilation or syntax errors occur
+4. Execution completes within the time limit (6 minutes per task)
+
+### Metrics
+
+- **Overall Accuracy**: Success rate across all languages and tasks
+- **Per-Language Accuracy**: Breakdown of performance by programming language
+
+### Performance Insights
+
+The multi-agent design allows for unique comparative analysis:
+- Compare how different models perform on identical tasks
+- Evaluate which code agent harness works best for different languages and models
+- Identify model strengths and weaknesses across programming paradigms
+

@@ -1,0 +1,72 @@
+---
+title: Reasoning
+description: Evaluate AI models on reasoning, logic, and multimodal understanding
+icon: lightbulb
+---
+
+openbench provides comprehensive reasoning benchmarks covering factuality, logical reasoning, multi-hop inference, and multimodal understanding across diverse domains.
+
+## Available Benchmarks
+
+<CardGroup cols={2}>
+  <Card title="SimpleQA" icon="check-circle">
+    Tests factuality and accuracy on straightforward questions with verifiable answers.
+
+    ```bash
+    bench eval simpleqa
+    ```
+  </Card>
+
+  <Card title="MuSR" icon="puzzle-piece">
+    Multi-Step Reasoning benchmark with murder mysteries, object placements, and team allocation problems.
+
+    ```bash
+    bench eval musr
+    ```
+  </Card>
+  <Card title="DROP" icon="paragraph">
+    Discrete Reasoning Over Paragraphs - numerical and span-based reasoning over text.
+
+    ```bash
+    bench eval drop
+    ```
+  </Card>
+
+  <Card title="GraphWalks" icon="diagram-project">
+    Multi-hop reasoning through graph structures to test navigation and inference.
+
+    ```bash
+    bench eval graphwalks
+    ```
+  </Card>
+
+  <Card title="BrowseComp" icon="globe">
+    Web browsing agent tasks requiring navigation and information synthesis.
+
+    ```bash
+    bench eval browsecomp
+    ```
+  </Card>
+
+  <Card title="MMMU" icon="image">
+    Massive Multi-discipline Multimodal Understanding across college-level subjects.
+
+    ```bash
+    bench eval mmmu
+    ```
+  </Card>
+  <Card title="MMMU Pro" icon="crown">
+    Enhanced version of MMMU with more challenging multimodal problems.
+
+    ```bash
+    bench eval mmmu_pro
+    ```
+  </Card>
+</CardGroup>
+
+## Related Resources
+- [SimpleQA by OpenAI](https://openai.com/index/introducing-simpleqa/)
+- [MuSR Paper](https://arxiv.org/abs/2310.16049)
+- [DROP Paper](https://arxiv.org/abs/1903.00161)
+- [MMMU Paper](https://arxiv.org/abs/2311.16502)
+

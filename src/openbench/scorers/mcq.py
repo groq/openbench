@@ -171,18 +171,19 @@ def create_mcq_scorer(
     # Build metrics list
     metrics: List[Any] = []
 
-    # Add grouped metrics if specified
+    # Always add base overall metrics first
+    metrics.extend([accuracy(), stderr(), std()])
+
+    # Add grouped metrics (without overall to avoid duplication)
     if group_keys:
         for key in group_keys:
-            metrics.append(grouped(group_key=key, metric=[accuracy(), stderr(), std()]))
+            metrics.append(
+                grouped(group_key=key, metric=[accuracy(), stderr(), std()], all=False)
+            )
 
     # Add any additional metrics
     if additional_metrics:
         metrics.extend(additional_metrics)
-
-    # If no metrics specified, use default accuracy and stderr
-    if not metrics:
-        metrics = [accuracy(), stderr(), std()]
 
     @scorer(metrics=metrics)
     def mcq_scorer() -> Callable:
