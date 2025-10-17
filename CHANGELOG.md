@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.5.3](https://github.com/groq/openbench/compare/v0.5.2...v0.5.3) (2025-10-17)
+
+
+### Features
+
+* add bbq benchmark ([#255](https://github.com/groq/openbench/issues/255)) ([46f4744](https://github.com/groq/openbench/commit/46f4744fa0e381cc50202532499efb83be1aba0c))
+* add SMT 2024 benchmarks ([#239](https://github.com/groq/openbench/issues/239)) ([5d9b475](https://github.com/groq/openbench/commit/5d9b4752133aeb5562f0f22c793a391dcb70bde4))
+* **simpleqa_verified:** add SimpleQA Verified benchmark ([#249](https://github.com/groq/openbench/issues/249)) ([8a512c4](https://github.com/groq/openbench/commit/8a512c48613a752574248c6acbb106a9bb8a2927))
+
 ## [0.5.2](https://github.com/groq/openbench/compare/v0.5.1...v0.5.2) (2025-10-16)
 
 
