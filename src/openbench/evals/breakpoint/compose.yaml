@@ -1,0 +1,12 @@
+services:
+  default:
+    build:
+      context: .
+    init: true
+    command: tail -f /dev/null
+    networks: [breakpoint_net]
+
+networks:
+  breakpoint_net:
+    driver: bridge
+    internal: false

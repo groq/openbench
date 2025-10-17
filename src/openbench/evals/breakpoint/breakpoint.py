@@ -17,11 +17,19 @@ Paper: http://arxiv.org/pdf/2506.00172
 
 Sample usage:
 ```bash
-# Run remove mode (498 problems)
+# Run remove mode (498 problems) with default budgets (16 tool-use / 4 attempts)
 bench eval breakpoint_remove --model "groq/llama-3.1-70b" --limit 10
 
 # Run discovery mode (269 problems)
 bench eval breakpoint_discovery --model "groq/llama-3.1-70b" --limit 10
+
+# Run with docker sandbox (recommended for isolation)
+bench eval breakpoint_remove --model "groq/llama-3.1-70b" --limit 10 \
+  -T sandbox_type=docker
+
+# Run with custom budgets (e.g., for scaling experiments as in paper)
+bench eval breakpoint_remove --model "groq/llama-3.1-70b" --limit 10 \
+  -T max_tool_uses=32 -T max_attempts=8
 ```
 
 Citation:
@@ -35,11 +43,17 @@ Citation:
 
 from inspect_ai import Task, task
 from inspect_ai.dataset import Sample, json_dataset
-from inspect_ai.solver import system_message
-from typing import Any
+from inspect_ai.agent import react
+from inspect_ai.solver import solver, Solver, TaskState
+from inspect_ai.tool import bash, python
+from typing import Any, Literal
+from pathlib import Path
 
-from openbench.solvers.breakpoint_solver import breakpoint_solver
+from openbench.tools.breakpoint_tools import submit_solution
 from openbench.scorers.breakpoint_scorer import breakpoint_scorer
+
+# Type alias for sandbox configuration
+SandboxConfig = str | tuple[str, str]
 
 
 # HuggingFace dataset URLs
@@ -48,6 +62,95 @@ BREAKPOINT_REMOVE_URL = (
 )
 BREAKPOINT_DISCOVERY_URL = "https://huggingface.co/datasets/uzpg/breakpoint/resolve/main/data/discovery-data.json"
 
+# Docker compose path for sandbox
+TASK_DIR = Path(__file__).parent
+COMPOSE_PATH = (TASK_DIR / "compose.yaml").resolve()
+
+
+def _get_repo_stat(repo: dict[str, Any], field: str) -> Any:
+    """Safely get repo stat from either direct field or stats sub-object.
+
+    Remove mode has direct fields (total_lines, functions_count, etc.)
+    Discovery mode has them in repo.stats sub-object.
+    """
+    # Try direct field first
+    if field in repo:
+        return repo[field]
+    # Try stats sub-object
+    if "stats" in repo and isinstance(repo["stats"], dict) and field in repo["stats"]:
+        return repo["stats"][field]
+    return None
+
+
+def _extract_metadata(record: dict[str, Any], mode: str) -> dict[str, Any]:
+    """Extract all metadata fields from a Breakpoint record.
+
+    This function handles both remove and discovery modes, extracting all
+    35 metadata fields including complexity metrics, centrality measures,
+    repository statistics, and test information.
+
+    Args:
+        record: The dataset record containing repo, test_info, complexity_info, etc.
+        mode: Either "remove" or "discovery"
+
+    Returns:
+        Dictionary with all metadata fields for the Sample
+    """
+    repo = record["repo"]
+    test_info = record.get("test_info", {})
+    complexity_info = record.get("complexity_info", {})
+    centrality = complexity_info.get("centrality", {})
+    corruption = record.get("corruption", {})
+
+    return {
+        # ===== Core identifiers =====
+        "mode": mode,
+        "repo_name": repo.get("name"),
+        "repo_url": repo.get("url"),
+        "repo_commit": repo.get("commit"),
+        "repo_path": repo.get("path"),
+        "repo_code_path": repo.get("code_path"),
+        "repo_test_command": repo.get("test_command", "pytest"),
+        "repo_exists": repo.get("exists"),
+        "repo_final_path": repo.get("repos_final_path"),
+        "fpath": record["fpath"],
+        "function_name": record["function_name"],
+        # ===== Repository statistics =====
+        # Handle both direct fields (remove mode) and stats sub-object (discovery mode)
+        "repo_files_count": _get_repo_stat(repo, "files_count"),
+        "repo_functions_count": _get_repo_stat(repo, "functions_count"),
+        "repo_total_lines": _get_repo_stat(repo, "total_lines"),
+        "repo_avg_lines_per_file": _get_repo_stat(repo, "avg_lines_per_file"),
+        "repo_avg_lines_per_func": _get_repo_stat(repo, "avg_lines_per_func"),
+        # ===== Test information =====
+        "test_success": test_info.get("success"),
+        "test_failed": test_info.get("failed"),
+        "test_passed": test_info.get("passed"),
+        "test_deselected": test_info.get("deselected"),
+        "test_had_execution_error": test_info.get("had_execution_error"),
+        "test_error_message": test_info.get("error_message"),
+        "baseline_failures": max(test_info.get("failed", 1), 1),  # For scorer
+        # ===== Complexity metrics =====
+        "cyclomatic_complexity": complexity_info.get("cyclomatic"),
+        "line_count": complexity_info.get("line_count"),
+        "code_line_count": complexity_info.get("code_line_count"),
+        "halstead_volume": complexity_info.get("halstead_volume"),
+        "halstead_difficulty": complexity_info.get("halstead_difficulty"),
+        # ===== Centrality metrics (graph-based) =====
+        "centrality_pagerank": centrality.get("pagerank"),
+        "centrality_betweenness": centrality.get("betweenness"),
+        "centrality_degree": centrality.get("degree"),
+        "centrality_harmonic": centrality.get("harmonic"),
+        "centrality_bidirectional_harmonic": centrality.get("bidirectional_harmonic"),
+        "centrality_in_degree": centrality.get("in_degree"),
+        "centrality_true_in_degree": centrality.get("true_in_degree"),
+        "centrality_out_degree": centrality.get("out_degree"),
+        "centrality_distance_discount": centrality.get("distance_discount"),
+        # ===== Corruption fields =====
+        "corruption_score": corruption.get("score") if mode == "discovery" else None,
+        "corruption_code": corruption.get("code") if mode == "discovery" else None,
+    }
+
 
 def record_to_sample_remove(record: dict[str, Any]) -> Sample:
     """Convert a remove-mode record to an Inspect AI Sample.
@@ -55,7 +158,7 @@ def record_to_sample_remove(record: dict[str, Any]) -> Sample:
     In remove mode, the function body has been deleted and the model must
     reconstruct it based on:
     - The repository context
-    - Test failure information
+    - Test failure messages
     - Function signature and location
 
     Args:
@@ -68,52 +171,61 @@ def record_to_sample_remove(record: dict[str, Any]) -> Sample:
     repo = record["repo"]
     fpath = record["fpath"]
     function_name = record["function_name"]
-    test_info = record.get("test_info", {})
 
-    # Create problem description
-    prompt = f"""You are debugging code in a Python repository.
-
-**Repository**: {repo.get("name", "unknown")}
-**File**: {fpath}
+    # Simple prompt - agent will clone and explore
+    prompt = f"""**Repository**: {repo.get("name", "unknown")}
+**Repository URL**: {repo.get("url", "")}
+**Commit**: {repo.get("commit", "main")}
+**Target File**: {fpath}
 **Function**: `{function_name}`
 
-The function body has been removed and needs to be reconstructed.
+The function `{function_name}` in file `{fpath}` has had its body removed (replaced with `pass`).
 
-**Test Command**: {repo.get("test_command", "pytest")}
-**Test Status**: {"FAILING" if not test_info.get("success", True) else "PASSING"}
-**Failed Tests**: {test_info.get("failed", 0)}
-**Passing Tests**: {test_info.get("passed", 0)}
+**Your task**: Reconstruct the complete, working implementation.
 
-"""
+⚠️ **BUDGET WARNING**: You have a maximum of 32 tool calls (bash/python/submit_solution combined). Plan carefully and avoid unnecessary exploration. If you exceed this limit, the evaluation will terminate immediately.
 
-    # Add failure information if available
-    failures = test_info.get("failures_info", [])
-    if failures:
-        prompt += "\n**Test Failures**:\n"
-        for i, failure in enumerate(failures[:3], 1):  # Limit to first 3 failures
-            prompt += f"\n{i}. {failure[:500]}\n"  # Limit each failure to 500 chars
+**CRITICAL: You MUST follow these steps IN ORDER**:
 
-    prompt += """
-Your task is to reconstruct the missing function body. Provide only the complete function implementation.
-"""
+**Step 1 - Clone the repository** (REQUIRED FIRST STEP):
+   - Use a unique directory name with timestamp to avoid conflicts: `repo_$(date +%s)`
+   - Clone command example: `git clone <url> repo_$(date +%s) && cd repo_* && git checkout <commit>`
+   - Verify clone succeeded: check for `.git` directory or run `git status`
+
+   DO NOT clone to paths like `/tmp/repo_name` that may already exist.
+   DO NOT skip error checking - verify git clone succeeded before continuing.
+
+**Step 2 - Explore and understand** (FOCUS HERE):
+   - Read the target file to understand the function signature
+   - Read tests to understand requirements
+   - Explore related code for context
+   - Analyze what the function should do
+
+   DO NOT run the full test suite yet - it will likely fail due to missing dependencies.
+   Focus on understanding requirements FIRST, then implement.
+
+**Step 3 - Implement and submit**:
+   - Write your complete function implementation
+   - Call `submit_solution(code)` with your implementation
+   - The tool will handle running tests for you
+
+**Step 4 - If submission fails** (ONLY if needed):
+   - Read the test output from submit_solution
+   - Install any missing dependencies if tests fail due to imports
+   - Refine your solution and submit again (you have 4 attempts total)
+
+**Available tools**:
+- `bash()`: Run shell commands (git clone, ls, cat, grep, etc.)
+  - **IMPORTANT**: Each bash() call is independent. Always use full paths or cd in the same command.
+  - Example: `bash("cd my_repo && ls")` NOT `bash("cd my_repo")` then `bash("ls")`
+- `python()`: Execute Python scripts for analysis
+- `submit_solution(code)`: Submit your function for testing (max 4 attempts)"""
 
     return Sample(
         input=prompt,
         target="",  # No ground truth available
         id=f"{repo.get('name', 'unknown')}_{function_name}",
-        metadata={
-            "repo_name": repo.get("name"),
-            "repo_url": repo.get("url"),
-            "repo_commit": repo.get("commit"),
-            "fpath": fpath,
-            "function_name": function_name,
-            "test_command": repo.get("test_command", "pytest"),
-            "baseline_failures": max(
-                test_info.get("failed", 1), 1
-            ),  # Ensure at least 1 to avoid division by zero
-            "mode": "remove",
-            "corruption_code": None,
-        },
+        metadata=_extract_metadata(record, "remove"),
     )
 
 
@@ -133,64 +245,106 @@ def record_to_sample_discovery(record: dict[str, Any]) -> Sample:
     repo = record["repo"]
     fpath = record["fpath"]
     function_name = record["function_name"]
-    test_info = record.get("test_info", {})
     corruption = record.get("corruption", {})
 
-    # Create problem description
-    prompt = f"""You are debugging code in a Python repository.
-
-**Repository**: {repo.get("name", "unknown")}
-**File**: {fpath}
+    # Simple prompt - agent will clone and explore
+    prompt = f"""**Repository**: {repo.get("name", "unknown")}
+**Repository URL**: {repo.get("url", "")}
+**Commit**: {repo.get("commit", "main")}
+**Target File**: {fpath}
 **Function**: `{function_name}`
 
-A subtle bug has been introduced in this function and needs to be fixed.
+A subtle bug has been introduced in the function `{function_name}`. Here's the corrupted code:
 
-**Corrupted Code**:
 ```python
 {corruption.get("code", "")}
 ```
 
-**Test Command**: {repo.get("test_command", "pytest")}
-**Test Status**: {"FAILING" if not test_info.get("success", True) else "PASSING"}
-**Failed Tests**: {test_info.get("failed", 0)}
-**Passing Tests**: {test_info.get("passed", 0)}
+**Your task**: Identify and fix the bug.
 
-"""
+⚠️ **BUDGET WARNING**: You have a maximum of 32 tool calls (bash/python/submit_solution combined). Plan carefully and avoid unnecessary exploration. If you exceed this limit, the evaluation will terminate immediately.
 
-    # Add failure information if available
-    failures = test_info.get("failures_info", [])
-    if failures:
-        prompt += "\n**Test Failures**:\n"
-        for i, failure in enumerate(failures[:3], 1):  # Limit to first 3 failures
-            prompt += f"\n{i}. {failure[:500]}\n"  # Limit each failure to 500 chars
+**CRITICAL: You MUST follow these steps IN ORDER**:
 
-    prompt += """
-Your task is to identify and fix the bug. Provide the corrected function implementation.
-"""
+**Step 1 - Clone the repository** (REQUIRED FIRST STEP):
+   - Use a unique directory name with timestamp to avoid conflicts: `repo_$(date +%s)`
+   - Clone command example: `git clone <url> repo_$(date +%s) && cd repo_* && git checkout <commit>`
+   - Verify clone succeeded: check for `.git` directory or run `git status`
+
+   DO NOT clone to paths like `/tmp/repo_name` that may already exist.
+   DO NOT skip error checking - verify git clone succeeded before continuing.
+
+**Step 2 - Analyze the bug** (FOCUS HERE):
+   - The corrupted code is shown above - analyze it carefully
+   - Read the target file to see the current implementation
+   - Identify what's wrong by comparing with the corrupted code
+   - Read related code if needed for context
+
+   DO NOT run the full test suite yet - it will likely fail due to missing dependencies.
+   Focus on understanding and fixing the bug FIRST.
+
+**Step 3 - Fix and submit**:
+   - Write your corrected implementation
+   - Call `submit_solution(code)` with your fixed function
+   - The tool will handle running tests for you
+
+**Step 4 - If submission fails** (ONLY if needed):
+   - Read the test output from submit_solution
+   - Install any missing dependencies if tests fail due to imports
+   - Refine your solution and submit again (you have 4 attempts total)
+
+**Available tools**:
+- `bash()`: Run shell commands (git clone, ls, cat, grep, etc.)
+  - **IMPORTANT**: Each bash() call is independent. Always use full paths or cd in the same command.
+  - Example: `bash("cd my_repo && ls")` NOT `bash("cd my_repo")` then `bash("ls")`
+- `python()`: Execute Python scripts for analysis
+- `submit_solution(code)`: Submit your fixed function for testing (max 4 attempts)"""
 
     return Sample(
         input=prompt,
         target="",  # No ground truth available
         id=f"{repo.get('name', 'unknown')}_{function_name}",
-        metadata={
-            "repo_name": repo.get("name"),
-            "repo_url": repo.get("url"),
-            "repo_commit": repo.get("commit"),
-            "fpath": fpath,
-            "function_name": function_name,
-            "test_command": repo.get("test_command", "pytest"),
-            "baseline_failures": max(
-                test_info.get("failed", 1), 1
-            ),  # Ensure at least 1 to avoid division by zero
-            "corruption_score": corruption.get("score", 0),
-            "corruption_code": corruption.get("code"),
-            "mode": "discovery",
-        },
+        metadata=_extract_metadata(record, "discovery"),
     )
 
 
+@solver
+def setup_metadata_solver(max_attempts: int) -> Solver:
+    """Setup max_attempts and sample metadata in store before agent runs.
+
+    This solver initializes the store with max_attempts and copies all
+    sample metadata fields to the store so tools can access them.
+
+    Args:
+        max_attempts: Maximum submission attempts allowed
+
+    Returns:
+        Solver that performs the setup
+    """
+
+    async def solve(state: TaskState, generate) -> TaskState:
+        from inspect_ai.util import store
+
+        # Initialize store with metadata
+        st = store()
+        st.set("max_attempts", max_attempts)
+
+        # Copy sample metadata to store for tool access
+        if state.metadata:
+            for key, value in state.metadata.items():
+                st.set(key, value)
+
+        return state
+
+    return solve
+
+
 @task
-def breakpoint_remove() -> Task:
+def breakpoint_remove(
+    max_tool_uses: int = 16,
+    max_attempts: int = 4,
+    sandbox_type: Literal["local", "docker"] = "local",
+) -> Task:
     """
     Breakpoint Remove Mode - Function reconstruction task
 
@@ -199,29 +353,58 @@ def breakpoint_remove() -> Task:
     - Test failure messages
     - Function signatures and locations
 
+    Args:
+        max_tool_uses: Maximum tool-use iterations (default: 16, as per paper)
+                       Set via -T max_tool_uses=N
+        max_attempts: Maximum submission attempts (default: 4, as per paper)
+                      Set via -T max_attempts=N
+        sandbox_type: Sandbox environment type (default: "local")
+                     - "local": Agent chooses path in local filesystem
+                     - "docker": Agent chooses path in Docker container
+                     Set via -T sandbox_type=local or -T sandbox_type=docker
+
+    Note: Use global --message-limit flag to control total message budget.
+          Each tool call = 2 messages (assistant + tool response)
+
     Dataset: 498 problems from real Python repositories
     """
+    # Set sandbox config based on sandbox type
+    sandbox_config: SandboxConfig
+    if sandbox_type == "docker":
+        sandbox_config = ("docker", str(COMPOSE_PATH))
+    else:
+        sandbox_config = "local"
+
     return Task(
         dataset=json_dataset(
             json_file=BREAKPOINT_REMOVE_URL,
             sample_fields=record_to_sample_remove,
             auto_id=True,
         ),
-        solver=[
-            system_message(
-                "You are an expert Python developer helping to debug and fix code. "
-                "Analyze the problem carefully, consider the test failures, and provide "
-                "a complete, working implementation."
-            ),
-            breakpoint_solver(),
-        ],
+        setup=setup_metadata_solver(max_attempts),
+        solver=react(
+            prompt="""You are an expert Python debugging agent.
+
+Follow the instructions in the task description carefully. Use bash and python tools to explore the codebase, understand the requirements, and implement the solution.
+
+When you're confident in your solution, call submit_solution(code) with your complete function implementation.""",
+            tools=[
+                bash(timeout=180),
+                python(timeout=180),
+                submit_solution(),
+            ],
+        ),
         scorer=breakpoint_scorer(),
-        sandbox="local",
+        sandbox=sandbox_config,
     )
 
 
 @task
-def breakpoint_discovery() -> Task:
+def breakpoint_discovery(
+    max_tool_uses: int = 16,
+    max_attempts: int = 4,
+    sandbox_type: Literal["local", "docker"] = "local",
+) -> Task:
     """
     Breakpoint Discovery Mode - Bug location and repair task
 
@@ -230,22 +413,52 @@ def breakpoint_discovery() -> Task:
     - Test failure messages
     - Repository context
 
+    Args:
+        max_tool_uses: Maximum tool-use iterations (default: 16, as per paper)
+                       Set via -T max_tool_uses=N
+        max_attempts: Maximum submission attempts (default: 4, as per paper)
+                      Set via -T max_attempts=N
+        sandbox_type: Sandbox environment type (default: "local")
+                     - "local": Agent chooses path in local filesystem
+                     - "docker": Agent chooses path in Docker container
+                     Set via -T sandbox_type=local or -T sandbox_type=docker
+
+    Note: Use global --message-limit flag to control total message budget.
+          Each tool call = 2 messages (assistant + tool response)
+
     Dataset: 269 problems from real Python repositories
+
+    In discovery mode, modifications persist throughout the trajectory,
+    allowing the agent to iterate and refine solutions.
     """
+    # Set sandbox config based on sandbox type
+    sandbox_config: SandboxConfig
+    if sandbox_type == "docker":
+        sandbox_config = ("docker", str(COMPOSE_PATH))
+    else:
+        sandbox_config = "local"
+
     return Task(
         dataset=json_dataset(
             json_file=BREAKPOINT_DISCOVERY_URL,
             sample_fields=record_to_sample_discovery,
             auto_id=True,
         ),
-        solver=[
-            system_message(
-                "You are an expert Python developer helping to debug and fix code. "
-                "Analyze the corrupted code carefully, identify the bug, and provide "
-                "a corrected implementation."
-            ),
-            breakpoint_solver(),
-        ],
+        setup=setup_metadata_solver(max_attempts),
+        solver=react(
+            prompt="""You are an expert Python debugging agent.
+
+Follow the instructions in the task description carefully. Use bash and python tools to explore the codebase, run tests, and understand the bug.
+
+In discovery mode, your changes persist - you can iterate and refine your solution across multiple attempts.
+
+When you're confident in your fix, call submit_solution(code) with your corrected function implementation.""",
+            tools=[
+                bash(timeout=180),
+                python(timeout=180),
+                submit_solution(),
+            ],
+        ),
         scorer=breakpoint_scorer(),
-        sandbox="local",
+        sandbox=sandbox_config,
     )
