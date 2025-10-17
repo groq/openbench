@@ -3,7 +3,7 @@ SimpleQA Verified dataset from Kaggle.
 Reference: https://www.kaggle.com/datasets/deepmind/simpleqa-verified
 """
 
-import kagglehub  # type: ignore[import-untyped]
+import kagglehub  # type: ignore[import-not-found, import-untyped]
 from inspect_ai.dataset import Dataset, csv_dataset, MemoryDataset
 import os
 
