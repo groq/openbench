@@ -19,3 +19,10 @@ local-prompts.md
 .env
 build/
 **/build/
+# Breakpoint eval artifacts
+*_repo/
+*_debug/
+*_dir/
+*_task/
+repo_*/
+.breakpoint_solution.py
