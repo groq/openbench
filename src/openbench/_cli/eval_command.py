@@ -492,6 +492,14 @@ def run_eval(
             envvar="BENCH_CODE_AGENT",
         ),
     ] = None,
+    system_prompt: Annotated[
+        Optional[str],
+        typer.Option(
+            "--system-prompt",
+            help="System prompt to use for all model requests. Useful for controlling thinking mode for vLLM models.",
+            envvar="BENCH_SYSTEM_PROMPT",
+        ),
+    ] = None,
 ) -> List[EvalLog] | None:
     """
     Run a benchmark on a model.
@@ -606,6 +614,7 @@ def run_eval(
                 reasoning_effort=reasoning_effort.value if reasoning_effort else None,
                 sandbox=sandbox,
                 log_format=log_format.value if log_format else None,
+                system_message=system_prompt,
             )
 
             typer.echo("Evaluation complete!")
