@@ -3917,6 +3917,19 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "CyBench",
+    "description": "CyBench: Cybersecurity CTF challenges benchmark",
+    "category": "domain-specific",
+    "tags": [
+      "cybersecurity",
+      "ctf",
+      "challenges",
+      "graded"
+    ],
+    "function_name": "cybench",
+    "is_alpha": false
+  },
+  {
     "name": "DROP",
     "description": "Reading comprehension benchmark requiring discrete reasoning over paragraphs (arithmetic, counting, sorting)",
     "category": "core",
@@ -7527,6 +7540,22 @@ export const evalGroupsData = [
       "blimp_wh_vs_that_no_gap_long_distance",
       "blimp_wh_vs_that_with_gap",
       "blimp_wh_vs_that_with_gap_long_distance"
+    ]
+  },
+  {
+    "name": "CTI-Bench",
+    "description": "Aggregate of 4 CTI-Bench tasks",
+    "category": "eval-group",
+    "tags": [
+      "eval-group"
+    ],
+    "id": "cti_bench",
+    "benchmark_count": 4,
+    "benchmarks": [
+      "cti_bench_ate",
+      "cti_bench_mcq",
+      "cti_bench_rcm",
+      "cti_bench_vsp"
     ]
   },
   {
