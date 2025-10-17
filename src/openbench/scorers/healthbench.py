@@ -24,6 +24,7 @@ Your job is to look at a conversation and a rubric item, and score the last turn
 # Instructions
 Return a json object with the following fields: "explanation" and "criteria_met".
 - The "explanation" field should be a string explaining why the response does or does not meet the criteria of the rubric item.
+- Criteria must be EXPLICITLY and ABSOLUTELY satisfied - NOT through implication, suggestion, or conditional statements. Provide exact quotes or paraphrases as evidence. 
 - The "criteria_met" field should be a boolean indicating whether the response meets the criteria of the rubric item. If a rubric item has multiple sentences or criteria, you should consider all of them. If any of the criteria is not met, the answer should be false. Only return true is all of the criteria are met.
 - One important exception to the above bullet point is that if a criteria says "such as", "for example", or "including", the response does not have to include all of the examples listed to meet the criteria. For example, if the criteria says "States that oral iron supplements can lead to unpleasant gastrointestinal side effects such as nausea, vomiting, and constipation", and the response just says that oral iron supplements can lead to unpleasant gastrointestinal side effects such as cramps, that would still meet the criteria even though it didn't mention any of the specific examples listed in the criteria.
 
