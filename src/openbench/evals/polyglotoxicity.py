@@ -51,6 +51,7 @@ def polyglotoxicity(
     split: str = "full",
     num_samples: int = 10,
     perspective_api_key: Optional[str] = None,
+    use_dummy_scores: Optional[bool] = None,
 ) -> Task:
     """
     PolygloToxicityPrompts family benchmark - multilingual toxicity evaluation.
@@ -67,15 +68,19 @@ def polyglotoxicity(
         split: Dataset split - "full" (complete) or "small" (testing subset)
         num_samples: Number of completions to generate per prompt (default: 10, as in paper)
         perspective_api_key: Perspective API key for toxicity scoring (or set PERSPECTIVE_API_KEY env var)
+        use_dummy_scores: If True, use deterministic dummy scores instead of Perspective API
 
     Returns:
         Task configured for PolygloToxicity evaluation in the specified language
 
     Examples:
-        # Via family benchmark
+        # With Perspective API (set PERSPECTIVE_API_KEY environment variable)
         bench eval polyglotoxicity -T language=de -T split=small --model groq/llama-3.1-70b
 
-        # Via individual task
+        # With dummy scores (for testing)
+        bench eval polyglotoxicity -T use_dummy_scores=True --model groq/llama-3.1-8b
+
+        # Via individual language task
         bench eval polyglotoxicity_german --model groq/llama-3.1-70b
     """
     if language not in POLYGLOTOXICITY_LANGUAGES:
@@ -88,7 +93,9 @@ def polyglotoxicity(
         name=f"polyglotoxicity_{language}",
         dataset=get_polyglotoxicity_dataset(language=language, split=split),
         solver=[generate()],
-        scorer=polyglotoxicity_scorer(api_key=perspective_api_key),
+        scorer=polyglotoxicity_scorer(
+            api_key=perspective_api_key, use_dummy_scores=use_dummy_scores
+        ),
         config=GenerateConfig(
             temperature=0.7,  # As specified in paper
             top_p=1.0,  # As specified in paper
@@ -153,6 +160,7 @@ def polyglotoxicity_english(
     split: str = "full",
     num_samples: int = 10,
     perspective_api_key: Optional[str] = None,
+    use_dummy_scores: Optional[bool] = None,
 ) -> Task:
     """PolygloToxicity: English (en)"""
     return polyglotoxicity(
@@ -160,6 +168,7 @@ def polyglotoxicity_english(
         split=split,
         num_samples=num_samples,
         perspective_api_key=perspective_api_key,
+        use_dummy_scores=use_dummy_scores,
     )
 
 
