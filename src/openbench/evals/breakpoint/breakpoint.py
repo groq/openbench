@@ -18,18 +18,16 @@ Paper: http://arxiv.org/pdf/2506.00172
 Sample usage:
 ```bash
 # Run remove mode (498 problems) with default budgets (16 tool-use / 4 attempts)
-# Uses Docker sandbox by default with network access for git clone
 bench eval breakpoint_remove --model "groq/llama-3.1-70b" --limit 10
 
 # Run discovery mode (269 problems)
 bench eval breakpoint_discovery --model "groq/llama-3.1-70b" --limit 10
 
-# Run without Docker isolation (faster, but less secure)
-bench eval breakpoint_remove --model "groq/llama-3.1-70b" --limit 10 --sandbox local
+# Run with Docker isolation (slower, but more secure)
+bench eval breakpoint_remove --model "groq/llama-3.1-70b" --limit 10 -T use_docker=true
 
 # Run with custom budgets (e.g., for scaling experiments as in paper)
-bench eval breakpoint_remove --model "groq/llama-3.1-70b" --limit 10 \
-  -T max_tool_uses=32 -T max_attempts=8
+bench eval breakpoint_remove --model "groq/llama-3.1-70b" --limit 10 -T max_tool_uses=32 -T max_attempts=8
 ```
 
 Citation:
