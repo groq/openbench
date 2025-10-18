@@ -560,15 +560,11 @@ def run_eval(
             prepare_livemcpbench_cache()
         # auto-prepare CVEBench challenges directory
         if "cvebench" in expanded_benchmarks:
-            try:
-                from importlib import import_module
+            from importlib import import_module
 
-                datasets = import_module("openbench_cyber.datasets.cvebench")
-                plugin_dir = datasets._default_challenges_dir().resolve()
-                if plugin_dir.exists():
-                    os.environ["CVEBENCH_CHALLENGE_DIR"] = str(plugin_dir)
-            except (ImportError, ModuleNotFoundError):
-                raise typer.BadParameter("No CVEBench challenges found")
+            datasets = import_module("openbench_cyber.datasets.cvebench")
+            plugin_dir = datasets._default_challenges_dir().resolve()
+            os.environ["CVEBENCH_CHALLENGE_DIR"] = str(plugin_dir)
     except Exception as e:
         raise typer.BadParameter(str(e))
 
