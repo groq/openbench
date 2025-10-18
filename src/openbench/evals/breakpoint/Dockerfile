@@ -1,25 +1,11 @@
-FROM debian:bookworm
+FROM python:3.11-bookworm
 
-# Install system dependencies
+# Install git and other essential tools for cloning repositories
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    curl \
     git \
-    python3 \
-    python3-pip \
-    python3-venv \
-    python3-dev \
-    build-essential \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Install uv (Python package manager)
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Add uv to PATH
-ENV PATH="/root/.local/bin:${PATH}"
-
-# Set working directory (where repos will be cloned)
 WORKDIR /workspace
 
-# Default command
 CMD ["tail", "-f", "/dev/null"]

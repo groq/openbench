@@ -18,14 +18,14 @@ Paper: http://arxiv.org/pdf/2506.00172
 Sample usage:
 ```bash
 # Run remove mode (498 problems) with default budgets (16 tool-use / 4 attempts)
+# Uses Docker sandbox by default with network access for git clone
 bench eval breakpoint_remove --model "groq/llama-3.1-70b" --limit 10
 
 # Run discovery mode (269 problems)
 bench eval breakpoint_discovery --model "groq/llama-3.1-70b" --limit 10
 
-# Run with docker sandbox (recommended for isolation)
-bench eval breakpoint_remove --model "groq/llama-3.1-70b" --limit 10 \
-  -T sandbox_type=docker
+# Run without Docker isolation (faster, but less secure)
+bench eval breakpoint_remove --model "groq/llama-3.1-70b" --limit 10 --sandbox local
 
 # Run with custom budgets (e.g., for scaling experiments as in paper)
 bench eval breakpoint_remove --model "groq/llama-3.1-70b" --limit 10 \
@@ -46,14 +46,11 @@ from inspect_ai.dataset import Sample, json_dataset
 from inspect_ai.agent import react
 from inspect_ai.solver import solver, Solver, TaskState
 from inspect_ai.tool import bash, python
-from typing import Any, Literal
+from typing import Any
 from pathlib import Path
 
 from openbench.tools.breakpoint_tools import submit_solution
 from openbench.scorers.breakpoint_scorer import breakpoint_scorer
-
-# Type alias for sandbox configuration
-SandboxConfig = str | tuple[str, str]
 
 
 # HuggingFace dataset URLs
@@ -62,7 +59,7 @@ BREAKPOINT_REMOVE_URL = (
 )
 BREAKPOINT_DISCOVERY_URL = "https://huggingface.co/datasets/uzpg/breakpoint/resolve/main/data/discovery-data.json"
 
-# Docker compose path for sandbox
+# Docker compose path for sandbox with network access
 TASK_DIR = Path(__file__).parent
 COMPOSE_PATH = (TASK_DIR / "compose.yaml").resolve()
 
@@ -183,8 +180,6 @@ The function `{function_name}` in file `{fpath}` has had its body removed (repla
 
 **Your task**: Reconstruct the complete, working implementation.
 
-⚠️ **BUDGET WARNING**: You have a maximum of 32 tool calls (bash/python/submit_solution combined). Plan carefully and avoid unnecessary exploration. If you exceed this limit, the evaluation will terminate immediately.
-
 **CRITICAL: You MUST follow these steps IN ORDER**:
 
 **Step 1 - Clone the repository** (REQUIRED FIRST STEP):
@@ -260,9 +255,7 @@ A subtle bug has been introduced in the function `{function_name}`. Here's the c
 {corruption.get("code", "")}
 ```
 
-**Your task**: Identify and fix the bug.
-
-⚠️ **BUDGET WARNING**: You have a maximum of 32 tool calls (bash/python/submit_solution combined). Plan carefully and avoid unnecessary exploration. If you exceed this limit, the evaluation will terminate immediately.
+**Your task**: Identify and fix the bug with limited tool calls and submission attempts.
 
 **CRITICAL: You MUST follow these steps IN ORDER**:
 
@@ -291,14 +284,14 @@ A subtle bug has been introduced in the function `{function_name}`. Here's the c
 **Step 4 - If submission fails** (ONLY if needed):
    - Read the test output from submit_solution
    - Install any missing dependencies if tests fail due to imports
-   - Refine your solution and submit again (you have 4 attempts total)
+   - Refine your solution and submit again
 
 **Available tools**:
 - `bash()`: Run shell commands (git clone, ls, cat, grep, etc.)
   - **IMPORTANT**: Each bash() call is independent. Always use full paths or cd in the same command.
   - Example: `bash("cd my_repo && ls")` NOT `bash("cd my_repo")` then `bash("ls")`
 - `python()`: Execute Python scripts for analysis
-- `submit_solution(code)`: Submit your fixed function for testing (max 4 attempts)"""
+- `submit_solution(code)`: Submit your fixed function for testing"""
 
     return Sample(
         input=prompt,
@@ -343,7 +336,7 @@ def setup_metadata_solver(max_attempts: int) -> Solver:
 def breakpoint_remove(
     max_tool_uses: int = 16,
     max_attempts: int = 4,
-    sandbox_type: Literal["local", "docker"] = "local",
+    use_docker: bool = False,
 ) -> Task:
     """
     Breakpoint Remove Mode - Function reconstruction task
@@ -358,22 +351,12 @@ def breakpoint_remove(
                        Set via -T max_tool_uses=N
         max_attempts: Maximum submission attempts (default: 4, as per paper)
                       Set via -T max_attempts=N
-        sandbox_type: Sandbox environment type (default: "local")
-                     - "local": Agent chooses path in local filesystem
-                     - "docker": Agent chooses path in Docker container
-                     Set via -T sandbox_type=local or -T sandbox_type=docker
-
-    Note: Use global --message-limit flag to control total message budget.
-          Each tool call = 2 messages (assistant + tool response)
+        use_docker: Use Docker sandbox with network access (default: False)
+                    Set via -T use_docker=true
 
     Dataset: 498 problems from real Python repositories
     """
-    # Set sandbox config based on sandbox type
-    sandbox_config: SandboxConfig
-    if sandbox_type == "docker":
-        sandbox_config = ("docker", str(COMPOSE_PATH))
-    else:
-        sandbox_config = "local"
+    sandbox_config = ("docker", str(COMPOSE_PATH)) if use_docker else "local"
 
     return Task(
         dataset=json_dataset(
@@ -396,6 +379,8 @@ When you're confident in your solution, call submit_solution(code) with your com
         ),
         scorer=breakpoint_scorer(),
         sandbox=sandbox_config,
+        max_messages=max_tool_uses * 2
+        + 1,  # Initial prompt + (each tool call = 2 messages)
     )
 
 
@@ -403,7 +388,7 @@ When you're confident in your solution, call submit_solution(code) with your com
 def breakpoint_discovery(
     max_tool_uses: int = 16,
     max_attempts: int = 4,
-    sandbox_type: Literal["local", "docker"] = "local",
+    use_docker: bool = False,
 ) -> Task:
     """
     Breakpoint Discovery Mode - Bug location and repair task
@@ -418,25 +403,15 @@ def breakpoint_discovery(
                        Set via -T max_tool_uses=N
         max_attempts: Maximum submission attempts (default: 4, as per paper)
                       Set via -T max_attempts=N
-        sandbox_type: Sandbox environment type (default: "local")
-                     - "local": Agent chooses path in local filesystem
-                     - "docker": Agent chooses path in Docker container
-                     Set via -T sandbox_type=local or -T sandbox_type=docker
-
-    Note: Use global --message-limit flag to control total message budget.
-          Each tool call = 2 messages (assistant + tool response)
+        use_docker: Use Docker sandbox with network access (default: False)
+                    Set via -T use_docker=true
 
     Dataset: 269 problems from real Python repositories
 
     In discovery mode, modifications persist throughout the trajectory,
     allowing the agent to iterate and refine solutions.
     """
-    # Set sandbox config based on sandbox type
-    sandbox_config: SandboxConfig
-    if sandbox_type == "docker":
-        sandbox_config = ("docker", str(COMPOSE_PATH))
-    else:
-        sandbox_config = "local"
+    sandbox_config = ("docker", str(COMPOSE_PATH)) if use_docker else "local"
 
     return Task(
         dataset=json_dataset(
@@ -461,4 +436,6 @@ When you're confident in your fix, call submit_solution(code) with your correcte
         ),
         scorer=breakpoint_scorer(),
         sandbox=sandbox_config,
+        max_messages=max_tool_uses * 2
+        + 1,  # Initial prompt + (each tool call = 2 messages)
     )

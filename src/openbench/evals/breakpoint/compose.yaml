@@ -7,6 +7,4 @@ services:
     networks: [breakpoint_net]
 
 networks:
-  breakpoint_net:
-    driver: bridge
-    internal: false
+  breakpoint_net: { driver: bridge, internal: false }
