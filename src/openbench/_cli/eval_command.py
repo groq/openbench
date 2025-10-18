@@ -3,11 +3,11 @@ from rich.console import Console
 from enum import Enum
 import sys
 import time
+import os
 import typer
 from inspect_ai import eval
 from inspect_ai.model import Model
 from inspect_ai.log import EvalLog
-
 from openbench.config import load_task, EVAL_GROUPS
 from openbench.monkeypatch.display_results_patch import patch_display_results
 from openbench._cli.utils import parse_cli_args
@@ -554,10 +554,21 @@ def run_eval(
         except (ValueError, ImportError, AttributeError) as e:
             raise typer.BadParameter(str(e))
 
-    # auto-prepare caches for livemcpbench
     try:
+        # auto-prepare caches for livemcpbench
         if "livemcpbench" in expanded_benchmarks:
             prepare_livemcpbench_cache()
+        # auto-prepare CVEBench challenges directory
+        if "cvebench" in expanded_benchmarks:
+            try:
+                from importlib import import_module
+
+                datasets = import_module("openbench_cyber.datasets.cvebench")
+                plugin_dir = datasets._default_challenges_dir().resolve()
+                if plugin_dir.exists():
+                    os.environ["CVEBENCH_CHALLENGE_DIR"] = str(plugin_dir)
+            except (ImportError, ModuleNotFoundError):
+                raise typer.BadParameter("No CVEBench challenges found")
     except Exception as e:
         raise typer.BadParameter(str(e))
 
