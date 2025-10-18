@@ -4,15 +4,18 @@ from enum import Enum
 import sys
 import time
 import typer
+import asyncio
 from inspect_ai import eval
 from inspect_ai.model import Model
 from inspect_ai.log import EvalLog
-
 from openbench.config import load_task, EVAL_GROUPS
 from openbench.monkeypatch.display_results_patch import patch_display_results
 from openbench._cli.utils import parse_cli_args
 from openbench.agents import AgentManager
-from openbench.utils.cache import prepare_livemcpbench_cache, clear_livemcpbench_root
+from openbench.utils.livemcpbench_cache import (
+    prepare_livemcpbench_cache,
+    clear_livemcpbench_root,
+)
 
 
 class SandboxType(str, Enum):
@@ -642,3 +645,11 @@ def run_eval(
         # Auto-clean root sandbox for livemcpbench unless opted out
         if "livemcpbench" in expanded_benchmarks and not keep_livemcp_root:
             clear_livemcpbench_root(quiet=False)
+        if "factscore" in expanded_benchmarks:
+            from openbench.scorers.factscore import cleanup_factscore_runners
+
+            try:
+                asyncio.run(cleanup_factscore_runners())
+            except Exception:
+                # Silently ignore cleanup errors
+                pass

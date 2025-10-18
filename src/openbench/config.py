@@ -5482,6 +5482,15 @@ _BUILTIN_BENCHMARKS = {
         function_name="multichallenge",
         is_alpha=False,
     ),
+    "factscore": BenchmarkMetadata(
+        name="FActScore",
+        description="FActScore - a benchmark for fine-grained factuality scoring",
+        category="knowledge-qa",
+        tags=["factuality", "long-form", "retrieval", "wikipedia"],
+        module_path="openbench.evals.factscore",
+        function_name="factscore",
+        is_alpha=False,
+    ),
 }
 
 

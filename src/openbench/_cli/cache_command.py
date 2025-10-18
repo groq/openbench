@@ -7,7 +7,6 @@ from typing import Optional, List
 
 import typer
 
-
 cache_app = typer.Typer(help="Manage OpenBench caches")
 
 
@@ -191,7 +190,7 @@ def cache_clear(
     cache_type: Optional[str] = typer.Option(
         None,
         "--type",
-        help="Cache type to clear (e.g., 'livemcpbench', 'scicode'). If not specified, uses default.",
+        help="Cache type to clear (e.g., 'livemcpbench'). If not specified, uses default.",
     ),
 ) -> None:
     """Remove selected cache data with confirmation."""
@@ -236,4 +235,93 @@ def cache_clear(
         typer.echo("✅ Cleared.")
     except Exception as e:
         typer.echo(f"❌ Failed to clear: {e}")
+        raise typer.Exit(1)
+
+
+@cache_app.command("upload")
+def cache_upload(
+    db_file: Optional[str] = typer.Option(
+        None,
+        "--db_file",
+        help="Path to a database file to upload",
+    ),
+    txt_file: Optional[str] = typer.Option(
+        None,
+        "--txt_file",
+        help="Path to a text file to upload",
+    ),
+    path: Optional[str] = typer.Option(
+        None,
+        "--path",
+        help="Destination path within the cache directory (e.g., 'factscore/data/enwiki.db')",
+    ),
+) -> None:
+    """Move files to the OpenBench cache directory.
+
+    This command helps you manually add required data files for evals that need them.
+    Files are MOVED (not copied) to save disk space - the original file will be removed.
+    You must specify both a file to move and a destination path within the cache.
+
+    Examples:
+        # Move a database file for FActScore
+        openbench cache upload --db_file ./enwiki-20230401.db \\
+            --path factscore/data/enwiki-20230401.db
+
+        # Move a text file for FActScore
+        openbench cache upload --txt_file ./prompt_entities.txt \\
+            --path factscore/data/labeled/prompt_entities.txt
+    """
+    # Validate inputs
+    if not any([db_file, txt_file]):
+        typer.echo("❌ No file specified. Use --db_file or --txt_file.")
+        raise typer.Exit(1)
+
+    if db_file and txt_file:
+        typer.echo("❌ Specify only one file type at a time (--db_file or --txt_file).")
+        raise typer.Exit(1)
+
+    if not path:
+        typer.echo(
+            "❌ Destination path is required. Use --path to specify where to upload the file."
+        )
+        raise typer.Exit(1)
+
+    # Determine source file
+    source_file = db_file if db_file else txt_file
+    file_type = "database" if db_file else "text"
+
+    # Resolve source path
+    src_path = Path(source_file).expanduser().resolve()  # type: ignore[arg-type]
+    if not src_path.exists():
+        typer.echo(f"❌ {file_type.capitalize()} file not found: {src_path}")
+        raise typer.Exit(1)
+
+    # Resolve destination path
+    cache_root = _cache_root()
+    dest_path = (cache_root / path).resolve()
+
+    # Security check: ensure destination is within cache root
+    try:
+        dest_path.relative_to(cache_root.resolve())
+    except ValueError:
+        typer.echo(
+            f"❌ Invalid path: destination must be within cache directory ({cache_root})"
+        )
+        raise typer.Exit(1)
+
+    # Create parent directories if needed
+    dest_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # Move file
+    try:
+        typer.secho(f"Cache root: {cache_root}", fg=typer.colors.CYAN)
+        typer.echo(f"Moving {src_path.name} → {dest_path}")
+        shutil.move(src_path, dest_path)
+        size = _human_size(dest_path.stat().st_size)
+        typer.secho(
+            f"✅ {file_type.capitalize()} file moved successfully ({size})",
+            fg=typer.colors.GREEN,
+        )
+    except Exception as e:
+        typer.echo(f"❌ Failed to move {file_type} file: {e}")
         raise typer.Exit(1)
