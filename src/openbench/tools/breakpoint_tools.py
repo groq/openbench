@@ -198,9 +198,91 @@ print("Code inserted successfully")
         if not manip_result.success:
             return f"❌ [Attempt {attempts}/{max_attempts}] Failed to insert code:\n{manip_result.stderr}"
 
+        # Install dependencies if not already done
+        # Only install once per repository to save time
+        deps_installed_key = f"deps_installed_{repo_root}"
+        install_notes = []
+
+        if not state.get(deps_installed_key, False):
+            # Check for pyproject.toml, setup.py, or requirements.txt
+            check_files_result = await sandbox().exec(
+                cmd=[
+                    "bash",
+                    "-c",
+                    "ls pyproject.toml setup.py requirements.txt 2>/dev/null || true",
+                ],
+                cwd=repo_root,
+                timeout=5,
+            )
+
+            files_found = (
+                check_files_result.stdout.strip() if check_files_result.stdout else ""
+            )
+
+            if files_found:
+                # Install the package in development mode
+                # Use uv pip (available system-wide) instead of python -m pip
+                # since the venv may not have pip installed
+                install_cmd = "uv pip install -e . 2>&1"
+
+                install_result = await sandbox().exec(
+                    cmd=["bash", "-c", install_cmd],
+                    cwd=repo_root,
+                    timeout=180,  # Give 3 minutes for installation
+                )
+
+                # Mark as installed (even if partial failure)
+                state.set(deps_installed_key, True)
+
+                # Capture installation output for debugging
+                install_output = install_result.stdout or ""
+                install_errors = install_result.stderr or ""
+
+                # Check if installation succeeded or had issues
+                if (
+                    install_result.returncode == 0
+                    or "Successfully installed" in install_output
+                ):
+                    install_notes.append("✓ Dependencies installed")
+                else:
+                    # Installation failed or partially failed
+                    # Extract useful error info
+                    error_lines = []
+                    for line in (install_output + install_errors).split("\n"):
+                        if any(
+                            keyword in line.lower()
+                            for keyword in ["error", "failed", "could not", "no module"]
+                        ):
+                            error_lines.append(line.strip())
+
+                    if error_lines:
+                        install_notes.append(
+                            "⚠ Dependency installation issues:\n"
+                            + "\n".join(error_lines[:5])
+                        )
+                    else:
+                        install_notes.append(
+                            f"⚠ Dependency installation returned code {install_result.returncode}"
+                        )
+
         # Run pytest - just use standard pytest, no plugins needed
         # Parse output directly since we can't rely on pytest-json-report being available
-        test_cmd = f"{test_command} -v"
+        # Strip any venv activation commands since we can't guarantee venv exists
+        # and pytest should be available system-wide or via the sandbox environment
+        clean_test_command = test_command
+        if "source" in test_command and "activate" in test_command:
+            # Remove "source venv/bin/activate &&" or similar patterns
+            import re
+
+            clean_test_command = re.sub(
+                r"source\s+[^\s]+/activate\s+&&\s+", "", test_command
+            )
+            # Also handle "./venv/bin/pytest" -> "pytest"
+            clean_test_command = re.sub(
+                r"\./[^\s]+/bin/(pytest|python)", r"\1", clean_test_command
+            )
+
+        test_cmd = f"{clean_test_command} -v"
 
         test_result = await sandbox().exec(
             cmd=["bash", "-c", test_cmd],
@@ -224,7 +306,14 @@ print("Code inserted successfully")
 
         # If pytest didn't run at all (missing deps), that's also a failure
         if test_result.returncode != 0 and passed == 0 and failed == 0:
+            install_info = (
+                "\n".join(install_notes)
+                if install_notes
+                else "No dependency installation attempted"
+            )
             return f"""❌ [Attempt {attempts}/{max_attempts}] Tests failed to run.
+
+{install_info}
 
 Test command: {test_cmd}
 Exit code: {test_result.returncode}
@@ -236,8 +325,8 @@ Stderr (first 500 chars):
 {test_result.stderr[:500] if test_result.stderr else "(empty)"}
 
 Likely issues:
-- Missing test dependencies (try installing requirements.txt)
-- pytest not available in environment"""
+- Missing test dependencies
+- Check installation notes above for dependency errors"""
 
         if failed == 0:
             return f"""✅ [Attempt {attempts}/{max_attempts}] SUCCESS! All tests passed!
