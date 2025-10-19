@@ -193,6 +193,19 @@ class Router:
                             )
                         ],
                     )
+                except Exception as e:
+                    error_msg = (
+                        f"Error executing tool {tool_name} on {server_name}: {str(e)}"
+                    )
+                    return types.CallToolResult(
+                        isError=True,
+                        content=[
+                            types.TextContent(
+                                type="text",
+                                text=error_msg,
+                            )
+                        ],
+                    )
 
     async def aclose(self):
         pass
