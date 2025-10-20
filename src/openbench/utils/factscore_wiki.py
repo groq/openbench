@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Dict, Iterable, Sequence
 
 import numpy as np
-from rank_bm25 import BM25Okapi  # type: ignore[import-untyped]
+from rank_bm25 import BM25Okapi  # type: ignore[import-not-found, import-untyped]
 
 SPECIAL_SEPARATOR = "####SPECIAL####SEPARATOR####"
 

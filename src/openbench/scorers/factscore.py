@@ -21,7 +21,7 @@ from openbench.utils.factscore_cache import (
 from openbench.utils.factscore_wiki import KnowledgeSourceError, WikipediaRetriever
 
 try:  # pragma: no cover - import guarded for optional dependency
-    from FactScoreLite import (  # type: ignore[import-untyped]
+    from FactScoreLite import (  # type: ignore[import-not-found, import-untyped]
         AtomicFactGenerator,
         FactScorer,
         configs as factscorelite_configs,
@@ -59,7 +59,7 @@ def _ensure_openai_key() -> None:
 
 def _ensure_nltk_resources() -> None:
     try:
-        import nltk  # type: ignore[import-untyped]
+        import nltk  # type: ignore[import-not-found, import-untyped]
     except ImportError as exc:  # pragma: no cover - safeguarded by optional deps
         raise RuntimeError(
             "FactScoreLite scorer requires the 'nltk' package. Install with `pip install openbench[factscore]`."
