@@ -238,9 +238,10 @@ print("Code inserted successfully")
                 else:
                     install_notes.append("✓ Created isolated venv")
 
-                    # Install the package in the isolated venv
-                    # Use the venv's pip to ensure packages install in the right place
-                    install_cmd = ".venv/bin/pip install -e . 2>&1"
+                    # Install the package + pytest in the isolated venv
+                    # pytest is always needed to run tests, and most test repos
+                    # only include it as an optional dependency
+                    install_cmd = ".venv/bin/pip install -e . pytest 2>&1"
 
                     install_result = await sandbox().exec(
                         cmd=["bash", "-c", install_cmd],
