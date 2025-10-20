@@ -2,20 +2,19 @@
 
 from __future__ import annotations
 
-from typing import Optional
-
-from inspect_ai.dataset import Dataset, MemoryDataset, Sample, hf_dataset
-
-
-AVAILABLE_SUBSETS = ["hyphenize", "numberize", "pythonize"]
+from inspect_ai.dataset import Dataset, Sample, hf_dataset
 
 
 def record_to_sample(record: dict) -> Sample:
     prompt = record.get("prompt", "")
+    category = record.get("category", "")
+    annotations = record.get("metadata", {})
     metadata = {
         "prompt": prompt,
         "objective": record.get("objective", ""),
         "id": record.get("id", ""),
+        "category": category,
+        "annotations": annotations,
     }
 
     return Sample(
@@ -24,27 +23,10 @@ def record_to_sample(record: dict) -> Sample:
     )
 
 
-def get_cosafe_m2s_dataset(subset: Optional[str] = None) -> Dataset:
+def get_cosafe_m2s_dataset() -> Dataset:
     """Load the CoSafe m2s dataset."""
-
-    if subset:
-        dataset = hf_dataset(
-            path="lvogel123/m2s-cosafe",
-            split=subset,
-            sample_fields=record_to_sample,
-        )
-        samples = list(dataset)
-        dataset_name = f"cosafe_m2s_{subset}"
-    else:
-        all_samples = []
-        for name in AVAILABLE_SUBSETS:
-            dataset = hf_dataset(
-                path="lvogel123/m2s-cosafe",
-                split=name,
-                sample_fields=record_to_sample,
-            )
-            all_samples.extend(list(dataset))
-        samples = all_samples
-        dataset_name = "cosafe_m2s"
-
-    return MemoryDataset(samples=samples, name=dataset_name)
+    return hf_dataset(
+        path="lvogel123/cosafe-300-m2s",
+        split="train",
+        sample_fields=record_to_sample,
+    )
