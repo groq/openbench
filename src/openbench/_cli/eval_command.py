@@ -260,9 +260,8 @@ def display_group_summary(
     typer.echo(f"Total samples:       {total_samples:,}")
 
     # Handle display based on whether scores are binary (0/1) or continuous (0.0-1.0)
-    # Use explicit tracking instead of checking if total_correct is an integer,
-    # which fails when continuous scores happen to sum to an integer (e.g., 0.5 + 0.5 = 1.0)
-    if all_scores_binary and total_correct == int(total_correct):
+    # Check if total_correct is an integer value (binary scoring)
+    if total_correct == int(total_correct):
         # Binary scores: display as simple counts
         total_incorrect = int(total_samples - total_correct)
         typer.echo(f"Correct:             {int(total_correct):,}")
