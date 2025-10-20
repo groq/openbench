@@ -95,15 +95,15 @@ Just return the letters "A", "B", or "C", with no text around it.
 """.strip()
 
 
-@scorer(metrics=[accuracy(), stderr(), simpleqa_metrics()])
-def simpleqa_scorer(model: str) -> Callable:
-    """SimpleQA scorer using model grading."""
+def _create_simpleqa_score_fn(model: str) -> Callable:
+    """Create the core SimpleQA scoring function (shared by simpleqa and simpleqa_verified).
 
+    This function contains the actual scoring logic used by both simpleqa and simpleqa_verified.
+    It is extracted to avoid code duplication while allowing different metric decorators.
+    """
     grader_model: Model = get_model(model)
 
     async def score(state: TaskState, target: Target) -> Score:
-        # Get the grader model (use the same model being evaluated)
-
         # Get question from the input
         question = state.input_text
 
@@ -147,3 +147,9 @@ def simpleqa_scorer(model: str) -> Callable:
         )
 
     return score
+
+
+@scorer(metrics=[accuracy(), stderr(), simpleqa_metrics()])
+def simpleqa_scorer(model: str) -> Callable:
+    """SimpleQA scorer using model grading."""
+    return _create_simpleqa_score_fn(model)

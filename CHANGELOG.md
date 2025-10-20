@@ -1,5 +1,139 @@
 # Changelog
 
+## [0.5.2](https://github.com/groq/openbench/compare/v0.5.1...v0.5.2) (2025-10-16)
+
+
+### Chores
+
+* require manual install for cyber plugin ([#252](https://github.com/groq/openbench/issues/252)) ([090f801](https://github.com/groq/openbench/commit/090f80123841d398a9f55577654a232b9bad8628))
+
+## [0.5.1](https://github.com/groq/openbench/compare/v0.5.0...v0.5.1) (2025-10-16)
+
+
+### Bug Fixes
+
+* broken link ([#247](https://github.com/groq/openbench/issues/247)) ([5ef66e0](https://github.com/groq/openbench/commit/5ef66e0908652b4becf11b6d3a8b5497656f9c40))
+
+
+### Chores
+
+* update lockfile ([dff1bd9](https://github.com/groq/openbench/commit/dff1bd92e47bd9d4770da4a46f9ccfb3e90f83b2))
+
+
+### Refactor
+
+* extract cybersecurity benchmarks to plugin ([#251](https://github.com/groq/openbench/issues/251)) ([df829e2](https://github.com/groq/openbench/commit/df829e2482a481d4cde2f75d3cc906184eda330d))
+
+## [0.5.0](https://github.com/groq/openbench/compare/v0.4.1...v0.5.0) (2025-10-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* added more groupings under benchmarks catalog ([#244](https://github.com/groq/openbench/issues/244))
+
+### Features
+
+* add clockbench evaluation framwork and script for synthesizing public dataset. ([#159](https://github.com/groq/openbench/issues/159)) ([3ba9836](https://github.com/groq/openbench/commit/3ba98367252e4c0938d2841ff673662108cebe07))
+* add IFEval ([#182](https://github.com/groq/openbench/issues/182)) ([8d1b939](https://github.com/groq/openbench/commit/8d1b939477a5a2202df4a874cb0fa0586fe2d9e3))
+* add local openbench implementation of groq provider in inspect ([#131](https://github.com/groq/openbench/issues/131)) ([52aea35](https://github.com/groq/openbench/commit/52aea3510f03cd49d0fb66c3e6789f61939a7ee0))
+* add mmmlu eval ([#193](https://github.com/groq/openbench/issues/193)) ([a42c2d5](https://github.com/groq/openbench/commit/a42c2d5499a87366cfbb62cc254d47021565a628))
+* add mmstar benchmark ([#174](https://github.com/groq/openbench/issues/174)) ([5d085ab](https://github.com/groq/openbench/commit/5d085ab4b14a0a176953bfb3134e89e8eb36cb85))
+* add new openbench documentation ([#169](https://github.com/groq/openbench/issues/169)) ([f3e6a37](https://github.com/groq/openbench/commit/f3e6a373c3195f90ed3017d81202ded81cde54d2))
+* add overarching bbh command to run all 18 BBH tasks ([463a25f](https://github.com/groq/openbench/commit/463a25f308f8613f742f6bf79aba16d3998a30f3))
+* add preset eval group infrastructure ([#215](https://github.com/groq/openbench/issues/215)) ([d9ea03a](https://github.com/groq/openbench/commit/d9ea03a76f1a580037cd9760aa5ee3505104e341))
+* added more groupings under benchmarks catalog ([#244](https://github.com/groq/openbench/issues/244)) ([d932cb0](https://github.com/groq/openbench/commit/d932cb0b4aa8752a2075706f63485b3fb4dbdec0))
+* **ArabicMMLU:** add remaining 32 Arabic exam subsets, total 41 subsets ([#219](https://github.com/groq/openbench/issues/219)) ([006e248](https://github.com/groq/openbench/commit/006e2480fd336642f5bbe0fc3a08b521fbbe7dc9))
+* **benchmark:** add support for arc-agi ([#158](https://github.com/groq/openbench/issues/158)) ([3f32253](https://github.com/groq/openbench/commit/3f3225324e7578b7e6e1cbf3261fa73107b75745))
+* **benchmark:** add support for detailbench ([#154](https://github.com/groq/openbench/issues/154)) ([23fbca5](https://github.com/groq/openbench/commit/23fbca5b09b4636b9c07886ce20e10ed1d386eb8))
+* **benchmark:** add support for TUMLU ([#160](https://github.com/groq/openbench/issues/160))  ([#161](https://github.com/groq/openbench/issues/161)) ([885be75](https://github.com/groq/openbench/commit/885be75b68529e1b81aa964f6fbd0e0ea1de0ccd))
+* **benchmark:** multichallenge implementation ([#170](https://github.com/groq/openbench/issues/170)) ([cf2ab4f](https://github.com/groq/openbench/commit/cf2ab4fcf77195a66360408f9b230cceae3732e8))
+* change default model to groq/openai/gpt-oss-20b ([#138](https://github.com/groq/openbench/issues/138)) ([8f7f42f](https://github.com/groq/openbench/commit/8f7f42f1a3faba9dafa535f135a6a1638592ed4f))
+* **components:** export the run_eval entrypoint method ([#157](https://github.com/groq/openbench/issues/157)) ([acbe7f4](https://github.com/groq/openbench/commit/acbe7f45c3174951c9f6232bd2a624ff2682121f))
+* configure release-please for pre-v1.0 version bumping ([#133](https://github.com/groq/openbench/issues/133)) ([c432934](https://github.com/groq/openbench/commit/c4329343e059f6dd8c9a664a67431aba8d8fb853))
+* **cybench:** ported over code for cybench ([#207](https://github.com/groq/openbench/issues/207)) ([7949425](https://github.com/groq/openbench/commit/794942597a248a454455acd33e56565807b77f48))
+* cybersecurity, changelog, more docs ([39f123c](https://github.com/groq/openbench/commit/39f123cd4c0c98192a965827ab07256a8403d421))
+* display results patch to include task duration stats ([#167](https://github.com/groq/openbench/issues/167)) ([e4e480c](https://github.com/groq/openbench/commit/e4e480cc9c73329e6fb9eaecdaa59b304a5db887))
+* **docs:** add changelog page ([#225](https://github.com/groq/openbench/issues/225)) ([7db9135](https://github.com/groq/openbench/commit/7db913513cd6b2cefba948cafb11b65588b2eb30))
+* **docs:** add release notes section and update index with new features for v0.5 ([#245](https://github.com/groq/openbench/issues/245)) ([09ab78e](https://github.com/groq/openbench/commit/09ab78ece5c6b85516503c0aaa682dff54eb260b))
+* **docs:** added feature card and docs page for exercism ([#243](https://github.com/groq/openbench/issues/243)) ([2b38147](https://github.com/groq/openbench/commit/2b38147397814d6d27f51854784630f3e4ef94a8))
+* **docs:** Added feature eval docs pages and cache command docs ([#191](https://github.com/groq/openbench/issues/191)) ([50501f1](https://github.com/groq/openbench/commit/50501f13d429ba52d82b55b21916aeac0fb2c972))
+* **eval:** add support for json output ([#14](https://github.com/groq/openbench/issues/14)) ([f335418](https://github.com/groq/openbench/commit/f3354188fcbd35067072da8840a444188a3a0221))
+* **exercism:** added support for exercism tasks w/ agent support for aider, roo, claude, opencode ([#151](https://github.com/groq/openbench/issues/151)) ([d86f0da](https://github.com/groq/openbench/commit/d86f0da6d98580a2ca6d4d1b63f5b89fd0a86175))
+* graphwalks token filter ([#115](https://github.com/groq/openbench/issues/115)) ([e38658c](https://github.com/groq/openbench/commit/e38658c916d987bf8074910dfdefefb88e97faf6))
+* groq reasoning effort + bugfix to override inspect's "groq" ([#142](https://github.com/groq/openbench/issues/142)) ([b919cc7](https://github.com/groq/openbench/commit/b919cc7e6bc748c92393a9a9bbf69db560313495))
+* **lighteval:** Add 7 core commonsense reasoning benchmarks from LightEval ([#197](https://github.com/groq/openbench/issues/197)) ([7792c45](https://github.com/groq/openbench/commit/7792c45a2bb0aad825403fe7ccb14e0e8a537a9d))
+* **lighteval:** add BigBench eval (122 MCQ tasks) ([9f35b1d](https://github.com/groq/openbench/commit/9f35b1daebf87d80666a4a291b12f18b616746be))
+* **lighteval:** Add cross-lingual understanding benchmarks (XCOPA, XStoryCloze, XWinograd) ([917667a](https://github.com/groq/openbench/commit/917667ad8238a1319d64c0e9e0babf337c30f57d))
+* **lighteval:** add Global-MMLU eval (42 languages) ([3542213](https://github.com/groq/openbench/commit/354221387cf5e3cf8754636810a0570ca64fe196))
+* **lighteval:** register BigBench benchmarks in config and registry ([77018e9](https://github.com/groq/openbench/commit/77018e9c0b187b0d4a553f91054e9f1bc7089831))
+* **lighteval:** register Global-MMLU benchmarks in config and registry ([156f509](https://github.com/groq/openbench/commit/156f509416d5a8f38214c9a20cf414cb4a6fc933))
+* link to subscription form on main page ([#240](https://github.com/groq/openbench/issues/240)) ([988d08c](https://github.com/groq/openbench/commit/988d08c0d63a7c4246bb0123a45145c968ebeb44))
+* **livemcpbench:** Adding support for liveMCPBench ([#127](https://github.com/groq/openbench/issues/127)) ([222f678](https://github.com/groq/openbench/commit/222f678369030a34144f8ac4fefba48835d7206f))
+* make evals dash/undescore insensitive ([#185](https://github.com/groq/openbench/issues/185)) ([5ec5177](https://github.com/groq/openbench/commit/5ec5177ffa1c42d6f62a02f88226395914d4eba5))
+* mbpp ([#117](https://github.com/groq/openbench/issues/117)) ([93ad88b](https://github.com/groq/openbench/commit/93ad88b56b6586405efef87a6a4a4e6c396c988c))
+* **mcq_eval:** enable abstraction of MCQ eval ([#181](https://github.com/groq/openbench/issues/181)) ([2f53db2](https://github.com/groq/openbench/commit/2f53db20bb8d1474e0d49610c8e41c469dd07719))
+* **mmmu-pro:** added support for mmmu_mcq, mmmu_open, mmmu_pro, mmmu_pro_vision ([#134](https://github.com/groq/openbench/issues/134)) ([a875378](https://github.com/groq/openbench/commit/a875378e62e3bbd3f8050d1a9685d3e05a47a53d))
+* **openrouter:** add OpenRouter provider support ([#145](https://github.com/groq/openbench/issues/145)) ([47b579e](https://github.com/groq/openbench/commit/47b579e65c8eeb520023bc1e077ff50641f43bb6))
+* **openrouter:** add provider routing args support ([#180](https://github.com/groq/openbench/issues/180)) ([12e1d81](https://github.com/groq/openbench/commit/12e1d818f9cecf2e74b930591981026d288557e2))
+* **otis-mock-aime:** added support for otis mock aime 2024-2025 ([#218](https://github.com/groq/openbench/issues/218)) ([1b9fd5c](https://github.com/groq/openbench/commit/1b9fd5c8a65d8132fe1faf0e48d90d8b5f55bbfe))
+* **plugins:** add entry point system for external benchmarks ([#216](https://github.com/groq/openbench/issues/216)) ([71e7257](https://github.com/groq/openbench/commit/71e7257298787905b05c0048ed9fbd6e3ff14169))
+* return eval logs from run_eval function ([#173](https://github.com/groq/openbench/issues/173)) ([ee459d9](https://github.com/groq/openbench/commit/ee459d97bcb68039509b39b38783360e5c03c823))
+* **rootly_terraform:** add initial implementation of Rootly Terraform evals ([#195](https://github.com/groq/openbench/issues/195)) ([cd3acae](https://github.com/groq/openbench/commit/cd3acaebf2a736942456f815f82c3bf54e2ac751))
+
+
+### Bug Fixes
+
+* allow for more python versions ([#164](https://github.com/groq/openbench/issues/164)) ([e6682fe](https://github.com/groq/openbench/commit/e6682fe60f2b69c5def4f0085f74006367fb6911))
+* close headqa metadata entry ([947522d](https://github.com/groq/openbench/commit/947522dd2ef341c861cf1290687594b0765e2929))
+* **cybench:** moved cybench dependency into dependency group ([#237](https://github.com/groq/openbench/issues/237)) ([8d30715](https://github.com/groq/openbench/commit/8d30715103dfe2476c8ebee0cb6b7158d8f0ad63))
+* handle missing SciCode dependency lazily in solver ([#186](https://github.com/groq/openbench/issues/186)) ([fed4e88](https://github.com/groq/openbench/commit/fed4e888b7673a5e0d76d3c854ec1fa342fa040a))
+* improve BBH target extraction to handle multi-char answers ([147e3e0](https://github.com/groq/openbench/commit/147e3e0696ad918d787ec82287cdd2c4b91498d2))
+* load Neue Regrade font in Mintlify docs ([#177](https://github.com/groq/openbench/issues/177)) ([550c7f5](https://github.com/groq/openbench/commit/550c7f575c715a5c47aaf8609325070e0d788788))
+* make core package actually install ([#235](https://github.com/groq/openbench/issues/235)) ([edeb4b8](https://github.com/groq/openbench/commit/edeb4b81134d9d138b8e9149f99f031288b05297))
+* normalize benchmark keys during entry point merge ([#217](https://github.com/groq/openbench/issues/217)) ([d285664](https://github.com/groq/openbench/commit/d285664b40e893f792413810d67f550ea377907b))
+* register headqa_en and headqa_es variants ([6a19aa1](https://github.com/groq/openbench/commit/6a19aa15b78570b5fb3bac715546e71d59daf1fe))
+* render inspect error correctly ([#241](https://github.com/groq/openbench/issues/241)) ([97ccd10](https://github.com/groq/openbench/commit/97ccd106de80f5a6555d130c3bb7515c39de5fb3))
+* resolve registry import conflict ([98a1c79](https://github.com/groq/openbench/commit/98a1c794436f06fc4297696530802125192ae27d))
+* **scicode:** add support for test split, fix test_data.h5 import error ([#149](https://github.com/groq/openbench/issues/149)) ([23fa8cb](https://github.com/groq/openbench/commit/23fa8cbf4cc431ce4afdbe87b268afc7310e1b3f))
+* update bbh function for programmatic access only ([811ce9e](https://github.com/groq/openbench/commit/811ce9ecb4f1ef0bb3cacce7fae8f298d0edfc61))
+* use generic type ignore for bbh task decorator ([fd67171](https://github.com/groq/openbench/commit/fd67171e55a4901d523c517906ff06941410ce30))
+
+
+### Documentation
+
+* **readme:** clarify benchmark case-sensitivity and grader requirements ([#135](https://github.com/groq/openbench/issues/135)) ([c34a5a3](https://github.com/groq/openbench/commit/c34a5a362ec6764909258350f383ec561274b5bb))
+
+
+### Chores
+
+* add [@nmayorga7](https://github.com/nmayorga7) to CODEOWNERS ([abad7bf](https://github.com/groq/openbench/commit/abad7bf76e86319e98921b73455e2c06e72d2940))
+* alphabetize available benchmarks error ([#214](https://github.com/groq/openbench/issues/214)) ([68f46e9](https://github.com/groq/openbench/commit/68f46e9304994d67b720e6dae40e328292f8ed57))
+* **benchmark:** removed combined cti-bench eval ([#183](https://github.com/groq/openbench/issues/183)) ([a77852c](https://github.com/groq/openbench/commit/a77852c69c210ed10ba410bd769c21a94789f5f7))
+* bugbot fixes for MCQ ([#190](https://github.com/groq/openbench/issues/190)) ([6ecaefc](https://github.com/groq/openbench/commit/6ecaefcafdd471ec0b9e2949d1ec3ee448da0447))
+* **docs:** add docs for openrouter and MCQEval ([#188](https://github.com/groq/openbench/issues/188)) ([7f8cd83](https://github.com/groq/openbench/commit/7f8cd83909f13b260078501fbac72cbeb60e0f97))
+* **docs:** alphabetize benchmarks metadata ([#187](https://github.com/groq/openbench/issues/187)) ([ce77812](https://github.com/groq/openbench/commit/ce778121a700f423132809dbf371468b45f150b2))
+* **docs:** benchmarks each on new line ([#184](https://github.com/groq/openbench/issues/184)) ([b3c40f8](https://github.com/groq/openbench/commit/b3c40f82fb5b26c0aba2ff0a17c9af45222f177d))
+* **docs:** minor cleanup ([#179](https://github.com/groq/openbench/issues/179)) ([80c9e09](https://github.com/groq/openbench/commit/80c9e096885817b7a3dc62220f365760347aa462))
+* fixed fonts in openbench docs ([#178](https://github.com/groq/openbench/issues/178)) ([6e3c2a5](https://github.com/groq/openbench/commit/6e3c2a5405e54b274656be34a9385d9b307fcd38))
+* GitHub Terraform: Create/Update .github/workflows/stale.yaml [skip ci] ([d0018d1](https://github.com/groq/openbench/commit/d0018d1cac7b024844b530117b31a09088882728))
+* **mcq-eval:** accept more dataset types ([#194](https://github.com/groq/openbench/issues/194)) ([cb5e038](https://github.com/groq/openbench/commit/cb5e038578ded316582f82c8d65503e7146e7781))
+* move all metrics to discrete files in /metrics ([#168](https://github.com/groq/openbench/issues/168)) ([7caa042](https://github.com/groq/openbench/commit/7caa042318a8ac27b496357c64b2489bd0da6d43))
+* release-please pre-1.0: treat BREAKING as minor ([3c88a42](https://github.com/groq/openbench/commit/3c88a429573ef81889751e2b3013a70e07b594f1))
+* remove pre-commit benchmark checks for easier CI ([#213](https://github.com/groq/openbench/issues/213)) ([67b07a7](https://github.com/groq/openbench/commit/67b07a7954e6bf6b87966f7347b65323aa159f3e))
+* rename OpenBench to openbench ([#196](https://github.com/groq/openbench/issues/196)) ([0621b46](https://github.com/groq/openbench/commit/0621b4691eb1f08c3110fada527752fc95e72add))
+* rename task to sample in time metrics ([#172](https://github.com/groq/openbench/issues/172)) ([96e1817](https://github.com/groq/openbench/commit/96e1817d79ab24a01c5680dc31a7dcab01e11d85))
+* sync packaging pyproject ([#234](https://github.com/groq/openbench/issues/234)) ([940a879](https://github.com/groq/openbench/commit/940a879f9bba7939c1920065a4593cb899b93999))
+* update Claude workflows to enhance permissions and streamline triggers ([#136](https://github.com/groq/openbench/issues/136)) ([effb7da](https://github.com/groq/openbench/commit/effb7da7ce12ba11da311bfb52493fb8b40dac24))
+* update readme and contributing ([#176](https://github.com/groq/openbench/issues/176)) ([ea606ba](https://github.com/groq/openbench/commit/ea606ba82ce0a385063288c6b06616e9d1e9f84c))
+* update release-please configuration and add lockfile update workflow ([#146](https://github.com/groq/openbench/issues/146)) ([2d6ad9b](https://github.com/groq/openbench/commit/2d6ad9b529e7092c554dabee9f479d6555a698c7))
+* user agent ([#163](https://github.com/groq/openbench/issues/163)) ([e20f3c1](https://github.com/groq/openbench/commit/e20f3c1bf9af74c14cee26f3dc92d0e85cbfed0a))
+
+
+### CI
+
+* add benchmarks validation pre commit hook ([#171](https://github.com/groq/openbench/issues/171)) ([3725638](https://github.com/groq/openbench/commit/37256380e95dce060b8a8ceb48d719356d7b95b3))
+* remove PR trigger from release-please ([#166](https://github.com/groq/openbench/issues/166)) ([6440d44](https://github.com/groq/openbench/commit/6440d44ba0a13834c6d77d913861c132de4482d1))
+
 ## [0.4.1](https://github.com/groq/openbench/compare/v0.4.0...v0.4.1) (2025-08-29)
 
 

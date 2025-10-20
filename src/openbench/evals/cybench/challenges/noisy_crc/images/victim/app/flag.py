@@ -1,1 +1,0 @@
-FLAG = b"SEKAI{CrCrCRcRCRcrcrcRCrCrC}"

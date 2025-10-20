@@ -1,0 +1,83 @@
+---
+title: Knowledge
+description: Evaluate AI models on knowledge and comprehension tasks
+icon: brain
+---
+
+openbench includes a comprehensive suite of knowledge benchmarks covering diverse subjects from undergraduate to graduate level, spanning multiple languages and domains.
+
+## Available Benchmarks
+
+<CardGroup cols={2}>
+  <Card title="MMLU" icon="book">
+    Massive Multitask Language Understanding across 57 subjects including STEM, humanities, and social sciences.
+
+    ```bash
+    bench eval mmlu
+    ```
+  </Card>
+
+  <Card title="MMLU-Pro" icon="graduation-cap">
+    Enhanced version of MMLU with more challenging questions and additional subjects.
+
+    ```bash
+    bench eval mmlu_pro
+    ```
+  </Card>
+
+  <Card title="GPQA Diamond" icon="gem">
+    Graduate-level science questions (PhD-level) in physics, chemistry, and biology.
+
+    ```bash
+    bench eval gpqa_diamond
+    ```
+  </Card>
+
+  <Card title="SuperGPQA" icon="star">
+    Extended graduate-level question answering spanning 285 academic disciplines.
+
+    ```bash
+    bench eval supergpqa
+    ```
+  </Card>
+
+  <Card title="TUMLU" icon="globe">
+    Turkish Understanding and Multitask Language Understanding across 9 languages.
+
+    ```bash
+    bench eval tumlu
+    ```
+  </Card>
+
+  <Card title="OpenBookQA" icon="book-open">
+    Question answering requiring multi-step reasoning with elementary science knowledge.
+
+    ```bash
+    bench eval openbookqa
+    ```
+  </Card>
+
+  <Card title="HLE" icon="trophy">
+    Humanity's Last Exam - 2,500 expert-written questions from 1,000+ domain experts across diverse fields.
+
+    ```bash
+    bench eval hle
+    ```
+  </Card>
+
+  <Card title="HLE Text" icon="file-text">
+    Text-only version of Humanity's Last Exam without visual components.
+
+    ```bash
+    bench eval hle_text
+    ```
+  </Card>
+</CardGroup>
+
+<br/>
+
+## Related Resources
+- [MMLU Paper](https://arxiv.org/abs/2009.03300)
+- [GPQA Paper](https://arxiv.org/abs/2311.12022)
+- [OpenBookQA Dataset](https://allenai.org/data/open-book-qa)
+

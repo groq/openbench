@@ -83,7 +83,9 @@ def normalize_eval_group(group_id: str, group: Any) -> Dict[str, Any]:
     }
 
 
-def export_benchmarks(snippet_mdx_path: Path) -> tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+def export_benchmarks(
+    snippet_mdx_path: Path,
+) -> tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     """Collect, normalize, sort, and write benchmark and eval group metadata."""
     # Include alpha in the export; filtering happens in the UI
     config_module = importlib.import_module("openbench.config")

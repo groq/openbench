@@ -7,7 +7,7 @@
         "include-v-in-tag": true,
         "include-component-in-tag": false,
         "changelog-path": "CHANGELOG.md",
-        "bump-minor-pre-major": false,
+        "bump-minor-pre-major": true,
         "bump-patch-for-minor-pre-major": true,
         "pull-request-title-pattern": "chore: release ${component} ${version}",
         "pull-request-header": "### Conventional Commits Only\n\nThis PR includes only changes from conventional commits. Non-conventional commits are automatically excluded.",
