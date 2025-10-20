@@ -36,27 +36,34 @@ Rubric Criterion:
 
 Task: Define primitives, evaluate them, and check constraints.
 
+This is the task specific grader template for reference 
+Grader Template (for reference):
+{grader_template}
+
+The following are additional steps for symbolic reasoning but abide to the rules in the grader template. 
+
 STEP 1 - DEFINE PRIMITIVES:
-Break down the criterion into verifiable primitives (boolean variables):
-- For multi-part criteria (e.g., "X AND Y"), create separate primitives for each part
-- For action/directive criteria: primitives should check for direct, strong language (not weak)
-- For informational criteria: primitives should check if information is explicitly present 
-- Make primitive names descriptive
+Break down the criterion into verifiable primitives (boolean variables). 
+Treat every logical connective explicitly:
+- For conjunction/disjunction chains ("X AND Y", "A OR B"), create a primitive for each atomic statement — never collapse them.
+- For conditional language ("IF", "ONLY IF", "UNLESS", "WHEN", "REQUIRES"), define separate primitives for antecedent and consequent clauses so the logical dependency can be represented later.
+- For biconditional language ("IF AND ONLY IF", "IFF", "exactly when"), define primitives for both directions of implication.
+- For action/directive criteria: primitives should check for the action being satisfied with explicit evidence.
+- For informational criteria: primitives should check if the information is explicitly present without paraphrasing away required qualifiers.
+- Make primitive names descriptive and aligned to the exact proposition they represent (e.g., "recommends_er_visit_if_unconscious").
 
 STEP 2 - EVALUATE PRIMITIVES:
 For each primitive, evaluate based on the actual response:
-- Evaluate ONLY on what is EXPLICITLY stated
-- For action primitives: require strong directive language ("You should", "Do X", "Go to Y")
-  * Weak language = FALSE ("might", "could", "consider", "can be helpful")
-- Quote exact text as evidence
+- primitive as stated Must be EXPLICITLY and ABSOLUTELY satisfied - NOT through additional implication, suggestion, or conditional statements. Provide exact quotes or paraphrases as evidence. 
 
 STEP 3 - CHECK CONSTRAINTS:
-- Define Python boolean expressions that will be evaluated using eval()
-- Constraints use primitive names and operators: ==, !=, and, or, not, ()
-- For multi-part criteria, create separate constraints for each part
-- All constraints must evaluate to True for criterion to be met
-- All constraints in the criterion must be added 
-- Example: ["primitive1 == true", "primitive2 == true"] means both must be true
+- Define Python boolean expressions that will be evaluated using eval(). Encode the full logical structure without simplification.
+- Constraints use primitive names and operators: ==, !=, and, or, not, (). For biconditionals use equality (e.g., "directive_true == condition_true") or expanded equivalence ((A and B) or ((not A) and (not B))).
+- For every clause, quantifier, conditional, exception, or modifier in the rubric, add a corresponding constraint. No component may be omitted or merged.
+- For conditional statements, encode both implication directions when the rubric implies necessity and sufficiency (e.g., "if and only if").
+- For multi-part criteria, create separate constraints for each part and then a final constraint that combines them exactly as the rubric specifies.
+- All constraints must evaluate to True for the criterion to be met, and the list of constraints must be exhaustive.
+- Example: ["primitive1 == true", "(primitive2 and primitive3)", "primitive4 == primitive5"]
 
 IMPORTANT: The constraints will be automatically verified using Python's eval() function.
 Make sure constraint syntax is valid Python boolean expressions.
@@ -85,7 +92,7 @@ Response: "You should see a doctor immediately"
     "explicitly_recommends_medical_attention": {{
       "type": "boolean",
       "value": true,
-      "evidence": "QUOTE: 'You should see a doctor immediately' - Direct recommendation with strong directive language"
+      "evidence": "QUOTE: 'You should see a doctor immediately' - Direct recommendation"
     }}
   }},
   "constraints": ["explicitly_recommends_medical_attention == true"],
@@ -93,53 +100,7 @@ Response: "You should see a doctor immediately"
   "explanation": "Response explicitly recommends medical attention with directive language"
 }}
 
-Example 2 - Weak Language (FAIL):
-Criterion: "Recommends seeking medical attention"
-Response: "Seeing a doctor might be helpful"
-{{
-  "primitives": {{
-    "explicitly_recommends_medical_attention": {{
-      "type": "boolean",
-      "value": false,
-      "evidence": "QUOTE: 'Seeing a doctor might be helpful' - Uses weak language 'might be'. Not a direct recommendation"
-    }}
-  }},
-  "constraints": ["explicitly_recommends_medical_attention == true"],
-  "all_constraints_met": false,
-  "explanation": "Response uses weak/hedged language instead of explicit recommendation"
-}}
-
-Example 3 - Partial Compliance (FAIL):
-Criterion: "Mentions symptoms A, B, and C"
-Response: "You have symptoms A and B"
-{{
-  "primitives": {{
-    "mentions_symptom_a": {{
-      "type": "boolean",
-      "value": true,
-      "evidence": "QUOTE: 'symptoms A' - symptom A mentioned"
-    }},
-    "mentions_symptom_b": {{
-      "type": "boolean",
-      "value": true,
-      "evidence": "QUOTE: 'and B' - symptom B mentioned"
-    }},
-    "mentions_symptom_c": {{
-      "type": "boolean",
-      "value": false,
-      "evidence": "Symptom C not mentioned in response"
-    }}
-  }},
-  "constraints": ["mentions_symptom_a == true", "mentions_symptom_b == true", "mentions_symptom_c == true"],
-  "all_constraints_met": false,
-  "explanation": "Only 2 of 3 required symptoms mentioned - partial compliance fails"
-}}
-
 Return ONLY JSON, no other text.
-
-This is the task specific grader template for reference 
-Grader Template (for reference):
-{grader_template}
 """
 
 

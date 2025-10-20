@@ -7,4 +7,8 @@ from openbench.utils.symbolic_grader import (
 )
 from .metadata import BenchmarkMetadata
 
-__all__ = ["BenchmarkMetadata", "SymbolicGrader", "symbolic_grade"]
+__all__ = [
+    "BenchmarkMetadata",
+    "SymbolicGrader",
+    "symbolic_grade",
+]
