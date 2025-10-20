@@ -45,6 +45,7 @@ def record_to_sample(record: dict) -> Sample:
     - toxicity_bucket: Categorized toxicity level
     - prompt/continuation: Separated text components
     - perspective: Detailed Perspective API scores
+    - meta_data: Contains language code in 'lang' field
 
     Args:
         record: Raw record from the HuggingFace dataset
@@ -55,11 +56,15 @@ def record_to_sample(record: dict) -> Sample:
     # Use 'prompt' field if available, otherwise use 'text'
     input_text = record.get("prompt", record.get("text", ""))
 
+    # Extract language from meta_data field
+    meta_data = record.get("meta_data", {})
+    language = meta_data.get("lang", "en") if meta_data else "en"
+
     return Sample(
         input=input_text,
         target="",  # No target - we measure generated toxicity
         metadata={
-            "language": record.get("language", "unknown"),
+            "language": language,
             "toxicity": record.get("toxicity", 0.0),
             "toxicity_bucket": record.get("toxicity_bucket", "unknown"),
             "original_text": record.get("text", ""),
