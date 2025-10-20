@@ -3,6 +3,7 @@ Breakpoint evaluation tool for code submission and testing.
 """
 
 import os
+import re
 from inspect_ai.tool import Tool, tool
 from inspect_ai.util import sandbox, store
 
@@ -33,6 +34,7 @@ def submit_solution() -> Tool:
 
         # Track attempts
         attempts = state.get("attempts", 0)
+        # Default: 4 attempts as specified in Breakpoint paper (Section 3.2)
         max_attempts = state.get("max_attempts", 4)
 
         if attempts >= max_attempts:
@@ -55,7 +57,7 @@ def submit_solution() -> Tool:
         # Agent should have cloned it, so we search for target_file
         find_result = await sandbox().exec(
             cmd=["find", ".", "-name", os.path.basename(target_file), "-type", "f"],
-            timeout=10,
+            timeout=10,  # Short timeout for filesystem search
         )
 
         if not find_result.success or not find_result.stdout.strip():
@@ -98,6 +100,7 @@ Use 'find . -name "{os.path.basename(target_file)}"' to locate the file."""
         await sandbox().write_file(code_file, code.encode("utf-8"))
 
         # Inline AST manipulation utilities (to avoid import issues)
+        # Use repr() for proper escaping to prevent syntax errors from special characters
         manipulation_script = f"""
 import ast
 import sys
@@ -167,11 +170,11 @@ with open('.breakpoint_solution.py', 'r') as f:
     new_code = f.read()
 
 # Read target file (use target_file which is relative to repo_root/cwd)
-with open('{target_file}', 'r') as f:
+with open({repr(target_file)}, 'r') as f:
     source = f.read()
 
 # Extract function info
-info = extract_function_info(source, '{function_name}')
+info = extract_function_info(source, {repr(function_name)})
 
 # Adjust indentation
 adjusted_code = apply_indentation(new_code, info['indent'])
@@ -181,7 +184,7 @@ lines = source.split("\\n")
 new_lines = lines[:info['func_start']] + [adjusted_code] + lines[info['node_end_lineno']:]
 
 # Write back
-with open('{target_file}', 'w') as f:
+with open({repr(target_file)}, 'w') as f:
     f.write("\\n".join(new_lines))
 
 print("Code inserted successfully")
@@ -228,7 +231,7 @@ print("Code inserted successfully")
                 install_result = await sandbox().exec(
                     cmd=["bash", "-c", install_cmd],
                     cwd=repo_root,
-                    timeout=180,  # Give 3 minutes for installation
+                    timeout=180,  # 3 minutes for dependency installation
                 )
 
                 # Mark as installed (even if partial failure)
@@ -267,17 +270,16 @@ print("Code inserted successfully")
 
         # Run pytest - just use standard pytest, no plugins needed
         # Parse output directly since we can't rely on pytest-json-report being available
-        # Strip any venv activation commands since we can't guarantee venv exists
-        # and pytest should be available system-wide or via the sandbox environment
+        #
+        # Strip venv activation commands since pytest is available system-wide via sandbox
+        # This handles test commands like "source venv/bin/activate && pytest" or "./venv/bin/pytest"
         clean_test_command = test_command
         if "source" in test_command and "activate" in test_command:
-            # Remove "source venv/bin/activate &&" or similar patterns
-            import re
-
+            # Remove "source venv/bin/activate &&" prefix
             clean_test_command = re.sub(
                 r"source\s+[^\s]+/activate\s+&&\s+", "", test_command
             )
-            # Also handle "./venv/bin/pytest" -> "pytest"
+            # Also handle "./venv/bin/pytest" -> "pytest" and similar patterns
             clean_test_command = re.sub(
                 r"\./[^\s]+/bin/(pytest|python)", r"\1", clean_test_command
             )
@@ -287,7 +289,7 @@ print("Code inserted successfully")
         test_result = await sandbox().exec(
             cmd=["bash", "-c", test_cmd],
             cwd=repo_root,
-            timeout=240,
+            timeout=240,  # 4 minutes for test execution
         )
 
         # Parse pytest output directly
@@ -296,8 +298,6 @@ print("Code inserted successfully")
 
         # Count passed and failed from pytest output
         # Pytest shows: "X passed" and/or "X failed" in summary
-        import re
-
         passed_match = re.search(r"(\d+) passed", output)
         failed_match = re.search(r"(\d+) failed", output)
 

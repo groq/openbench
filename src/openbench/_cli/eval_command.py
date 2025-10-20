@@ -208,6 +208,8 @@ def display_group_summary(
         0.0  # Use float to support both binary (0/1) and continuous (0.0-1.0) scores
     )
     completed_samples = 0
+    # Track if all scores are binary (exactly 0.0 or 1.0) to determine display format
+    all_scores_binary = True
 
     for log in group_logs:
         if log.results:
@@ -243,6 +245,10 @@ def display_group_summary(
                             if hasattr(accuracy_value, "value")
                             else accuracy_value
                         )
+                        # Check if this is a continuous score (strictly between 0 and 1)
+                        if 0.0 < numeric_value < 1.0:
+                            all_scores_binary = False
+
                         # For continuous scores (0.0-1.0), keep as weighted sum
                         # This works for both binary (0/1) and continuous scores
                         total_correct += numeric_value * log.results.completed_samples
@@ -269,7 +275,9 @@ def display_group_summary(
     typer.echo(f"Total samples:       {total_samples:,}")
 
     # Handle display based on whether scores are binary (0/1) or continuous (0.0-1.0)
-    if total_correct == int(total_correct):
+    # Use explicit tracking instead of checking if total_correct is an integer,
+    # which fails when continuous scores happen to sum to an integer (e.g., 0.5 + 0.5 = 1.0)
+    if all_scores_binary and total_correct == int(total_correct):
         # Binary scores: display as simple counts
         total_incorrect = int(total_samples - total_correct)
         typer.echo(f"Correct:             {int(total_correct):,}")
