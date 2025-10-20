@@ -202,8 +202,9 @@ print("Code inserted successfully")
             return f"❌ [Attempt {attempts}/{max_attempts}] Failed to insert code:\n{manip_result.stderr}"
 
         # Install dependencies if not already done
-        # Only install once per repository to save time
+        # Create isolated venv per repository to prevent dependency conflicts
         deps_installed_key = f"deps_installed_{repo_root}"
+        venv_path = os.path.join(repo_root, ".venv")
         install_notes = []
 
         if not state.get(deps_installed_key, False):
@@ -223,68 +224,107 @@ print("Code inserted successfully")
             )
 
             if files_found:
-                # Install the package in development mode
-                # Use uv pip (available system-wide) instead of python -m pip
-                # since the venv may not have pip installed
-                install_cmd = "uv pip install -e . 2>&1"
-
-                install_result = await sandbox().exec(
-                    cmd=["bash", "-c", install_cmd],
+                # Create isolated virtual environment for this repository
+                venv_create_result = await sandbox().exec(
+                    cmd=["python3", "-m", "venv", ".venv"],
                     cwd=repo_root,
-                    timeout=180,  # 3 minutes for dependency installation
+                    timeout=60,
                 )
+
+                if not venv_create_result.success:
+                    install_notes.append(
+                        f"⚠ Failed to create venv: {venv_create_result.stderr[:200]}"
+                    )
+                else:
+                    install_notes.append("✓ Created isolated venv")
+
+                    # Install the package in the isolated venv
+                    # Use the venv's pip to ensure packages install in the right place
+                    install_cmd = ".venv/bin/pip install -e . 2>&1"
+
+                    install_result = await sandbox().exec(
+                        cmd=["bash", "-c", install_cmd],
+                        cwd=repo_root,
+                        timeout=180,  # 3 minutes for dependency installation
+                    )
+
+                    # Capture installation output for debugging
+                    install_output = install_result.stdout or ""
+                    install_errors = install_result.stderr or ""
+
+                    # Check if installation succeeded or had issues
+                    if (
+                        install_result.returncode == 0
+                        or "Successfully installed" in install_output
+                    ):
+                        install_notes.append("✓ Dependencies installed in isolated venv")
+                    else:
+                        # Installation failed or partially failed
+                        # Extract useful error info
+                        error_lines = []
+                        for line in (install_output + install_errors).split("\n"):
+                            if any(
+                                keyword in line.lower()
+                                for keyword in [
+                                    "error",
+                                    "failed",
+                                    "could not",
+                                    "no module",
+                                ]
+                            ):
+                                error_lines.append(line.strip())
+
+                        if error_lines:
+                            install_notes.append(
+                                "⚠ Dependency installation issues:\n"
+                                + "\n".join(error_lines[:5])
+                            )
+                        else:
+                            install_notes.append(
+                                f"⚠ Dependency installation returned code {install_result.returncode}"
+                            )
 
                 # Mark as installed (even if partial failure)
                 state.set(deps_installed_key, True)
 
-                # Capture installation output for debugging
-                install_output = install_result.stdout or ""
-                install_errors = install_result.stderr or ""
-
-                # Check if installation succeeded or had issues
-                if (
-                    install_result.returncode == 0
-                    or "Successfully installed" in install_output
-                ):
-                    install_notes.append("✓ Dependencies installed")
-                else:
-                    # Installation failed or partially failed
-                    # Extract useful error info
-                    error_lines = []
-                    for line in (install_output + install_errors).split("\n"):
-                        if any(
-                            keyword in line.lower()
-                            for keyword in ["error", "failed", "could not", "no module"]
-                        ):
-                            error_lines.append(line.strip())
-
-                    if error_lines:
-                        install_notes.append(
-                            "⚠ Dependency installation issues:\n"
-                            + "\n".join(error_lines[:5])
-                        )
-                    else:
-                        install_notes.append(
-                            f"⚠ Dependency installation returned code {install_result.returncode}"
-                        )
-
-        # Run pytest - just use standard pytest, no plugins needed
-        # Parse output directly since we can't rely on pytest-json-report being available
+        # Run pytest using the isolated venv's pytest
+        # This ensures tests run with the correct dependencies installed
         #
-        # Strip venv activation commands since pytest is available system-wide via sandbox
-        # This handles test commands like "source venv/bin/activate && pytest" or "./venv/bin/pytest"
+        # Check if isolated venv exists, otherwise fall back to system pytest
+        venv_pytest = os.path.join(venv_path, "bin", "pytest")
+
+        # Strip venv activation commands and path prefixes from test_command
+        # since we'll use the venv's pytest directly
         clean_test_command = test_command
         if "source" in test_command and "activate" in test_command:
             # Remove "source venv/bin/activate &&" prefix
             clean_test_command = re.sub(
                 r"source\s+[^\s]+/activate\s+&&\s+", "", test_command
             )
-            # Also handle "./venv/bin/pytest" -> "pytest" and similar patterns
-            clean_test_command = re.sub(
-                r"\./[^\s]+/bin/(pytest|python)", r"\1", clean_test_command
-            )
+        # Also handle "./venv/bin/pytest" -> "pytest" and similar patterns
+        clean_test_command = re.sub(
+            r"\./[^\s]+/bin/(pytest|python)", r"\1", clean_test_command
+        )
 
-        test_cmd = f"{clean_test_command} -v"
+        # Use venv's pytest if it exists, otherwise use system pytest
+        # Check if venv pytest exists
+        check_venv_pytest = await sandbox().exec(
+            cmd=["test", "-f", venv_pytest],
+            cwd=repo_root,
+            timeout=5,
+        )
+
+        if check_venv_pytest.success:
+            # Replace 'pytest' with venv's pytest path
+            if clean_test_command.startswith("pytest"):
+                test_cmd = clean_test_command.replace("pytest", venv_pytest, 1)
+            else:
+                # If test command doesn't start with pytest, prepend venv path
+                test_cmd = f"{venv_pytest} {clean_test_command}"
+            test_cmd += " -v"
+        else:
+            # Fall back to system pytest (no venv created or pytest not in venv)
+            test_cmd = f"{clean_test_command} -v"
 
         test_result = await sandbox().exec(
             cmd=["bash", "-c", test_cmd],

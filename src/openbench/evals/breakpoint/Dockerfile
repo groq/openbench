@@ -1,4 +1,4 @@
-FROM python:3.11-bookworm
+FROM python:3.13-bookworm
 
 # Install git and other essential tools for cloning repositories
 RUN apt-get update && apt-get install -y --no-install-recommends \
