@@ -211,6 +211,7 @@ def export_logs_to_hub(
     results_rows: List[Dict[str, Any]] = []
     stats_rows: List[Dict[str, Any]] = []
     samples_rows: List[Dict[str, Any]] = []
+    first_valid_log_data: Dict[str, Any] = {}
 
     for path in files:
         try:
@@ -219,6 +220,10 @@ def export_logs_to_hub(
             msg = f"Skipping log '{path}': {e}"
             typer.secho(msg, fg=typer.colors.YELLOW)
             continue
+
+        # Store first successfully parsed log for config naming
+        if not first_valid_log_data:
+            first_valid_log_data = data
 
         eval_info = data.get("eval", {})
         base = {
@@ -236,10 +241,9 @@ def export_logs_to_hub(
         samples_rows.extend(_flatten_samples(data, base))
 
     # Generate config name prefix for this run
-    # Use first log file's data for naming (all should have same benchmark/model)
-    first_log_data = _read_log_json(files[0]) if files else {}
+    # Use first successfully parsed log file's data for naming
     config_prefix = _generate_config_prefix(
-        hub_benchmark_name, hub_model_name, first_log_data
+        hub_benchmark_name, hub_model_name, first_valid_log_data
     )
 
     if results_rows:
