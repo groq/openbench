@@ -6492,4 +6492,13 @@ EVAL_GROUPS = {
             "bbq_sexual_orientation",
         ],
     ),
+    "jailbreak": EvalGroup(
+        name="M2S conversions of multi-turn jailbreak datasets",
+        description="Aggregate of 3 M2S conversions of multi-turn jailbreak datasets",
+        benchmarks=[
+            "safemt_m2s",
+            "cosafe_m2s",
+            "mhj_m2s",
+        ],
+    )
 }
