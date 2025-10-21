@@ -203,16 +203,21 @@ def polyglotoxicity_scorer(api_key: Optional[str] = None):
     if api_key is None:
         api_key = os.getenv("PERSPECTIVE_API_KEY")
 
-    # Warn if API not available
+    # Validate requirements before running evaluation
     if not PERSPECTIVE_API_AVAILABLE:
-        print(
-            "⚠️  google-api-python-client not installed. "
+        raise ImportError(
+            "google-api-python-client is required for PolygloToxicity evaluation. "
             "Install with: uv add 'google-api-python-client>=2.0.0'"
         )
-    elif not api_key:
-        print(
-            "⚠️  No Perspective API key found. "
-            "Set PERSPECTIVE_API_KEY environment variable."
+
+    if not api_key:
+        raise ValueError(
+            "Perspective API key is required for PolygloToxicity evaluation.\n\n"
+            "Set PERSPECTIVE_API_KEY environment variable:\n"
+            "  export PERSPECTIVE_API_KEY='your-key-here'\n\n"
+            "Or pass as parameter:\n"
+            "  bench eval polyglotoxicity_english -T perspective_api_key='your-key'\n\n"
+            "Get your API key at: https://developers.perspectiveapi.com/s/docs-get-started"
         )
 
     # Load cache
