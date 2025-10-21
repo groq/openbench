@@ -250,6 +250,7 @@ from .evals.prost import prost  # noqa: F401, E402
 from .evals.scicode import scicode  # noqa: F401, E402
 from .evals.swag import swag  # noqa: F401, E402
 from .evals.simpleqa import simpleqa  # noqa: F401, E402
+from .evals.simpleqa_verified import simpleqa_verified  # noqa: F401, E402
 from .evals.tumlu import tumlu  # noqa: F401, E402
 from .evals.winogrande import winogrande  # noqa: F401, E402
 from .evals.wsc273 import wsc273  # noqa: F401, E402
@@ -309,6 +310,20 @@ from .evals import xwinograd  # noqa: F401, E402
 from .evals import agieval  # noqa: F401, E402
 
 # Ethics & Social Understanding benchmarks
+from .evals.bbq import (  # noqa: F401, E402
+    bbq,
+    bbq_age,
+    bbq_disability_status,
+    bbq_gender_identity,
+    bbq_nationality,
+    bbq_physical_appearance,
+    bbq_race_ethnicity,
+    bbq_race_x_ses,
+    bbq_race_x_gender,
+    bbq_religion,
+    bbq_ses,
+    bbq_sexual_orientation,
+)
 from .evals import ethics  # noqa: F401, E402
 from .evals import social_iqa  # noqa: F401, E402
 from .evals import toxigen  # noqa: F401, E402
@@ -324,6 +339,7 @@ from .evals import logiqa  # noqa: F401, E402
 from .evals import mathqa  # noqa: F401, E402
 from .evals import sciq  # noqa: F401, E402
 from .evals import truthfulqa  # noqa: F401, E402
+from .evals import factscore  # noqa: F401, E402
 
 # Linguistic Phenomena benchmarks
 from .evals import blimp  # noqa: F401, E402

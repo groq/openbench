@@ -2,8 +2,25 @@ from typing import Callable
 from inspect_ai.scorer import scorer, accuracy, stderr, Score, Target, std
 from inspect_ai.model import Model, get_model, ChatMessageUser
 from inspect_ai.solver import TaskState
-from openbench.utils.text import MOCK_AIME_GRADER_PROMPT
 from openbench.metrics import grouped
+
+
+SMT_GRADER_PROMPT = """
+You are a mathematics expert tasked with grading Stanford Math Tournament solutions. You will be given:
+
+A student's complete solution with their reasoning
+The correct answer
+
+Grade the student solution as either CORRECT or INCORRECT, based on whether the student's final answer matches the correct answer.
+Only respond with a single word: either "CORRECT" or "INCORRECT".
+
+Student Solution:
+{response}
+
+Correct Answer:
+{correct_answer}
+
+Grade (CORRECT/INCORRECT):""".strip()
 
 
 @scorer(
@@ -11,18 +28,18 @@ from openbench.metrics import grouped
         accuracy(),
         stderr(),
         std(),
-        grouped(group_key="mathematical_topic", metric=[accuracy(), stderr(), std()]),
+        grouped(group_key="category", metric=[accuracy(), stderr(), std()]),
     ]
 )
-def otis_mock_aime_scorer(model: str = "openai/gpt-4.1-mini-2025-04-14") -> Callable:
+def smt_scorer(model: str = "openai/gpt-4.1-mini-2025-04-14") -> Callable:
     """
-    MockAIME scorer using LLM-based grading for mathematical problem evaluation.
+    SMT scorer using LLM-based grading for mathematical problem evaluation.
 
     Args:
         model: The model identifier for the grader (default: GPT-4.1-mini)
 
     Returns:
-        A scorer function that evaluates MockAIME responses
+        A scorer function that evaluates SMT responses
     """
     grader_model: Model = get_model(model)
 
@@ -30,8 +47,8 @@ def otis_mock_aime_scorer(model: str = "openai/gpt-4.1-mini-2025-04-14") -> Call
         predicted_answer = state.output.completion
         answer = target.text
 
-        grader_prompt = MOCK_AIME_GRADER_PROMPT.format(
-            response=predicted_answer, correct_solution=answer
+        grader_prompt = SMT_GRADER_PROMPT.format(
+            response=predicted_answer, correct_answer=answer
         )
 
         message = ChatMessageUser(content=grader_prompt)

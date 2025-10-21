@@ -499,6 +499,7 @@ class TestCacheCommandIntegration:
         assert "info" in clean_stdout
         assert "ls" in clean_stdout
         assert "clear" in clean_stdout
+        assert "upload" in clean_stdout
 
     def test_cache_info_help(self):
         """Test cache info help command."""
@@ -561,3 +562,234 @@ class TestPrintTreeFunction:
 
         # Should print error message
         mock_echo.assert_called_with(f"Path not found: {nonexistent_path}")
+
+
+class TestCacheUploadCommand:
+    """Test cache upload command for generic file uploads."""
+
+    def test_cache_upload_no_arguments(self):
+        """Test cache upload without any file arguments."""
+        result = runner.invoke(app, ["cache", "upload"])
+        assert result.exit_code == 1
+        assert "No file specified" in result.stdout
+
+    def test_cache_upload_no_path(self):
+        """Test cache upload without destination path."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            db_file = Path(temp_dir) / "test.db"
+            db_file.write_bytes(b"test")
+
+            result = runner.invoke(app, ["cache", "upload", "--db_file", str(db_file)])
+            assert result.exit_code == 1
+            assert "Destination path is required" in result.stdout
+
+    def test_cache_upload_both_file_types(self):
+        """Test cache upload with both file types specified."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            db_file = Path(temp_dir) / "test.db"
+            db_file.write_bytes(b"test")
+            txt_file = Path(temp_dir) / "test.txt"
+            txt_file.write_text("test")
+
+            result = runner.invoke(
+                app,
+                [
+                    "cache",
+                    "upload",
+                    "--db_file",
+                    str(db_file),
+                    "--txt_file",
+                    str(txt_file),
+                    "--path",
+                    "test/file.db",
+                ],
+            )
+            assert result.exit_code == 1
+            assert "Specify only one file type" in result.stdout
+
+    @patch("openbench._cli.cache_command._cache_root")
+    def test_cache_upload_file_not_found(self, mock_cache_root):
+        """Test cache upload with nonexistent file."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            cache_path = Path(temp_dir) / ".openbench"
+            cache_path.mkdir()
+            mock_cache_root.return_value = cache_path
+
+            nonexistent_file = Path(temp_dir) / "nonexistent.db"
+            result = runner.invoke(
+                app,
+                [
+                    "cache",
+                    "upload",
+                    "--db_file",
+                    str(nonexistent_file),
+                    "--path",
+                    "test/file.db",
+                ],
+            )
+            assert result.exit_code == 1
+            assert "Database file not found" in result.stdout
+
+    @patch("openbench._cli.cache_command._cache_root")
+    def test_cache_upload_db_file_success(self, mock_cache_root):
+        """Test successful database file move."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            cache_path = Path(temp_dir) / ".openbench"
+            cache_path.mkdir()
+            mock_cache_root.return_value = cache_path
+
+            # Create a test database file
+            db_file = Path(temp_dir) / "test.db"
+            db_file.write_bytes(b"fake database content")
+
+            result = runner.invoke(
+                app,
+                [
+                    "cache",
+                    "upload",
+                    "--db_file",
+                    str(db_file),
+                    "--path",
+                    "factscore/data/enwiki-20230401.db",
+                ],
+            )
+            assert result.exit_code == 0
+            assert "Database file moved successfully" in result.stdout
+
+            # Verify file was moved
+            dest_file = cache_path / "factscore" / "data" / "enwiki-20230401.db"
+            assert dest_file.exists()
+            assert dest_file.read_bytes() == b"fake database content"
+            # Verify original file no longer exists
+            assert not db_file.exists()
+
+    @patch("openbench._cli.cache_command._cache_root")
+    def test_cache_upload_txt_file_success(self, mock_cache_root):
+        """Test successful text file move."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            cache_path = Path(temp_dir) / ".openbench"
+            cache_path.mkdir()
+            mock_cache_root.return_value = cache_path
+
+            # Create a test text file
+            txt_file = Path(temp_dir) / "entities.txt"
+            txt_file.write_text("entity1\nentity2\n")
+
+            result = runner.invoke(
+                app,
+                [
+                    "cache",
+                    "upload",
+                    "--txt_file",
+                    str(txt_file),
+                    "--path",
+                    "factscore/data/labeled/prompt_entities.txt",
+                ],
+            )
+            assert result.exit_code == 0
+            assert "Text file moved successfully" in result.stdout
+
+            # Verify file was moved to correct location
+            dest_file = (
+                cache_path / "factscore" / "data" / "labeled" / "prompt_entities.txt"
+            )
+            assert dest_file.exists()
+            assert dest_file.read_text() == "entity1\nentity2\n"
+            # Verify original file no longer exists
+            assert not txt_file.exists()
+
+    @patch("shutil.move")
+    @patch("openbench._cli.cache_command._cache_root")
+    def test_cache_upload_move_failure(self, mock_cache_root, mock_move):
+        """Test cache upload when move operation fails."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            cache_path = Path(temp_dir) / ".openbench"
+            cache_path.mkdir()
+            mock_cache_root.return_value = cache_path
+            mock_move.side_effect = PermissionError("Access denied")
+
+            # Create a test database file
+            db_file = Path(temp_dir) / "test.db"
+            db_file.write_bytes(b"database")
+
+            result = runner.invoke(
+                app,
+                [
+                    "cache",
+                    "upload",
+                    "--db_file",
+                    str(db_file),
+                    "--path",
+                    "test/file.db",
+                ],
+            )
+            assert result.exit_code == 1
+            assert "Failed to move database file" in result.stdout
+
+    @patch("openbench._cli.cache_command._cache_root")
+    def test_cache_upload_path_traversal_protection(self, mock_cache_root):
+        """Test that path traversal attacks are prevented."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            cache_path = Path(temp_dir) / ".openbench"
+            cache_path.mkdir()
+            mock_cache_root.return_value = cache_path
+
+            # Create a test file
+            db_file = Path(temp_dir) / "test.db"
+            db_file.write_bytes(b"test")
+
+            # Try to escape the cache directory
+            result = runner.invoke(
+                app,
+                [
+                    "cache",
+                    "upload",
+                    "--db_file",
+                    str(db_file),
+                    "--path",
+                    "../../../etc/passwd",
+                ],
+            )
+            assert result.exit_code == 1
+            assert "Invalid path" in result.stdout
+
+    @patch("openbench._cli.cache_command._cache_root")
+    def test_cache_upload_creates_parent_directories(self, mock_cache_root):
+        """Test that parent directories are created automatically."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            cache_path = Path(temp_dir) / ".openbench"
+            cache_path.mkdir()
+            mock_cache_root.return_value = cache_path
+
+            # Create a test file
+            txt_file = Path(temp_dir) / "test.txt"
+            txt_file.write_text("test content")
+
+            # Move to nested path that doesn't exist
+            result = runner.invoke(
+                app,
+                [
+                    "cache",
+                    "upload",
+                    "--txt_file",
+                    str(txt_file),
+                    "--path",
+                    "deeply/nested/path/file.txt",
+                ],
+            )
+            assert result.exit_code == 0
+            dest_file = cache_path / "deeply" / "nested" / "path" / "file.txt"
+            assert dest_file.exists()
+            assert dest_file.read_text() == "test content"
+            # Verify original file no longer exists
+            assert not txt_file.exists()
+
+    def test_cache_upload_help(self):
+        """Test cache upload help command."""
+        result = runner.invoke(app, ["cache", "upload", "--help"])
+        assert result.exit_code == 0
+        clean_stdout = strip_ansi_codes(result.stdout)
+        assert "Move files to the OpenBench cache" in clean_stdout
+        assert "--db_file" in clean_stdout
+        assert "--txt_file" in clean_stdout
+        assert "--path" in clean_stdout
