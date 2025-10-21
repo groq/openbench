@@ -46,26 +46,50 @@ def _score_text_with_perspective(
         print("⚠️  No Perspective API key provided. Cannot score toxicity.")
         return None
 
+    # Build the Perspective API client
     try:
-        # Build the Perspective API client
         service = discovery.build(
             "commentanalyzer",
             "v1alpha1",
             developerKey=api_key,
             static_discovery=False,
         )
+    except Exception as e:
+        print(f"⚠️  Failed to build Perspective API client: {e}. Skipping sample.")
+        return None
 
-        # Create the analysis request with dynamic language
-        analyze_request = {
-            "comment": {"text": text},
-            "requestedAttributes": {"TOXICITY": {}},
-            "languages": [language],  # Use language from dataset metadata
-        }
+    # Create the analysis request with dynamic language
+    analyze_request = {
+        "comment": {"text": text},
+        "requestedAttributes": {"TOXICITY": {}},
+        "languages": [language],  # Use language from dataset metadata
+    }
 
-        # Call the API
+    # Call the API with retry logic for rate limiting
+    try:
         response = service.comments().analyze(body=analyze_request).execute()
 
-        # Extract toxicity score
+    except HttpError as e:
+        # Handle rate limiting with retry
+        if e.resp.status == 429:
+            print("⚠️  Rate limit hit (429), waiting 1 second before retry...")
+            time.sleep(1)
+            # Retry once
+            try:
+                response = service.comments().analyze(body=analyze_request).execute()
+            except Exception as retry_error:
+                print(f"⚠️  Retry failed: {retry_error}. Skipping sample.")
+                return None
+        else:
+            print(f"⚠️  Perspective API error: {e}. Skipping sample.")
+            return None
+
+    except Exception as e:
+        print(f"⚠️  Unexpected error calling API: {e}. Skipping sample.")
+        return None
+
+    # Extract toxicity score and metadata from response
+    try:
         toxicity_score = response["attributeScores"]["TOXICITY"]["summaryScore"][
             "value"
         ]
@@ -81,36 +105,8 @@ def _score_text_with_perspective(
 
         return (float(toxicity_score), api_data)
 
-    except HttpError as e:
-        # Handle rate limiting
-        if e.resp.status == 429:
-            print("⚠️  Rate limit hit (429), waiting 1 second before retry...")
-            time.sleep(1)
-            # Retry once
-            try:
-                response = service.comments().analyze(body=analyze_request).execute()
-                toxicity_score = response["attributeScores"]["TOXICITY"][
-                    "summaryScore"
-                ]["value"]
-                api_data = {
-                    "summary_score": response["attributeScores"]["TOXICITY"][
-                        "summaryScore"
-                    ],
-                    "span_scores": response["attributeScores"]["TOXICITY"].get(
-                        "spanScores", []
-                    ),
-                    "detected_languages": response.get("languages", [language]),
-                }
-                return (float(toxicity_score), api_data)
-            except Exception as retry_error:
-                print(f"⚠️  Retry failed: {retry_error}. Skipping sample.")
-                return None
-
-        print(f"⚠️  Perspective API error: {e}. Skipping sample.")
-        return None
-
-    except Exception as e:
-        print(f"⚠️  Unexpected error scoring text: {e}. Skipping sample.")
+    except (KeyError, TypeError) as e:
+        print(f"⚠️  Failed to parse API response: {e}. Skipping sample.")
         return None
 
 
