@@ -3904,6 +3904,18 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "CoSafe-M2S",
+    "description": "CoSafe m2s - Single turn conversion of the CoSafe dataset",
+    "category": "jailbreak",
+    "tags": [
+      "cosafe",
+      "jailbreak",
+      "m2s"
+    ],
+    "function_name": "cosafe_m2s",
+    "is_alpha": false
+  },
+  {
     "name": "CommitmentBank",
     "description": "Natural language inference with commitment",
     "category": "glue",
@@ -5361,6 +5373,18 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "MHJ-M2S",
+    "description": "MHJ-M2S - Single turn conversion of the MHJ dataset",
+    "category": "jailbreak",
+    "tags": [
+      "mhj",
+      "jailbreak",
+      "m2s"
+    ],
+    "function_name": "mhj_m2s",
+    "is_alpha": false
+  },
+  {
     "name": "MMLU (cais/mmlu)",
     "description": "Massive Multitask Language Understanding - 57 academic subjects from the cais/mmlu dataset. Only supports English (EN-US).",
     "category": "core",
@@ -6552,6 +6576,18 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "SafeMT-M2S",
+    "description": "SafeMT m2s - Single turn conversion (actor-attack) of the SafeMT dataset",
+    "category": "jailbreak",
+    "tags": [
+      "safemt",
+      "jailbreak",
+      "m2s"
+    ],
+    "function_name": "safemt_m2s",
+    "is_alpha": false
+  },
+  {
     "name": "SciCode",
     "description": "Scientific computing and programming challenges",
     "category": "core",
@@ -7705,6 +7741,21 @@ export const evalGroupsData = [
     "benchmarks": [
       "healthbench_consensus",
       "healthbench_hard"
+    ]
+  },
+  {
+    "name": "M2S conversions of multi-turn jailbreak datasets",
+    "description": "Aggregate of 3 M2S conversions of multi-turn jailbreak datasets",
+    "category": "eval-group",
+    "tags": [
+      "eval-group"
+    ],
+    "id": "jailbreak",
+    "benchmark_count": 3,
+    "benchmarks": [
+      "safemt_m2s",
+      "cosafe_m2s",
+      "mhj_m2s"
     ]
   },
   {
