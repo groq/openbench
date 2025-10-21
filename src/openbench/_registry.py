@@ -296,6 +296,12 @@ from .evals.mmmu_pro import mmmu_pro, mmmu_pro_vision  # noqa: F401, E402
 from .evals.arc_agi import arc_agi, arc_agi_1, arc_agi_2  # noqa: F401, E402
 from .evals.mockaime import otis_mock_aime, otis_mock_aime_2024, otis_mock_aime_2025  # noqa: F401, E402
 
+# cybench is defined in openbench-cyber package, not here
+# from .evals.cybench import cybench  # noqa: F401, E402
+from .evals.mhj_m2s import mhj_m2s  # noqa: F401, E402
+from .evals.safemt_m2s import safemt_m2s  # noqa: F401, E402
+from .evals.cosafe_m2s import cosafe_m2s  # noqa: F401, E402
+
 # GLUE/SuperGLUE benchmarks
 from .evals import anli  # noqa: F401, E402
 from .evals import glue  # noqa: F401, E402

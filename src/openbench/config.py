@@ -5653,6 +5653,30 @@ _BUILTIN_BENCHMARKS = {
         function_name="factscore",
         is_alpha=False,
     ),
+    "mhj_m2s": BenchmarkMetadata(
+        name="MHJ-M2S",
+        description="MHJ-M2S - Single turn conversion of the MHJ dataset",
+        category="jailbreak",
+        tags=["mhj", "jailbreak", "m2s"],
+        module_path="openbench.evals.mhj_m2s",
+        function_name="mhj_m2s",
+    ),
+    "safemt_m2s": BenchmarkMetadata(
+        name="SafeMT-M2S",
+        description="SafeMT m2s - Single turn conversion (actor-attack) of the SafeMT dataset",
+        category="jailbreak",
+        tags=["safemt", "jailbreak", "m2s"],
+        module_path="openbench.evals.safemt_m2s",
+        function_name="safemt_m2s",
+    ),
+    "cosafe_m2s": BenchmarkMetadata(
+        name="CoSafe-M2S",
+        description="CoSafe m2s - Single turn conversion of the CoSafe dataset",
+        category="jailbreak",
+        tags=["cosafe", "jailbreak", "m2s"],
+        module_path="openbench.evals.cosafe_m2s",
+        function_name="cosafe_m2s",
+    ),
 }
 
 
@@ -6651,6 +6675,15 @@ EVAL_GROUPS = {
             "bbq_religion",
             "bbq_ses",
             "bbq_sexual_orientation",
+        ],
+    ),
+    "jailbreak": EvalGroup(
+        name="M2S conversions of multi-turn jailbreak datasets",
+        description="Aggregate of 3 M2S conversions of multi-turn jailbreak datasets",
+        benchmarks=[
+            "safemt_m2s",
+            "cosafe_m2s",
+            "mhj_m2s",
         ],
     ),
 }

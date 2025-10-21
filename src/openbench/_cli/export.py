@@ -4,6 +4,7 @@ from typing import Optional, List, Dict, Any
 import os
 import json
 import typer
+from datetime import datetime
 from datasets import Dataset  # type: ignore[import-untyped]
 
 
@@ -125,13 +126,79 @@ def _flatten_samples(
     return rows
 
 
+def _generate_config_prefix(
+    benchmark_name: Optional[str],
+    model_name: Optional[str],
+    eval_data: Dict[str, Any],
+) -> str:
+    """Generate config name prefix in format: benchmark_model_datetime.
+
+    Args:
+        benchmark_name: Override for benchmark name (from --hub-benchmark-name)
+        model_name: Override for model name (from --hub-model-name)
+        eval_data: Eval log data containing task and model info
+
+    Returns:
+        Config prefix string (e.g., "mmlu_llama3_20250120-143052")
+    """
+    eval_info = eval_data.get("eval", {})
+
+    # Extract benchmark name
+    if benchmark_name:
+        bench = benchmark_name
+    else:
+        # Auto-detect from task name
+        task = eval_info.get("task", "unknown")
+        # Strip namespace prefix if present (e.g., "openbench/mmlu" -> "mmlu")
+        bench = task.split("/")[-1] if "/" in task else task
+
+    # Extract model name
+    if model_name:
+        model = model_name
+    else:
+        # Auto-detect from model field
+        model_full = eval_info.get("model", "unknown")
+        # Extract last part of model name (e.g., "groq/llama-3.1-70b" -> "llama-3.1-70b")
+        model = model_full.split("/")[-1] if "/" in model_full else model_full
+        # Sanitize model name for use in config (replace special chars with underscores)
+        # Replace /, :, -, and . with underscores for clean config names
+        model = (
+            model.replace("/", "_")
+            .replace(":", "_")
+            .replace("-", "_")
+            .replace(".", "_")
+        )
+
+    # Generate timestamp with hyphen separator for readability
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+
+    # Combine into prefix using underscores
+    return f"{bench}_{model}_{timestamp}"
+
+
 def export_logs_to_hub(
     *,
     logfile: Optional[str],
     start_time: float,
     hub_repo: str,
     hub_private: Optional[bool],
+    hub_benchmark_name: Optional[str] = None,
+    hub_model_name: Optional[str] = None,
 ) -> None:
+    """Export evaluation logs to HuggingFace Hub.
+
+    Args:
+        logfile: Path to specific log file (optional)
+        start_time: Timestamp to filter recent log files
+        hub_repo: Target HuggingFace repo (e.g., "username/openbench-logs")
+        hub_private: Whether to create private dataset
+        hub_benchmark_name: Override benchmark name in config (default: auto-detect)
+        hub_model_name: Override model name in config (default: auto-detect)
+
+    The config naming format is: {benchmark}_{model}_{datetime}_{type}
+    where type is "results", "stats", or "samples".
+    For example: "mmlu_llama3_1_70b_20250120-143052_results"
+    """
     files = _collect_log_files(logfile=logfile, start_time=start_time)
     if not files:
         msg = "No eval logs found to export (looked in INSPECT_LOG_DIR or ./logs)"
@@ -144,6 +211,7 @@ def export_logs_to_hub(
     results_rows: List[Dict[str, Any]] = []
     stats_rows: List[Dict[str, Any]] = []
     samples_rows: List[Dict[str, Any]] = []
+    first_valid_log_data: Dict[str, Any] = {}
 
     for path in files:
         try:
@@ -152,6 +220,10 @@ def export_logs_to_hub(
             msg = f"Skipping log '{path}': {e}"
             typer.secho(msg, fg=typer.colors.YELLOW)
             continue
+
+        # Store first successfully parsed log for config naming
+        if not first_valid_log_data:
+            first_valid_log_data = data
 
         eval_info = data.get("eval", {})
         base = {
@@ -168,39 +240,44 @@ def export_logs_to_hub(
         stats_rows.extend(_flatten_stats(data, base))
         samples_rows.extend(_flatten_samples(data, base))
 
+    # Generate config name prefix for this run
+    # Use first successfully parsed log file's data for naming
+    config_prefix = _generate_config_prefix(
+        hub_benchmark_name, hub_model_name, first_valid_log_data
+    )
+
     if results_rows:
         ds = Dataset.from_list(results_rows)
+        config_name = f"{config_prefix}_results"
         ds.push_to_hub(
             repo_id=hub_repo,
-            config_name="results",
+            config_name=config_name,
             split="train",
             private=hub_private,
         )
-        msg = (
-            f"Pushed results ({len(results_rows)} rows) to {hub_repo} [config=results]"
-        )
+        msg = f"Pushed results ({len(results_rows)} rows) to {hub_repo} [config={config_name}]"
         typer.echo(msg)
 
     if stats_rows:
         ds = Dataset.from_list(stats_rows)
+        config_name = f"{config_prefix}_stats"
         ds.push_to_hub(
             repo_id=hub_repo,
-            config_name="stats",
+            config_name=config_name,
             split="train",
             private=hub_private,
         )
-        msg = f"Pushed stats ({len(stats_rows)} rows) to {hub_repo} [config=stats]"
+        msg = f"Pushed stats ({len(stats_rows)} rows) to {hub_repo} [config={config_name}]"
         typer.echo(msg)
 
     if samples_rows:
         ds = Dataset.from_list(samples_rows)
+        config_name = f"{config_prefix}_samples"
         ds.push_to_hub(
             repo_id=hub_repo,
-            config_name="samples",
+            config_name=config_name,
             split="train",
             private=hub_private,
         )
-        msg = (
-            f"Pushed samples ({len(samples_rows)} rows) to {hub_repo} [config=samples]"
-        )
+        msg = f"Pushed samples ({len(samples_rows)} rows) to {hub_repo} [config={config_name}]"
         typer.echo(msg)

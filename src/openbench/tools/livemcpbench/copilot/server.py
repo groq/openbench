@@ -184,10 +184,18 @@ This is a tool used to find MCP servers and tools that can solve user needs
                     types.TextContent(type="text", text="Router context unavailable"),
                 ],
             )
-        result = await router.route(query)
-        return types.CallToolResult(
-            content=[types.TextContent(type="text", text=dump_to_yaml(result))]
-        )
+        try:
+            result = await router.route(query)
+            return types.CallToolResult(
+                content=[types.TextContent(type="text", text=dump_to_yaml(result))]
+            )
+        except Exception as e:
+            error_msg = f"Error routing query: {str(e)}"
+            logger.error(error_msg, exc_info=True)
+            return types.CallToolResult(
+                isError=True,
+                content=[types.TextContent(type="text", text=error_msg)],
+            )
 
     @server.tool(
         name="execute-tool",

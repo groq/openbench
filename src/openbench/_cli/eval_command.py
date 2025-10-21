@@ -472,6 +472,20 @@ def run_eval(
             envvar="BENCH_HUB_PRIVATE",
         ),
     ] = False,
+    hub_benchmark_name: Annotated[
+        Optional[str],
+        typer.Option(
+            help="Override benchmark name in Hub config (default: auto-detect from task)",
+            envvar="BENCH_HUB_BENCHMARK_NAME",
+        ),
+    ] = None,
+    hub_model_name: Annotated[
+        Optional[str],
+        typer.Option(
+            help="Override model name in Hub config (default: auto-detect from model)",
+            envvar="BENCH_HUB_MODEL_NAME",
+        ),
+    ] = None,
     keep_livemcp_root: Annotated[
         bool,
         typer.Option(
@@ -635,6 +649,8 @@ def run_eval(
                     start_time=start_time,
                     hub_repo=hub_repo,
                     hub_private=hub_private,
+                    hub_benchmark_name=hub_benchmark_name,
+                    hub_model_name=hub_model_name,
                 )
             return eval_logs
         except Exception as e:
