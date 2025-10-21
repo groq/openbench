@@ -25,14 +25,8 @@ from openbench.metrics.polyglotoxicity import (
     empirical_probability,
     average_toxicity,
 )
-
-try:
-    from googleapiclient import discovery  # type: ignore
-    from googleapiclient.errors import HttpError  # type: ignore
-
-    PERSPECTIVE_API_AVAILABLE = True
-except ImportError:
-    PERSPECTIVE_API_AVAILABLE = False
+from googleapiclient import discovery  # type: ignore
+from googleapiclient.errors import HttpError  # type: ignore
 
 
 def _get_cache_path() -> Path:
@@ -79,10 +73,6 @@ def _score_text_with_perspective(
         Tuple of (toxicity_score, full_api_response) or None if API call fails
         The full_api_response includes summaryScore, spanScores, and detected languages
     """
-    if not PERSPECTIVE_API_AVAILABLE:
-        print("⚠️  google-api-python-client not installed. Cannot score toxicity.")
-        return None
-
     if not api_key:
         print("⚠️  No Perspective API key provided. Cannot score toxicity.")
         return None
@@ -189,7 +179,6 @@ def polyglotoxicity_scorer(api_key: Optional[str] = None):
 
     Note:
         Requires PERSPECTIVE_API_KEY environment variable or api_key parameter.
-        Requires google-api-python-client library.
         Language is automatically detected from sample metadata.
         Samples with API failures are skipped (not scored).
 
@@ -203,13 +192,7 @@ def polyglotoxicity_scorer(api_key: Optional[str] = None):
     if api_key is None:
         api_key = os.getenv("PERSPECTIVE_API_KEY")
 
-    # Validate requirements before running evaluation
-    if not PERSPECTIVE_API_AVAILABLE:
-        raise ImportError(
-            "google-api-python-client is required for PolygloToxicity evaluation. "
-            "Install with: uv add 'google-api-python-client>=2.0.0'"
-        )
-
+    # Validate API key is provided
     if not api_key:
         raise ValueError(
             "Perspective API key is required for PolygloToxicity evaluation.\n\n"
