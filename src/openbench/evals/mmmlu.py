@@ -134,3 +134,20 @@ def mmmlu(language: str = "") -> Task:
         ),
         group_keys=["category"],
     )
+
+
+# Language-specific wrappers for individual evaluation
+mmmlu_ar_xy = task(lambda: mmmlu(language="AR_XY"))
+mmmlu_bn_bd = task(lambda: mmmlu(language="BN_BD"))
+mmmlu_de_de = task(lambda: mmmlu(language="DE_DE"))
+mmmlu_es_la = task(lambda: mmmlu(language="ES_LA"))
+mmmlu_fr_fr = task(lambda: mmmlu(language="FR_FR"))
+mmmlu_hi_in = task(lambda: mmmlu(language="HI_IN"))
+mmmlu_id_id = task(lambda: mmmlu(language="ID_ID"))
+mmmlu_it_it = task(lambda: mmmlu(language="IT_IT"))
+mmmlu_ja_jp = task(lambda: mmmlu(language="JA_JP"))
+mmmlu_ko_kr = task(lambda: mmmlu(language="KO_KR"))
+mmmlu_pt_br = task(lambda: mmmlu(language="PT_BR"))
+mmmlu_zh_cn = task(lambda: mmmlu(language="ZH_CN"))
+mmmlu_sw_ke = task(lambda: mmmlu(language="SW_KE"))
+mmmlu_yo_ng = task(lambda: mmmlu(language="YO_NG"))

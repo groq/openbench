@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.3.0
+    rev: v0.14.0
     hooks:
       - id: ruff
         name: ruff check
@@ -11,6 +11,11 @@ repos:
         files: ^src/
   - repo: local
     hooks:
+      - id: sync-pyproject
+        name: sync packages/pyproject.toml
+        entry: bash scripts/run_sync_pyproject.sh
+        language: system
+        pass_filenames: false
       - id: mypy
         name: mypy
         entry: .venv/bin/mypy

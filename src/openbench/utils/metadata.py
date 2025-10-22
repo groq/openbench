@@ -21,3 +21,6 @@ class BenchmarkMetadata:
 
     # Alpha/experimental flag
     is_alpha: bool = False  # Whether this benchmark is experimental/alpha
+
+    # Family benchmark subtask flag
+    subtask: bool = False  # Whether this is a subtask of a family benchmark

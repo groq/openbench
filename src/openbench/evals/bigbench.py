@@ -36,6 +36,8 @@ Citation:
 from inspect_ai import Task, task
 from openbench.utils.mcq import MCQEval, MCQSample
 from openbench.utils.text import create_dynamic_multiple_choice_prompt
+from typing import Union
+import warnings
 
 # Monkey-patch to fix compatibility issue with datasets library 3.x
 # BigBench dataset metadata uses deprecated 'List' type instead of 'Sequence'
@@ -49,7 +51,7 @@ except ImportError:
     pass  # datasets library not available, patch not needed
 
 
-def record_to_mcq_sample_bigbench(record: dict) -> MCQSample:
+def record_to_mcq_sample_bigbench(record: dict) -> Union[MCQSample, list]:
     """Convert a BigBench record to an OpenBench MCQSample.
 
     BigBench tasks have a consistent structure:
@@ -62,9 +64,12 @@ def record_to_mcq_sample_bigbench(record: dict) -> MCQSample:
     1. Extract the question from inputs (everything before "choice:")
     2. Use multiple_choice_targets as the choices
     3. Find the correct answer from multiple_choice_scores
+
+    Returns:
+        MCQSample if valid, empty list [] if record should be skipped.
     """
     # Extract question - everything before the first "choice:" line
-    inputs_text = record["inputs"]
+    inputs_text = record.get("inputs", "")
     if "choice:" in inputs_text:
         # Split by newlines and find where choices start
         lines = inputs_text.split("\n")
@@ -85,39 +90,45 @@ def record_to_mcq_sample_bigbench(record: dict) -> MCQSample:
             question = question[:-2].strip()
 
     # Get choices from multiple_choice_targets
-    choices = record["multiple_choice_targets"]
+    choices = record.get("multiple_choice_targets", [])
+    if not choices:
+        return []  # Skip records with no choices
 
     # Find correct answer from multiple_choice_scores
-    scores = record["multiple_choice_scores"]
+    scores = record.get("multiple_choice_scores", [])
     correct_index = scores.index(1) if 1 in scores else 0
 
     # Handle tasks with more than 26 choices by limiting to first 26
-    # This matches how create_dynamic_multiple_choice_prompt handles large choice sets
     if len(choices) > 26:
-        # If the correct answer is beyond index 25, we need to skip this sample
-        # as it can't be represented with A-Z format
         if correct_index >= 26:
             # Use the original target text instead and map it to first 26 choices
-            # Find if the target exists in first 26 choices
-            original_target = record["targets"][0] if record["targets"] else ""
+            original_target = record["targets"][0] if record.get("targets") else ""
             if original_target in choices[:26]:
                 correct_index = choices[:26].index(original_target)
             else:
-                # Skip samples where correct answer is not in first 26 choices
-                # This is a limitation of the A-Z format
                 correct_index = 0  # Fallback to A
-        choices = choices[:26]  # Limit to 26 choices
+        choices = choices[:26]
 
-    target_letter = chr(65 + correct_index)  # Convert to A, B, C, etc.
+    target_letter = chr(65 + correct_index)
 
     # Create the prompt
     prompt = create_dynamic_multiple_choice_prompt(question, choices)
+
+    # Skip samples with empty prompts (silently - MCQSample validation will warn)
+    if not prompt or not prompt.strip():
+        record_id = record.get("idx", record.get("id", "<unknown>"))
+        warnings.warn(
+            f"Skipping BigBench record {record_id}: prompt is empty after generation",
+            UserWarning,
+            stacklevel=2,
+        )
+        return []
 
     return MCQSample(
         input=prompt,
         target=target_letter,
         metadata={
-            "original_target": record["targets"][0] if record["targets"] else "",
+            "original_target": record.get("targets", [""])[0],
             "idx": record.get("idx", -1),
         },
     )

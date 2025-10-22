@@ -4,10 +4,11 @@ Export openbench benchmark metadata for the docs catalog.
 
 Outputs (fixed paths):
 - docs/data/benchmarks.json
-- docs/snippets/benchmarks.data.mdx (benchmarksData export)
+- docs/snippets/benchmarks.data.mdx (benchmarksData and evalGroupsData exports)
 
 Fields included:
-- name, description, category, tags, function_name, is_alpha
+Benchmarks: name, description, category, tags, function_name, is_alpha
+Eval Groups: name, description, id, benchmark_count, benchmarks
 """
 
 from __future__ import annotations
@@ -57,31 +58,73 @@ def normalize_benchmark(record: Any) -> Dict[str, Any]:
     }
 
 
-def export_benchmarks(snippet_mdx_path: Path) -> List[Dict[str, Any]]:
-    """Collect, normalize, sort, and write benchmark metadata JSON."""
+def normalize_eval_group(group_id: str, group: Any) -> Dict[str, Any]:
+    """Normalize an EvalGroup into a plain dict."""
+    name = getattr(group, "name", None)
+    if not isinstance(name, str) or not name.strip():
+        raise ValueError(f"Missing or invalid name in eval group {group_id}")
+
+    description = getattr(group, "description", None)
+    if not isinstance(description, str) or not description.strip():
+        raise ValueError(f"Missing or invalid description in eval group {group_id}")
+
+    benchmarks = getattr(group, "benchmarks", None)
+    if not isinstance(benchmarks, list) or not benchmarks:
+        raise ValueError(f"Missing or invalid benchmarks list in eval group {group_id}")
+
+    return {
+        "name": name.strip(),
+        "description": description.strip(),
+        "category": "eval-group",
+        "tags": ["eval-group"],
+        "id": group_id,
+        "benchmark_count": len(benchmarks),
+        "benchmarks": benchmarks,
+    }
+
+
+def export_benchmarks(
+    snippet_mdx_path: Path,
+) -> tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    """Collect, normalize, sort, and write benchmark and eval group metadata."""
     # Include alpha in the export; filtering happens in the UI
     config_module = importlib.import_module("openbench.config")
     all_benchmarks = getattr(config_module, "BENCHMARKS", None)
     if not isinstance(all_benchmarks, dict):
         raise AttributeError("Error loading benchmarks from openbench.config")
 
-    rows: List[Dict[str, Any]] = []
+    all_groups = getattr(config_module, "EVAL_GROUPS", None)
+    if not isinstance(all_groups, dict):
+        raise AttributeError("Error loading eval groups from openbench.config")
+
+    # Normalize benchmarks
+    benchmark_rows: List[Dict[str, Any]] = []
     for eval_name, metadata in all_benchmarks.items():
-        rows.append(normalize_benchmark(metadata))
+        benchmark_rows.append(normalize_benchmark(metadata))
 
-    # Output sorted by category, then name
-    rows.sort(key=lambda r: r.get("name", ""))
+    # Normalize eval groups
+    group_rows: List[Dict[str, Any]] = []
+    for group_id, group in all_groups.items():
+        group_rows.append(normalize_eval_group(group_id, group))
 
-    # write to MDX snippet for docs to source benchmarks info
+    # Sort benchmarks by name
+    benchmark_rows.sort(key=lambda r: r.get("name", ""))
+    # Sort groups by name
+    group_rows.sort(key=lambda r: r.get("name", ""))
+
+    # Write to MDX snippet for docs to source benchmarks info
     snippet_mdx_path.parent.mkdir(parents=True, exist_ok=True)
     snippet_mdx_path.write_text(
         "export const benchmarksData = "
-        + json.dumps(rows, ensure_ascii=False, indent=2)
+        + json.dumps(benchmark_rows, ensure_ascii=False, indent=2)
+        + ";\n\n"
+        + "export const evalGroupsData = "
+        + json.dumps(group_rows, ensure_ascii=False, indent=2)
         + ";\n",
         encoding="utf-8",
     )
 
-    return rows
+    return benchmark_rows, group_rows
 
 
 def main() -> None:

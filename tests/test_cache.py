@@ -7,7 +7,7 @@ from unittest.mock import Mock, patch
 import pytest
 import typer
 
-from openbench.utils.cache import (
+from openbench.utils.livemcpbench_cache import (
     prepare_livemcpbench_cache,
     _livemcpbench_root_dir,
     clear_livemcpbench_root,
@@ -17,10 +17,10 @@ from openbench.utils.cache import (
 class TestPrepareLivemcpbenchCache:
     """Test the prepare_livemcpbench_cache function."""
 
-    @patch("openbench.utils.cache.prepare_copilot_cache")
-    @patch("openbench.utils.cache.prepare_root_data")
-    @patch("openbench.utils.cache.typer.secho")
-    @patch("openbench.utils.cache.typer.echo")
+    @patch("openbench.utils.livemcpbench_cache.prepare_copilot_cache")
+    @patch("openbench.utils.livemcpbench_cache.prepare_root_data")
+    @patch("openbench.utils.livemcpbench_cache.typer.secho")
+    @patch("openbench.utils.livemcpbench_cache.typer.echo")
     @patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"})
     def test_successful_preparation(
         self, mock_echo, mock_secho, mock_prepare_root, mock_prepare_copilot
@@ -58,10 +58,10 @@ class TestPrepareLivemcpbenchCache:
 
         assert "OPENAI_API_KEY is required for LiveMCPBench" in str(exc_info.value)
 
-    @patch("openbench.utils.cache.prepare_copilot_cache")
-    @patch("openbench.utils.cache.prepare_root_data")
-    @patch("openbench.utils.cache.typer.secho")
-    @patch("openbench.utils.cache.typer.echo")
+    @patch("openbench.utils.livemcpbench_cache.prepare_copilot_cache")
+    @patch("openbench.utils.livemcpbench_cache.prepare_root_data")
+    @patch("openbench.utils.livemcpbench_cache.typer.secho")
+    @patch("openbench.utils.livemcpbench_cache.typer.echo")
     @patch.dict(os.environ, {"OPENAI_API_KEY": ""})
     def test_empty_openai_api_key(
         self, mock_echo, mock_secho, mock_prepare_root, mock_prepare_copilot
@@ -72,10 +72,10 @@ class TestPrepareLivemcpbenchCache:
 
         assert "OPENAI_API_KEY is required for LiveMCPBench" in str(exc_info.value)
 
-    @patch("openbench.utils.cache.prepare_copilot_cache")
-    @patch("openbench.utils.cache.prepare_root_data")
-    @patch("openbench.utils.cache.typer.secho")
-    @patch("openbench.utils.cache.typer.echo")
+    @patch("openbench.utils.livemcpbench_cache.prepare_copilot_cache")
+    @patch("openbench.utils.livemcpbench_cache.prepare_root_data")
+    @patch("openbench.utils.livemcpbench_cache.typer.secho")
+    @patch("openbench.utils.livemcpbench_cache.typer.echo")
     @patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"})
     def test_mcp_data_path_environment_variable(
         self, mock_echo, mock_secho, mock_prepare_root, mock_prepare_copilot
@@ -97,8 +97,8 @@ class TestPrepareLivemcpbenchCache:
         # Verify MCP_DATA_PATH was set correctly
         assert os.environ["MCP_DATA_PATH"] == str(mock_cache_path)
 
-    @patch("openbench.utils.cache.prepare_copilot_cache")
-    @patch("openbench.utils.cache.prepare_root_data")
+    @patch("openbench.utils.livemcpbench_cache.prepare_copilot_cache")
+    @patch("openbench.utils.livemcpbench_cache.prepare_root_data")
     @patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"})
     def test_prepare_copilot_cache_exception(
         self, mock_prepare_root, mock_prepare_copilot
@@ -109,8 +109,8 @@ class TestPrepareLivemcpbenchCache:
         with pytest.raises(RuntimeError, match="Copilot cache error"):
             prepare_livemcpbench_cache()
 
-    @patch("openbench.utils.cache.prepare_copilot_cache")
-    @patch("openbench.utils.cache.prepare_root_data")
+    @patch("openbench.utils.livemcpbench_cache.prepare_copilot_cache")
+    @patch("openbench.utils.livemcpbench_cache.prepare_root_data")
     @patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"})
     def test_prepare_root_data_exception(self, mock_prepare_root, mock_prepare_copilot):
         """Test handling of exceptions from prepare_root_data."""
@@ -125,7 +125,7 @@ class TestPrepareLivemcpbenchCache:
 class TestLivemcpbenchRootDir:
     """Test the _livemcpbench_root_dir function."""
 
-    @patch("openbench.utils.cache.os.path.expanduser")
+    @patch("openbench.utils.livemcpbench_cache.os.path.expanduser")
     def test_root_dir_path_expansion(self, mock_expanduser):
         """Test that the function correctly expands the user path."""
         mock_expanduser.return_value = "/home/testuser/.openbench/livemcpbench/root"
@@ -135,7 +135,7 @@ class TestLivemcpbenchRootDir:
         mock_expanduser.assert_called_once_with("~/.openbench/livemcpbench/root")
         assert result == Path("/home/testuser/.openbench/livemcpbench/root").resolve()
 
-    @patch("openbench.utils.cache.os.path.expanduser")
+    @patch("openbench.utils.livemcpbench_cache.os.path.expanduser")
     def test_root_dir_path_resolution(self, mock_expanduser):
         """Test that the function resolves the path correctly."""
         # Use a real-looking path to test resolution
@@ -161,9 +161,9 @@ class TestLivemcpbenchRootDir:
 class TestClearLivemcpbenchRoot:
     """Test the clear_livemcpbench_root function."""
 
-    @patch("openbench.utils.cache._livemcpbench_root_dir")
-    @patch("openbench.utils.cache.shutil.rmtree")
-    @patch("openbench.utils.cache.typer.echo")
+    @patch("openbench.utils.livemcpbench_cache._livemcpbench_root_dir")
+    @patch("openbench.utils.livemcpbench_cache.shutil.rmtree")
+    @patch("openbench.utils.livemcpbench_cache.typer.echo")
     def test_successful_cleanup_with_existing_directory(
         self, mock_echo, mock_rmtree, mock_root_dir
     ):
@@ -180,9 +180,9 @@ class TestClearLivemcpbenchRoot:
             "🧹 Cleaned LiveMCPBench root: /test/root/path"
         )
 
-    @patch("openbench.utils.cache._livemcpbench_root_dir")
-    @patch("openbench.utils.cache.shutil.rmtree")
-    @patch("openbench.utils.cache.typer.echo")
+    @patch("openbench.utils.livemcpbench_cache._livemcpbench_root_dir")
+    @patch("openbench.utils.livemcpbench_cache.shutil.rmtree")
+    @patch("openbench.utils.livemcpbench_cache.typer.echo")
     def test_cleanup_with_nonexistent_directory(
         self, mock_echo, mock_rmtree, mock_root_dir
     ):
@@ -199,9 +199,9 @@ class TestClearLivemcpbenchRoot:
             "(LiveMCPBench root already clean: /test/root/path)"
         )
 
-    @patch("openbench.utils.cache._livemcpbench_root_dir")
-    @patch("openbench.utils.cache.shutil.rmtree")
-    @patch("openbench.utils.cache.typer.echo")
+    @patch("openbench.utils.livemcpbench_cache._livemcpbench_root_dir")
+    @patch("openbench.utils.livemcpbench_cache.shutil.rmtree")
+    @patch("openbench.utils.livemcpbench_cache.typer.echo")
     def test_cleanup_quiet_mode_existing_directory(
         self, mock_echo, mock_rmtree, mock_root_dir
     ):
@@ -215,9 +215,9 @@ class TestClearLivemcpbenchRoot:
         mock_rmtree.assert_called_once_with(mock_root_path)
         mock_echo.assert_not_called()
 
-    @patch("openbench.utils.cache._livemcpbench_root_dir")
-    @patch("openbench.utils.cache.shutil.rmtree")
-    @patch("openbench.utils.cache.typer.echo")
+    @patch("openbench.utils.livemcpbench_cache._livemcpbench_root_dir")
+    @patch("openbench.utils.livemcpbench_cache.shutil.rmtree")
+    @patch("openbench.utils.livemcpbench_cache.typer.echo")
     def test_cleanup_quiet_mode_nonexistent_directory(
         self, mock_echo, mock_rmtree, mock_root_dir
     ):
@@ -231,9 +231,9 @@ class TestClearLivemcpbenchRoot:
         mock_rmtree.assert_not_called()
         mock_echo.assert_not_called()
 
-    @patch("openbench.utils.cache._livemcpbench_root_dir")
-    @patch("openbench.utils.cache.shutil.rmtree")
-    @patch("openbench.utils.cache.typer.echo")
+    @patch("openbench.utils.livemcpbench_cache._livemcpbench_root_dir")
+    @patch("openbench.utils.livemcpbench_cache.shutil.rmtree")
+    @patch("openbench.utils.livemcpbench_cache.typer.echo")
     def test_cleanup_exception_handling(self, mock_echo, mock_rmtree, mock_root_dir):
         """Test exception handling during cleanup."""
         mock_root_path = Mock(spec=Path)
@@ -250,9 +250,9 @@ class TestClearLivemcpbenchRoot:
             "⚠️  Failed to clean LiveMCPBench root (/test/root/path): Permission denied"
         )
 
-    @patch("openbench.utils.cache._livemcpbench_root_dir")
-    @patch("openbench.utils.cache.shutil.rmtree")
-    @patch("openbench.utils.cache.typer.echo")
+    @patch("openbench.utils.livemcpbench_cache._livemcpbench_root_dir")
+    @patch("openbench.utils.livemcpbench_cache.shutil.rmtree")
+    @patch("openbench.utils.livemcpbench_cache.typer.echo")
     def test_cleanup_exception_handling_quiet_mode(
         self, mock_echo, mock_rmtree, mock_root_dir
     ):
@@ -268,9 +268,9 @@ class TestClearLivemcpbenchRoot:
         mock_rmtree.assert_called_once_with(mock_root_path)
         mock_echo.assert_not_called()
 
-    @patch("openbench.utils.cache._livemcpbench_root_dir")
-    @patch("openbench.utils.cache.shutil.rmtree")
-    @patch("openbench.utils.cache.typer.echo")
+    @patch("openbench.utils.livemcpbench_cache._livemcpbench_root_dir")
+    @patch("openbench.utils.livemcpbench_cache.shutil.rmtree")
+    @patch("openbench.utils.livemcpbench_cache.typer.echo")
     def test_cleanup_default_quiet_parameter(
         self, mock_echo, mock_rmtree, mock_root_dir
     ):
@@ -288,9 +288,9 @@ class TestClearLivemcpbenchRoot:
             "🧹 Cleaned LiveMCPBench root: /test/root/path"
         )
 
-    @patch("openbench.utils.cache._livemcpbench_root_dir")
-    @patch("openbench.utils.cache.shutil.rmtree")
-    @patch("openbench.utils.cache.typer.echo")
+    @patch("openbench.utils.livemcpbench_cache._livemcpbench_root_dir")
+    @patch("openbench.utils.livemcpbench_cache.shutil.rmtree")
+    @patch("openbench.utils.livemcpbench_cache.typer.echo")
     def test_cleanup_multiple_exception_types(
         self, mock_echo, mock_rmtree, mock_root_dir
     ):
@@ -321,11 +321,11 @@ class TestClearLivemcpbenchRoot:
 class TestCacheIntegration:
     """Integration tests for cache functions working together."""
 
-    @patch("openbench.utils.cache.prepare_copilot_cache")
-    @patch("openbench.utils.cache.prepare_root_data")
-    @patch("openbench.utils.cache.shutil.rmtree")
-    @patch("openbench.utils.cache.typer.secho")
-    @patch("openbench.utils.cache.typer.echo")
+    @patch("openbench.utils.livemcpbench_cache.prepare_copilot_cache")
+    @patch("openbench.utils.livemcpbench_cache.prepare_root_data")
+    @patch("openbench.utils.livemcpbench_cache.shutil.rmtree")
+    @patch("openbench.utils.livemcpbench_cache.typer.secho")
+    @patch("openbench.utils.livemcpbench_cache.typer.echo")
     @patch.dict(os.environ, {"OPENAI_API_KEY": "test-key"})
     def test_prepare_then_clear_workflow(
         self,
@@ -348,7 +348,9 @@ class TestCacheIntegration:
         assert os.environ["MCP_DATA_PATH"] == str(mock_cache_path)
 
         # Mock the root directory for cleanup
-        with patch("openbench.utils.cache._livemcpbench_root_dir") as mock_root_dir:
+        with patch(
+            "openbench.utils.livemcpbench_cache._livemcpbench_root_dir"
+        ) as mock_root_dir:
             mock_root_dir_obj = Mock(spec=Path)
             mock_root_dir_obj.exists.return_value = True
             mock_root_dir_obj.__str__ = Mock(return_value=str(mock_root_path))
@@ -360,7 +362,7 @@ class TestCacheIntegration:
             # Verify cleanup was called
             mock_rmtree.assert_called_once_with(mock_root_dir_obj)
 
-    @patch("openbench.utils.cache.os.path.expanduser")
+    @patch("openbench.utils.livemcpbench_cache.os.path.expanduser")
     def test_root_dir_consistency(self, mock_expanduser):
         """Test that _livemcpbench_root_dir returns consistent paths."""
         mock_expanduser.return_value = "/home/user/.openbench/livemcpbench/root"

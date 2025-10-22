@@ -239,6 +239,7 @@ from .evals.medqa import medqa  # noqa: F401, E402
 from .evals.mgsm import mgsm, mgsm_en, mgsm_latin, mgsm_non_latin  # noqa: F401, E402
 from .evals.mmlu import mmlu  # noqa: F401, E402
 from .evals.mmlu_pro import mmlu_pro  # noqa: F401, E402
+from .evals.multichallenge import multichallenge  # noqa: F401, E402
 from .evals.mrcr import openai_mrcr, openai_mrcr_2n, openai_mrcr_4n, openai_mrcr_8n  # noqa: F401, E402
 from .evals.mmstar import mmstar  # noqa: F401, E402
 from .evals.musr import musr  # noqa: F401, E402
@@ -249,6 +250,7 @@ from .evals.prost import prost  # noqa: F401, E402
 from .evals.scicode import scicode  # noqa: F401, E402
 from .evals.swag import swag  # noqa: F401, E402
 from .evals.simpleqa import simpleqa  # noqa: F401, E402
+from .evals.simpleqa_verified import simpleqa_verified  # noqa: F401, E402
 from .evals.tumlu import tumlu  # noqa: F401, E402
 from .evals.winogrande import winogrande  # noqa: F401, E402
 from .evals.wsc273 import wsc273  # noqa: F401, E402
@@ -292,6 +294,13 @@ from .evals.mmmu import (  # noqa: F401, E402
 )
 from .evals.mmmu_pro import mmmu_pro, mmmu_pro_vision  # noqa: F401, E402
 from .evals.arc_agi import arc_agi, arc_agi_1, arc_agi_2  # noqa: F401, E402
+from .evals.mockaime import otis_mock_aime, otis_mock_aime_2024, otis_mock_aime_2025  # noqa: F401, E402
+
+# cybench is defined in openbench-cyber package, not here
+# from .evals.cybench import cybench  # noqa: F401, E402
+from .evals.mhj_m2s import mhj_m2s  # noqa: F401, E402
+from .evals.safemt_m2s import safemt_m2s  # noqa: F401, E402
+from .evals.cosafe_m2s import cosafe_m2s  # noqa: F401, E402
 
 # GLUE/SuperGLUE benchmarks
 from .evals import anli  # noqa: F401, E402
@@ -307,9 +316,24 @@ from .evals import xwinograd  # noqa: F401, E402
 from .evals import agieval  # noqa: F401, E402
 
 # Ethics & Social Understanding benchmarks
+from .evals.bbq import (  # noqa: F401, E402
+    bbq,
+    bbq_age,
+    bbq_disability_status,
+    bbq_gender_identity,
+    bbq_nationality,
+    bbq_physical_appearance,
+    bbq_race_ethnicity,
+    bbq_race_x_ses,
+    bbq_race_x_gender,
+    bbq_religion,
+    bbq_ses,
+    bbq_sexual_orientation,
+)
 from .evals import ethics  # noqa: F401, E402
 from .evals import social_iqa  # noqa: F401, E402
 from .evals import toxigen  # noqa: F401, E402
+from .evals import polyglotoxicity  # noqa: F401, E402
 
 # Reading Comprehension benchmarks
 from .evals import race  # noqa: F401, E402
@@ -321,6 +345,7 @@ from .evals import logiqa  # noqa: F401, E402
 from .evals import mathqa  # noqa: F401, E402
 from .evals import sciq  # noqa: F401, E402
 from .evals import truthfulqa  # noqa: F401, E402
+from .evals import factscore  # noqa: F401, E402
 
 # Linguistic Phenomena benchmarks
 from .evals import blimp  # noqa: F401, E402
@@ -343,11 +368,43 @@ from .evals.arabic_exams import (  # noqa: F401, E402
     arabic_exams,
     arabic_exams_accounting_university,
     arabic_exams_arabic_language_general,
+    arabic_exams_arabic_language_grammar,
+    arabic_exams_arabic_language_high_school,
+    arabic_exams_arabic_language_middle_school,
+    arabic_exams_arabic_language_primary_school,
+    arabic_exams_biology_high_school,
+    arabic_exams_civics_high_school,
+    arabic_exams_civics_middle_school,
     arabic_exams_computer_science_high_school,
+    arabic_exams_computer_science_middle_school,
+    arabic_exams_computer_science_primary_school,
     arabic_exams_computer_science_university,
+    arabic_exams_driving_test,
+    arabic_exams_economics_high_school,
+    arabic_exams_economics_middle_school,
+    arabic_exams_economics_university,
+    arabic_exams_general_knowledge,
+    arabic_exams_general_knowledge_middle_school,
+    arabic_exams_general_knowledge_primary_school,
+    arabic_exams_geography_high_school,
+    arabic_exams_geography_middle_school,
+    arabic_exams_geography_primary_school,
+    arabic_exams_history_high_school,
+    arabic_exams_history_middle_school,
+    arabic_exams_history_primary_school,
     arabic_exams_islamic_studies_general,
-    arabic_exams_math_high_school,
+    arabic_exams_islamic_studies_high_school,
+    arabic_exams_islamic_studies_middle_school,
+    arabic_exams_islamic_studies_primary_school,
+    arabic_exams_law_professional,
+    arabic_exams_management_university,
+    arabic_exams_math_primary_school,
+    arabic_exams_natural_science_middle_school,
+    arabic_exams_natural_science_primary_school,
+    arabic_exams_philosophy_high_school,
     arabic_exams_physics_high_school,
-    arabic_exams_physics_university,
+    arabic_exams_political_science_university,
+    arabic_exams_social_science_middle_school,
+    arabic_exams_social_science_primary_school,
 )
 from .evals.legalsupport import legalsupport  # noqa: F401, E402

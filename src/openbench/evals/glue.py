@@ -14,7 +14,7 @@ Note: BoolQ is already implemented separately in boolq.py and is not included he
 Sample usage:
 ```bash
 bench eval copa --model "groq/llama-3.1-8b-instant"
-bench eval rte_superglue --model "groq/llama-3.1-8b-instant"
+bench eval rte --model "groq/llama-3.1-8b-instant"
 ```
 
 The prompts are based on the lighteval implementations:
@@ -216,7 +216,7 @@ SUPERGLUE_SUBSET_CONFIG = {
         "converter": record_to_mcq_sample_copa,
     },
     "rte": {
-        "task_name": "rte_superglue",
+        "task_name": "rte",
         "dataset_subset": "rte",
         "converter": record_to_mcq_sample_rte,
     },
@@ -290,7 +290,7 @@ def copa(split: str = "validation") -> Task:
 
 
 @task
-def rte_superglue(split: str = "validation") -> Task:
+def rte(split: str = "validation") -> Task:
     """
     RTE: Recognizing Textual Entailment (SuperGLUE)
 

@@ -61,7 +61,14 @@ def exercism(
             sample.metadata = {}
         sample.metadata["code_agent"] = code_agent
 
+    # Determine task name based on languages
+    if languages and len(languages) == 1:
+        task_name = f"exercism_{languages[0]}"
+    else:
+        task_name = "exercism"
+
     return Task(
+        name=task_name,
         dataset=dataset,
         solver=exercism_solver(),
         scorer=exercism_scorer(),

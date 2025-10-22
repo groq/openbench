@@ -4,7 +4,7 @@ description: Complete catalog of all available benchmarks with evaluation comman
 ---
 
 import { useEffect, useMemo, useState } from 'react'
-import { benchmarksData } from "/snippets/benchmarks.data.mdx"
+import { benchmarksData, evalGroupsData } from "/snippets/benchmarks.data.mdx"
 
 ## Featured
 
@@ -37,10 +37,10 @@ import { benchmarksData } from "/snippets/benchmarks.data.mdx"
     
   </Card>
   
-  <Card title="SciCode" icon="flask" href="/evals/scicode">
-    **Science** · Code generation
+  <Card title="Exercism" icon="code" href="/evals/exercism">
+    **Agent** · Code generation
 
-    Scientific computing and programming challenges
+    Real world code agent programming challenges across 5 languages
 
   </Card>
   
@@ -65,14 +65,27 @@ export const CatalogTable = () => {
   const [pageSize, setPageSize] = useState(20)
 
   const data = useMemo(() => {
-    return (benchmarksData || []).map((r) => ({
+    const benchmarks = (benchmarksData || []).map((r) => ({
       name: String(r?.name ?? "").trim(),
       description: String(r?.description ?? "").trim(),
       category: String(r?.category ?? "").trim(),
       tags: Array.isArray(r?.tags) ? r.tags.map((t) => String(t).trim()).filter(Boolean) : [],
       function_name: String(r?.function_name ?? "").trim(),
       is_alpha: Boolean(r?.is_alpha),
+      is_group: false,
+      benchmark_count: 0,
     }))
+    const groups = (evalGroupsData || []).map((g) => ({
+      name: String(g?.name ?? "").trim(),
+      description: String(g?.description ?? "").trim(),
+      category: String(g?.category ?? "").trim(),
+      tags: Array.isArray(g?.tags) ? g.tags.map((t) => String(t).trim()).filter(Boolean) : [],
+      function_name: String(g?.id ?? "").trim(),
+      is_alpha: false,
+      is_group: true,
+      benchmark_count: Number(g?.benchmark_count ?? 0),
+    }))
+    return [...benchmarks, ...groups]
   }, [])
 
   const categories = useMemo(() => {
@@ -186,7 +199,7 @@ export const CatalogTable = () => {
             ) : (
               pageRows.map((r) => (
                 <tr key={r.function_name} className="border-t border-zinc-200 dark:border-zinc-800 align-top">
-                  <td className="px-4 py-3"><div className="flex items-center gap-2"><span className="font-medium text-zinc-900 dark:text-zinc-100">{r.name}</span>{r.is_alpha && (<span className="inline-flex items-center rounded bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">alpha</span>)}</div></td>
+                  <td className="px-4 py-3"><div className="flex items-center gap-2"><span className="font-medium text-zinc-900 dark:text-zinc-100">{r.name}</span>{r.is_alpha && (<span className="inline-flex items-center rounded bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">alpha</span>)}{r.is_group && (<span className="inline-flex items-center rounded bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">group</span>)}</div>{r.is_group && r.benchmark_count > 0 && (<div className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">{r.benchmark_count} benchmarks</div>)}</td>
                   <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">{r.description}</td>
                   <td className="px-4 py-3"><span className="inline-flex rounded-md bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-xs text-zinc-700 dark:text-zinc-300">{r.category}</span></td>
                   <td className="px-4 py-3"><div className="flex flex-wrap gap-1.5">{r.tags.map((t) => (<span key={t} className="inline-flex rounded-md bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 text-xs text-zinc-700 dark:text-zinc-300">{t}</span>))}</div></td>

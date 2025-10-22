@@ -1,0 +1,104 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openbench"
+version = "0.5.2"
+requires-python = ">=3.10"
+description = "openbench - open source, replicable, and standardized evaluation infrastructure"
+license = {text = "MIT"}
+authors = [
+    { name="Aarush Sah" },
+    { name="Groq" }
+]
+dependencies = [
+    "datasets>=3.6.0",
+    "groq>=0.30.0",
+    "inspect-ai==0.3.125",
+    "openai>=1.99.7",
+    "pillow>=10.0.0",
+    "jsonschema>=4.23.0",
+    "mcp>=1.13.1",
+    "platformdirs>=4.0.0",
+    "pydantic-settings>=2.9.1",
+    "scipy>=1.15.3",
+    "tiktoken>=0.11.0",
+    "typer>=0.15.3",
+    "google-api-python-client>=2.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/groq/openbench"
+Repository = "https://github.com/groq/openbench"
+
+[project.entry-points.inspect_ai]
+openbench = "openbench._registry"
+
+[tool.setuptools]
+package-dir = {"" = "../../src"}
+
+[tool.setuptools.packages.find]
+where = ["../../src"]
+include = ["openbench*"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra -q --strict-markers"
+testpaths = ["../../tests"]
+pythonpath = ["../../src", "../.."]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "integration: marks tests that require external services (deselect with '-m \"not integration\"')",
+]
+
+[tool.ruff]
+
+[tool.coverage.run]
+source = ["../../src/openbench"]
+omit = ["../../tests/*", "**/__init__.py", "**/conftest.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+precision = 2
+show_missing = true
+
+[tool.uv.sources]
+scicode = { git = "https://github.com/TheFloatingString/SciCode-fork.git", rev = "4f20d721ba3e2227196262083b9b7a70484d54f7" }
+
+[dependency-groups]
+dev = [
+    "mypy>=1.15.0",
+    "pre-commit>=4.2.0",
+    "pytest>=8.3.5",
+    "pytest-asyncio==0.24.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.11.9",
+    "types-jsonschema>=4.0.0",
+    "types-pyyaml>=6.0.12.20250809",
+]
+scicode = [
+    "scicode",
+]
+jsonschemabench = [
+    "jsonschema>=4.23.0",
+]
+ifeval = [
+    "langdetect>=1.0.9",
+    "nltk>=3.9.1",
+]
+simpleqa_verified = [
+    "kagglehub>=0.3.4",
+]
+factscore = [
+    "factscorelite>=1.3.0,<2.0.0",
+    "rank-bm25>=0.2.2",
+]

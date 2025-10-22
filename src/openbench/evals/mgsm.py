@@ -102,3 +102,105 @@ def mgsm_non_latin() -> Task:
             max_tokens=8192,
         ),
     )
+
+
+# Individual language wrappers
+mgsm_de = task(
+    lambda: Task(
+        dataset=get_dataset(languages=["de"]),
+        solver=[generate()],
+        scorer=mgsm_scorer(),
+        name="mgsm_de",
+        config=GenerateConfig(temperature=0.0, max_tokens=8192),
+    )
+)
+
+mgsm_es = task(
+    lambda: Task(
+        dataset=get_dataset(languages=["es"]),
+        solver=[generate()],
+        scorer=mgsm_scorer(),
+        name="mgsm_es",
+        config=GenerateConfig(temperature=0.0, max_tokens=8192),
+    )
+)
+
+mgsm_fr = task(
+    lambda: Task(
+        dataset=get_dataset(languages=["fr"]),
+        solver=[generate()],
+        scorer=mgsm_scorer(),
+        name="mgsm_fr",
+        config=GenerateConfig(temperature=0.0, max_tokens=8192),
+    )
+)
+
+mgsm_sw = task(
+    lambda: Task(
+        dataset=get_dataset(languages=["sw"]),
+        solver=[generate()],
+        scorer=mgsm_scorer(),
+        name="mgsm_sw",
+        config=GenerateConfig(temperature=0.0, max_tokens=8192),
+    )
+)
+
+mgsm_bn = task(
+    lambda: Task(
+        dataset=get_dataset(languages=["bn"]),
+        solver=[generate()],
+        scorer=mgsm_scorer(),
+        name="mgsm_bn",
+        config=GenerateConfig(temperature=0.0, max_tokens=8192),
+    )
+)
+
+mgsm_ja = task(
+    lambda: Task(
+        dataset=get_dataset(languages=["ja"]),
+        solver=[generate()],
+        scorer=mgsm_scorer(),
+        name="mgsm_ja",
+        config=GenerateConfig(temperature=0.0, max_tokens=8192),
+    )
+)
+
+mgsm_ru = task(
+    lambda: Task(
+        dataset=get_dataset(languages=["ru"]),
+        solver=[generate()],
+        scorer=mgsm_scorer(),
+        name="mgsm_ru",
+        config=GenerateConfig(temperature=0.0, max_tokens=8192),
+    )
+)
+
+mgsm_te = task(
+    lambda: Task(
+        dataset=get_dataset(languages=["te"]),
+        solver=[generate()],
+        scorer=mgsm_scorer(),
+        name="mgsm_te",
+        config=GenerateConfig(temperature=0.0, max_tokens=8192),
+    )
+)
+
+mgsm_th = task(
+    lambda: Task(
+        dataset=get_dataset(languages=["th"]),
+        solver=[generate()],
+        scorer=mgsm_scorer(),
+        name="mgsm_th",
+        config=GenerateConfig(temperature=0.0, max_tokens=8192),
+    )
+)
+
+mgsm_zh = task(
+    lambda: Task(
+        dataset=get_dataset(languages=["zh"]),
+        solver=[generate()],
+        scorer=mgsm_scorer(),
+        name="mgsm_zh",
+        config=GenerateConfig(temperature=0.0, max_tokens=8192),
+    )
+)
