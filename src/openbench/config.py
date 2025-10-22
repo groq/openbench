@@ -6603,8 +6603,9 @@ EVAL_GROUPS = {
             # MATH dataset variants (2)
             "math",
             "math_500",
-            # Multilingual Grade School Math - Individual languages (10)
+            # Multilingual Grade School Math - Individual languages (11)
             "mgsm_de",
+            "mgsm_en",
             "mgsm_es",
             "mgsm_fr",
             "mgsm_sw",
@@ -6614,10 +6615,6 @@ EVAL_GROUPS = {
             "mgsm_te",
             "mgsm_th",
             "mgsm_zh",
-            # Multilingual Grade School Math - Grouped by script (3)
-            "mgsm_en",
-            "mgsm_latin",
-            "mgsm_non_latin",
             # AIME (American Invitational Mathematics Examination) (7)
             "aime_2023_I",
             "aime_2023_II",
