@@ -6597,11 +6597,51 @@ EVAL_GROUPS = {
         ],
     ),
     "math": EvalGroup(
-        name="MATH Dataset",
-        description="MATH dataset variants for mathematical problem solving",
+        name="Mathematics",
+        description="Comprehensive mathematics evaluation including competition math, multilingual grade school math, and advanced problem solving",
         benchmarks=[
+            # MATH dataset variants
             "math",
             "math_500",
+            # Multilingual Grade School Math
+            "mgsm_de",
+            "mgsm_es",
+            "mgsm_fr",
+            "mgsm_sw",
+            "mgsm_bn",
+            "mgsm_ja",
+            "mgsm_ru",
+            "mgsm_te",
+            "mgsm_th",
+            "mgsm_zh",
+            # AIME (American Invitational Mathematics Examination)
+            "aime_2023_I",
+            "aime_2023_II",
+            "aime_2024",
+            "aime_2024_I",
+            "aime_2024_II",
+            "aime_2025",
+            "aime_2025_II",
+            # Harvard-MIT Mathematics Tournament
+            "hmmt_feb_2023",
+            "hmmt_feb_2024",
+            "hmmt_feb_2025",
+            # Bruno Mathematical Olympiad
+            "brumo_2025",
+            # OTIS Mock AIME
+            "otis_mock_aime",
+            "otis_mock_aime_2024",
+            "otis_mock_aime_2025",
+            # Stanford Math Tournament
+            "smt",
+            "smt_algebra",
+            "smt_calculus",
+            "smt_discrete",
+            "smt_general",
+            "smt_geometry",
+            "smt_guts",
+            # MMMU Math subset
+            "mmmu_math",
         ],
     ),
     "mmmlu": EvalGroup(
