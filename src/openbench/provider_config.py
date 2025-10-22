@@ -44,6 +44,7 @@ class ProviderType(str, Enum):
     SAMBANOVA = "sambanova"
     TOGETHER = "together"
     VERCEL = "vercel"
+    WANDB = "wandb"
     XAI = "xai"
 
 
@@ -337,6 +338,15 @@ PROVIDER_CONFIGS: Dict[ProviderType, ProviderConfig] = {
         display_name="Vercel AI Gateway",
         api_key_env="AI_GATEWAY_API_KEY",
         supports_vision=True,
+        supports_function_calling=True,
+    ),
+    ProviderType.WANDB: ProviderConfig(
+        name="wandb",
+        display_name="W&B Inference",
+        api_key_env="WANDB_API_KEY",
+        base_url="https://api.inference.wandb.ai/v1",
+        base_url_env="WANDB_INFERENCE_BASE_URL",
+        supports_vision=False,
         supports_function_calling=True,
     ),
     ProviderType.XAI: ProviderConfig(

@@ -171,6 +171,14 @@ def openrouter() -> Type[ModelAPI]:
     return OpenRouterAPI
 
 
+@modelapi(name="wandb")
+def wandb() -> Type[ModelAPI]:
+    """Register W&B Inference provider."""
+    from .model._providers.wandb import WandBInferenceAPI
+
+    return WandBInferenceAPI
+
+
 def _override_builtin_groq_provider():
     """Replace Inspect AI's built-in groq provider with enhanced openbench version."""
     from inspect_ai._util.registry import _registry
