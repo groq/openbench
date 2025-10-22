@@ -6596,14 +6596,14 @@ EVAL_GROUPS = {
             "bbh_tracking_shuffled_objects_three_objects",
         ],
     ),
-    "math_22_10_2025": EvalGroup(
+    "math_group_22_10_2025": EvalGroup(
         name="Mathematics - 22 Oct 2025",
         description="Comprehensive mathematics evaluation including competition math, multilingual grade school math, and advanced problem solving",
         benchmarks=[
-            # MATH dataset variants
+            # MATH dataset variants (2)
             "math",
             "math_500",
-            # Multilingual Grade School Math
+            # Multilingual Grade School Math - Individual languages (10)
             "mgsm_de",
             "mgsm_es",
             "mgsm_fr",
@@ -6614,7 +6614,11 @@ EVAL_GROUPS = {
             "mgsm_te",
             "mgsm_th",
             "mgsm_zh",
-            # AIME (American Invitational Mathematics Examination)
+            # Multilingual Grade School Math - Grouped by script (3)
+            "mgsm_en",
+            "mgsm_latin",
+            "mgsm_non_latin",
+            # AIME (American Invitational Mathematics Examination) (7)
             "aime_2023_I",
             "aime_2023_II",
             "aime_2024",
@@ -6622,25 +6626,23 @@ EVAL_GROUPS = {
             "aime_2024_II",
             "aime_2025",
             "aime_2025_II",
-            # Harvard-MIT Mathematics Tournament
+            # Harvard-MIT Mathematics Tournament (3)
             "hmmt_feb_2023",
             "hmmt_feb_2024",
             "hmmt_feb_2025",
-            # Bruno Mathematical Olympiad
+            # Bruno Mathematical Olympiad (1)
             "brumo_2025",
-            # OTIS Mock AIME
-            "otis_mock_aime",
+            # OTIS Mock AIME subtasks (2)
             "otis_mock_aime_2024",
             "otis_mock_aime_2025",
-            # Stanford Math Tournament
-            "smt",
+            # Stanford Math Tournament subtasks (6)
             "smt_algebra",
             "smt_calculus",
             "smt_discrete",
             "smt_general",
             "smt_geometry",
             "smt_guts",
-            # MMMU Math subset
+            # MMMU Math subset (1)
             "mmmu_math",
         ],
     ),
