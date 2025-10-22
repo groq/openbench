@@ -180,11 +180,16 @@ def display_group_summary(
 ) -> None:
     """Display aggregate metrics for a single group.
 
+    Computes mean accuracy, standard deviation, and standard error across benchmarks.
+    Treats I/C scores as 1.0 (correct) and 0.0 (incorrect), and includes numerical scores
+    on the 0.0-1.0 scale.
+
     Args:
         group_name: Display name of the group (e.g., "BIG-Bench", "BBH")
         group_benchmarks: List of benchmark names in this group
         eval_logs: List of evaluation logs from all benchmarks
     """
+    import numpy as np
 
     # Filter to only logs from this group's benchmarks
     # Handle both 'benchmark' and 'openbench/benchmark' task name formats
@@ -205,15 +210,12 @@ def display_group_summary(
     if not group_logs:
         return
 
-    # Aggregate metrics
+    # Collect per-benchmark accuracy scores (0.0-1.0 scale)
+    benchmark_accuracies = []
     total_samples = 0
-    total_correct = 0
-    completed_samples = 0
 
     for log in group_logs:
         if log.results:
-            completed_samples += log.results.completed_samples
-
             # Extract accuracy from EvalScore.metrics (correct API per inspect_ai)
             # log.results.scores is a list of EvalScore objects, each with a .metrics dict
             accuracy_value = None
@@ -227,8 +229,8 @@ def display_group_summary(
                             )
                             break
 
-            # Only include benchmarks with accuracy in aggregate calculation
-            # This prevents skewing results when mixing benchmark types
+            # Include benchmarks with accuracy in aggregate calculation
+            # Converts I/C to 1.0/0.0 and keeps numerical scores as-is
             if accuracy_value is not None:
                 total_samples += log.results.completed_samples
                 # Extract numeric value if it's an EvalMetric object
@@ -237,31 +239,48 @@ def display_group_summary(
                     if hasattr(accuracy_value, "value")
                     else accuracy_value
                 )
-                correct = int(numeric_value * log.results.completed_samples)
-                total_correct += correct
+                benchmark_accuracies.append(numeric_value)
 
     # Only display if we have data
-    if total_samples == 0:
+    if len(benchmark_accuracies) == 0:
         # Debug: help users understand why no summary was shown
-        if completed_samples > 0:
+        if any(log.results for log in group_logs):
             typer.echo(
                 "\n⚠️  Note: Group evaluation completed but aggregate summary unavailable. "
                 "This may occur if benchmarks don't report accuracy metrics."
             )
         return
 
-    total_incorrect = total_samples - total_correct
-    aggregate_accuracy = total_correct / total_samples if total_samples > 0 else 0.0
+    # Calculate statistics
+    mean_accuracy = float(np.mean(benchmark_accuracies))
+    median_accuracy = float(np.median(benchmark_accuracies))
+    std_accuracy = (
+        float(np.std(benchmark_accuracies, ddof=1))
+        if len(benchmark_accuracies) > 1
+        else 0.0
+    )
+    stderr_accuracy = (
+        std_accuracy / np.sqrt(len(benchmark_accuracies))
+        if len(benchmark_accuracies) > 1
+        else 0.0
+    )
+
+    # Calculate 95% confidence interval (mean ± 1.96 * stderr)
+    ci_margin = 1.96 * stderr_accuracy if len(benchmark_accuracies) > 1 else 0.0
+    ci_lower = max(0.0, mean_accuracy - ci_margin)  # Clamp to [0, 1]
+    ci_upper = min(1.0, mean_accuracy + ci_margin)
 
     # Display summary
     typer.echo("\n" + "=" * 60)
     typer.echo(f"📊 GROUP SUMMARY - {group_name}")
     typer.echo("=" * 60)
-    typer.echo(f"Total benchmarks:    {len(group_logs)}")
+    typer.echo(f"Total benchmarks:    {len(benchmark_accuracies)}")
     typer.echo(f"Total samples:       {total_samples:,}")
-    typer.echo(f"Correct:             {total_correct:,}")
-    typer.echo(f"Incorrect:           {total_incorrect:,}")
-    typer.echo(f"Aggregate accuracy:  {aggregate_accuracy:.2%}")
+    typer.echo(f"Mean accuracy:       {mean_accuracy:.2%}")
+    typer.echo(f"Median accuracy:     {median_accuracy:.2%}")
+    typer.echo(f"95% CI:              [{ci_lower:.2%}, {ci_upper:.2%}]")
+    typer.echo(f"Std deviation:       {std_accuracy:.4f}")
+    typer.echo(f"Std error:           {stderr_accuracy:.4f}")
     typer.echo("=" * 60 + "\n")
 
 
