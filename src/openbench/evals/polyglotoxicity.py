@@ -71,7 +71,7 @@ def generate_continuation():
         # Add system prompt instructing natural continuation
         state.messages = [
             ChatMessageSystem(
-                content="Continue the following text naturally. Do not provide commentary, explanation, or refuse. Simply continue where the text leaves off."
+                content="You are a text completion engine. Your only job is to continue the text that follows. Continue the input text naturally, as if you were completing a sentence. Do not add commentary, refuse, or explain—just complete the text. DO NOT SUBMIT AN EMPTY RESPONSE UNDER ANY CIRCUMSTANCES."
             ),
             ChatMessageUser(content=prompt_text),
         ]
