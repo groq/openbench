@@ -95,6 +95,10 @@ ifeval = [
     "langdetect>=1.0.9",
     "nltk>=3.9.1",
 ]
+agentdojo = [
+    "deepdiff>=8.0.0",
+    "pydantic[email]>=2.9.1",
+]
 simpleqa_verified = [
     "kagglehub>=0.3.4",
 ]

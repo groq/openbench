@@ -6,7 +6,7 @@ from openbench.evals.agentdojo.tools.cloud_drive_client import CloudDrive
 from openbench.evals.agentdojo.tools.email_client import Inbox
 
 if TYPE_CHECKING:
-    from deepdiff.diff import DeepDiff as DeepDiffType
+    from deepdiff.diff import DeepDiff as DeepDiffType  # type: ignore[import-not-found]
 
 
 class WorkspaceEnvironment(TaskEnvironment):
@@ -52,7 +52,7 @@ class _WorkspaceDeepDiff:
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         if self._deepdiff_fn is None:
             try:
-                from deepdiff import DeepDiff
+                from deepdiff import DeepDiff  # type: ignore[import-not-found]
 
                 self._deepdiff_fn = DeepDiff
             except ImportError:

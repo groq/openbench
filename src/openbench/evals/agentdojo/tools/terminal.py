@@ -205,9 +205,9 @@ async def _middle_truncate_string(
             f"\n<the output has been truncated to {actual_max_length} characters>\n"
         )
 
-    assert (
-        len(truncation_message) <= max_length
-    ), "max_length is too low to include truncation message"
+    assert len(truncation_message) <= max_length, (
+        "max_length is too low to include truncation message"
+    )
 
     if end_truncate:
         # Keep the beginning of the string and add truncation message at the end
