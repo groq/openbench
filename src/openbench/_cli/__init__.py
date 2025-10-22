@@ -14,7 +14,7 @@ app.command("describe")(describe_eval)
 app.command("eval")(run_eval)
 app.command("eval-retry")(run_eval_retry)
 app.command("view")(run_view)
-app.command("export")(run_export)
+app.command("export-hf")(run_export)
 app.add_typer(cache_app, name="cache")
 
 

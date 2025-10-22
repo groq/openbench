@@ -50,8 +50,8 @@ def run_export(
     """Export evaluation log files to HuggingFace Hub.
 
     Example:
-        bench export --log-files logs/my_eval.eval --hub-repo username/openbench-logs
-        bench export --log-files logs/file1.eval --log-files logs/file2.eval --hub-repo username/openbench-logs --hub-private
+        bench export-hf --log-files logs/my_eval.eval --hub-repo username/openbench-logs
+        bench export-hf --log-files logs/file1.eval --log-files logs/file2.eval --hub-repo username/openbench-logs --hub-private
     """
     if not log_files:
         typer.secho("No log files specified", fg=typer.colors.RED, err=True)

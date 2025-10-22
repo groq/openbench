@@ -70,7 +70,7 @@ class TestExportCommand:
 
     def test_export_requires_log_files(self):
         """Test export command requires log file arguments."""
-        result = runner.invoke(app, ["export", "--hub-repo", "test/repo"])
+        result = runner.invoke(app, ["export-hf", "--hub-repo", "test/repo"])
         assert result.exit_code != 0
 
     def test_export_requires_hub_repo(self):
@@ -79,7 +79,7 @@ class TestExportCommand:
             log_file = Path(temp_dir) / "test.eval"
             create_mock_eval_log(log_file)
 
-            result = runner.invoke(app, ["export", "--log-files", str(log_file)])
+            result = runner.invoke(app, ["export-hf", "--log-files", str(log_file)])
             assert result.exit_code != 0
             assert "Missing option" in result.stdout
 
@@ -88,7 +88,7 @@ class TestExportCommand:
         result = runner.invoke(
             app,
             [
-                "export",
+                "export-hf",
                 "--log-files",
                 "/nonexistent/file.eval",
                 "--hub-repo",
@@ -133,7 +133,8 @@ class TestExportCommand:
             log_file.write_text(json.dumps(mock_log_data))
 
             result = runner.invoke(
-                app, ["export", "--log-files", str(log_file), "--hub-repo", "test/repo"]
+                app,
+                ["export-hf", "--log-files", str(log_file), "--hub-repo", "test/repo"],
             )
 
             assert result.exit_code == 0
@@ -178,7 +179,7 @@ class TestExportCommand:
             result = runner.invoke(
                 app,
                 [
-                    "export",
+                    "export-hf",
                     "--log-files",
                     str(log_file),
                     "--hub-repo",
@@ -228,7 +229,7 @@ class TestExportCommand:
             result = runner.invoke(
                 app,
                 [
-                    "export",
+                    "export-hf",
                     "--log-files",
                     str(log_file1),
                     "--log-files",
@@ -273,7 +274,7 @@ class TestExportCommand:
             result = runner.invoke(
                 app,
                 [
-                    "export",
+                    "export-hf",
                     "--log-files",
                     str(log_file),
                     "--hub-repo",
@@ -318,7 +319,7 @@ class TestExportCommand:
             result = runner.invoke(
                 app,
                 [
-                    "export",
+                    "export-hf",
                     "--log-files",
                     str(log_file),
                     "--hub-repo",
@@ -347,7 +348,8 @@ class TestExportCommand:
             log_file.write_text("not valid json {{{")
 
             result = runner.invoke(
-                app, ["export", "--log-files", str(log_file), "--hub-repo", "test/repo"]
+                app,
+                ["export-hf", "--log-files", str(log_file), "--hub-repo", "test/repo"],
             )
 
             assert result.exit_code == 1
@@ -391,7 +393,7 @@ class TestExportCommand:
             result = runner.invoke(
                 app,
                 [
-                    "export",
+                    "export-hf",
                     "--log-files",
                     str(log_file1),
                     "--log-files",
@@ -407,7 +409,7 @@ class TestExportCommand:
 
     def test_export_help(self):
         """Test export help command."""
-        result = runner.invoke(app, ["export", "--help"])
+        result = runner.invoke(app, ["export-hf", "--help"])
         assert result.exit_code == 0
         assert "Export evaluation log files to HuggingFace Hub" in result.stdout
         assert "--hub-repo" in result.stdout
@@ -455,7 +457,8 @@ class TestExportCommandIntegration:
             log_file.write_text("binary eval data")
 
             result = runner.invoke(
-                app, ["export", "--log-files", str(log_file), "--hub-repo", "test/repo"]
+                app,
+                ["export-hf", "--log-files", str(log_file), "--hub-repo", "test/repo"],
             )
 
             assert result.exit_code == 0
@@ -506,7 +509,8 @@ class TestExportCommandIntegration:
             log_file.write_text(json.dumps(mock_log_data))
 
             result = runner.invoke(
-                app, ["export", "--log-files", str(log_file), "--hub-repo", "test/repo"]
+                app,
+                ["export-hf", "--log-files", str(log_file), "--hub-repo", "test/repo"],
             )
 
             assert result.exit_code == 0
