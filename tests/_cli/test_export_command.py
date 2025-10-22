@@ -1,6 +1,7 @@
 """Unit tests for export command."""
 
 import json
+import re
 import tempfile
 from pathlib import Path
 from unittest.mock import patch, MagicMock
@@ -10,6 +11,12 @@ from typer.testing import CliRunner
 from openbench._cli import app
 
 runner = CliRunner()
+
+
+def strip_ansi_codes(text: str) -> str:
+    """Strip ANSI color codes from text for reliable string matching in tests."""
+    ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+    return ansi_escape.sub("", text)
 
 
 def create_mock_eval_log(
@@ -411,11 +418,12 @@ class TestExportCommand:
         """Test export help command."""
         result = runner.invoke(app, ["export-hf", "--help"])
         assert result.exit_code == 0
-        assert "Export evaluation log files to HuggingFace Hub" in result.stdout
-        assert "--hub-repo" in result.stdout
-        assert "--hub-private" in result.stdout
-        assert "--hub-benchmark-name" in result.stdout
-        assert "--hub-model-name" in result.stdout
+        clean_stdout = strip_ansi_codes(result.stdout)
+        assert "Export evaluation log files to HuggingFace Hub" in clean_stdout
+        assert "--hub-repo" in clean_stdout
+        assert "--hub-private" in clean_stdout
+        assert "--hub-benchmark-name" in clean_stdout
+        assert "--hub-model-name" in clean_stdout
 
 
 class TestExportCommandIntegration:
