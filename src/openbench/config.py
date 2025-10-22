@@ -6596,8 +6596,8 @@ EVAL_GROUPS = {
             "bbh_tracking_shuffled_objects_three_objects",
         ],
     ),
-    "math": EvalGroup(
-        name="Mathematics",
+    "math_22_10_2025": EvalGroup(
+        name="Mathematics - 22 Oct 2025",
         description="Comprehensive mathematics evaluation including competition math, multilingual grade school math, and advanced problem solving",
         benchmarks=[
             # MATH dataset variants
