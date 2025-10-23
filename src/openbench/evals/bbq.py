@@ -131,7 +131,7 @@ def bbq(category: str = "Age", split: str = "test") -> Task:
         config=GenerateConfig(
             temperature=0.0,  # Use deterministic generation for bias evaluation
         ),
-        dataset_kwargs={"trust": True},
+        dataset_kwargs={},
     )
 
 

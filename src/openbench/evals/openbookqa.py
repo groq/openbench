@@ -33,5 +33,5 @@ def openbookqa(split: str = "validation") -> Task:
         dataset_path="allenai/openbookqa",
         record_to_mcq_sample=record_to_mcq_sample,
         split=split,
-        dataset_kwargs={"trust": True},
+        dataset_kwargs={},
     )

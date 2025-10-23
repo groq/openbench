@@ -70,5 +70,5 @@ def logiqa(split: str = "validation") -> Task:
         record_to_mcq_sample=record_to_mcq_sample,
         split=split,
         auto_id=True,
-        dataset_kwargs={"trust": True},
+        dataset_kwargs={},
     )
