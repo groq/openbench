@@ -25,7 +25,7 @@ dependencies = [
     "scipy>=1.15.3",
     "tiktoken>=0.11.0",
     "typer>=0.15.3",
-    "google-api-python-client>=2.0.0",
+
 ]
 
 [project.urls]
@@ -34,6 +34,11 @@ Repository = "https://github.com/groq/openbench"
 
 [project.entry-points.inspect_ai]
 openbench = "openbench._registry"
+
+[project.optional-dependencies]
+simpleqa_verified = [
+    "kagglehub>=0.3.4",
+]
 
 [tool.setuptools]
 package-dir = {"" = "../../src"}
@@ -101,6 +106,9 @@ agentdojo = [
 ]
 simpleqa_verified = [
     "kagglehub>=0.3.4",
+]
+polyglotoxicity = [
+    "google-api-python-client>=2.0.0",
 ]
 factscore = [
     "factscorelite>=1.3.0,<2.0.0",

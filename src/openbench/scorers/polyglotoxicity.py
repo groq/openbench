@@ -22,8 +22,6 @@ from openbench.metrics.polyglotoxicity import (
     empirical_probability,
     average_toxicity,
 )
-from googleapiclient import discovery  # type: ignore
-from googleapiclient.errors import HttpError  # type: ignore
 
 
 def _score_text_with_perspective(
@@ -42,6 +40,15 @@ def _score_text_with_perspective(
         Tuple of (toxicity_score, full_api_response) or None if API call fails
         The full_api_response includes summaryScore, spanScores, and detected languages
     """
+    try:
+        from googleapiclient import discovery  # type: ignore[import-not-found, import-untyped]
+        from googleapiclient.errors import HttpError  # type: ignore[import-not-found, import-untyped]
+    except ModuleNotFoundError:
+        raise RuntimeError(
+            "The 'google-api-python-client' package is required for PolygloToxicity evaluation. "
+            "Install it with: pip install google-api-python-client (or pip install openbench[polyglotoxicity])."
+        ) from None
+
     if not api_key:
         print("⚠️  No Perspective API key provided. Cannot score toxicity.")
         return None

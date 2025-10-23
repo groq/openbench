@@ -3,17 +3,23 @@ SimpleQA Verified dataset from Kaggle.
 Reference: https://www.kaggle.com/datasets/deepmind/simpleqa-verified
 """
 
-import kagglehub  # type: ignore[import-not-found, import-untyped]
-from inspect_ai.dataset import Dataset, csv_dataset, MemoryDataset
-import os
 
-from openbench.datasets.simpleqa import record_to_sample
-
-
-def get_dataset() -> Dataset:
+def get_dataset():
     """Load the SimpleQA Verified dataset from Kaggle.
     This downloads the dataset from Kaggle and loads it as a CSV dataset.
     """
+    from inspect_ai.dataset import csv_dataset, MemoryDataset
+    import os
+    from openbench.datasets.simpleqa import record_to_sample
+
+    try:
+        import kagglehub  # type: ignore[import-not-found, import-untyped]
+    except ModuleNotFoundError:
+        raise RuntimeError(
+            "The 'kagglehub' package is required to load the SimpleQA Verified dataset. "
+            "Install it with: pip install kagglehub (or pip install openbench[simpleqa_verified])."
+        ) from None
+
     # Download the dataset from Kaggle
     path = kagglehub.dataset_download("deepmind/simpleqa-verified")
 
