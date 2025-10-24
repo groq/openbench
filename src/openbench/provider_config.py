@@ -42,6 +42,7 @@ class ProviderType(str, Enum):
     PERPLEXITY = "perplexity"
     REKA = "reka"
     SAMBANOVA = "sambanova"
+    SILICONFLOW = "siliconflow"
     TOGETHER = "together"
     VERCEL = "vercel"
     WANDB = "wandb"
