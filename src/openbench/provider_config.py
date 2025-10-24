@@ -5,10 +5,10 @@ This module provides a unified configuration system for all supported model prov
 including their API keys, base URLs, and provider-specific settings.
 """
 
-from dataclasses import dataclass
-from typing import Dict, List, Optional
-from enum import Enum
 import os
+from dataclasses import dataclass
+from enum import Enum
+from typing import Dict, List, Optional
 
 
 class ProviderType(str, Enum):
@@ -326,11 +326,12 @@ PROVIDER_CONFIGS: Dict[ProviderType, ProviderConfig] = {
         supports_vision=False,
         supports_function_calling=True,
     ),
-    ProviderType.TOGETHER: ProviderConfig(
-        name="together",
-        display_name="Together AI",
-        api_key_env="TOGETHER_API_KEY",
-        base_url="https://api.together.xyz/v1",
+    ProviderType.SILICONFLOW: ProviderConfig(
+        name="siliconflow",
+        display_name="SiliconFlow",
+        api_key_env="SILICONFLOW_API_KEY",
+        base_url="https://api.siliconflow.com/v1",
+        base_url_env="SILICONFLOW_BASE_URL",
         supports_vision=True,
         supports_function_calling=True,
     ),
