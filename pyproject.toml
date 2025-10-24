@@ -41,9 +41,6 @@ openbench = "openbench._cli:main"
 openbench = "openbench._registry"
 
 [project.optional-dependencies]
-simpleqa_verified = [
-    "kagglehub>=0.3.4",
-]
 
 [tool.setuptools]
 package-dir = {"" = "src"}
@@ -108,9 +105,6 @@ ifeval = [
 agentdojo = [
     "deepdiff>=8.0.0",
     "pydantic[email]>=2.9.1",
-]
-simpleqa_verified = [
-    "kagglehub>=0.3.4",
 ]
 polyglotoxicity = [
     "google-api-python-client>=2.0.0",
