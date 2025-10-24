@@ -331,6 +331,7 @@ PROVIDER_CONFIGS: Dict[ProviderType, ProviderConfig] = {
         display_name="SiliconFlow",
         api_key_env="SILICONFLOW_API_KEY",
         base_url="https://api.siliconflow.com/v1",
+        base_url_env="SILICONFLOW_BASE_URL",
         supports_vision=True,
         supports_function_calling=True,
     ),
