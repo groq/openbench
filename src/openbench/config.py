@@ -6608,21 +6608,6 @@ EVAL_GROUPS = {
         name="Mathematics - 22 Oct 2025",
         description="Comprehensive mathematics evaluation including competition math, multilingual grade school math, and advanced problem solving",
         benchmarks=[
-            # MATH dataset variants (2)
-            "math",
-            "math_500",
-            # Multilingual Grade School Math - Individual languages (11)
-            "mgsm_de",
-            "mgsm_en",
-            "mgsm_es",
-            "mgsm_fr",
-            "mgsm_sw",
-            "mgsm_bn",
-            "mgsm_ja",
-            "mgsm_ru",
-            "mgsm_te",
-            "mgsm_th",
-            "mgsm_zh",
             # AIME (American Invitational Mathematics Examination) (7)
             "aime_2023_I",
             "aime_2023_II",
@@ -6635,7 +6620,7 @@ EVAL_GROUPS = {
             "hmmt_feb_2023",
             "hmmt_feb_2024",
             "hmmt_feb_2025",
-            # Bruno Mathematical Olympiad (1)
+            # Brumo Mathematical Olympiad (1)
             "brumo_2025",
             # OTIS Mock AIME subtasks (2)
             "otis_mock_aime_2024",
@@ -6647,8 +6632,6 @@ EVAL_GROUPS = {
             "smt_general",
             "smt_geometry",
             "smt_guts",
-            # MMMU Math subset (1)
-            "mmmu_math",
         ],
     ),
     "mmmlu": EvalGroup(
