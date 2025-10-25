@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.5.3](https://github.com/groq/openbench/compare/v0.5.2...v0.5.3) (2025-10-25)
+
+
+### Features
+
+* add bbq benchmark ([#255](https://github.com/groq/openbench/issues/255)) ([46f4744](https://github.com/groq/openbench/commit/46f4744fa0e381cc50202532499efb83be1aba0c))
+* add configurable HuggingFace Hub config naming ([#261](https://github.com/groq/openbench/issues/261)) ([8abe2ae](https://github.com/groq/openbench/commit/8abe2aefb3fe11ec4bb9c36deaf1ee4a21cf2656))
+* add math EvalGroup ([#263](https://github.com/groq/openbench/issues/263)) ([e0f4a9b](https://github.com/groq/openbench/commit/e0f4a9b9ab9ebdc327b601bc5d8c1ee52c2e878d))
+* add optional extras for simpleqa and toxicity ([#266](https://github.com/groq/openbench/issues/266)) ([2450ddf](https://github.com/groq/openbench/commit/2450ddf76ad546784fbf63ff25f5f48715d65516))
+* add SMT 2024 benchmarks ([#239](https://github.com/groq/openbench/issues/239)) ([5d9b475](https://github.com/groq/openbench/commit/5d9b4752133aeb5562f0f22c793a391dcb70bde4))
+* **agentdojo:** port agentdojo benchmark ([#223](https://github.com/groq/openbench/issues/223)) ([1cf174c](https://github.com/groq/openbench/commit/1cf174c99fd03ed941073bb0e257e3ce8719b03d))
+* **cli:** added export command to exposrt specific logs to hf ([#265](https://github.com/groq/openbench/issues/265)) ([62e8d8c](https://github.com/groq/openbench/commit/62e8d8c8dfc2f79f2fd1f031cbebce9979dcdf8a))
+* **cvebench:** added auto prepare env set up for cvebench ([#259](https://github.com/groq/openbench/issues/259)) ([db238a3](https://github.com/groq/openbench/commit/db238a3ce5417ebee9a89206ac860c52c83a2b92))
+* **factscore:** added support for factscore ([#258](https://github.com/groq/openbench/issues/258)) ([13aafd7](https://github.com/groq/openbench/commit/13aafd783f975a94dc01b43a814b89b9f322651d))
+* **groq:** implement configurable timeout for GroqAPI client ([#271](https://github.com/groq/openbench/issues/271)) ([be492b6](https://github.com/groq/openbench/commit/be492b6d3478e00420b5a56ad45c2582bf36becf))
+* **m2s:** added support for single turn conversion of 3 multi turn jailbreak datasets (mhj, safeMT, cosafe) ([#222](https://github.com/groq/openbench/issues/222)) ([6b8f2b1](https://github.com/groq/openbench/commit/6b8f2b1bf938659310ddbf7cc3f5c85644f096e5))
+* **PolygloToxicityPrompts:** add multilingual toxicity evaluation ([#262](https://github.com/groq/openbench/issues/262)) ([46de7ee](https://github.com/groq/openbench/commit/46de7ee0f6c1a34514a092e49f04ed9ada355dce))
+* **providers:** add W&B Inference model provider ([#264](https://github.com/groq/openbench/issues/264)) ([a02c34f](https://github.com/groq/openbench/commit/a02c34fa693668d56795754b21ff59381eeda0b9))
+* **simpleqa_verified:** add SimpleQA Verified benchmark ([#249](https://github.com/groq/openbench/issues/249)) ([8a512c4](https://github.com/groq/openbench/commit/8a512c48613a752574248c6acbb106a9bb8a2927))
+
+
+### Bug Fixes
+
+* **livemcpbench:** catch errors on call_tool and route ([#260](https://github.com/groq/openbench/issues/260)) ([0ab746d](https://github.com/groq/openbench/commit/0ab746dd6788048ab267cb2cee4615492c607cf9))
+* **math:** shorten math group ([#268](https://github.com/groq/openbench/issues/268)) ([19cc66b](https://github.com/groq/openbench/commit/19cc66b3779bd1442e49193a53af3e39201887f5))
+* **simpleqa_verified:** silence mypy for optional kagglehub import ([#257](https://github.com/groq/openbench/issues/257)) ([32a1ff4](https://github.com/groq/openbench/commit/32a1ff4582ba8228ab11837e550c0c6d2612f8a3))
+
+
+### Documentation
+
+* add missing docstrings and type hints for code clarity ([#221](https://github.com/groq/openbench/issues/221)) ([38d34a0](https://github.com/groq/openbench/commit/38d34a0882c04284f3f4f2ed7bebfe2b73766d0d))
+
+
+### Chores
+
+* fix deprecated methods for dataset loading with scripts ([#267](https://github.com/groq/openbench/issues/267)) ([4c503f6](https://github.com/groq/openbench/commit/4c503f6ac10c192dee40a4c979aac01302661a11))
+
 ## [0.5.2](https://github.com/groq/openbench/compare/v0.5.1...v0.5.2) (2025-10-16)
 
 
