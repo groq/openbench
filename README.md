@@ -113,6 +113,7 @@ openbench supports 30+ model providers through Inspect AI. Set the appropriate A
 | **Perplexity**        | `PERPLEXITY_API_KEY`   | `perplexity/model-name`          |
 | **Reka**              | `REKA_API_KEY`         | `reka/model-name`                |
 | **SambaNova**         | `SAMBANOVA_API_KEY`    | `sambanova/model-name`           |
+| **SiliconFlow**       | `SILICONFLOW_API_KEY`  | `siliconflow/model-name`         |
 | **Together AI**       | `TOGETHER_API_KEY`     | `together/model-name`            |
 | **Vercel AI Gateway** | `AI_GATEWAY_API_KEY`   | `vercel/creator-name/model-name` |
 | **W&B Inference**     | `WANDB_API_KEY`        | `wandb/model-name`               |

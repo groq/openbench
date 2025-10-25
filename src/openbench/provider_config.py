@@ -5,10 +5,10 @@ This module provides a unified configuration system for all supported model prov
 including their API keys, base URLs, and provider-specific settings.
 """
 
-from dataclasses import dataclass
-from typing import Dict, List, Optional
-from enum import Enum
 import os
+from dataclasses import dataclass
+from enum import Enum
+from typing import Dict, List, Optional
 
 
 class ProviderType(str, Enum):
@@ -42,6 +42,7 @@ class ProviderType(str, Enum):
     PERPLEXITY = "perplexity"
     REKA = "reka"
     SAMBANOVA = "sambanova"
+    SILICONFLOW = "siliconflow"
     TOGETHER = "together"
     VERCEL = "vercel"
     WANDB = "wandb"
@@ -323,6 +324,15 @@ PROVIDER_CONFIGS: Dict[ProviderType, ProviderConfig] = {
         base_url="https://api.sambanova.ai/v1",
         base_url_env="SAMBANOVA_BASE_URL",
         supports_vision=False,
+        supports_function_calling=True,
+    ),
+    ProviderType.SILICONFLOW: ProviderConfig(
+        name="siliconflow",
+        display_name="SiliconFlow",
+        api_key_env="SILICONFLOW_API_KEY",
+        base_url="https://api.siliconflow.com/v1",
+        base_url_env="SILICONFLOW_BASE_URL",
+        supports_vision=True,
         supports_function_calling=True,
     ),
     ProviderType.TOGETHER: ProviderConfig(

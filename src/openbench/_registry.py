@@ -179,6 +179,14 @@ def wandb() -> Type[ModelAPI]:
     return WandBInferenceAPI
 
 
+@modelapi(name="siliconflow")
+def siliconflow() -> Type[ModelAPI]:
+    """Register SiliconFlow provider."""
+    from .model._providers.siliconflow import SiliconFlowAPI
+
+    return SiliconFlowAPI
+
+
 def _override_builtin_groq_provider():
     """Replace Inspect AI's built-in groq provider with enhanced openbench version."""
     from inspect_ai._util.registry import _registry
