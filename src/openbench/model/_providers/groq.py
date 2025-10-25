@@ -82,13 +82,23 @@ class GroqAPI(ModelAPI):
         if not self.api_key:
             raise environment_prerequisite_error("Groq", GROQ_API_KEY)
 
+        # Create httpx client with proper timeout configuration
+        timeout_seconds = getattr(config, "timeout", None)
+        if timeout_seconds is not None:
+            http_client = httpx.AsyncClient(
+                limits=httpx.Limits(max_connections=None),
+                timeout=httpx.Timeout(timeout=timeout_seconds),
+            )
+        else:
+            http_client = httpx.AsyncClient(
+                limits=httpx.Limits(max_connections=None),
+            )
+
         self.client = AsyncGroq(
             api_key=self.api_key,
             base_url=model_base_url(base_url, "GROQ_BASE_URL"),
             **model_args,
-            http_client=httpx.AsyncClient(
-                limits=httpx.Limits(max_connections=None),
-            ),
+            http_client=http_client,
         )
 
         # create time tracker
