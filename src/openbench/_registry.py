@@ -211,9 +211,26 @@ def _override_builtin_openrouter_provider():
     return openbench_openrouter_override
 
 
+def _override_builtin_vllm_provider():
+    """Replace Inspect AI's built-in vllm provider with enhanced openbench version."""
+    from inspect_ai._util.registry import _registry
+    from .model._providers.vllm import VLLMAPI
+    from inspect_ai.model._registry import modelapi
+
+    @modelapi(name="vllm")
+    def openbench_vllm_override():
+        return VLLMAPI
+
+    # Force override the inspect_ai/vllm entry with openbench implementation
+    _registry["modelapi:inspect_ai/vllm"] = openbench_vllm_override
+
+    return openbench_vllm_override
+
+
 # Execute the overrides
 _override_builtin_groq_provider()
 _override_builtin_openrouter_provider()
+_override_builtin_vllm_provider()
 
 
 # Task Registration
