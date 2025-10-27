@@ -7,18 +7,24 @@ import math
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Dict, List
+from typing import TYPE_CHECKING, Any, Callable, Dict, List
 
 from inspect_ai.scorer import Score, mean, scorer, Target
 from inspect_ai.solver import TaskState
 
 from openbench.metrics.factscore import factscore_metrics
+
+if TYPE_CHECKING:  # pragma: no cover - type-checking only
+    from openbench.utils.factscore_wiki import WikipediaRetriever
 from openbench.utils.factscore_cache import (
     cache_dir,
     knowledge_db_path,
     resolve_cache_root,
 )
-from openbench.utils.factscore_wiki import KnowledgeSourceError, WikipediaRetriever
+
+# Note: Avoid importing WikipediaRetriever / BM25-dependent utilities at module
+# import time to ensure the optional 'rank-bm25' dependency is only imported when
+# the scorer is actually invoked.
 
 try:  # pragma: no cover - import guarded for optional dependency
     from FactScoreLite import (  # type: ignore[import-not-found, import-untyped]
@@ -152,6 +158,11 @@ class _FactScoreLiteRunner:
         retrieval_cache = (
             cache_dir(cache_root) / "factscorelite" / "knowledge_cache.json"
         )
+        # Import WikipediaRetriever lazily to avoid importing optional dependencies
+        from openbench.utils.factscore_wiki import (
+            WikipediaRetriever,  # type: ignore
+        )
+
         self._retriever = WikipediaRetriever(
             db_path=db_path,
             cache_path=retrieval_cache,
@@ -263,6 +274,18 @@ async def cleanup_factscore_runners() -> None:
             await _unregister_runner(runner)
 
 
+def _is_knowledge_source_error(exc: Exception) -> bool:
+    """Return True if ``exc`` is a KnowledgeSourceError from wiki utils.
+
+    Imported lazily to avoid importing optional dependencies until needed.
+    """
+    try:
+        from openbench.utils.factscore_wiki import KnowledgeSourceError
+    except Exception:
+        return False
+    return isinstance(exc, KnowledgeSourceError)
+
+
 @scorer(metrics=[mean(), factscore_metrics()])  # type: ignore[arg-type]
 def factscore_scorer(
     model_name: str = "retrieval+ChatGPT",
@@ -330,8 +353,10 @@ def factscore_scorer(
 
         try:
             result = await runner.score(topic=topic, generation=generation, query=query)
-        except KnowledgeSourceError as exc:
-            raise RuntimeError(str(exc)) from exc
+        except Exception as exc:
+            if _is_knowledge_source_error(exc):
+                raise RuntimeError(str(exc)) from exc
+            raise
 
         raw_score = result.get("score", 0.0) or 0.0
         init_score = result.get("init_score", 0.0) or 0.0

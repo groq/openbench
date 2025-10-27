@@ -18,9 +18,7 @@ class TestGroqProviderTimeout:
                 config = GenerateConfig(timeout=300)  # 5 minutes
 
                 # Create the GroqAPI instance
-                GroqAPI(
-                    model_name="test-model", api_key="test-key", config=config
-                )
+                GroqAPI(model_name="test-model", api_key="test-key", config=config)
 
                 # Verify that httpx.AsyncClient was called with the correct timeout
                 mock_client.assert_called_once()
@@ -41,9 +39,7 @@ class TestGroqProviderTimeout:
                 config = GenerateConfig()  # No timeout set
 
                 # Create the GroqAPI instance
-                GroqAPI(
-                    model_name="test-model", api_key="test-key", config=config
-                )
+                GroqAPI(model_name="test-model", api_key="test-key", config=config)
 
                 # Verify that httpx.AsyncClient was called without timeout
                 mock_client.assert_called_once()
@@ -61,9 +57,7 @@ class TestGroqProviderTimeout:
                 config = GenerateConfig(timeout=None)
 
                 # Create the GroqAPI instance
-                GroqAPI(
-                    model_name="test-model", api_key="test-key", config=config
-                )
+                GroqAPI(model_name="test-model", api_key="test-key", config=config)
 
                 # Verify that httpx.AsyncClient was called without timeout
                 mock_client.assert_called_once()
@@ -82,9 +76,7 @@ class TestGroqProviderTimeout:
                     config = GenerateConfig(timeout=180)
 
                     # Create the GroqAPI instance
-                    GroqAPI(
-                        model_name="test-model", api_key="test-key", config=config
-                    )
+                    GroqAPI(model_name="test-model", api_key="test-key", config=config)
 
                     # Verify that httpx.Timeout was called with the correct timeout
                     mock_timeout.assert_called_once_with(timeout=180)
@@ -104,9 +96,7 @@ class TestGroqProviderTimeout:
                 config = GenerateConfig(timeout=0)
 
                 # Create the GroqAPI instance
-                GroqAPI(
-                    model_name="test-model", api_key="test-key", config=config
-                )
+                GroqAPI(model_name="test-model", api_key="test-key", config=config)
 
                 # Verify that httpx.AsyncClient was called with timeout=0
                 mock_client.assert_called_once()
@@ -126,13 +116,9 @@ class TestGroqProviderTimeout:
                 config1 = GenerateConfig(timeout=100)
                 config2 = GenerateConfig(timeout=200)
 
-                GroqAPI(
-                    model_name="test-model-1", api_key="test-key", config=config1
-                )
+                GroqAPI(model_name="test-model-1", api_key="test-key", config=config1)
 
-                GroqAPI(
-                    model_name="test-model-2", api_key="test-key", config=config2
-                )
+                GroqAPI(model_name="test-model-2", api_key="test-key", config=config2)
 
                 # Verify that httpx.AsyncClient was called twice
                 assert mock_client.call_count == 2

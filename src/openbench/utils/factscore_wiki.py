@@ -15,7 +15,6 @@ from pathlib import Path
 from typing import Dict, Iterable, Sequence
 
 import numpy as np
-from rank_bm25 import BM25Okapi  # type: ignore[import-not-found, import-untyped]
 
 SPECIAL_SEPARATOR = "####SPECIAL####SEPARATOR####"
 
@@ -91,6 +90,15 @@ def _select_passages(
 
     if not any(tokenised_passages):
         return list(passages[:num_passages])
+
+    try:
+        from rank_bm25 import (  # type: ignore[import-not-found, import-untyped]
+            BM25Okapi,
+        )
+    except Exception as exc:  # pragma: no cover - exercised when dependency missing
+        raise RuntimeError(
+            "BM25 ranking requires the 'rank-bm25' package. Install with `pip install openbench[factscore]`."
+        ) from exc
 
     bm25 = BM25Okapi(tokenised_passages)
     query_tokens = []

@@ -2,6 +2,8 @@
 
 import functools
 import logging
+from typing import Any
+import httpx
 
 from openai import APIStatusError
 from typing_extensions import override
@@ -24,6 +26,7 @@ from inspect_ai.tool._tool_choice import ToolChoice
 from inspect_ai.tool._tool_info import ToolInfo
 
 from inspect_ai.model._providers.openai_compatible import OpenAICompatibleAPI
+from inspect_ai.model._openai import OpenAIAsyncHttpxClient
 
 # Set up logger for this module
 logger = logging.getLogger(__name__)
@@ -72,6 +75,14 @@ class VLLMAPI(OpenAICompatibleAPI):
         self.is_mistral = is_mistral
 
         # Initialize with existing server
+        # Build an httpx client honoring config.timeout
+        timeout_seconds = getattr(config, "timeout", None)
+        extra_args: dict[str, Any] = {}
+        if timeout_seconds is not None:
+            extra_args["http_client"] = OpenAIAsyncHttpxClient(
+                timeout=httpx.Timeout(timeout=timeout_seconds)
+            )
+
         super().__init__(
             model_name=model_name,
             base_url=base_url,
@@ -79,6 +90,8 @@ class VLLMAPI(OpenAICompatibleAPI):
             config=config,
             service="vLLM",
             service_base_url=base_url,
+            # If provided, set a default client timeout for all requests
+            **extra_args,
         )
         logger.info(f"Connected to vLLM server at {self.base_url}")
 
