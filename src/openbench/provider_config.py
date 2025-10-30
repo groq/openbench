@@ -27,6 +27,7 @@ class ProviderType(str, Enum):
     FRIENDLI = "friendli"
     GOOGLE = "google"
     GROQ = "groq"
+    HELICONE = "helicone"
     HUGGINGFACE = "huggingface"
     HYPERBOLIC = "hyperbolic"
     LAMBDA = "lambda"
@@ -195,6 +196,14 @@ PROVIDER_CONFIGS: Dict[ProviderType, ProviderConfig] = {
         display_name="Groq",
         api_key_env="GROQ_API_KEY",
         base_url="https://api.groq.com/openai/v1",
+        supports_vision=True,
+        supports_function_calling=True,
+    ),
+    ProviderType.HELICONE: ProviderConfig(
+        name="helicone",
+        display_name="Helicone AI Gateway",
+        api_key_env="HELICONE_API_KEY",
+        base_url="https://ai-gateway.helicone.ai",
         supports_vision=True,
         supports_function_calling=True,
     ),

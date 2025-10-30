@@ -70,6 +70,9 @@ bench eval mmlu --model google/gemini-2.5-pro
 # Local models with Ollama
 bench eval musr --model ollama/llama3.1:70b
 
+# Helicone AI Gateway
+bench eval mmlu --model helicone/gpt-4o
+
 # Hugging Face Inference Providers
 bench eval mmlu --model huggingface/gpt-oss-120b:groq
 
@@ -97,6 +100,7 @@ openbench supports 30+ model providers through Inspect AI. Set the appropriate A
 | **Friendli**          | `FRIENDLI_TOKEN`       | `friendli/model-name`            |
 | **Google**            | `GOOGLE_API_KEY`       | `google/model-name`              |
 | **Groq**              | `GROQ_API_KEY`         | `groq/model-name`                |
+| **Helicone**          | `HELICONE_API_KEY`     | `helicone/model-name`            |
 | **Hugging Face**      | `HF_TOKEN`             | `huggingface/model-name`         |
 | **Hyperbolic**        | `HYPERBOLIC_API_KEY`   | `hyperbolic/model-name`          |
 | **Lambda**            | `LAMBDA_API_KEY`       | `lambda/model-name`              |
@@ -146,6 +150,7 @@ Here are the currently available benchmarks. For an up-to-date list use `bench l
 export GROQ_API_KEY=your_key
 export HF_TOKEN=your_key
 export OPENAI_API_KEY=your_key  # Optional
+export HELICONE_API_KEY=your_key  # For Helicone AI Gateway
 export OPENROUTER_API_KEY=your_key  # For OpenRouter
 
 # Set default model

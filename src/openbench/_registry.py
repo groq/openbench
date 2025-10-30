@@ -163,6 +163,14 @@ def vercel() -> Type[ModelAPI]:
     return VercelAPI
 
 
+@modelapi(name="helicone")
+def helicone() -> Type[ModelAPI]:
+    """Register Helicone AI Gateway provider."""
+    from .model._providers.helicone import HeliconeAPI
+
+    return HeliconeAPI
+
+
 @modelapi(name="openrouter")
 def openrouter() -> Type[ModelAPI]:
     """Register OpenRouter provider."""
