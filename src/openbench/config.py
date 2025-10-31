@@ -5685,6 +5685,19 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.cosafe_m2s",
         function_name="cosafe_m2s",
     ),
+    "slide_vqa": BenchmarkMetadata(
+        name="SlideVQA",
+        description="Goes through slides and answers questions as well as tracing the source of the answer.",
+        category="core",
+        tags=[
+            "image",
+            "Q&A",
+            "source-tracing"
+        ],
+        module_path="openbench.evals.slide_vqa",
+        function_name="slide_vqa",
+        is_alpha=False,
+    ),
 }
 
 
