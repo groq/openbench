@@ -442,3 +442,6 @@ from .evals.arabic_exams import (  # noqa: F401, E402
     arabic_exams_social_science_primary_school,
 )
 from .evals.legalsupport import legalsupport  # noqa: F401, E402
+
+# spatial reasoning benchmarks
+from .evals.rocketscience import rocketscience  # noqa: F401, E402

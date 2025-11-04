@@ -5685,6 +5685,15 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.cosafe_m2s",
         function_name="cosafe_m2s",
     ),
+    "rocketscience": BenchmarkMetadata(
+        name="RocketScience",
+        description="Contrastive spatial reasoning benchmark",
+        category="core",
+        tags=["multimodal", "spatial-reasoning", "vision-language", "images"],
+        module_path="openbench.evals.rocketscience",
+        function_name="rocketscience",
+        is_alpha=False,
+    ),
 }
 
 
