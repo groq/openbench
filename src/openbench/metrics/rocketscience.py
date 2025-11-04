@@ -1,66 +1,60 @@
 from inspect_ai.scorer import metric, Metric, SampleScore, Value
 from collections import defaultdict
-from typing import List
 
 
-def _get_contrastive_score_per_group(
-    scores: list[SampleScore], type: str
-) -> List[float]:
-    """Calculate contrastive score per group based on type (textscore/imagescore)"""
+def _get_contrastive_scores(scores: list[SampleScore]) -> tuple[float, float, float]:
+    """Calculate contrastive score per group, returning dict mapping tuple_id -> score"""
 
-    # find unique tuple_ids
+    # gather scores by tuple_id
     grouped_scores = defaultdict(list)
     for score in scores:
         if score.sample_metadata is not None:
             grouped_scores[score.sample_metadata["tuple_id"]].append(score)
 
-    # calculate metrics for each group
-    metrics = []
-    for group in grouped_scores.values():
-        return_scores = [
-            s
-            for s in group
-            if s.sample_metadata is not None and s.sample_metadata["type"] == type
-        ]
-        if len(return_scores) >= 2:
-            score1 = return_scores[0].score.value
-            score2 = return_scores[1].score.value
-            metrics.append(1.0 if score1 == 1.0 and score2 == 1.0 else 0.0)
-    return metrics
+    # calculate metrics for each tuple_id
+    image_scores = []
+    text_scores = []
+    group_scores = []
+    for _, group in grouped_scores.items():
+        image_score_items = []
+        text_score_items = []
+
+        # divides the four scores into image and text score items
+        for item in group:
+            if item.sample_metadata is not None:
+                if item.sample_metadata["type"] == "imagescore":
+                    image_score_items.append(item.score.value)
+                elif item.sample_metadata["type"] == "textscore":
+                    text_score_items.append(item.score.value)
+
+        if len(image_score_items) == 2 and len(text_score_items) == 2:
+            i0 = image_score_items[0]
+            i1 = image_score_items[1]
+            t0 = text_score_items[0]
+            t1 = text_score_items[1]
+
+            image_scores.append(1.0 if i0 == 1.0 and i1 == 1.0 else 0.0)
+            text_scores.append(1.0 if t0 == 1.0 and t1 == 1.0 else 0.0)
+            group_scores.append(
+                1.0 if t0 == 1.0 and t1 == 1.0 and i0 == 1.0 and i1 == 1.0 else 0.0
+            )
+
+    image_score = sum(image_scores) / len(image_scores) if image_scores else 0.0
+    text_score = sum(text_scores) / len(text_scores) if text_scores else 0.0
+    group_score = sum(group_scores) / len(group_scores) if group_scores else 0.0
+    return image_score, text_score, group_score
 
 
 @metric
-def rocketscience_text_score() -> Metric:
-    """Calculate RocketScience Text Score"""
+def rocketscience_metrics() -> Metric:
+    """Calculate all RocketScience scores (image, text, and group scores)"""
 
     def metric_fn(scores: list[SampleScore]) -> Value:
-        score_per_group = _get_contrastive_score_per_group(scores, type="textscore")
-        return sum(score_per_group) / len(score_per_group) if score_per_group else 0.0
-
-    return metric_fn
-
-
-@metric
-def rocketscience_image_score() -> Metric:
-    """Calculate RocketScience Image Score"""
-
-    def metric_fn(scores: list[SampleScore]) -> Value:
-        score_per_group = _get_contrastive_score_per_group(scores, type="imagescore")
-        return sum(score_per_group) / len(score_per_group) if score_per_group else 0.0
-
-    return metric_fn
-
-
-@metric
-def rocketscience_group_score() -> Metric:
-    """Calculate RocketScience Group Score (combined text and image scores)"""
-
-    def metric_fn(scores: list[SampleScore]) -> Value:
-        textscore = _get_contrastive_score_per_group(scores, type="textscore")
-        imagescore = _get_contrastive_score_per_group(scores, type="imagescore")
-        score_per_group = [
-            1.0 if t == 1.0 and i == 1.0 else 0.0 for t, i in zip(textscore, imagescore)
-        ]
-        return sum(score_per_group) / len(score_per_group) if score_per_group else 0.0
+        image_score, text_score, group_score = _get_contrastive_scores(scores)
+        return {
+            "image_score": image_score,
+            "text_score": text_score,
+            "group_score": group_score,
+        }
 
     return metric_fn

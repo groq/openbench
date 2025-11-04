@@ -2,11 +2,7 @@ from inspect_ai import task, Task
 from openbench.datasets.rocketscience import get_dataset
 from inspect_ai.solver import generate
 from inspect_ai.scorer import pattern
-from openbench.metrics.rocketscience import (
-    rocketscience_text_score,
-    rocketscience_image_score,
-    rocketscience_group_score,
-)
+from openbench.metrics.rocketscience import rocketscience_metrics
 
 
 @task
@@ -40,8 +36,6 @@ def rocketscience() -> Task:
         scorer=pattern(pattern=r".*?([12])\D*$"),
         name="rocketscience",
         metrics=[
-            rocketscience_text_score(),
-            rocketscience_image_score(),
-            rocketscience_group_score(),
+            rocketscience_metrics(),
         ],
     )
