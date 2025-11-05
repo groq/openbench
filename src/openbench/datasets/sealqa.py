@@ -82,6 +82,14 @@ def get_dataset(
 
     samples = list(dataset)
 
+    if normalized_last_updated == "latest":
+        warning_text = (
+            "⚠️ This eval is using the latest SealQA dataset. "
+            "SealQA refreshes over time, so future runs without a pinned `last_updated` "
+            "date may use a different snapshot."
+        )
+        print(f"\033[1;33m{warning_text}\033[0m")
+
     dataset_name_suffix = (
         normalized_last_updated if normalized_last_updated != "latest" else "latest"
     )
