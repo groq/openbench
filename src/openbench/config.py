@@ -479,6 +479,14 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.supergpqa",
         function_name="supergpqa",
     ),
+    "sealqa": BenchmarkMetadata(
+        name="sealqa",
+        description="Raising the Bar for Reasoning in Search-Augmented Language Models",
+        category="core",
+        tags=["factuality", "question-answering", "graded"],
+        module_path="openbench.evals.sealqa",
+        function_name="sealqa",
+    ),
     "simpleqa": BenchmarkMetadata(
         name="SimpleQA",
         description="Measuring short-form factuality in large language models with simple Q&A pairs",
