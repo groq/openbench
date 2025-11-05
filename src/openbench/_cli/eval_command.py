@@ -361,11 +361,11 @@ def run_eval(
         ),
     ] = False,
     epochs: Annotated[
-        int,
+        Optional[int],
         typer.Option(
             help="Number of epochs to run each evaluation", envvar="BENCH_EPOCHS"
         ),
-    ] = 1,
+    ] = None,
     limit: Annotated[
         Optional[str],
         typer.Option(
