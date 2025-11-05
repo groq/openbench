@@ -195,7 +195,7 @@ All cache data is stored under `~/.openbench`. The cache command helps you monit
 
 | Option                | Environment Variable      | Default                   | Description                                                      |
 | --------------------- | ------------------------- | ------------------------- | ---------------------------------------------------------------- |
-| `-M <args>`           | None                      | None                      | Pass model-specific arguments (e.g., `-M reasoning_effort=high`) |
+| `-M <args>`           | None                      | None                      | Pass model/provider-specific arguments (e.g., `-M only=groq`)    |
 | `-T <args>`           | None                      | None                      | Pass task-specific arguments to the benchmark                    |
 | `--model`             | `BENCH_MODEL`             | `groq/openai/gpt-oss-20b` | Model(s) to evaluate                                             |
 | `--epochs`            | `BENCH_EPOCHS`            | `1`                       | Number of epochs to run each evaluation                          |

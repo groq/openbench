@@ -53,8 +53,11 @@ If not defined through any of the above methods, parameters resort to **default 
 | `--model-base-url` | `BENCH_MODEL_BASE_URL` | Base URL for model(s).          |
 | `--model-role`     | `BENCH_MODEL_ROLE`     | Map role(s) to specific models. |
 
-Use `-M` Flag for Other Model-Specific Arguments  
-(e.g. `bench eval simpleqa --model openai/o3-2025-04-16 -M reasoning_effort=high`)
+Use `--reasoning-effort` for reasoning models  
+(e.g. `bench eval simpleqa --model openai/o3-2025-04-16 --reasoning-effort high`)
+
+Use `-M` for other provider/model-specific arguments  
+(e.g. OpenRouter routing: `-M only=groq`)
 
 ### Task Configuration
 
