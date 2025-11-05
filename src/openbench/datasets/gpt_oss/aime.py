@@ -35,4 +35,4 @@ def get_dataset() -> MemoryDataset:
     )
     all_samples.extend(list[Sample](dataset_ii))
 
-    return MemoryDataset(samples=all_samples, name="gpt_oss_aime2025")
+    return MemoryDataset(samples=all_samples, name="gpt_oss_aime25")

@@ -258,7 +258,7 @@ from .evals.clockbench import clockbench  # noqa: F401, E402
 from .evals.drop import drop  # noqa: F401, E402
 from .evals.gpqa_diamond import gpqa_diamond  # noqa: F401, E402
 from .evals.gpqa import gpqa  # noqa: F401, E402
-from .evals.gpt_oss.aime import gpt_oss_aime  # noqa: F401, E402
+from .evals.gpt_oss.aime import gpt_oss_aime25  # noqa: F401, E402
 from .evals.graphwalks import graphwalks  # noqa: F401, E402
 from .evals.headqa import headqa, headqa_en, headqa_es  # noqa: F401, E402
 from .evals.healthbench import healthbench, healthbench_hard, healthbench_consensus  # noqa: F401, E402

@@ -6,7 +6,7 @@ from openbench.scorers.gpt_oss.aime import gpt_oss_aime_scorer
 
 
 @task
-def gpt_oss_aime() -> Task:
+def gpt_oss_aime25() -> Task:
     return Task(
         dataset=get_dataset(),
         solver=[generate()],

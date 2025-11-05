@@ -340,13 +340,13 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.gpqa",
         function_name="gpqa",
     ),
-    "gpt_oss_aime": BenchmarkMetadata(
+    "gpt_oss_aime25": BenchmarkMetadata(
         name="GPT-OSS AIME 2025",
         description="An exact replica of the aime25 eval from OpenAI's GPT-OSS release",
         category="core",
         tags=["math", "competition", "aime", "2025"],
         module_path="openbench.evals.gpt_oss.aime",
-        function_name="gpt_oss_aime",
+        function_name="gpt_oss_aime25",
     ),
     "humaneval": BenchmarkMetadata(
         name="HumanEval",
