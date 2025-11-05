@@ -491,6 +491,13 @@ def run_eval(
             envvar="BENCH_TOP_P",
         ),
     ] = None,
+    max_tasks: Annotated[
+        Optional[int],
+        typer.Option(
+            help="Maximum number of tasks to run concurrently",
+            envvar="BENCH_MAX_TASKS",
+        ),
+    ] = None,
     max_tokens: Annotated[
         Optional[int],
         typer.Option(
@@ -758,6 +765,7 @@ def run_eval(
                 sandbox=sandbox,
                 sandbox_cleanup=sandbox_cleanup,
                 log_format=log_format.value if log_format else None,
+                max_tasks=max_tasks,
             )
 
             typer.echo("Evaluation complete!")
