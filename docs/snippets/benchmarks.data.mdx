@@ -6700,19 +6700,6 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
-    "name": "RocketScience",
-    "description": "Contrastive benchmark for spatial reasoning in VLMs",
-    "category": "spatial-reasoning",
-    "tags": [
-      "contrastive",
-      "spatial-reasoning",
-      "reasoning",
-      "image-text"
-    ],
-    "function_name": "rocket_science",
-    "is_alpha": false
-  },
-  {
     "name": "RTE (SuperGLUE)",
     "description": "Recognizing Textual Entailment from SuperGLUE",
     "category": "glue",
@@ -6723,6 +6710,19 @@ export const benchmarksData = [
       "reasoning"
     ],
     "function_name": "rte",
+    "is_alpha": false
+  },
+  {
+    "name": "RocketScience",
+    "description": "Contrastive spatial reasoning benchmark",
+    "category": "core",
+    "tags": [
+      "multimodal",
+      "spatial-reasoning",
+      "vision-language",
+      "images"
+    ],
+    "function_name": "rocketscience",
     "is_alpha": false
   },
   {
@@ -6871,18 +6871,6 @@ export const benchmarksData = [
       "biology"
     ],
     "function_name": "sciq",
-    "is_alpha": false
-  },
-  {
-    "name": "SealQA",
-    "description": "Raising the Bar for Reasoning in Search-Augmented Language Models",
-    "category": "core",
-    "tags": [
-      "factuality",
-      "question-answering",
-      "graded"
-    ],
-    "function_name": "sealqa",
     "is_alpha": false
   },
   {
@@ -7478,6 +7466,18 @@ export const benchmarksData = [
       "xwinograd"
     ],
     "function_name": "xwinograd_ru",
+    "is_alpha": false
+  },
+  {
+    "name": "sealqa",
+    "description": "Raising the Bar for Reasoning in Search-Augmented Language Models",
+    "category": "core",
+    "tags": [
+      "factuality",
+      "question-answering",
+      "graded"
+    ],
+    "function_name": "sealqa",
     "is_alpha": false
   }
 ];
@@ -8153,20 +8153,12 @@ export const evalGroupsData = [
       "eval-group"
     ],
     "id": "math_group_22_10_2025",
-    "benchmark_count": 19,
+    "benchmark_count": 11,
     "benchmarks": [
-      "aime_2023_I",
-      "aime_2023_II",
-      "aime_2024",
-      "aime_2024_I",
-      "aime_2024_II",
       "aime_2025",
       "aime_2025_II",
-      "hmmt_feb_2023",
-      "hmmt_feb_2024",
       "hmmt_feb_2025",
       "brumo_2025",
-      "otis_mock_aime_2024",
       "otis_mock_aime_2025",
       "smt_algebra",
       "smt_calculus",
