@@ -36,7 +36,8 @@
           "benchmarks/coding",
           "benchmarks/math",
           "benchmarks/reasoning",
-          "benchmarks/cybersecurity"
+          "benchmarks/cybersecurity",
+          "benchmarks/search"
         ]
       },
       {
