@@ -466,8 +466,26 @@ def chartqapro_scorer():
                 always_use_exact_match=always_use_exact_match,
             )
 
+            # Determine scoring method for explanation
+            if always_use_exact_match:
+                scoring_method = "Exact match"
+            elif year_flags_to_use and any(
+                f.upper() == "YES" for f in year_flags_to_use
+            ):
+                scoring_method = "Exact match (year)"
+            else:
+                # Check if numeric comparison was used
+                pred_float = to_float(pred_text)
+                target_float = to_float(target_text)
+                if pred_float is not None and target_float is not None:
+                    scoring_method = "Numeric (5% tolerance)"
+                else:
+                    scoring_method = "ANLS (Levenshtein similarity)"
+
             return Score(
                 value=score_value,
+                answer=pred_text,
+                explanation=scoring_method,
                 metadata={
                     "sample_id": state.sample_id,
                     "question_type": question_type,
@@ -482,6 +500,8 @@ def chartqapro_scorer():
         except Exception as e:
             return Score(
                 value=0.0,
+                answer=state.output.completion if hasattr(state, "output") else "",
+                explanation=f"Error: {str(e)}",
                 metadata={
                     "error": str(e),
                     "sample_id": getattr(state, "sample_id", "unknown"),
