@@ -552,6 +552,14 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmstar",
         function_name="mmstar",
     ),
+    "chartqapro": BenchmarkMetadata(
+        name="ChartQAPro",
+        description="Comprehensive chart understanding benchmark with 1,948 samples testing vision-language models across 5 question types (Factoid, Multi Choice, Hypothetical, Fact Checking, Conversational) with support for direct, CoT, and PoT prompting strategies",
+        category="core",
+        tags=["vision", "multi-modal", "charts", "reasoning", "multi-turn"],
+        module_path="openbench.evals.chartqapro",
+        function_name="chartqapro",
+    ),
     "healthbench": BenchmarkMetadata(
         name="HealthBench",
         description="Medical dialogue evaluation using physician-created rubrics for assessing healthcare conversations",
