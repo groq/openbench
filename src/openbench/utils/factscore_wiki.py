@@ -97,7 +97,7 @@ def _select_passages(
         )
     except Exception as exc:  # pragma: no cover - exercised when dependency missing
         raise RuntimeError(
-            "BM25 ranking requires the 'rank-bm25' package. Install with `pip install openbench[factscore]`."
+            "BM25 ranking requires the 'rank-bm25' package. Install with `uv pip install openbench[factscore]`."
         ) from exc
 
     bm25 = BM25Okapi(tokenised_passages)

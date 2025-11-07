@@ -8,9 +8,19 @@ multiple runs can share the same assets.
 
 from __future__ import annotations
 
+import hashlib
 import os
+import shutil
+import tempfile
 from pathlib import Path
-from typing import Iterable, List
+
+import gdown  # type: ignore[import-untyped,import-not-found]
+from rich.console import Console
+from rich.progress import (
+    Progress,
+    SpinnerColumn,
+    TextColumn,
+)
 
 
 FACTSCORE_CACHE_ENV = "OPENBENCH_FACTSCORE_CACHE"
@@ -63,20 +73,19 @@ def cache_dir(cache_root: str | os.PathLike[str] | None = None) -> Path:
     return path
 
 
-def ensure_resources_exist(required_files: Iterable[Path]) -> None:
+def ensure_resources_exist(required_file: Path) -> None:
     """Validate that all required paths exist, raising a helpful error."""
 
-    missing = [path for path in required_files if not path.exists()]
+    missing = not required_file.exists()
     if not missing:
         return
 
-    missing_str = "\n  - ".join(str(path) for path in missing)
     raise FactScoreResourceError(
         "Missing FactScore resources. download the assets here: \n"
         " https://drive.google.com/drive/folders/1kFey69z8hGXScln01mVxrOhrqgM62X7I\n"
         "Use bench cache upload to upload the assets to the respective cache directory.\n"
         "The following paths were not found:\n  - "
-        f"{missing_str}"
+        f"{required_file}"
     )
 
 
@@ -87,26 +96,181 @@ def knowledge_db_path(
     """Return the path to the expected Wikipedia SQLite database."""
 
     path = data_dir(cache_root) / filename
-    ensure_resources_exist([path])
+    ensure_resources_exist(path)
     return path
 
 
-def prompt_entities_path(
-    split: str,
+def _check_disk_space(path: Path, required_bytes: int) -> bool:
+    """Check if there's enough disk space at the given path."""
+    stat = shutil.disk_usage(path)
+    return stat.free >= required_bytes
+
+
+def _compute_file_hash(filepath: Path, algorithm: str = "sha256") -> str:
+    """Compute hash of a file for integrity verification."""
+    hash_func = hashlib.new(algorithm)
+    with open(filepath, "rb") as f:
+        # Read in chunks to handle large files efficiently
+        for chunk in iter(lambda: f.read(8192), b""):
+            hash_func.update(chunk)
+    return hash_func.hexdigest()
+
+
+def download_factscore_db(
     cache_root: str | os.PathLike[str] | None = None,
-    filename: str = "prompt_entities.txt",
+    expected_sha256: str | None = None,
+    max_retries: int = 3,
 ) -> Path:
-    """Return the path to the prompt entities list for a given split."""
+    """Download the FActScore Wikipedia database from Google Drive.
 
-    path = data_dir(cache_root) / split / filename
-    ensure_resources_exist([path])
-    return path
+    This function handles the automatic download of the ~20GB Wikipedia SQLite
+    database required for FActScore evaluation. It includes safety features:
+    - Checks if file already exists
+    - Verifies sufficient disk space before downloading
+    - Shows progress bar during download
+    - Retries on failure
+    - Uses atomic write
+    - Verifies file integrity after download
 
+    Args:
+        cache_root: Root directory for FActScore cache. Uses default if None.
+        expected_sha256: Expected SHA-256 hash for verification. Skip verification if None.
+        max_retries: Maximum number of download attempts (default: 3).
 
-def _required_files(root: Path) -> List[Path]:
-    base_data = data_dir(root)
-    return [
-        base_data / "enwiki-20230401.db",
-        base_data / "labeled" / "prompt_entities.txt",
-        base_data / "unlabeled" / "prompt_entities.txt",
-    ]
+    Returns:
+        Path to the downloaded database file.
+
+    Raises:
+        RuntimeError: If download fails after retries or verification fails.
+        OSError: If insufficient disk space.
+    """
+    console = Console()
+    output_path = data_dir(cache_root) / "enwiki-20230401.db"
+
+    # Google Drive file ID for the Wikipedia database
+    FILE_ID = "1Qu4JHWjpUKhGPaAW5UHhS5RJ545CVy4I"
+
+    # Check if file already exists
+    if output_path.exists():
+        file_size_gb = output_path.stat().st_size / (1024**3)
+        console.print(
+            f"[green]✓[/green] FActScore database already exists at {output_path} "
+            f"({file_size_gb:.1f} GB)"
+        )
+        return output_path
+
+    # Check disk space (estimate 20GB + 2GB buffer)
+    required_space = 22 * 1024 * 1024 * 1024  # 22GB in bytes
+    if not _check_disk_space(output_path.parent, required_space):
+        raise OSError(
+            f"Insufficient disk space. Need at least 22GB free at {output_path.parent}\n"
+            f"Current free space: {shutil.disk_usage(output_path.parent).free / (1024**3):.1f} GB"
+        )
+
+    console.print("\n[bold cyan]FActScore Database Download[/bold cyan]")
+    console.print(
+        f"Downloading Wikipedia database (~20GB) to:\n[blue]{output_path}[/blue]\n"
+    )
+    console.print(
+        "[yellow]This is a one-time download and may take a while...[/yellow]\n"
+    )
+
+    # Download to temporary location first
+    temp_dir = tempfile.mkdtemp(prefix="factscore_", dir=output_path.parent)
+    temp_path = Path(temp_dir) / "enwiki-20230401.db"
+
+    last_error = None
+    for attempt in range(1, max_retries + 1):
+        try:
+            if attempt > 1:
+                console.print(
+                    f"\n[yellow]Retry attempt {attempt}/{max_retries}...[/yellow]"
+                )
+
+            # Google Drive file download URL
+            url = f"https://drive.google.com/uc?id={FILE_ID}"
+
+            console.print("[cyan]Downloading from Google Drive...[/cyan]")
+
+            # gdown.download handles large files and Google Drive's virus scan warnings
+            gdown.download(
+                url,
+                str(temp_path),
+                quiet=False,
+                fuzzy=False,
+            )
+
+            # Verify download succeeded
+            if not temp_path.exists():
+                raise RuntimeError("Download completed but file is missing")
+
+            file_size = temp_path.stat().st_size
+            if file_size == 0:
+                raise RuntimeError("Downloaded file is empty")
+
+            file_size_gb = file_size / (1024**3)
+            console.print(
+                f"\n[green]✓[/green] Download complete ({file_size_gb:.1f} GB)"
+            )
+
+            # Verify file integrity if hash provided
+            if expected_sha256:
+                console.print("[yellow]Verifying file integrity...[/yellow]")
+                with Progress(
+                    SpinnerColumn(),
+                    TextColumn("[progress.description]{task.description}"),
+                    console=console,
+                ) as progress:
+                    task = progress.add_task("Computing SHA-256 hash...", total=None)
+                    actual_hash = _compute_file_hash(temp_path)
+                    progress.update(task, completed=True)
+
+                if actual_hash != expected_sha256:
+                    raise RuntimeError(
+                        f"File integrity check failed!\n"
+                        f"Expected SHA-256: {expected_sha256}\n"
+                        f"Got SHA-256:      {actual_hash}\n"
+                        f"The file may be corrupted or tampered with."
+                    )
+                console.print("[green]✓[/green] File integrity verified")
+
+            # Move to final location
+            console.print("[cyan]Moving file to cache directory...[/cyan]")
+            shutil.move(str(temp_path), str(output_path))
+
+            console.print(
+                f"\n[bold green]✓ Success![/bold green] "
+                f"Database ready at {output_path}\n"
+            )
+            return output_path
+
+        except Exception as e:
+            last_error = e
+            console.print(f"[red]✗ Attempt {attempt} failed: {e}[/red]")
+
+            # Clean up partial download
+            if temp_path.exists():
+                try:
+                    temp_path.unlink()
+                except Exception:
+                    pass
+
+            if attempt < max_retries:
+                console.print("[yellow]Retrying in 5 seconds...[/yellow]")
+                import time
+
+                time.sleep(5)
+
+    # Clean up temp directory
+    if Path(temp_dir).exists():
+        shutil.rmtree(temp_dir, ignore_errors=True)
+
+    # All retries failed
+    raise RuntimeError(
+        f"Failed to download FActScore database after {max_retries} attempts.\n"
+        f"Last error: {last_error}\n\n"
+        f"You can manually download from:\n"
+        f"https://drive.google.com/file/d/{FILE_ID}/view\n"
+        f"Then upload using:\n"
+        f"  bench cache upload --db_file <path> --path factscore/data/enwiki-20230401.db"
+    )

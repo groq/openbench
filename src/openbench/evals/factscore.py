@@ -50,14 +50,7 @@ def factscore(
             "FactScoreLite package is required to run the factscore benchmark."
         )
 
-    dataset = get_dataset(
-        split=split,
-        num_examples=num_examples,
-        shuffle=shuffle,
-        seed=seed,
-        prompt_template=prompt_template,
-        cache_root=cache_root,
-    )
+    dataset = get_dataset()
 
     scorer = factscore_scorer(
         model_name=grader_model,

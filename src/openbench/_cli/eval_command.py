@@ -17,6 +17,7 @@ from openbench.utils.livemcpbench_cache import (
     prepare_livemcpbench_cache,
     clear_livemcpbench_root,
 )
+from openbench.utils.factscore_cache import download_factscore_db
 
 
 class SandboxType(str, Enum):
@@ -693,6 +694,16 @@ def run_eval(
             datasets = import_module("openbench_cyber.datasets.cvebench")
             plugin_dir = datasets._default_challenges_dir().resolve()
             os.environ["CVEBENCH_CHALLENGE_DIR"] = str(plugin_dir)
+
+        if "factscore" in expanded_benchmarks:
+            if os.getenv("ALLOW_FASCTORE_DOWNLOAD") == "1":
+                typer.secho(
+                    "WARNING: In order to run the factscore benchmark, you need to download the FActScore wikipedia database. set ALLOW_FASCTORE_DOWNLOAD=1 to allow the download.",
+                    fg=typer.colors.YELLOW,
+                )
+                raise typer.Exit(code=0)
+            else:
+                download_factscore_db()
     except Exception as e:
         raise typer.BadParameter(str(e))
 
