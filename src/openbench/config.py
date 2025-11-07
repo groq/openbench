@@ -568,6 +568,14 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.chartqapro",
         function_name="chartqapro",
     ),
+    "mmvetv2": BenchmarkMetadata(
+        name="MM-Vet v2",
+        description="Challenging benchmark evaluating large multimodal models for integrated capabilities using GPT-4 judge with 5-run grading average (configurable via --task-args num_grading_attempts=N)",
+        category="multimodal",
+        tags=["multimodal", "vision", "llm-judge"],
+        module_path="openbench.evals.mmvetv2",
+        function_name="mmvetv2",
+    ),
     "healthbench": BenchmarkMetadata(
         name="HealthBench",
         description="Medical dialogue evaluation using physician-created rubrics for assessing healthcare conversations",
