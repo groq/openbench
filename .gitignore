@@ -19,3 +19,6 @@ local-prompts.md
 .env
 build/
 **/build/
+dist/
+**/dist/
+packages/src/
