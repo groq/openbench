@@ -5710,6 +5710,22 @@ _BUILTIN_BENCHMARKS = {
         function_name="rocketscience",
         is_alpha=False,
     ),
+    "ocrbenchv2": BenchmarkMetadata(
+        name="OCRBench v2",
+        description="Visual text localization and reasoning benchmark across 31 diverse OCR and document understanding scenarios",
+        category="core",
+        tags=[
+            "multimodal",
+            "vision-language",
+            "ocr",
+            "document-understanding",
+            "images",
+            "vision",
+        ],
+        module_path="openbench.evals.ocrbenchv2",
+        function_name="ocrbenchv2",
+        is_alpha=False,
+    ),
 }
 
 
