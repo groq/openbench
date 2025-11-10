@@ -97,7 +97,16 @@ def mmvetv2_scorer(
 
     Returns:
         Scorer function compatible with Inspect AI
+
+    Raises:
+        ValueError: If num_grading_attempts is less than 1
     """
+    # Validate configuration
+    if num_grading_attempts < 1:
+        raise ValueError(
+            f"num_grading_attempts must be at least 1, got {num_grading_attempts}"
+        )
+
     model: Model = get_model(grader_model)
 
     async def score(state: TaskState, target: Target) -> Score:
