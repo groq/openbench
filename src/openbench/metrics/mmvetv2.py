@@ -11,6 +11,7 @@ capability dimensions:
 - seq: Sequential Reasoning
 """
 
+from collections import defaultdict
 from typing import Any, List, cast
 
 from inspect_ai.scorer import accuracy, stderr, std
@@ -42,35 +43,39 @@ def mmvetv2_capability_breakdown(
     """
 
     def capability_metric(scores: List[SampleScore]) -> Value:
-        # Get metric names
+        # Extract metric short names
         metric_names = [registry_info(m).name for m in base_metrics]
         short_names = [name.split("/")[-1] for name in metric_names]
 
         results: dict[str, Value] = {}
 
-        # Compute overall metrics first
+        # Compute overall metrics
         for m, short_name in zip(base_metrics, short_names):
             results[short_name] = cast(MetricProtocol, m)(scores)
 
-        # Compute per-capability metrics
-        for cap in CORE_CAPABILITIES:
-            # Filter scores for this capability
-            filtered_scores = []
-            for score in scores:
-                if (
-                    score.sample_metadata is not None
-                    and "capability" in score.sample_metadata
-                ):
-                    capabilities = score.sample_metadata["capability"]
-                    # capabilities is a list of strings
-                    if isinstance(capabilities, list) and cap in capabilities:
-                        filtered_scores.append(score)
+        # Group scores by capability in a single pass
+        by_capability: dict[str, List[SampleScore]] = defaultdict(list)
 
-            # Compute metrics for this capability if we have samples
-            if filtered_scores:
+        for score in scores:
+            # Safely get capabilities list from metadata
+            capabilities = (
+                score.sample_metadata.get("capability", [])
+                if score.sample_metadata
+                else []
+            )
+
+            # Add score to each capability it belongs to
+            if isinstance(capabilities, list):
+                for cap in capabilities:
+                    if cap in CORE_CAPABILITIES:
+                        by_capability[cap].append(score)
+
+        # Compute per-capability metrics (only for capabilities with samples)
+        for cap in CORE_CAPABILITIES:
+            if cap in by_capability:
                 for m, short_name in zip(base_metrics, short_names):
                     key = f"{cap}_{short_name}"
-                    results[key] = cast(MetricProtocol, m)(filtered_scores)
+                    results[key] = cast(MetricProtocol, m)(by_capability[cap])
 
         return cast(Value, results)
 
