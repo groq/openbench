@@ -23,7 +23,7 @@ from inspect_ai.model import GenerateConfig
 from inspect_ai.solver import generate
 
 from openbench.datasets.mmvetv2 import get_mmvetv2_dataset
-from openbench.metrics.mmvetv2 import mmvetv2_capability_metrics
+from openbench.metrics.mmvetv2 import mmvetv2_capability_metrics_list
 from openbench.scorers.mmvetv2 import mmvetv2_scorer
 
 
@@ -81,7 +81,7 @@ def mmvetv2(
             grader_model=grader_model,
             num_grading_attempts=num_grading_attempts,
         ),
-        metrics=mmvetv2_capability_metrics(),
+        metrics=mmvetv2_capability_metrics_list(),
         name="mmvetv2",
         config=GenerateConfig(
             max_tokens=1024,  # Allow detailed responses

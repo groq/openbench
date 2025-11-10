@@ -14,15 +14,8 @@ capability dimensions:
 from collections import defaultdict
 from typing import Any, List, cast
 
-from inspect_ai.scorer import accuracy, stderr, std
-from inspect_ai.scorer._metric import (
-    Metric,
-    MetricProtocol,
-    SampleScore,
-    Value,
-    metric,
-    registry_info,
-)
+import numpy as np
+from inspect_ai.scorer import Metric, SampleScore, Value, metric
 
 
 # The 7 core capabilities in MM-Vet v2
@@ -30,69 +23,67 @@ CORE_CAPABILITIES = ["rec", "ocr", "know", "gen", "spat", "math", "seq"]
 
 
 @metric
-def mmvetv2_capability_breakdown(
-    base_metrics: List[Metric],
-) -> Metric:
-    """Create capability-specific breakdown metrics for MM-Vet v2.
+def mmvetv2_capability_metrics() -> Metric:
+    """Compute MM-Vet v2 metrics with per-capability breakdown.
 
-    Args:
-        base_metrics: List of base metrics to apply (e.g., [accuracy(), stderr(), std()])
+    Computes accuracy, stderr, and std for:
+    - Overall performance across all samples
+    - Each of 7 capability dimensions (rec, ocr, know, gen, spat, math, seq)
+
+    Samples can have multiple capabilities and contribute to each capability's metrics.
 
     Returns:
-        A metric that computes per-capability breakdown for each base metric
+        Metric function that computes overall and per-capability statistics
     """
 
-    def capability_metric(scores: List[SampleScore]) -> Value:
-        # Extract metric short names
-        metric_names = [registry_info(m).name for m in base_metrics]
-        short_names = [name.split("/")[-1] for name in metric_names]
+    def compute(scores: List[SampleScore]) -> Value:
+        results = {}
 
-        results: dict[str, Value] = {}
+        # Extract all score values for overall metrics
+        all_values = [cast(float, s.score.value) for s in scores]
 
-        # Compute overall metrics
-        for m, short_name in zip(base_metrics, short_names):
-            results[short_name] = cast(MetricProtocol, m)(scores)
+        # Overall metrics
+        if all_values:
+            results["accuracy"] = float(np.mean(all_values))
+            results["stderr"] = float(np.std(all_values) / np.sqrt(len(all_values)))
+            results["std"] = float(np.std(all_values))
 
-        # Group scores by capability in a single pass
-        by_capability: dict[str, List[SampleScore]] = defaultdict(list)
+        # Group scores by capability (single pass, handles multi-label)
+        by_capability: dict[str, List[float]] = defaultdict(list)
 
         for score in scores:
-            # Safely get capabilities list from metadata
             capabilities = (
                 score.sample_metadata.get("capability", [])
                 if score.sample_metadata
                 else []
             )
 
-            # Add score to each capability it belongs to
+            # Add score value to each capability it belongs to
             if isinstance(capabilities, list):
+                score_val = cast(float, score.score.value)
                 for cap in capabilities:
                     if cap in CORE_CAPABILITIES:
-                        by_capability[cap].append(score)
+                        by_capability[cap].append(score_val)
 
-        # Compute per-capability metrics (only for capabilities with samples)
+        # Per-capability metrics (only for capabilities with samples)
         for cap in CORE_CAPABILITIES:
             if cap in by_capability:
-                for m, short_name in zip(base_metrics, short_names):
-                    key = f"{cap}_{short_name}"
-                    results[key] = cast(MetricProtocol, m)(by_capability[cap])
+                cap_values = by_capability[cap]
+                results[f"{cap}_accuracy"] = float(np.mean(cap_values))
+                results[f"{cap}_stderr"] = float(
+                    np.std(cap_values) / np.sqrt(len(cap_values))
+                )
+                results[f"{cap}_std"] = float(np.std(cap_values))
 
-        return cast(Value, results)
+        return results  # type: ignore
 
-    return capability_metric
+    return compute
 
 
-def mmvetv2_capability_metrics() -> List[Any]:
-    """Create capability-specific metrics for MM-Vet v2.
-
-    Returns metrics for overall performance and individual performance
-    on each of the 7 core capabilities. Since samples can have multiple
-    capabilities, a sample contributes to the metric for each capability
-    it contains.
+def mmvetv2_capability_metrics_list() -> List[Any]:
+    """Return metrics as a list for Task configuration.
 
     Returns:
-        List of metric functions including overall and per-capability metrics
+        List containing the mmvetv2_capability_metrics function
     """
-    return [
-        mmvetv2_capability_breakdown([accuracy(), stderr(), std()]),
-    ]
+    return [mmvetv2_capability_metrics()]
