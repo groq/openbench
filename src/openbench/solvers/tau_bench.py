@@ -1,5 +1,9 @@
 """
 Async solver that runs tau2-bench simulations against Inspect models.
+
+This leverages certain parts of the tau2 package (like the construction of the env, the prompts, the execution etc.),
+but uses inspect to call the LLMs (to leverage their integration and to use the API keys of the user).
+This, however, means that the state has to be passed constantly between inspect and tau2-bench.
 """
 
 from __future__ import annotations
@@ -8,7 +12,9 @@ import json
 from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Iterable, Optional
+from functools import lru_cache
+from types import SimpleNamespace
+from typing import Any, Optional
 from uuid import uuid4
 
 from inspect_ai.model import (
@@ -24,6 +30,45 @@ from inspect_ai.tool import Tool, ToolError
 from inspect_ai.tool import ToolCall as InspectToolCall
 from inspect_ai.tool._tool_def import ToolDef
 from inspect_ai.tool._tool_params import ToolParams
+
+
+@lru_cache(maxsize=1)
+def _tau2() -> SimpleNamespace:
+    from tau2.agent.llm_agent import AGENT_INSTRUCTION, SYSTEM_PROMPT  # type: ignore
+    from tau2.data_model.message import (  # type: ignore
+        AssistantMessage,
+        ToolCall,
+        ToolMessage,
+        UserMessage,
+    )
+    from tau2.data_model.simulation import SimulationRun, TerminationReason  # type: ignore
+    from tau2.data_model.tasks import Task  # type: ignore
+    from tau2.evaluator.evaluator import EvaluationType, evaluate_simulation  # type: ignore
+    from tau2.orchestrator.orchestrator import DEFAULT_FIRST_AGENT_MESSAGE, Role  # type: ignore
+    from tau2.user.base import OUT_OF_SCOPE, STOP, TRANSFER  # type: ignore
+    from tau2.user.user_simulator import get_global_user_sim_guidelines  # type: ignore
+    from tau2.utils.utils import get_now  # type: ignore
+
+    return SimpleNamespace(  # type: ignore
+        AGENT_INSTRUCTION=AGENT_INSTRUCTION,
+        SYSTEM_PROMPT=SYSTEM_PROMPT,
+        AssistantMessage=AssistantMessage,
+        UserMessage=UserMessage,
+        ToolMessage=ToolMessage,
+        ToolCall=ToolCall,
+        SimulationRun=SimulationRun,
+        TerminationReason=TerminationReason,
+        Task=Task,
+        EvaluationType=EvaluationType,
+        evaluate_simulation=evaluate_simulation,
+        DEFAULT_FIRST_AGENT_MESSAGE=DEFAULT_FIRST_AGENT_MESSAGE,
+        Role=Role,
+        OUT_OF_SCOPE=OUT_OF_SCOPE,
+        STOP=STOP,
+        TRANSFER=TRANSFER,
+        get_global_user_sim_guidelines=get_global_user_sim_guidelines,
+        get_now=get_now,
+    )
 
 
 def _create_tau2_environment(domain: str):
@@ -54,45 +99,11 @@ def _create_tau2_environment(domain: str):
     raise ValueError(f"Unsupported tau-bench domain: {domain}")
 
 
-def _load_tau2_task(task_payload: dict):
-    from tau2.data_model.tasks import Task as Tau2Task  # type: ignore
-
-    return Tau2Task.model_validate(task_payload)
-
-
-def _tau2_now() -> str:
-    from tau2.utils.utils import get_now  # type: ignore
-
-    return get_now()
-
-
-def _default_first_agent_message():
-    from tau2.orchestrator.orchestrator import (  # type: ignore
-        DEFAULT_FIRST_AGENT_MESSAGE,
-    )
-
-    first = deepcopy(DEFAULT_FIRST_AGENT_MESSAGE)
-    first.timestamp = _tau2_now()
-    return first
-
-
-def _agent_system_prompt(policy: str) -> str:
-    from tau2.agent.llm_agent import (  # type: ignore
-        AGENT_INSTRUCTION,
-        SYSTEM_PROMPT,
-    )
-
-    return SYSTEM_PROMPT.format(
-        agent_instruction=AGENT_INSTRUCTION, domain_policy=policy
-    )
-
-
 def _user_system_prompt(use_tools: bool, instructions: str) -> str:
-    from tau2.user.user_simulator import (  # type: ignore
-        get_global_user_sim_guidelines,
-    )
-
-    guidelines = get_global_user_sim_guidelines(use_tools=use_tools)
+    """
+    In tau2, this is the system_prompt property of UserSimulator(BaseUser)
+    """
+    guidelines = _tau2().get_global_user_sim_guidelines(use_tools=use_tools)
     template = """
 {global_user_sim_guidelines}
 
@@ -104,16 +115,6 @@ def _user_system_prompt(use_tools: bool, instructions: str) -> str:
         global_user_sim_guidelines=guidelines,
         instructions=instructions,
     )
-
-
-def _user_stop_tokens() -> Iterable[str]:
-    from tau2.user.base import (  # type: ignore
-        OUT_OF_SCOPE,
-        STOP,
-        TRANSFER,
-    )
-
-    return (STOP, TRANSFER, OUT_OF_SCOPE)
 
 
 def _convert_tools(tools) -> list[Tool]:
@@ -146,14 +147,14 @@ def _tool_from_schema(schema: dict) -> Tool:
         )
 
     _execute.__name__ = name
-    tdef = ToolDef(
+    tool_def = ToolDef(
         _execute,
         name=name,
         description=description,
         parameters=parameters,
         parallel=True,
     )
-    return tdef.as_tool()
+    return tool_def.as_tool()
 
 
 def _parse_arguments(arguments: Any) -> dict:
@@ -168,10 +169,9 @@ def _parse_arguments(arguments: Any) -> dict:
 
 
 def _inspect_to_tau2_tool_call(tool_call: InspectToolCall, requestor: str):
-    from tau2.data_model.message import ToolCall  # type: ignore
-
     name = getattr(tool_call, "function", getattr(tool_call, "name", ""))
-    return ToolCall(
+    tau2 = _tau2()
+    return tau2.ToolCall(
         id=getattr(tool_call, "id", None) or f"tc_{uuid4().hex}",
         name=name,
         arguments=_parse_arguments(getattr(tool_call, "arguments", {})),
@@ -190,16 +190,11 @@ def _tau2_to_inspect_tool_call(tool_call) -> InspectToolCall:
 
 def _tau2_to_agent_history(messages) -> list:
     chat: list = []
+    tau2 = _tau2()
     for msg in messages:
-        from tau2.data_model.message import (  # type: ignore
-            AssistantMessage,
-            ToolMessage,
-            UserMessage,
-        )
-
-        if isinstance(msg, UserMessage):
+        if isinstance(msg, tau2.UserMessage):
             chat.append(ChatMessageUser(content=msg.content or ""))
-        elif isinstance(msg, AssistantMessage):
+        elif isinstance(msg, tau2.AssistantMessage):
             tool_calls = None
             if msg.tool_calls:
                 tool_calls = [_tau2_to_inspect_tool_call(tc) for tc in msg.tool_calls]
@@ -209,7 +204,7 @@ def _tau2_to_agent_history(messages) -> list:
                     tool_calls=tool_calls,
                 )
             )
-        elif isinstance(msg, ToolMessage):
+        elif isinstance(msg, tau2.ToolMessage):
             if msg.requestor != "assistant":
                 continue
             chat.append(
@@ -223,14 +218,9 @@ def _tau2_to_agent_history(messages) -> list:
 
 def _tau2_to_user_history(messages) -> list:
     chat: list = []
+    tau2 = _tau2()
     for msg in messages:
-        from tau2.data_model.message import (  # type: ignore
-            AssistantMessage,
-            ToolMessage,
-            UserMessage,
-        )
-
-        if isinstance(msg, UserMessage):
+        if isinstance(msg, tau2.UserMessage):
             tool_calls = None
             if msg.tool_calls:
                 tool_calls = [_tau2_to_inspect_tool_call(tc) for tc in msg.tool_calls]
@@ -240,9 +230,9 @@ def _tau2_to_user_history(messages) -> list:
                     tool_calls=tool_calls,
                 )
             )
-        elif isinstance(msg, AssistantMessage):
+        elif isinstance(msg, tau2.AssistantMessage):
             chat.append(ChatMessageUser(content=msg.content or ""))
-        elif isinstance(msg, ToolMessage):
+        elif isinstance(msg, tau2.ToolMessage):
             if msg.requestor != "user":
                 continue
             chat.append(
@@ -255,18 +245,13 @@ def _tau2_to_user_history(messages) -> list:
 
 
 def _tau2_to_inspect_conversation(messages) -> list:
-    from tau2.data_model.message import (  # type: ignore
-        AssistantMessage,
-        ToolMessage,
-        UserMessage,
-    )
-
     chat: list = []
     tool_name_map: dict[str, str] = {}
+    tau2 = _tau2()
     for msg in messages:
-        if isinstance(msg, UserMessage):
+        if isinstance(msg, tau2.UserMessage):
             chat.append(ChatMessageUser(content=msg.content or ""))
-        elif isinstance(msg, AssistantMessage):
+        elif isinstance(msg, tau2.AssistantMessage):
             tool_calls = None
             if msg.tool_calls:
                 tool_calls = []
@@ -279,7 +264,7 @@ def _tau2_to_inspect_conversation(messages) -> list:
                     tool_calls=tool_calls,
                 )
             )
-        elif isinstance(msg, ToolMessage):
+        elif isinstance(msg, tau2.ToolMessage):
             chat.append(
                 ChatMessageTool(
                     content=msg.content or "",
@@ -293,7 +278,8 @@ def _tau2_to_inspect_conversation(messages) -> list:
 def _is_user_stop(content: Optional[str]) -> bool:
     if not content:
         return False
-    tokens = _user_stop_tokens()
+    tau2 = _tau2()
+    tokens = (tau2.STOP, tau2.TRANSFER, tau2.OUT_OF_SCOPE)
     return any(token in content for token in tokens)
 
 
@@ -307,6 +293,8 @@ class TauBenchResult:
 class TauBenchRunner:
     """
     Minimal async reimplementation of tau2's orchestrator that swaps in Inspect models.
+
+    Certain features (like seed, solo mode, max errors) were left out intentionally.
     """
 
     def __init__(
@@ -318,25 +306,28 @@ class TauBenchRunner:
         agent_model: Model,
         user_model: Model,
         max_steps: int,
-        max_errors: int,
     ):
+        self._tau2 = _tau2()
         self.domain = domain
-        self.tau2_task = _load_tau2_task(task_payload)
+        self.tau2_task = self._tau2.Task.model_validate(task_payload)
         self.trial = trial
         self.agent_model = agent_model
         self.user_model = user_model
         self.max_steps = max_steps
-        self.max_errors = max_errors
 
         self.environment = _create_tau2_environment(domain)
         self.agent_tools = _convert_tools(self.environment.get_tools())
         try:
-            self.user_tools = _convert_tools(self.environment.get_user_tools())
-        except Exception:
-            self.user_tools = []
+            raw_user_tools = self.environment.get_user_tools()
+        except ValueError:
+            raw_user_tools = []
+        self.user_tools = _convert_tools(raw_user_tools)
 
         instructions = str(self.tau2_task.user_scenario.instructions)
-        self.agent_system_prompt = _agent_system_prompt(self.environment.get_policy())
+        self.agent_system_prompt = self._tau2.SYSTEM_PROMPT.format(
+            agent_instruction=self._tau2.AGENT_INSTRUCTION,
+            domain_policy=self.environment.get_policy(),
+        )
         self.user_system_prompt = _user_system_prompt(
             use_tools=bool(self.user_tools), instructions=instructions
         )
@@ -345,6 +336,7 @@ class TauBenchRunner:
         self.step_count = 0
         self.num_errors = 0
         self.termination_reason = None
+        self.done = False
 
         self._initialize_environment()
 
@@ -368,35 +360,32 @@ class TauBenchRunner:
             self.trajectory.append(msg)
 
     async def run(self) -> TauBenchResult:
-        from tau2.data_model.message import (  # type: ignore
-            AssistantMessage,
-            UserMessage,
-        )
-        from tau2.data_model.simulation import (  # type: ignore
-            SimulationRun,
-            TerminationReason,
-        )
-        from tau2.evaluator.evaluator import (  # type: ignore
-            EvaluationType,
-            evaluate_simulation,
-        )
-        from tau2.orchestrator.orchestrator import Role  # type: ignore
-        from tau2.utils.utils import get_now  # type: ignore
-
+        """
+        Combines tau2bench's run + step
+        """
+        tau2 = self._tau2
         if self.trajectory:
             last_message = self.trajectory[-1]
-            if isinstance(last_message, AssistantMessage):
-                to_role = Role.USER if not last_message.is_tool_call() else Role.ENV
-            elif isinstance(last_message, UserMessage):
-                to_role = Role.AGENT if not last_message.is_tool_call() else Role.ENV
+            if isinstance(last_message, tau2.AssistantMessage):
+                to_role = (
+                    tau2.Role.USER if not last_message.is_tool_call() else tau2.Role.ENV
+                )
+            elif isinstance(last_message, tau2.UserMessage):
+                to_role = (
+                    tau2.Role.AGENT
+                    if not last_message.is_tool_call()
+                    else tau2.Role.ENV
+                )
             else:
                 to_role = (
-                    Role.AGENT if last_message.requestor == "assistant" else Role.USER
+                    tau2.Role.AGENT
+                    if last_message.requestor == "assistant"
+                    else tau2.Role.USER
                 )
         else:
-            first_message = _default_first_agent_message()
+            first_message = tau2.DEFAULT_FIRST_AGENT_MESSAGE
             self.trajectory.append(first_message)
-            to_role = Role.USER
+            to_role = tau2.Role.USER
             last_message = first_message
 
         start_time = datetime.now()
@@ -404,52 +393,51 @@ class TauBenchRunner:
 
         while not done:
             if self.max_steps and self.step_count >= self.max_steps:
-                self.termination_reason = TerminationReason.MAX_STEPS
-                break
-            if self.max_errors and self.num_errors >= self.max_errors:
-                self.termination_reason = TerminationReason.TOO_MANY_ERRORS
+                self.termination_reason = tau2.TerminationReason.MAX_STEPS
                 break
 
-            if to_role == Role.USER:
+            if to_role == tau2.Role.USER:
                 user_message = await self._generate_user_message()
                 self.trajectory.append(user_message)
                 if user_message.is_tool_call():
-                    to_role = Role.ENV
+                    to_role = tau2.Role.ENV
                     last_message = user_message
                 else:
-                    to_role = Role.AGENT
+                    to_role = tau2.Role.AGENT
                     last_message = user_message
                 if _is_user_stop(user_message.content):
-                    self.termination_reason = TerminationReason.USER_STOP
+                    self.termination_reason = tau2.TerminationReason.USER_STOP
                     done = True
-            elif to_role == Role.AGENT:
+            elif to_role == tau2.Role.AGENT:
                 agent_message = await self._generate_agent_message()
                 self.trajectory.append(agent_message)
                 if agent_message.is_tool_call():
-                    to_role = Role.ENV
+                    to_role = tau2.Role.ENV
                     last_message = agent_message
                 else:
-                    to_role = Role.USER
+                    to_role = tau2.Role.USER
                     last_message = agent_message
             else:
                 tool_messages = self._execute_tools(last_message)
                 self.trajectory.extend(tool_messages)
                 if not tool_messages:
                     to_role = (
-                        Role.USER if last_message.requestor == "user" else Role.AGENT
+                        tau2.Role.USER
+                        if last_message.requestor == "user"
+                        else tau2.Role.AGENT
                     )
                 else:
                     requestor = tool_messages[-1].requestor
-                    to_role = Role.USER if requestor == "user" else Role.AGENT
+                    to_role = tau2.Role.USER if requestor == "user" else tau2.Role.AGENT
                 last_message = tool_messages[-1] if tool_messages else last_message
             self.step_count += 1
 
         end_time = datetime.now()
         final_reason = self.termination_reason or "completed"
-        simulation = SimulationRun(
+        simulation = tau2.SimulationRun(
             id=f"{self.domain}_{self.tau2_task.id}_{uuid4().hex}",
             task_id=self.tau2_task.id,
-            timestamp=get_now(),
+            timestamp=tau2.get_now(),
             start_time=start_time.isoformat(),
             end_time=end_time.isoformat(),
             duration=(end_time - start_time).total_seconds(),
@@ -459,10 +447,10 @@ class TauBenchRunner:
             messages=self.trajectory,
             trial=self.trial,
         )
-        reward_info = evaluate_simulation(
+        reward_info = tau2.evaluate_simulation(
             simulation=simulation,
             task=self.tau2_task,
-            evaluation_type=EvaluationType.ALL,
+            evaluation_type=tau2.EvaluationType.ALL,
             solo_mode=False,
             domain=self.domain,
         )
@@ -473,10 +461,6 @@ class TauBenchRunner:
         )
 
     async def _generate_agent_message(self):
-        from tau2.data_model.message import (
-            AssistantMessage,  # type: ignore
-        )
-
         messages = [ChatMessageSystem(content=self.agent_system_prompt)]
         messages.extend(_tau2_to_agent_history(self.trajectory))
         response = await self.agent_model.generate(
@@ -497,7 +481,7 @@ class TauBenchRunner:
             and getattr(assistant_message, "text", None) is not None
             else getattr(response, "completion", None)
         )
-        return AssistantMessage(
+        return self._tau2.AssistantMessage(
             role="assistant",
             content=completion,
             tool_calls=tool_calls,
@@ -505,8 +489,6 @@ class TauBenchRunner:
         )
 
     async def _generate_user_message(self):
-        from tau2.data_model.message import UserMessage  # type: ignore
-
         messages = [ChatMessageSystem(content=self.user_system_prompt)]
         messages.extend(_tau2_to_user_history(self.trajectory))
         response = await self.user_model.generate(
@@ -525,7 +507,7 @@ class TauBenchRunner:
             if user_message and getattr(user_message, "text", None) is not None
             else getattr(response, "completion", None)
         )
-        return UserMessage(
+        return self._tau2.UserMessage(
             role="user",
             content=completion,
             tool_calls=tool_calls,
@@ -533,9 +515,7 @@ class TauBenchRunner:
         )
 
     def _execute_tools(self, message) -> list:
-        from tau2.data_model.message import ToolMessage  # type: ignore
-
-        tool_messages: list[ToolMessage] = []
+        tool_messages: list = []
         if not message or not message.tool_calls:
             return tool_messages
         for tc in message.tool_calls:
@@ -553,7 +533,6 @@ def tau_bench_solver(
     *,
     user_model: str = "openai/gpt-4.1-mini",
     max_steps: int = 200,
-    max_errors: int = 10,
 ) -> Solver:
     """
     Solver factory for tau-bench tasks.
@@ -578,7 +557,6 @@ def tau_bench_solver(
             agent_model=candidate,
             user_model=user_model_instance,
             max_steps=max_steps,
-            max_errors=max_errors,
         )
         result = await runner.run()
         state.metadata["tau2"] = {

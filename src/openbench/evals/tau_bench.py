@@ -9,9 +9,13 @@ from typing import Iterable, Optional
 from inspect_ai import Task, task
 from inspect_ai.model import GenerateConfig
 
-from openbench.datasets.tau_bench import get_tau_bench_dataset
+from openbench.datasets.tau_bench import ensure_tau2_data_dir, get_tau_bench_dataset
 from openbench.scorers.tau_bench import tau_bench_scorer
-from openbench.solvers.tau_bench import tau_bench_solver
+
+# Ensure tau2 data assets are available (and TAU2_DATA_DIR is set) before any tau2 imports.
+ensure_tau2_data_dir()
+
+from openbench.solvers.tau_bench import tau_bench_solver  # noqa: E402
 
 
 def _build_tau_bench_task(
@@ -20,7 +24,6 @@ def _build_tau_bench_task(
     user_model: str,
     num_trials: int,
     max_steps: int,
-    max_errors: int,
     task_ids: Optional[Iterable[str]] = None,
     num_tasks: Optional[int] = None,
 ) -> Task:
@@ -33,7 +36,6 @@ def _build_tau_bench_task(
     solver_fn = tau_bench_solver(
         user_model=user_model,
         max_steps=max_steps,
-        max_errors=max_errors,
     )
     return Task(
         dataset=dataset,
@@ -51,7 +53,6 @@ def tau_bench_retail(
     user_model: str = "openai/gpt-4.1-mini",
     num_trials: int = 1,
     max_steps: int = 200,
-    max_errors: int = 10,
     task_ids: Optional[list[str]] = None,
     num_tasks: Optional[int] = None,
 ) -> Task:
@@ -63,7 +64,6 @@ def tau_bench_retail(
         user_model=user_model,
         num_trials=num_trials,
         max_steps=max_steps,
-        max_errors=max_errors,
         task_ids=task_ids,
         num_tasks=num_tasks,
     )
@@ -74,7 +74,6 @@ def tau_bench_airline(
     user_model: str = "openai/gpt-4.1-mini",
     num_trials: int = 1,
     max_steps: int = 200,
-    max_errors: int = 10,
     task_ids: Optional[list[str]] = None,
     num_tasks: Optional[int] = None,
 ) -> Task:
@@ -83,7 +82,6 @@ def tau_bench_airline(
         user_model=user_model,
         num_trials=num_trials,
         max_steps=max_steps,
-        max_errors=max_errors,
         task_ids=task_ids,
         num_tasks=num_tasks,
     )
@@ -94,7 +92,6 @@ def tau_bench_telecom(
     user_model: str = "openai/gpt-4.1-mini",
     num_trials: int = 1,
     max_steps: int = 200,
-    max_errors: int = 10,
     task_ids: Optional[list[str]] = None,
     num_tasks: Optional[int] = None,
 ) -> Task:
@@ -103,7 +100,6 @@ def tau_bench_telecom(
         user_model=user_model,
         num_trials=num_trials,
         max_steps=max_steps,
-        max_errors=max_errors,
         task_ids=task_ids,
         num_tasks=num_tasks,
     )
