@@ -19,7 +19,6 @@ Models for Integrated Capabilities" (arXiv:2408.00765)
 """
 
 from inspect_ai import Task, task
-from inspect_ai.model import GenerateConfig
 from inspect_ai.solver import generate
 
 from openbench.datasets.mmvetv2 import get_mmvetv2_dataset
@@ -83,7 +82,4 @@ def mmvetv2(
         ),
         metrics=mmvetv2_capability_metrics_list(),
         name="mmvetv2",
-        config=GenerateConfig(
-            max_tokens=1024,  # Allow detailed responses
-        ),
     )
