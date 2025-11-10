@@ -823,11 +823,10 @@ def text_grounding_evaluation(predict: str, answers: list[str]) -> float:
     if len(pred_coords) < 4:
         return 0.0
 
-    # Parse ground truth coordinates
-    # Ground truth might be a list of numbers as strings
+    # Extract ground truth bbox coordinates
+    # answers is a list like ['888', '959', '946', '999'] representing [x1, y1, x2, y2]
     gt_numbers = []
     for answer in answers:
-        # Try to extract numbers from answer string
         nums = re.findall(r"\d+", str(answer))
         gt_numbers.extend(nums)
 
@@ -1045,7 +1044,13 @@ def ocrbenchv2_scorer():
 
             # Convert Target object to list of strings
             # Target is a sequence-like object from inspect_ai
-            answers = list(target) if hasattr(target, "__iter__") else [str(target)]
+            # Exclude strings from iterable check to avoid splitting "ABC" into ['A','B','C']
+            if isinstance(target, str):
+                answers = [target]
+            elif hasattr(target, "__iter__"):
+                answers = list(target)
+            else:
+                answers = [str(target)]
 
             # Evaluate using category-specific function
             score_value = evaluate_by_category(
