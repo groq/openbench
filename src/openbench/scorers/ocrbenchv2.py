@@ -896,7 +896,7 @@ def evaluate_by_category(
     # (must check BEFORE other categories since it's not in any category set)
     if category == "handwritten answer extraction cn":
         # Get question text from metadata to determine path
-        question = metadata.get("input", "")
+        question = metadata.get("question", "")
 
         # Path 1: Essay questions (含"简答") - use OCR metrics
         if "简答" in question:

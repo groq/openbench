@@ -146,6 +146,9 @@ def get_ocrbenchv2_dataset(
                     "raw_text": item.get("raw_text"),
                     "content": item.get("content"),
                     "image_path": item.get("image_path", ""),
+                    "question": item[
+                        "question"
+                    ],  # Add question for handwritten CN essay detection
                 },
             )
         )
