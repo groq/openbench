@@ -30,6 +30,7 @@ from inspect_ai.tool import Tool, ToolError
 from inspect_ai.tool import ToolCall as InspectToolCall
 from inspect_ai.tool._tool_def import ToolDef
 from inspect_ai.tool._tool_params import ToolParams
+from inspect_ai.model import GenerateConfig
 
 
 @lru_cache(maxsize=1)
@@ -312,7 +313,9 @@ class TauBenchRunner:
         self.tau2_task = self._tau2.Task.model_validate(task_payload)
         self.trial = trial
         self.agent_model = agent_model
+        self.agent_model_config = agent_model.config
         self.user_model = user_model
+        self.user_model_config = user_model.config
         self.max_steps = max_steps
 
         self.environment = _create_tau2_environment(domain)
@@ -463,9 +466,11 @@ class TauBenchRunner:
     async def _generate_agent_message(self):
         messages = [ChatMessageSystem(content=self.agent_system_prompt)]
         messages.extend(_tau2_to_agent_history(self.trajectory))
+        agent_config = self.agent_model_config or GenerateConfig(temperature=0.0)
         response = await self.agent_model.generate(
             messages,
             tools=self.agent_tools,
+            config=agent_config,
             tool_choice="auto" if self.agent_tools else None,
         )
         assistant_message = getattr(response, "message", None)
@@ -491,9 +496,11 @@ class TauBenchRunner:
     async def _generate_user_message(self):
         messages = [ChatMessageSystem(content=self.user_system_prompt)]
         messages.extend(_tau2_to_user_history(self.trajectory))
+        user_config = self.user_model_config or GenerateConfig(temperature=0.0)
         response = await self.user_model.generate(
             messages,
             tools=self.user_tools,
+            config=user_config,
             tool_choice="auto" if self.user_tools else None,
         )
         user_message = getattr(response, "message", None)
