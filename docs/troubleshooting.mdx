@@ -60,6 +60,18 @@ description: "Get the most out of openbench with these best practices and soluti
     ```
   </Accordion>
 
+  <Accordion title="Reasoning effort not applied or invalid">
+    The `reasoning_effort` parameter is now a first-class CLI flag.
+    
+    ```bash
+    # Correct (for models like openai/o3)
+    bench eval simpleqa --model openai/o3-2025-04-16 --reasoning-effort high
+
+    # Deprecated example
+    bench eval simpleqa --model openai/o3-2025-04-16 -M reasoning_effort=high
+    ```
+  </Accordion>
+
 </AccordionGroup>
 
 ## Runtime Errors

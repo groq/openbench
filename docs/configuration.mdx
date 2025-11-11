@@ -53,8 +53,11 @@ If not defined through any of the above methods, parameters resort to **default 
 | `--model-base-url` | `BENCH_MODEL_BASE_URL` | Base URL for model(s).          |
 | `--model-role`     | `BENCH_MODEL_ROLE`     | Map role(s) to specific models. |
 
-Use `-M` Flag for Other Model-Specific Arguments  
-(e.g. `bench eval simpleqa --model openai/o3-2025-04-16 -M reasoning_effort=high`)
+Use `--reasoning-effort` for reasoning models  
+(e.g. `bench eval simpleqa --model openai/o3-2025-04-16 --reasoning-effort high`)
+
+Use `-M` for other provider/model-specific arguments  
+(e.g. OpenRouter routing: `-M only=groq`)
 
 ### Task Configuration
 
@@ -83,6 +86,7 @@ Use `-T` Flag for Other Task-Specific Arguments
 | -------------------- | ------------------------ | ---------------------------------------------------------- |
 | `--max-connections`  | `BENCH_MAX_CONNECTIONS`  | Maximum number of parallel requests.                       |
 | `--max-subprocesses` | `BENCH_MAX_SUBPROCESSES` | Maximum number of parallel subprocesses.                   |
+| `--max-tasks`        | `BENCH_MAX_TASKS`        | Maximum number of tasks to run concurrently.               |
 | `--timeout`          | `BENCH_TIMEOUT`          | Timeout per model API request (seconds).                   |
 | `--max-retries`      | `BENCH_MAX_RETRIES`      | Maximum number of retries for API requests.                |
 | `--retry-on-error`   | `BENCH_RETRY_ON_ERROR`   | Retry samples on errors (set number of retries).           |

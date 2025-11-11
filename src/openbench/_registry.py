@@ -163,6 +163,14 @@ def vercel() -> Type[ModelAPI]:
     return VercelAPI
 
 
+@modelapi(name="helicone")
+def helicone() -> Type[ModelAPI]:
+    """Register Helicone AI Gateway provider."""
+    from .model._providers.helicone import HeliconeAPI
+
+    return HeliconeAPI
+
+
 @modelapi(name="openrouter")
 def openrouter() -> Type[ModelAPI]:
     """Register OpenRouter provider."""
@@ -250,6 +258,7 @@ from .evals.clockbench import clockbench  # noqa: F401, E402
 from .evals.drop import drop  # noqa: F401, E402
 from .evals.gpqa_diamond import gpqa_diamond  # noqa: F401, E402
 from .evals.gpqa import gpqa  # noqa: F401, E402
+from .evals.gpt_oss.aime import gpt_oss_aime25  # noqa: F401, E402
 from .evals.graphwalks import graphwalks  # noqa: F401, E402
 from .evals.headqa import headqa, headqa_en, headqa_es  # noqa: F401, E402
 from .evals.healthbench import healthbench, healthbench_hard, healthbench_consensus  # noqa: F401, E402
@@ -281,6 +290,7 @@ from .evals.pubmedqa import pubmedqa  # noqa: F401, E402
 from .evals.piqa import piqa  # noqa: F401, E402
 from .evals.prost import prost  # noqa: F401, E402
 from .evals.scicode import scicode  # noqa: F401, E402
+from .evals.sealqa import sealqa  # noqa: F401, E402
 from .evals.swag import swag  # noqa: F401, E402
 from .evals.simpleqa import simpleqa  # noqa: F401, E402
 from .evals.simpleqa_verified import simpleqa_verified  # noqa: F401, E402
@@ -329,6 +339,7 @@ from .evals.mmmu_pro import mmmu_pro, mmmu_pro_vision  # noqa: F401, E402
 from .evals.arc_agi import arc_agi, arc_agi_1, arc_agi_2  # noqa: F401, E402
 from .evals.agentdojo import agentdojo  # noqa: F401, E402
 from .evals.mockaime import otis_mock_aime, otis_mock_aime_2024, otis_mock_aime_2025  # noqa: F401, E402
+from .evals.chartqapro import chartqapro  # noqa: F401, E402
 
 # cybench is defined in openbench-cyber package, not here
 # from .evals.cybench import cybench  # noqa: F401, E402
@@ -447,3 +458,6 @@ from .evals.arabic_exams import (  # noqa: F401, E402
     arabic_exams_social_science_primary_school,
 )
 from .evals.legalsupport import legalsupport  # noqa: F401, E402
+
+# spatial reasoning benchmarks
+from .evals.rocketscience import rocketscience  # noqa: F401, E402

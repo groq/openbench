@@ -3904,6 +3904,20 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "ChartQAPro",
+    "description": "Comprehensive chart understanding benchmark with 1,948 samples testing vision-language models across 5 question types (Factoid, Multi Choice, Hypothetical, Fact Checking, Conversational) with support for direct, CoT, and PoT prompting strategies",
+    "category": "core",
+    "tags": [
+      "vision",
+      "multi-modal",
+      "charts",
+      "reasoning",
+      "multi-turn"
+    ],
+    "function_name": "chartqapro",
+    "is_alpha": false
+  },
+  {
     "name": "ClockBench",
     "description": "Clock benchmark - time-based reasoning tasks",
     "category": "community",
@@ -4321,6 +4335,19 @@ export const benchmarksData = [
       "graduate-level"
     ],
     "function_name": "gpqa_diamond",
+    "is_alpha": false
+  },
+  {
+    "name": "GPT-OSS AIME 2025",
+    "description": "An exact replica of the aime25 eval from OpenAI's GPT-OSS release",
+    "category": "core",
+    "tags": [
+      "math",
+      "competition",
+      "aime",
+      "2025"
+    ],
+    "function_name": "gpt_oss_aime25",
     "is_alpha": false
   },
   {
@@ -6713,6 +6740,19 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
+    "name": "RocketScience",
+    "description": "Contrastive spatial reasoning benchmark",
+    "category": "core",
+    "tags": [
+      "multimodal",
+      "spatial-reasoning",
+      "vision-language",
+      "images"
+    ],
+    "function_name": "rocketscience",
+    "is_alpha": false
+  },
+  {
     "name": "SMT 2024",
     "description": "Stanford Math Tournament 2024 - competition math problems across multiple categories",
     "category": "math",
@@ -7454,6 +7494,18 @@ export const benchmarksData = [
     ],
     "function_name": "xwinograd_ru",
     "is_alpha": false
+  },
+  {
+    "name": "sealqa",
+    "description": "Raising the Bar for Reasoning in Search-Augmented Language Models",
+    "category": "core",
+    "tags": [
+      "factuality",
+      "question-answering",
+      "graded"
+    ],
+    "function_name": "sealqa",
+    "is_alpha": false
   }
 ];
 
@@ -8128,20 +8180,12 @@ export const evalGroupsData = [
       "eval-group"
     ],
     "id": "math_group_22_10_2025",
-    "benchmark_count": 19,
+    "benchmark_count": 11,
     "benchmarks": [
-      "aime_2023_I",
-      "aime_2023_II",
-      "aime_2024",
-      "aime_2024_I",
-      "aime_2024_II",
       "aime_2025",
       "aime_2025_II",
-      "hmmt_feb_2023",
-      "hmmt_feb_2024",
       "hmmt_feb_2025",
       "brumo_2025",
-      "otis_mock_aime_2024",
       "otis_mock_aime_2025",
       "smt_algebra",
       "smt_calculus",

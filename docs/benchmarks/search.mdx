@@ -1,0 +1,63 @@
+---
+title: Search 
+description: Evaluate models and agents with search
+icon: search
+---
+Evaluating models and agents equipped with search tools poses a challenge due to the inherently dynamic nature of real-time data retrieval. To perform well, search-enabled AI needs to be able to parse ambiguous queries, complete single and multi hop queries, and judge between contrasting sources. Openbench provides standardized, reproducible implementations of leading search evaluation suites spanning adversarial multi-hop reasoning, large-scale factual recall, human-curated verification, and end-to-end research workflows. 
+
+## Search Benchmarks
+
+<CardGroup cols={2}>
+  <Card title="SealQA" icon="shield-check">
+    Evaluates search-augmented language models on fact-seeking questions with noisy web results. **Seal_0**, includes the most challenging queries (near-zero accuracy).
+    ```bash
+    bench eval sealqa -T subset=seal_0
+    ```
+    **Seal_Hard** expands seal_0 to more broadly test factual accuracy and reasoning. 
+    ```bash
+    bench eval sealqa -T subset=seal_hard
+    ```
+    **Long Seal** tests sustained retrieval and reasoning over extended contexts.
+    ```bash
+    bench eval sealqa -T subset=longseal
+    ```
+  </Card>
+
+  <Card title="SimpleQA" icon="check">
+    A collection of over 4000 factual questions spanning topics ranging from TV show trivia to scientific history.
+
+    ```bash
+    bench eval simpleqa
+    ```
+    **SimpleQA Verified** is Google DeepMind’s manually verified upgrade to SimpleQA, providing a more topically balanced, de-duplicated, and accurately labeled dataset for assessing factual accuracy in search tasks.
+
+    ```bash
+    bench eval simpleqa_verified
+    ```
+  </Card>
+
+  <Card title="DeepResearch Bench" icon="compass">
+    End-to-end research missions that grade planning, browsing, note-taking, and citation hygiene.
+
+    ```bash
+    bench eval deepresearch
+    ```
+  </Card>
+
+  <Card title="BrowseComp" icon="globe">
+    Challenging queries requiring persistent web browsing/navigation to find obscure and entangled information.
+
+    ```bash
+    bench eval browsecomp
+    ```
+  </Card>
+</CardGroup>
+
+<br/>
+
+## Related Resources
+- [SealQA Paper](https://arxiv.org/abs/2506.01062)
+- [SimpleQA Paper](https://arxiv.org/abs/2411.04368)
+- [SimpleQA Verified Paper](https://arxiv.org/abs/2509.07968)
+- [DeepResearchBench Paper](https://arxiv.org/abs/2506.11763)
+- [BrowseComp Paper](https://arxiv.org/abs/2504.12516)

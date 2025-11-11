@@ -345,12 +345,27 @@ def run_eval(
             envvar="BENCH_SANDBOX",
         ),
     ] = None,
+    sandbox_cleanup: Annotated[
+        Optional[bool],
+        typer.Option(
+            help="Cleanup sandbox environments after task completes",
+            envvar="BENCH_SANDBOX_CLEANUP",
+        ),
+    ] = None,
+    no_sandbox_cleanup: Annotated[
+        bool,
+        typer.Option(
+            "--no-sandbox-cleanup",
+            help="Do not cleanup sandbox environments after task completes",
+            envvar="BENCH_NO_SANDBOX_CLEANUP",
+        ),
+    ] = False,
     epochs: Annotated[
-        int,
+        Optional[int],
         typer.Option(
             help="Number of epochs to run each evaluation", envvar="BENCH_EPOCHS"
         ),
-    ] = 1,
+    ] = None,
     limit: Annotated[
         Optional[str],
         typer.Option(
@@ -365,6 +380,14 @@ def run_eval(
             envvar="BENCH_FAIL_ON_ERROR",
         ),
     ] = None,
+    no_fail_on_error: Annotated[
+        bool,
+        typer.Option(
+            "--no-fail-on-error",
+            help="Do not fail the eval if errors occur within samples (instead, continue running other samples)",
+            envvar="BENCH_NO_FAIL_ON_ERROR",
+        ),
+    ] = False,
     message_limit: Annotated[
         Optional[int],
         typer.Option(
@@ -386,6 +409,14 @@ def run_eval(
             envvar="BENCH_LOG_SAMPLES",
         ),
     ] = None,
+    no_log_samples: Annotated[
+        bool,
+        typer.Option(
+            "--no-log-samples",
+            help="Do not include samples in the log file",
+            envvar="BENCH_NO_LOG_SAMPLES",
+        ),
+    ] = False,
     log_images: Annotated[
         Optional[bool],
         typer.Option(
@@ -393,6 +424,14 @@ def run_eval(
             envvar="BENCH_LOG_IMAGES",
         ),
     ] = None,
+    no_log_images: Annotated[
+        bool,
+        typer.Option(
+            "--no-log-images",
+            help="Do not include base64 encoded images in the log file",
+            envvar="BENCH_NO_LOG_IMAGES",
+        ),
+    ] = False,
     log_buffer: Annotated[
         Optional[int],
         typer.Option(
@@ -400,6 +439,29 @@ def run_eval(
             envvar="BENCH_LOG_BUFFER",
         ),
     ] = 10,
+    log_dir: Annotated[
+        Optional[str],
+        typer.Option(
+            help="Directory for log files",
+            envvar="BENCH_LOG_DIR",
+        ),
+    ] = "./logs",
+    trace: Annotated[
+        bool,
+        typer.Option(
+            "--trace",
+            help="Trace message interactions with evaluated model to terminal",
+            envvar="BENCH_TRACE",
+        ),
+    ] = False,
+    debug_errors: Annotated[
+        bool,
+        typer.Option(
+            "--debug-errors",
+            help="Enable debug mode for errors",
+            envvar="BENCH_DEBUG_ERRORS",
+        ),
+    ] = False,
     score: Annotated[
         bool,
         typer.Option(
@@ -407,6 +469,14 @@ def run_eval(
             envvar="BENCH_SCORE",
         ),
     ] = True,
+    no_score: Annotated[
+        bool,
+        typer.Option(
+            "--no-score",
+            help="Do not score model output (use the inspect score command to score output later)",
+            envvar="BENCH_NO_SCORE",
+        ),
+    ] = False,
     temperature: Annotated[
         Optional[float],
         typer.Option(
@@ -419,6 +489,13 @@ def run_eval(
         typer.Option(
             help="Model top-p",
             envvar="BENCH_TOP_P",
+        ),
+    ] = None,
+    max_tasks: Annotated[
+        Optional[int],
+        typer.Option(
+            help="Maximum number of tasks to run concurrently",
+            envvar="BENCH_MAX_TASKS",
         ),
     ] = None,
     max_tokens: Annotated[
@@ -450,6 +527,20 @@ def run_eval(
             envvar="BENCH_TIMEOUT",
         ),
     ] = 10000,
+    max_retries: Annotated[
+        Optional[int],
+        typer.Option(
+            help="Maximum number of times to retry model API requests (defaults to unlimited)",
+            envvar="BENCH_MAX_RETRIES",
+        ),
+    ] = None,
+    retry_on_error: Annotated[
+        Optional[int],
+        typer.Option(
+            help="Retry samples if they encounter errors (by default, no retries occur). Specify --retry-on-error to retry a single time, or specify e.g. --retry-on-error=3 to retry multiple times.",
+            envvar="BENCH_RETRY_ON_ERROR",
+        ),
+    ] = None,
     reasoning_effort: Annotated[
         Optional[ReasoningEffortLevel],
         typer.Option(
@@ -622,6 +713,24 @@ def run_eval(
     # Capture start time to locate logs created by this run
     start_time = time.time()
 
+    # Process negating options to mirror eval-retry behavior
+    if no_log_samples:
+        log_samples = False
+    if no_log_images:
+        log_images = False
+    if no_score:
+        score = False
+    if no_sandbox_cleanup:
+        sandbox_cleanup = False
+    if no_fail_on_error:
+        fail_on_error = False
+    elif fail_on_error == 0.0:
+        fail_on_error = True
+
+    # Align retry semantics with eval-retry command
+    if retry_on_error == 0:
+        retry_on_error = None
+
     try:
         try:
             eval_logs = eval(
@@ -640,16 +749,23 @@ def run_eval(
                 log_samples=log_samples,
                 log_images=log_images,
                 log_buffer=log_buffer,
+                log_dir=log_dir,
                 score=score,
+                debug_errors=debug_errors,
                 temperature=temperature,
                 top_p=top_p,
                 max_tokens=max_tokens,
                 seed=seed,
                 display=display.value if display else None,
                 timeout=timeout,
+                trace=trace,
+                max_retries=max_retries,
+                retry_on_error=retry_on_error,
                 reasoning_effort=reasoning_effort.value if reasoning_effort else None,
                 sandbox=sandbox,
+                sandbox_cleanup=sandbox_cleanup,
                 log_format=log_format.value if log_format else None,
+                max_tasks=max_tasks,
             )
 
             typer.echo("Evaluation complete!")
