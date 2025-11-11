@@ -5735,6 +5735,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.tau_bench",
         function_name="tau_bench_telecom",
         is_alpha=False,
+    ),
     "rocketscience": BenchmarkMetadata(
         name="RocketScience",
         description="Contrastive spatial reasoning benchmark",
