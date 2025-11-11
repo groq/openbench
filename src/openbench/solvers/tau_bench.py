@@ -9,6 +9,7 @@ This, however, means that the state has to be passed constantly between inspect 
 from __future__ import annotations
 
 import json
+from contextlib import nullcontext
 from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime
@@ -31,6 +32,51 @@ from inspect_ai.tool import ToolCall as InspectToolCall
 from inspect_ai.tool._tool_def import ToolDef
 from inspect_ai.tool._tool_params import ToolParams
 from inspect_ai.model import GenerateConfig
+from rich.console import Console
+from inspect_ai._display.textual.display import TextualDisplay  # type: ignore
+
+_tau2_logging_configured = False
+
+
+def _ensure_tau2_logging_redirected() -> None:
+    """Route tau2's loguru output through Inspect's display console."""
+
+    global _tau2_logging_configured
+    if _tau2_logging_configured:
+        return
+
+    try:
+        from loguru import logger as loguru_logger  # type: ignore
+    except ImportError:
+        _tau2_logging_configured = True
+        return
+
+    fallback_console = Console()
+
+    def _console_sink(message: str) -> None:
+        text = message.rstrip("\n")
+        try:
+            from inspect_ai._display.core.active import display as get_display
+
+            disp = get_display()
+            ctx = (
+                nullcontext()
+                if isinstance(disp, TextualDisplay)
+                else disp.suspend_task_app()
+            )
+            with ctx:
+                disp.print(text)
+        except Exception:
+            fallback_console.print(text, markup=False, highlight=False)
+
+    loguru_logger.remove()
+    loguru_logger.add(
+        _console_sink,
+        level="INFO",
+        enqueue=False,  # keep intra-process queueing simple (no mp lock needed)
+        format="[tau2] {time:HH:mm:ss} | {level:<8} | {message}",
+    )
+    _tau2_logging_configured = True
 
 
 @lru_cache(maxsize=1)
@@ -556,6 +602,8 @@ def tau_bench_solver(
 
         candidate = get_model()
         user_model_instance = get_model(user_model)
+
+        _ensure_tau2_logging_redirected()
 
         runner = TauBenchRunner(
             domain=str(domain),
