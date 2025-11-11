@@ -531,7 +531,7 @@ class TauBenchRunner:
 @solver
 def tau_bench_solver(
     *,
-    user_model: str = "openai/gpt-4.1-mini",
+    user_model: str = "openai/gpt-4.1",
     max_steps: int = 200,
 ) -> Solver:
     """

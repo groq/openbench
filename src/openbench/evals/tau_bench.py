@@ -50,7 +50,7 @@ def _build_tau_bench_task(
 
 @task
 def tau_bench_retail(
-    user_model: str = "openai/gpt-4.1-mini",
+    user_model: str = "openai/gpt-4.1",
     num_trials: int = 1,
     max_steps: int = 200,
     task_ids: Optional[list[str]] = None,
@@ -71,7 +71,7 @@ def tau_bench_retail(
 
 @task
 def tau_bench_airline(
-    user_model: str = "openai/gpt-4.1-mini",
+    user_model: str = "openai/gpt-4.1",
     num_trials: int = 1,
     max_steps: int = 200,
     task_ids: Optional[list[str]] = None,
@@ -89,7 +89,7 @@ def tau_bench_airline(
 
 @task
 def tau_bench_telecom(
-    user_model: str = "openai/gpt-4.1-mini",
+    user_model: str = "openai/gpt-4.1",
     num_trials: int = 1,
     max_steps: int = 200,
     task_ids: Optional[list[str]] = None,
