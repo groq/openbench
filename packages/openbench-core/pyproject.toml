@@ -113,6 +113,7 @@ ocrbenchv2 = [
     "apted>=1.0.3",
     "lxml>=5.0.0",
     "nltk>=3.8",
+]
 deep_research_bench = [
     "google-genai>=1.47.0",
     "requests>=2.32.0",
