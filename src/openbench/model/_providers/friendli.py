@@ -28,7 +28,11 @@ class FriendliAPI(OpenAICompatibleAPI):
         base_url = base_url or os.environ.get(
             "FRIENDLI_BASE_URL", "https://api.friendli.ai/serverless/v1"
         )
-        api_key = api_key or os.environ.get("FRIENDLI_TOKEN") or os.environ.get("FRIENDLI_API_KEY")
+        api_key = (
+            api_key
+            or os.environ.get("FRIENDLI_TOKEN")
+            or os.environ.get("FRIENDLI_API_KEY")
+        )
 
         if not api_key:
             raise ValueError(
