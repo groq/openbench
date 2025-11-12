@@ -18,6 +18,7 @@ from .robust_boxed import robust_boxed_scorer, aime_scorer, extract_boxed_answer
 from .open_answer import create_open_answer_scorer, simple_open_answer_scorer
 from .mmmu import mmmu_mixed_scorer
 from .exercism import exercism_scorer
+from .pass_hat import pass_hat
 
 __all__ = [
     # Number scoring functions
@@ -41,4 +42,6 @@ __all__ = [
     "mmmu_mixed_scorer",
     # Code execution scoring
     "exercism_scorer",
+    # pass^k reducer for multi-epoch runs
+    "pass_hat",
 ]
