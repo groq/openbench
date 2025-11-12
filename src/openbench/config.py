@@ -5718,6 +5718,14 @@ _BUILTIN_BENCHMARKS = {
         function_name="rocketscience",
         is_alpha=False,
     ),
+    "deep_research_bench": BenchmarkMetadata(
+        name="DeepResearch Bench",
+        description="A comprehensive benchmark for evaluating Deep Research Agents",
+        category="core",
+        tags=["research", "long-form", "multilingual"],
+        module_path="openbench.evals.deep_research_bench",
+        function_name="deep_research_bench",
+    ),
 }
 
 
