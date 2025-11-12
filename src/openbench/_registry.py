@@ -456,3 +456,6 @@ from .evals.legalsupport import legalsupport  # noqa: F401, E402
 
 # spatial reasoning benchmarks
 from .evals.rocketscience import rocketscience  # noqa: F401, E402
+
+# Vision & OCR benchmarks
+from .evals.ocrbenchv2 import ocrbenchv2  # noqa: F401, E402
