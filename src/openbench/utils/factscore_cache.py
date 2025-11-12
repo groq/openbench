@@ -253,8 +253,8 @@ def download_factscore_db(
                     pass
 
             if attempt < max_retries:
-                console.print("[yellow]Retrying in 5 seconds...[/yellow]")
                 wait_time = 5 * (2 ** (attempt - 1))
+                console.print(f"[yellow]Retrying in {wait_time} seconds...[/yellow]")
                 time.sleep(wait_time)
 
     # Clean up temp directory
