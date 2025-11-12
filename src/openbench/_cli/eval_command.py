@@ -696,12 +696,12 @@ def run_eval(
             os.environ["CVEBENCH_CHALLENGE_DIR"] = str(plugin_dir)
 
         if "factscore" in expanded_benchmarks:
-            if os.getenv("ALLOW_FASCTORE_DOWNLOAD") == "1":
+            if os.getenv("ALLOW_FACTSCORE_DOWNLOAD") != "1":
                 typer.secho(
-                    "WARNING: In order to run the factscore benchmark, you need to download the FActScore wikipedia database. set ALLOW_FASCTORE_DOWNLOAD=1 to allow the download.",
+                    "WARNING: In order to run the factscore benchmark, you need to download the FActScore wikipedia database (20GB). set ALLOW_FACTSCORE_DOWNLOAD=1 and then rerun the eval command to allow the download.",
                     fg=typer.colors.YELLOW,
                 )
-                raise typer.Exit(code=0)
+                sys.exit(0)
             else:
                 download_factscore_db()
     except Exception as e:

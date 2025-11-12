@@ -13,8 +13,9 @@ import os
 import shutil
 import tempfile
 from pathlib import Path
+import time
 
-import gdown  # type: ignore[import-untyped,import-not-found]
+from huggingface_hub import hf_hub_download  # type: ignore[import-untyped]
 from rich.console import Console
 from rich.progress import (
     Progress,
@@ -124,13 +125,7 @@ def download_factscore_db(
     """Download the FActScore Wikipedia database from Google Drive.
 
     This function handles the automatic download of the ~20GB Wikipedia SQLite
-    database required for FActScore evaluation. It includes safety features:
-    - Checks if file already exists
-    - Verifies sufficient disk space before downloading
-    - Shows progress bar during download
-    - Retries on failure
-    - Uses atomic write
-    - Verifies file integrity after download
+    database required for FActScore evaluation.
 
     Args:
         cache_root: Root directory for FActScore cache. Uses default if None.
@@ -147,10 +142,9 @@ def download_factscore_db(
     console = Console()
     output_path = data_dir(cache_root) / "enwiki-20230401.db"
 
-    # Google Drive file ID for the Wikipedia database
-    FILE_ID = "1Qu4JHWjpUKhGPaAW5UHhS5RJ545CVy4I"
+    filename = "enwiki-20230401.db"
+    repo_id = "lvogel123/factscore-data"
 
-    # Check if file already exists
     if output_path.exists():
         file_size_gb = output_path.stat().st_size / (1024**3)
         console.print(
@@ -159,8 +153,11 @@ def download_factscore_db(
         )
         return output_path
 
+    if max_retries < 1:
+        raise ValueError("max_retries must be at least 1")
+
     # Check disk space (estimate 20GB + 2GB buffer)
-    required_space = 22 * 1024 * 1024 * 1024  # 22GB in bytes
+    required_space = 22 * 1024 * 1024 * 1024
     if not _check_disk_space(output_path.parent, required_space):
         raise OSError(
             f"Insufficient disk space. Need at least 22GB free at {output_path.parent}\n"
@@ -175,7 +172,6 @@ def download_factscore_db(
         "[yellow]This is a one-time download and may take a while...[/yellow]\n"
     )
 
-    # Download to temporary location first
     temp_dir = tempfile.mkdtemp(prefix="factscore_", dir=output_path.parent)
     temp_path = Path(temp_dir) / "enwiki-20230401.db"
 
@@ -187,24 +183,21 @@ def download_factscore_db(
                     f"\n[yellow]Retry attempt {attempt}/{max_retries}...[/yellow]"
                 )
 
-            # Google Drive file download URL
-            url = f"https://drive.google.com/uc?id={FILE_ID}"
+            console.print("[cyan]Downloading from Hugging Face...[/cyan]")
 
-            console.print("[cyan]Downloading from Google Drive...[/cyan]")
-
-            # gdown.download handles large files and Google Drive's virus scan warnings
-            gdown.download(
-                url,
-                str(temp_path),
-                quiet=False,
-                fuzzy=False,
+            downloaded_path = hf_hub_download(
+                repo_id=repo_id,
+                filename=filename,
+                repo_type="dataset",
+                local_dir=temp_dir,
             )
 
-            # Verify download succeeded
-            if not temp_path.exists():
+            path = Path(downloaded_path)
+
+            if not path.exists():
                 raise RuntimeError("Download completed but file is missing")
 
-            file_size = temp_path.stat().st_size
+            file_size = path.stat().st_size
             if file_size == 0:
                 raise RuntimeError("Downloaded file is empty")
 
@@ -237,6 +230,7 @@ def download_factscore_db(
             # Move to final location
             console.print("[cyan]Moving file to cache directory...[/cyan]")
             shutil.move(str(temp_path), str(output_path))
+            shutil.rmtree(temp_dir, ignore_errors=True)
 
             console.print(
                 f"\n[bold green]✓ Success![/bold green] "
@@ -257,9 +251,8 @@ def download_factscore_db(
 
             if attempt < max_retries:
                 console.print("[yellow]Retrying in 5 seconds...[/yellow]")
-                import time
-
-                time.sleep(5)
+                wait_time = 5 * (2 ** (attempt - 1))
+                time.sleep(wait_time)
 
     # Clean up temp directory
     if Path(temp_dir).exists():
@@ -270,7 +263,7 @@ def download_factscore_db(
         f"Failed to download FActScore database after {max_retries} attempts.\n"
         f"Last error: {last_error}\n\n"
         f"You can manually download from:\n"
-        f"https://drive.google.com/file/d/{FILE_ID}/view\n"
+        f"https://drive.google.com/drive/folders/1kFey69z8hGXScln01mVxrOhrqgM62X7I\n"
         f"Then upload using:\n"
         f"  bench cache upload --db_file <path> --path factscore/data/enwiki-20230401.db"
     )
