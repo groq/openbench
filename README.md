@@ -193,28 +193,29 @@ All cache data is stored under `~/.openbench`. The cache command helps you monit
 
 ### Key `eval` Command Common Configuration Options
 
-| Option                | Environment Variable      | Default                   | Description                                                      |
-| --------------------- | ------------------------- | ------------------------- | ---------------------------------------------------------------- |
-| `-M <args>`           | None                      | None                      | Pass model/provider-specific arguments (e.g., `-M only=groq`)    |
-| `-T <args>`           | None                      | None                      | Pass task-specific arguments to the benchmark                    |
-| `--model`             | `BENCH_MODEL`             | `groq/openai/gpt-oss-20b` | Model(s) to evaluate                                             |
-| `--epochs`            | `BENCH_EPOCHS`            | `1`                       | Number of epochs to run each evaluation                          |
-| `--max-connections`   | `BENCH_MAX_CONNECTIONS`   | `10`                      | Maximum parallel requests to model                               |
-| `--temperature`       | `BENCH_TEMPERATURE`       | `0.6`                     | Model temperature                                                |
-| `--top-p`             | `BENCH_TOP_P`             | `1.0`                     | Model top-p                                                      |
-| `--max-tokens`        | `BENCH_MAX_TOKENS`        | `None`                    | Maximum tokens for model response                                |
-| `--seed`              | `BENCH_SEED`              | `None`                    | Seed for deterministic generation                                |
-| `--limit`             | `BENCH_LIMIT`             | `None`                    | Limit evaluated samples (number or start,end)                    |
-| `--logfile`           | `BENCH_OUTPUT`            | `None`                    | Output file for results                                          |
-| `--sandbox`           | `BENCH_SANDBOX`           | `None`                    | Environment to run evaluation (local/docker)                     |
-| `--timeout`           | `BENCH_TIMEOUT`           | `10000`                   | Timeout for each API request (seconds)                           |
-| `--display`           | `BENCH_DISPLAY`           | `None`                    | Display type (full/conversation/rich/plain/none)                 |
-| `--reasoning-effort`  | `BENCH_REASONING_EFFORT`  | `None`                    | Reasoning effort level (low/medium/high)                         |
-| `--json`              | None                      | `False`                   | Output results in JSON format                                    |
-| `--log-format`        | `BENCH_LOG_FORMAT`        | `eval`                    | Output logging format (eval/json)                                |
-| `--hub-repo`          | `BENCH_HUB_REPO`          | `None`                    | Push results to a Hugging Face Hub dataset                       |
+| Option               | Environment Variable      | Default                   | Description                                                      |
+| -------------------- |---------------------------|---------------------------|------------------------------------------------------------------|
+| `-M <args>`          | None                      | None                      | Pass model/provider-specific arguments (e.g., `-M only=groq`)    |
+| `-T <args>`          | None                      | None                      | Pass task-specific arguments to the benchmark                    |
+| `--model`            | `BENCH_MODEL`             | `groq/openai/gpt-oss-20b` | Model(s) to evaluate                                             |
+| `--epochs`           | `BENCH_EPOCHS`            | `1`                       | Number of epochs to run each evaluation                          |
+| `--epochs-reducer`   | `BENCH_EPOCHS_REDUCER`    | None                      | Reducer(s) applied when aggregating epoch scores.                |
+| `--max-connections`  | `BENCH_MAX_CONNECTIONS`   | `10`                      | Maximum parallel requests to model                               |
+| `--temperature`      | `BENCH_TEMPERATURE`       | `0.6`                     | Model temperature                                                |
+| `--top-p`            | `BENCH_TOP_P`             | `1.0`                     | Model top-p                                                      |
+| `--max-tokens`       | `BENCH_MAX_TOKENS`        | `None`                    | Maximum tokens for model response                                |
+| `--seed`             | `BENCH_SEED`              | `None`                    | Seed for deterministic generation                                |
+| `--limit`            | `BENCH_LIMIT`             | `None`                    | Limit evaluated samples (number or start,end)                    |
+| `--logfile`          | `BENCH_OUTPUT`            | `None`                    | Output file for results                                          |
+| `--sandbox`          | `BENCH_SANDBOX`           | `None`                    | Environment to run evaluation (local/docker)                     |
+| `--timeout`          | `BENCH_TIMEOUT`           | `10000`                   | Timeout for each API request (seconds)                           |
+| `--display`          | `BENCH_DISPLAY`           | `None`                    | Display type (full/conversation/rich/plain/none)                 |
+| `--reasoning-effort` | `BENCH_REASONING_EFFORT`  | `None`                    | Reasoning effort level (low/medium/high)                         |
+| `--json`             | None                      | `False`                   | Output results in JSON format                                    |
+| `--log-format`       | `BENCH_LOG_FORMAT`        | `eval`                    | Output logging format (eval/json)                                |
+| `--hub-repo`         | `BENCH_HUB_REPO`          | `None`                    | Push results to a Hugging Face Hub dataset                       |
 | `--keep-livemcp-root` | `BENCH_KEEP_LIVEMCP_ROOT` | `False`                   | Allow preservation of root data after livemcpbench eval runs     |
-| `--code-agent`        | `BENCH_CODE_AGENT`        | `opencode`                | Select code agent for exercism tasks                             |
+| `--code-agent`       | `BENCH_CODE_AGENT`        | `opencode`                | Select code agent for exercism tasks                             |
 
 ## Grader Information
 
