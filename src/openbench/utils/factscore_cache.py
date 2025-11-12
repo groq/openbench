@@ -23,6 +23,8 @@ from rich.progress import (
     TextColumn,
 )
 
+from openbench.utils.text import FACTSCORE_DB_SHA256
+
 
 FACTSCORE_CACHE_ENV = "OPENBENCH_FACTSCORE_CACHE"
 DEFAULT_FACTSCORE_CACHE = Path("~/.openbench/factscore").expanduser()
@@ -119,17 +121,18 @@ def _compute_file_hash(filepath: Path, algorithm: str = "sha256") -> str:
 
 def download_factscore_db(
     cache_root: str | os.PathLike[str] | None = None,
-    expected_sha256: str | None = None,
+    expected_sha256: str | None = FACTSCORE_DB_SHA256,
     max_retries: int = 3,
 ) -> Path:
-    """Download the FActScore Wikipedia database from Google Drive.
+    """Download the FActScore Wikipedia database from Hugging Face.
 
     This function handles the automatic download of the ~20GB Wikipedia SQLite
-    database required for FActScore evaluation.
+    database required for FActScore evaluation, with built-in integrity verification.
 
     Args:
         cache_root: Root directory for FActScore cache. Uses default if None.
-        expected_sha256: Expected SHA-256 hash for verification. Skip verification if None.
+        expected_sha256: Expected SHA-256 hash for verification. Defaults to known-good hash.
+            Set to None to skip verification (not recommended).
         max_retries: Maximum number of download attempts (default: 3).
 
     Returns:

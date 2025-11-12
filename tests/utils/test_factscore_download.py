@@ -156,11 +156,11 @@ class TestDownloadFactScoreDB:
 
                 assert "Insufficient disk space" in str(exc_info.value)
 
-    @patch("openbench.utils.factscore_cache.gdown.download")
+    @patch("openbench.utils.factscore_cache.hf_hub_download")
     @patch("openbench.utils.factscore_cache._check_disk_space")
     @patch("openbench.utils.factscore_cache.Console")
     def test_download_successful_without_hash_verification(
-        self, mock_console_class, mock_check_disk, mock_gdown
+        self, mock_console_class, mock_check_disk, mock_hf_download
     ):
         """Test successful download without hash verification."""
         mock_console = MagicMock()
@@ -171,11 +171,14 @@ class TestDownloadFactScoreDB:
             db_dir = Path(temp_dir) / "data"
             db_dir.mkdir()
 
-            # Mock gdown to create a fake downloaded file
-            def fake_download(url, output, quiet, fuzzy):
-                Path(output).write_bytes(b"fake database content" * 1000)
+            # Mock hf_hub_download to create a fake downloaded file
+            def fake_hf_download(repo_id, filename, repo_type, local_dir):
+                # hf_hub_download creates the file at local_dir/filename
+                downloaded_file = Path(local_dir) / filename
+                downloaded_file.write_bytes(b"fake database content" * 1000)
+                return str(downloaded_file)
 
-            mock_gdown.side_effect = fake_download
+            mock_hf_download.side_effect = fake_hf_download
 
             with patch("openbench.utils.factscore_cache.data_dir", return_value=db_dir):
                 result = download_factscore_db(expected_sha256=None)
@@ -184,18 +187,18 @@ class TestDownloadFactScoreDB:
                 assert result.exists()
                 assert result.read_bytes() == b"fake database content" * 1000
 
-                # Verify gdown was called with correct URL
-                mock_gdown.assert_called_once()
-                call_args = mock_gdown.call_args
-                # gdown.download is called as: download(url, output, quiet=False, fuzzy=False)
-                # So the URL is the first positional argument
-                assert "1Qu4JHWjpUKhGPaAW5UHhS5RJ545CVy4I" in call_args[0][0]
+                # Verify hf_hub_download was called with correct parameters
+                mock_hf_download.assert_called_once()
+                call_kwargs = mock_hf_download.call_args.kwargs
+                assert call_kwargs["repo_id"] == "lvogel123/factscore-data"
+                assert call_kwargs["filename"] == "enwiki-20230401.db"
+                assert call_kwargs["repo_type"] == "dataset"
 
-    @patch("openbench.utils.factscore_cache.gdown.download")
+    @patch("openbench.utils.factscore_cache.hf_hub_download")
     @patch("openbench.utils.factscore_cache._check_disk_space")
     @patch("openbench.utils.factscore_cache.Console")
     def test_download_successful_with_hash_verification(
-        self, mock_console_class, mock_check_disk, mock_gdown
+        self, mock_console_class, mock_check_disk, mock_hf_download
     ):
         """Test successful download with hash verification."""
         mock_console = MagicMock()
@@ -209,11 +212,13 @@ class TestDownloadFactScoreDB:
             db_dir = Path(temp_dir) / "data"
             db_dir.mkdir()
 
-            # Mock gdown to create a fake downloaded file
-            def fake_download(url, output, quiet, fuzzy):
-                Path(output).write_bytes(fake_content)
+            # Mock hf_hub_download to create a fake downloaded file
+            def fake_hf_download(repo_id, filename, repo_type, local_dir):
+                downloaded_file = Path(local_dir) / filename
+                downloaded_file.write_bytes(fake_content)
+                return str(downloaded_file)
 
-            mock_gdown.side_effect = fake_download
+            mock_hf_download.side_effect = fake_hf_download
 
             with patch("openbench.utils.factscore_cache.data_dir", return_value=db_dir):
                 result = download_factscore_db(expected_sha256=expected_hash)
@@ -226,11 +231,11 @@ class TestDownloadFactScoreDB:
                     "integrity verified" in str(call).lower() for call in print_calls
                 )
 
-    @patch("openbench.utils.factscore_cache.gdown.download")
+    @patch("openbench.utils.factscore_cache.hf_hub_download")
     @patch("openbench.utils.factscore_cache._check_disk_space")
     @patch("openbench.utils.factscore_cache.Console")
     def test_download_fails_hash_verification(
-        self, mock_console_class, mock_check_disk, mock_gdown
+        self, mock_console_class, mock_check_disk, mock_hf_download
     ):
         """Test download fails when hash verification doesn't match."""
         mock_console = MagicMock()
@@ -244,11 +249,13 @@ class TestDownloadFactScoreDB:
             db_dir = Path(temp_dir) / "data"
             db_dir.mkdir()
 
-            # Mock gdown to create a fake downloaded file
-            def fake_download(url, output, quiet, fuzzy):
-                Path(output).write_bytes(fake_content)
+            # Mock hf_hub_download to create a fake downloaded file
+            def fake_hf_download(repo_id, filename, repo_type, local_dir):
+                downloaded_file = Path(local_dir) / filename
+                downloaded_file.write_bytes(fake_content)
+                return str(downloaded_file)
 
-            mock_gdown.side_effect = fake_download
+            mock_hf_download.side_effect = fake_hf_download
 
             with patch("openbench.utils.factscore_cache.data_dir", return_value=db_dir):
                 with pytest.raises(RuntimeError) as exc_info:
@@ -256,11 +263,11 @@ class TestDownloadFactScoreDB:
 
                 assert "integrity check failed" in str(exc_info.value).lower()
 
-    @patch("openbench.utils.factscore_cache.gdown.download")
+    @patch("openbench.utils.factscore_cache.hf_hub_download")
     @patch("openbench.utils.factscore_cache._check_disk_space")
     @patch("openbench.utils.factscore_cache.Console")
     def test_download_retries_on_failure(
-        self, mock_console_class, mock_check_disk, mock_gdown
+        self, mock_console_class, mock_check_disk, mock_hf_download
     ):
         """Test download retries on failure."""
         mock_console = MagicMock()
@@ -270,13 +277,15 @@ class TestDownloadFactScoreDB:
         # First two attempts fail, third succeeds
         call_count = [0]
 
-        def fake_download(url, output, quiet, fuzzy):
+        def fake_hf_download(repo_id, filename, repo_type, local_dir):
             call_count[0] += 1
             if call_count[0] < 3:
                 raise ConnectionError("Network error")
-            Path(output).write_bytes(b"fake database")
+            downloaded_file = Path(local_dir) / filename
+            downloaded_file.write_bytes(b"fake database")
+            return str(downloaded_file)
 
-        mock_gdown.side_effect = fake_download
+        mock_hf_download.side_effect = fake_hf_download
 
         with tempfile.TemporaryDirectory() as temp_dir:
             db_dir = Path(temp_dir) / "data"
@@ -284,21 +293,21 @@ class TestDownloadFactScoreDB:
 
             with patch("openbench.utils.factscore_cache.data_dir", return_value=db_dir):
                 with patch("time.sleep"):  # Skip sleep delays in tests
-                    result = download_factscore_db(max_retries=3)
+                    result = download_factscore_db(max_retries=3, expected_sha256=None)
 
                     assert result.exists()
-                    assert mock_gdown.call_count == 3
+                    assert mock_hf_download.call_count == 3
                     # Verify retry messages were printed
                     print_calls = [
                         str(call) for call in mock_console.print.call_args_list
                     ]
                     assert any("retry" in str(call).lower() for call in print_calls)
 
-    @patch("openbench.utils.factscore_cache.gdown.download")
+    @patch("openbench.utils.factscore_cache.hf_hub_download")
     @patch("openbench.utils.factscore_cache._check_disk_space")
     @patch("openbench.utils.factscore_cache.Console")
     def test_download_fails_after_max_retries(
-        self, mock_console_class, mock_check_disk, mock_gdown
+        self, mock_console_class, mock_check_disk, mock_hf_download
     ):
         """Test download raises error after max retries exhausted."""
         mock_console = MagicMock()
@@ -306,7 +315,7 @@ class TestDownloadFactScoreDB:
         mock_check_disk.return_value = True
 
         # All attempts fail
-        mock_gdown.side_effect = ConnectionError("Network error")
+        mock_hf_download.side_effect = ConnectionError("Network error")
 
         with tempfile.TemporaryDirectory() as temp_dir:
             db_dir = Path(temp_dir) / "data"
@@ -319,13 +328,13 @@ class TestDownloadFactScoreDB:
 
                     assert "Failed to download" in str(exc_info.value)
                     assert "2 attempts" in str(exc_info.value)
-                    assert mock_gdown.call_count == 2
+                    assert mock_hf_download.call_count == 2
 
-    @patch("openbench.utils.factscore_cache.gdown.download")
+    @patch("openbench.utils.factscore_cache.hf_hub_download")
     @patch("openbench.utils.factscore_cache._check_disk_space")
     @patch("openbench.utils.factscore_cache.Console")
     def test_download_cleans_up_temp_files_on_failure(
-        self, mock_console_class, mock_check_disk, mock_gdown
+        self, mock_console_class, mock_check_disk, mock_hf_download
     ):
         """Test download cleans up temporary files on failure."""
         mock_console = MagicMock()
@@ -333,7 +342,7 @@ class TestDownloadFactScoreDB:
         mock_check_disk.return_value = True
 
         # Fail download
-        mock_gdown.side_effect = RuntimeError("Download failed")
+        mock_hf_download.side_effect = RuntimeError("Download failed")
 
         with tempfile.TemporaryDirectory() as temp_dir:
             db_dir = Path(temp_dir) / "data"
@@ -350,11 +359,11 @@ class TestDownloadFactScoreDB:
                     ]
                     assert len(temp_dirs) == 0
 
-    @patch("openbench.utils.factscore_cache.gdown.download")
+    @patch("openbench.utils.factscore_cache.hf_hub_download")
     @patch("openbench.utils.factscore_cache._check_disk_space")
     @patch("openbench.utils.factscore_cache.Console")
     def test_download_handles_empty_file(
-        self, mock_console_class, mock_check_disk, mock_gdown
+        self, mock_console_class, mock_check_disk, mock_hf_download
     ):
         """Test download detects and fails on empty downloaded file."""
         mock_console = MagicMock()
@@ -362,10 +371,12 @@ class TestDownloadFactScoreDB:
         mock_check_disk.return_value = True
 
         # Create empty file
-        def fake_download(url, output, quiet, fuzzy):
-            Path(output).write_bytes(b"")
+        def fake_hf_download(repo_id, filename, repo_type, local_dir):
+            downloaded_file = Path(local_dir) / filename
+            downloaded_file.write_bytes(b"")
+            return str(downloaded_file)
 
-        mock_gdown.side_effect = fake_download
+        mock_hf_download.side_effect = fake_hf_download
 
         with tempfile.TemporaryDirectory() as temp_dir:
             db_dir = Path(temp_dir) / "data"
@@ -378,34 +389,36 @@ class TestDownloadFactScoreDB:
 
                     assert "empty" in str(exc_info.value).lower()
 
-    @patch("openbench.utils.factscore_cache.gdown.download")
+    @patch("openbench.utils.factscore_cache.hf_hub_download")
     @patch("openbench.utils.factscore_cache._check_disk_space")
     @patch("openbench.utils.factscore_cache.Console")
     def test_download_atomic_write(
-        self, mock_console_class, mock_check_disk, mock_gdown
+        self, mock_console_class, mock_check_disk, mock_hf_download
     ):
-        """Test download uses atomic write (temp file then move)."""
+        """Test download uses atomic write (temp dir then move)."""
         mock_console = MagicMock()
         mock_console_class.return_value = mock_console
         mock_check_disk.return_value = True
 
         downloaded_to_temp = [False]
 
-        def fake_download(url, output, quiet, fuzzy):
+        def fake_hf_download(repo_id, filename, repo_type, local_dir):
             # Verify download happens to temp location, not final location
-            output_path = Path(output)
-            if "factscore_" in output_path.parent.name:
+            local_dir_path = Path(local_dir)
+            if "factscore_" in local_dir_path.name:
                 downloaded_to_temp[0] = True
-            output_path.write_bytes(b"database content")
+            downloaded_file = local_dir_path / filename
+            downloaded_file.write_bytes(b"database content")
+            return str(downloaded_file)
 
-        mock_gdown.side_effect = fake_download
+        mock_hf_download.side_effect = fake_hf_download
 
         with tempfile.TemporaryDirectory() as temp_dir:
             db_dir = Path(temp_dir) / "data"
             db_dir.mkdir()
 
             with patch("openbench.utils.factscore_cache.data_dir", return_value=db_dir):
-                result = download_factscore_db()
+                result = download_factscore_db(expected_sha256=None)
 
                 # Verify download happened to temp location first
                 assert downloaded_to_temp[0]

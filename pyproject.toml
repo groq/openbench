@@ -112,5 +112,4 @@ polyglotoxicity = [
 factscore = [
     "factscorelite>=1.3.0,<2.0.0",
     "rank-bm25>=0.2.2",
-    "gdown>=5.0.0",
 ]

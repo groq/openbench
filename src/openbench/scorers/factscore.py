@@ -172,9 +172,12 @@ class _FactScoreLiteRunner:
         self, topic: str, generation: str, query: str | None
     ) -> Dict[str, Any]:
         await self._ensure_initialized()
-        assert self._atomic_generator is not None
-        assert self._fact_scorer is not None
-        assert self._retriever is not None
+        if (
+            self._atomic_generator is None
+            or self._fact_scorer is None
+            or self._retriever is None
+        ):
+            raise RuntimeError("Runner not properly initialized")
 
         async with self._run_lock:
             return await asyncio.to_thread(self._score_sync, topic, generation, query)
@@ -182,9 +185,9 @@ class _FactScoreLiteRunner:
     def _score_sync(
         self, topic: str, generation: str, query: str | None
     ) -> Dict[str, Any]:
+        assert self._retriever is not None
         assert self._atomic_generator is not None
         assert self._fact_scorer is not None
-        assert self._retriever is not None
 
         knowledge_source = self._retriever.get_knowledge(topic, query)
 
