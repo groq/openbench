@@ -763,6 +763,15 @@ _BUILTIN_BENCHMARKS = {
         function_name="math_500",
         subtask=True,
     ),
+    "mathvista": BenchmarkMetadata(
+        name="MathVista",
+        description="Mathematical Reasoning in Visual Contexts - 6.1K multimodal math problems requiring fine-grained visual understanding across diverse visual contexts",
+        category="core",
+        tags=["multimodal", "math", "reasoning", "visual", "images", "math-vision"],
+        module_path="openbench.evals.mathvista",
+        function_name="mathvista",
+        is_alpha=False,
+    ),
     # Math competitions
     # MathArena family aggregate
     "aime_2023_I": BenchmarkMetadata(

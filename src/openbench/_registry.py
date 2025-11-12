@@ -275,6 +275,7 @@ from .evals.exercism.exercism import (  # noqa: F401, E402
 )
 from .evals.livemcpbench import livemcpbench  # noqa: F401, E402
 from .evals.math import math, math_500  # noqa: F401, E402
+from .evals.mathvista import mathvista  # noqa: F401, E402
 from .evals.mbpp import mbpp  # noqa: F401, E402
 from .evals.medmcqa import medmcqa  # noqa: F401, E402
 from .evals.medqa import medqa  # noqa: F401, E402
