@@ -4,8 +4,6 @@ Tau-bench eval registrations.
 
 from __future__ import annotations
 
-from typing import Iterable, Optional
-
 from inspect_ai import Task, task
 from inspect_ai.model import GenerateConfig
 
@@ -22,16 +20,10 @@ def _build_tau_bench_task(
     domain: str,
     *,
     user_model: str,
-    num_trials: int,
     max_steps: int,
-    task_ids: Optional[Iterable[str]] = None,
-    num_tasks: Optional[int] = None,
 ) -> Task:
     dataset = get_tau_bench_dataset(
         domain,
-        num_trials=num_trials,
-        task_ids=list(task_ids) if task_ids else None,
-        num_tasks=num_tasks,
     )
     solver_fn = tau_bench_solver(
         user_model=user_model,
@@ -51,10 +43,7 @@ def _build_tau_bench_task(
 @task
 def tau_bench_retail(
     user_model: str = "openai/gpt-4.1",
-    num_trials: int = 1,
     max_steps: int = 200,
-    task_ids: Optional[list[str]] = None,
-    num_tasks: Optional[int] = None,
 ) -> Task:
     """
     Run tau-bench retail tasks with a simulated user and real tool calls.
@@ -62,44 +51,29 @@ def tau_bench_retail(
     return _build_tau_bench_task(
         "retail",
         user_model=user_model,
-        num_trials=num_trials,
         max_steps=max_steps,
-        task_ids=task_ids,
-        num_tasks=num_tasks,
     )
 
 
 @task
 def tau_bench_airline(
     user_model: str = "openai/gpt-4.1",
-    num_trials: int = 1,
     max_steps: int = 200,
-    task_ids: Optional[list[str]] = None,
-    num_tasks: Optional[int] = None,
 ) -> Task:
     return _build_tau_bench_task(
         "airline",
         user_model=user_model,
-        num_trials=num_trials,
         max_steps=max_steps,
-        task_ids=task_ids,
-        num_tasks=num_tasks,
     )
 
 
 @task
 def tau_bench_telecom(
     user_model: str = "openai/gpt-4.1",
-    num_trials: int = 1,
     max_steps: int = 200,
-    task_ids: Optional[list[str]] = None,
-    num_tasks: Optional[int] = None,
 ) -> Task:
     return _build_tau_bench_task(
         "telecom",
         user_model=user_model,
-        num_trials=num_trials,
         max_steps=max_steps,
-        task_ids=task_ids,
-        num_tasks=num_tasks,
     )
