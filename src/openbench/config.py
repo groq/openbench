@@ -5733,6 +5733,7 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.ocrbenchv2",
         function_name="ocrbenchv2",
         is_alpha=False,
+    ),
     "deep_research_bench": BenchmarkMetadata(
         name="DeepResearch Bench",
         description="A comprehensive benchmark for evaluating Deep Research Agents",
