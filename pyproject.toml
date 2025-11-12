@@ -27,6 +27,7 @@ dependencies = [
     "tiktoken>=0.11.0",
     "typer>=0.15.3",
     "numpy==2.2.6",
+    "python-levenshtein>=0.20.0",
 ]
 
 [project.urls]
