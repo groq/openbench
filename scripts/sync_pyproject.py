@@ -84,6 +84,15 @@ def remove_cli_entrypoints(content: str) -> str:
     return REMOVE_PROJECT_SCRIPTS.sub("", content)
 
 
+def rename_project_name(content: str, new_name: str = "openbench-core") -> str:
+    """Rename the project name."""
+    return re.sub(
+        r'(?m)^(\s*name\s*=\s*["\']).*?(["\']\s*)$',
+        rf'\1{new_name}\2',
+        content,
+    )
+
+
 def main() -> None:
     if not SOURCE_FILE.exists():
         raise FileNotFoundError(f"Source pyproject not found at {SOURCE_FILE}")
@@ -91,6 +100,7 @@ def main() -> None:
     content = SOURCE_FILE.read_text(encoding="utf-8")
     content = remove_cli_entrypoints(content)
     content = adjust_relative_paths(content)
+    content = rename_project_name(content, "openbench-core")
     # Collapse double blank lines introduced by the removal step.
     content = re.sub(r"\n{3,}", "\n\n", content).strip() + "\n"
 

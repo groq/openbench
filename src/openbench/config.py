@@ -560,6 +560,14 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmstar",
         function_name="mmstar",
     ),
+    "chartqapro": BenchmarkMetadata(
+        name="ChartQAPro",
+        description="Comprehensive chart understanding benchmark with 1,948 samples testing vision-language models across 5 question types (Factoid, Multi Choice, Hypothetical, Fact Checking, Conversational) with support for direct, CoT, and PoT prompting strategies",
+        category="core",
+        tags=["vision", "multi-modal", "charts", "reasoning", "multi-turn"],
+        module_path="openbench.evals.chartqapro",
+        function_name="chartqapro",
+    ),
     "healthbench": BenchmarkMetadata(
         name="HealthBench",
         description="Medical dialogue evaluation using physician-created rubrics for assessing healthcare conversations",
@@ -5725,6 +5733,13 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.ocrbenchv2",
         function_name="ocrbenchv2",
         is_alpha=False,
+    "deep_research_bench": BenchmarkMetadata(
+        name="DeepResearch Bench",
+        description="A comprehensive benchmark for evaluating Deep Research Agents",
+        category="core",
+        tags=["research", "long-form", "multilingual"],
+        module_path="openbench.evals.deep_research_bench",
+        function_name="deep_research_bench",
     ),
 }
 

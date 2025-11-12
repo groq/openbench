@@ -1,0 +1,99 @@
+---
+name: Publish openbench-core to pyx
+
+'on':
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      team:
+        description: 'pyx team slug (overrides repo var PYX_TEAM)'
+        required: false
+        type: string
+      registry:
+        description: 'pyx registry name'
+        required: false
+        default: 'main'
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@2ddd2b9cb38ad8efd50337e8ab201519a34c9f24
+
+      - name: Resolve pyx target
+        id: target
+        shell: bash
+        run: |
+          TEAM_INPUT="${{ inputs.team }}"
+          TEAM_VAR="${{ vars.PYX_TEAM }}"
+          TEAM="${TEAM_INPUT:-$TEAM_VAR}"
+          if [ -z "$TEAM" ]; then
+            echo "::error::pyx team not provided." >&2
+            echo "Set repo variable PYX_TEAM" >&2
+            echo "or provide workflow input 'team'." >&2
+            exit 1
+          fi
+          REGISTRY_INPUT="${{ inputs.registry }}"
+          REGISTRY="${REGISTRY_INPUT:-main}"
+          echo "team=$TEAM" >> "$GITHUB_OUTPUT"
+          echo "registry=$REGISTRY" >> "$GITHUB_OUTPUT"
+          URL="https://api.pyx.dev/v1/upload/${TEAM}/${REGISTRY}"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+
+      - name: Compute dev version and patch pyproject
+        working-directory: packages/openbench-core
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE_VERSION=$( \
+            grep -E '^version[[:space:]]*=[[:space:]]*"' pyproject.toml | \
+            head -n1 | \
+            sed -E 's/^version[[:space:]]*=[[:space:]]*"([^"]+)"/\1/' \
+          )
+          DATE=$(date -u +%Y%m%d)
+          RUN_NUM="${{ github.run_number }}"
+          NEW_VERSION="${BASE_VERSION}.dev${DATE}${RUN_NUM}"
+          cp pyproject.toml pyproject.toml.bak
+          P1='s/^version[[:space:]]*=[[:space:]]*\"[^\"]+\"/version = \"'
+          P2='\"/'
+          PATTERN="$P1${NEW_VERSION//\//-}$P2"
+          sed -i.bak -E "$PATTERN" pyproject.toml
+          echo "version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Build distributions
+        working-directory: packages/openbench-core
+        run: uv build --sdist --wheel
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: openbench-core-dists
+          path: packages/openbench-core/dist/*
+
+      - name: Authenticate to pyx (Trusted Publishing)
+        id: auth
+        uses: astral-sh/pyx-auth-action@08873fa2b19cf2361327222bea1657faed760ae2
+        with:
+          workspace: ${{ steps.target.outputs.team }}
+          registry: ${{ steps.target.outputs.registry }}
+
+      - name: Publish to pyx
+        working-directory: packages/openbench-core
+        env:
+          UV_PUBLISH_URL: ${{ steps.auth.outputs.url }}
+          UV_PUBLISH_TOKEN: ${{ steps.auth.outputs.token }}
+        run: uv publish dist/*

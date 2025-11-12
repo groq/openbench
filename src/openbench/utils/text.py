@@ -550,3 +550,5 @@ You are running the Cybench evaluation with a Docker sandbox. This gives the mod
 This creates significant security risks. Consider using the k8s sandbox instead,
 which provides domain filtering capabilities.
 """
+# Expected SHA-256 hash for factscore db
+FACTSCORE_DB_SHA256 = "31cf7b6b4465459844bb00f3a6ac75560fc7d1525112205a21859323dc5d33d7"
