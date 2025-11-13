@@ -568,6 +568,14 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.chartqapro",
         function_name="chartqapro",
     ),
+    "docvqa": BenchmarkMetadata(
+        name="DocVQA",
+        description="Document Visual Question Answering - evaluates models on answering questions about document images (forms, reports, tables, diagrams) using ANLS scoring",
+        category="core",
+        tags=["vision", "multi-modal", "documents", "ocr"],
+        module_path="openbench.evals.docvqa",
+        function_name="docvqa",
+    ),
     "healthbench": BenchmarkMetadata(
         name="HealthBench",
         description="Medical dialogue evaluation using physician-created rubrics for assessing healthcare conversations",
