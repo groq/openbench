@@ -576,6 +576,14 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmvetv2",
         function_name="mmvetv2",
     ),
+    "docvqa": BenchmarkMetadata(
+        name="DocVQA",
+        description="Document Visual Question Answering - evaluates models on answering questions about document images (forms, reports, tables, diagrams) using ANLS scoring",
+        category="core",
+        tags=["vision", "multimodal", "documents", "ocr"],
+        module_path="openbench.evals.docvqa",
+        function_name="docvqa",
+    ),
     "healthbench": BenchmarkMetadata(
         name="HealthBench",
         description="Medical dialogue evaluation using physician-created rubrics for assessing healthcare conversations",
@@ -5725,6 +5733,30 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.rocketscience",
         function_name="rocketscience",
         is_alpha=False,
+    ),
+    "ocrbenchv2": BenchmarkMetadata(
+        name="OCRBench v2",
+        description="Visual text localization and reasoning benchmark across 31 diverse OCR and document understanding scenarios",
+        category="core",
+        tags=[
+            "multimodal",
+            "vision-language",
+            "ocr",
+            "document-understanding",
+            "images",
+            "vision",
+        ],
+        module_path="openbench.evals.ocrbenchv2",
+        function_name="ocrbenchv2",
+        is_alpha=False,
+    ),
+    "deep_research_bench": BenchmarkMetadata(
+        name="DeepResearch Bench",
+        description="A comprehensive benchmark for evaluating Deep Research Agents",
+        category="core",
+        tags=["research", "long-form", "multilingual"],
+        module_path="openbench.evals.deep_research_bench",
+        function_name="deep_research_bench",
     ),
 }
 

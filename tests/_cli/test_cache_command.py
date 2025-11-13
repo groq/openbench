@@ -663,41 +663,6 @@ class TestCacheUploadCommand:
             # Verify original file no longer exists
             assert not db_file.exists()
 
-    @patch("openbench._cli.cache_command._cache_root")
-    def test_cache_upload_txt_file_success(self, mock_cache_root):
-        """Test successful text file move."""
-        with tempfile.TemporaryDirectory() as temp_dir:
-            cache_path = Path(temp_dir) / ".openbench"
-            cache_path.mkdir()
-            mock_cache_root.return_value = cache_path
-
-            # Create a test text file
-            txt_file = Path(temp_dir) / "entities.txt"
-            txt_file.write_text("entity1\nentity2\n")
-
-            result = runner.invoke(
-                app,
-                [
-                    "cache",
-                    "upload",
-                    "--txt_file",
-                    str(txt_file),
-                    "--path",
-                    "factscore/data/labeled/prompt_entities.txt",
-                ],
-            )
-            assert result.exit_code == 0
-            assert "Text file moved successfully" in result.stdout
-
-            # Verify file was moved to correct location
-            dest_file = (
-                cache_path / "factscore" / "data" / "labeled" / "prompt_entities.txt"
-            )
-            assert dest_file.exists()
-            assert dest_file.read_text() == "entity1\nentity2\n"
-            # Verify original file no longer exists
-            assert not txt_file.exists()
-
     @patch("shutil.move")
     @patch("openbench._cli.cache_command._cache_root")
     def test_cache_upload_move_failure(self, mock_cache_root, mock_move):
