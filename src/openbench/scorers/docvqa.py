@@ -8,7 +8,7 @@ Reference: https://arxiv.org/abs/1907.00490 (original ANLS paper)
 
 from typing import Any, Dict, List
 
-import Levenshtein
+import Levenshtein  # type: ignore[import-not-found]
 from inspect_ai.scorer import Score, Scorer, Target, scorer
 
 

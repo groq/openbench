@@ -54,12 +54,6 @@ class FactScoreConfig:
     passages: int = 8
 
 
-def _normalise_model_name(model_name: str) -> str:
-    if model_name.lower() in {"retrieval+chatgpt", "chatgpt"}:
-        return "gpt-4o-mini"
-    return model_name
-
-
 def _ensure_openai_key() -> None:
     if "OPENAI_API_KEY" not in os.environ or not os.environ["OPENAI_API_KEY"].strip():
         raise RuntimeError(
@@ -154,7 +148,7 @@ class _FactScoreLiteRunner:
 
         factscorelite_configs.facts_db_path = str(facts_path)
         factscorelite_configs.decisions_db_path = str(decisions_path)
-        factscorelite_configs.model_name = _normalise_model_name(self.cfg.openai_model)
+        factscorelite_configs.model_name = self.cfg.openai_model
 
         self._atomic_generator = AtomicFactGenerator()
         self._fact_scorer = FactScorer()
@@ -178,9 +172,12 @@ class _FactScoreLiteRunner:
         self, topic: str, generation: str, query: str | None
     ) -> Dict[str, Any]:
         await self._ensure_initialized()
-        assert self._atomic_generator is not None
-        assert self._fact_scorer is not None
-        assert self._retriever is not None
+        if (
+            self._atomic_generator is None
+            or self._fact_scorer is None
+            or self._retriever is None
+        ):
+            raise RuntimeError("Runner not properly initialized")
 
         async with self._run_lock:
             return await asyncio.to_thread(self._score_sync, topic, generation, query)
@@ -188,9 +185,9 @@ class _FactScoreLiteRunner:
     def _score_sync(
         self, topic: str, generation: str, query: str | None
     ) -> Dict[str, Any]:
+        assert self._retriever is not None
         assert self._atomic_generator is not None
         assert self._fact_scorer is not None
-        assert self._retriever is not None
 
         knowledge_source = self._retriever.get_knowledge(topic, query)
 
@@ -293,7 +290,7 @@ def _is_knowledge_source_error(exc: Exception) -> bool:
 
 @scorer(metrics=[mean(), factscore_metrics()])  # type: ignore[arg-type]
 def factscore_scorer(
-    model_name: str = "retrieval+ChatGPT",
+    model_name: str = "gpt-4o-mini",
     knowledge_source: str | None = "enwiki-20230401",
     gamma: int = 10,
     cache_root: str | None = None,
@@ -307,7 +304,7 @@ def factscore_scorer(
         )
 
     cfg = FactScoreConfig(
-        openai_model=_normalise_model_name(model_name),
+        openai_model=model_name,
         knowledge_source=knowledge_source,
         gamma=gamma,
         cache_root=cache_root,
@@ -320,17 +317,17 @@ def factscore_scorer(
         _ = target
         topic = None
         if isinstance(state.metadata, dict):
-            topic = state.metadata.get("topic")
+            topic = state.metadata.get("entity")
         if not topic and state.sample_id and hasattr(state, "sample_id"):
             if isinstance(state.sample_id, dict) and "metadata" in state.sample_id:
-                topic = state.sample_id.get("metadata", {}).get("topic")  # type: ignore[union-attr]
+                topic = state.sample_id.get("metadata", {}).get("entity")  # type: ignore[union-attr]
         if not topic and state.sample_id:
             topic = state.sample_id
 
         topic = str(topic) if topic else ""
         if not topic.strip():
             raise RuntimeError(
-                "FactScoreLite scorer requires the sample metadata to include a 'topic'."
+                "FactScoreLite scorer requires the sample metadata to include a 'entity'."
             )
 
         generation = state.output.completion if state.output else ""
