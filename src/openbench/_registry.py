@@ -284,6 +284,7 @@ from .evals.mmlu_pro import mmlu_pro  # noqa: F401, E402
 from .evals.multichallenge import multichallenge  # noqa: F401, E402
 from .evals.mrcr import openai_mrcr, openai_mrcr_2n, openai_mrcr_4n, openai_mrcr_8n  # noqa: F401, E402
 from .evals.mmstar import mmstar  # noqa: F401, E402
+from .evals.mmvetv2 import mmvetv2  # noqa: F401, E402
 from .evals.musr import musr  # noqa: F401, E402
 from .evals.openbookqa import openbookqa  # noqa: F401, E402
 from .evals.pubmedqa import pubmedqa  # noqa: F401, E402
