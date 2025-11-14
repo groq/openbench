@@ -34,7 +34,7 @@ def record_to_mcq_sample(record: dict) -> MCQSample:
 
 @task
 def gpqa_diamond() -> Task:
-    """Evaluate the GQPQA Diamond dataset (MCQ Abstracted)."""
+    """Evaluate the GPQA Diamond dataset (MCQ Abstracted)."""
     return MCQEval(
         name="gpqa_diamond",
         dataset_path="nmayorga7/gpqa_diamond",
