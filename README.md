@@ -123,6 +123,22 @@ openbench supports 30+ model providers through Inspect AI. Set the appropriate A
 | **W&B Inference**     | `WANDB_API_KEY`        | `wandb/model-name`               |
 | **vLLM**              | None (local)           | `vllm/model-name`                |
 
+### Using Unsupported Providers
+
+openbench works with any OpenAI-compatible API endpoint, even if the provider isn't listed above. This allows you to benchmark models from new or specialized providers that support the OpenAI Chat Completions API format.
+
+**Setup Pattern:**
+1. Use the model string format: `openai-api/<provider>/<model-name>`
+2. Set environment variables: `<PROVIDER>_API_KEY` and `<PROVIDER>_BASE_URL`
+
+```bash
+# Example with Groq (shown for demonstration, since Groq is already natively supported)
+export GROQ_API_KEY=your_key
+export GROQ_BASE_URL=https://api.groq.com/openai/v1
+
+bench eval mmlu --model openai-api/groq/llama-3.3-70b-versatile
+```
+
 ## Available Benchmarks
 
 Here are the currently available benchmarks. For an up-to-date list use `bench list`.
