@@ -4,6 +4,9 @@ Async solver that runs tau2-bench simulations against Inspect models.
 This leverages certain parts of the tau2 package (like the construction of the env, the prompts, the execution etc.),
 but uses inspect to call the LLMs (to leverage their integration and to use the API keys of the user).
 This, however, means that the state has to be passed constantly between inspect and tau2-bench.
+
+As it re-implements parts of tau2, parts are adapted from the original implementation,
+see https://github.com/sierra-research/tau2-bench (MIT)
 """
 
 from __future__ import annotations
