@@ -88,7 +88,7 @@ def rename_project_name(content: str, new_name: str = "openbench-core") -> str:
     """Rename the project name."""
     return re.sub(
         r'(?m)^(\s*name\s*=\s*["\']).*?(["\']\s*)$',
-        rf'\1{new_name}\2',
+        rf"\1{new_name}\2",
         content,
     )
 
