@@ -5716,7 +5716,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["agents", "tools", "graded"],
         module_path="openbench.evals.tau_bench",
         function_name="tau_bench_retail",
-        is_alpha=False,
+        is_alpha=True,
     ),
     "tau_bench_airline": BenchmarkMetadata(
         name="TauBench Airline",
@@ -5725,7 +5725,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["agents", "tools", "graded"],
         module_path="openbench.evals.tau_bench",
         function_name="tau_bench_airline",
-        is_alpha=False,
+        is_alpha=True,
     ),
     "tau_bench_telecom": BenchmarkMetadata(
         name="TauBench Telecom",
@@ -5734,7 +5734,7 @@ _BUILTIN_BENCHMARKS = {
         tags=["agents", "tools", "graded"],
         module_path="openbench.evals.tau_bench",
         function_name="tau_bench_telecom",
-        is_alpha=False,
+        is_alpha=True,
     ),
     "rocketscience": BenchmarkMetadata(
         name="RocketScience",
