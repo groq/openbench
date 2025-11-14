@@ -7,13 +7,16 @@ spatial awareness, mathematics, and sequential reasoning.
 
 from __future__ import annotations
 
-import base64
 from typing import Any, Dict, List, Union, cast
 
 from inspect_ai.dataset import Dataset, Sample, hf_dataset, MemoryDataset
 from inspect_ai.model import ChatMessageUser, ContentImage, ContentText
 
-from openbench.utils.image import compress_image, detect_image_mime_type
+from openbench.utils.image import (
+    compress_image,
+    extract_image_bytes,
+    image_bytes_to_data_uri,
+)
 
 
 def record_to_sample(record: Dict[str, Any]) -> Sample:
@@ -58,22 +61,10 @@ def record_to_sample(record: Dict[str, Any]) -> Sample:
                 # Load and convert image if it exists
                 image_data = record.get(f"image_{img_idx}")
                 if image_data is not None:
-                    # Handle PIL Image objects from HuggingFace
-                    if hasattr(image_data, "tobytes"):
-                        # Convert PIL Image to bytes
-                        import io
+                    try:
+                        # Extract bytes from various image formats (HF dict, raw bytes, or PIL)
+                        image_bytes = extract_image_bytes(image_data)
 
-                        img_bytes = io.BytesIO()
-                        image_data.save(img_bytes, format="PNG")
-                        image_bytes = img_bytes.getvalue()
-                    elif isinstance(image_data, dict) and "bytes" in image_data:
-                        image_bytes = image_data["bytes"]
-                    elif isinstance(image_data, bytes):
-                        image_bytes = image_data
-                    else:
-                        image_bytes = None
-
-                    if image_bytes:
                         # Compress and convert to base64 data URI
                         compressed_bytes = compress_image(
                             image_bytes,
@@ -81,14 +72,13 @@ def record_to_sample(record: Dict[str, Any]) -> Sample:
                             quality=75,
                             max_dimension=1536,
                         )
-                        base64_image = base64.b64encode(compressed_bytes).decode(
-                            "utf-8"
-                        )
-                        mime_type = detect_image_mime_type(compressed_bytes)
-                        data_uri = f"data:{mime_type};base64,{base64_image}"
+                        data_uri = image_bytes_to_data_uri(compressed_bytes)
 
                         # Add the image to input content
                         input_content.append(ContentImage(image=data_uri))
+                    except ValueError:
+                        # Skip if image format is unsupported
+                        pass
 
                 # Add any remaining text after this image marker
                 if remaining_text.strip():

@@ -10,13 +10,16 @@ documents.
 Reference: https://arxiv.org/abs/2007.00398
 """
 
-import base64
 from typing import Any, Dict, List, Union, cast
 
 from inspect_ai.dataset import Dataset, hf_dataset, Sample
 from inspect_ai.model import ChatMessageUser, ContentImage, ContentText
 
-from openbench.utils.image import compress_image, detect_image_mime_type
+from openbench.utils.image import (
+    compress_image,
+    extract_image_bytes,
+    image_bytes_to_data_uri,
+)
 
 
 def record_to_sample(record: Dict[str, Any]) -> Sample:
@@ -49,15 +52,15 @@ def record_to_sample(record: Dict[str, Any]) -> Sample:
     # Add image if present
     if "image" in record and record["image"] is not None:
         image_data = record["image"]
-        image_bytes = image_data["bytes"]
+
+        # Extract bytes from various image formats (HF dict, raw bytes, or PIL)
+        image_bytes = extract_image_bytes(image_data)
 
         # Compress image to reduce size and speed up processing
         compressed_bytes = compress_image(
             image_bytes, max_size_mb=5.0, quality=85, max_dimension=2048
         )
-        base64_image = base64.b64encode(compressed_bytes).decode("utf-8")
-        mime_type = detect_image_mime_type(compressed_bytes)
-        data_uri = f"data:{mime_type};base64,{base64_image}"
+        data_uri = image_bytes_to_data_uri(compressed_bytes)
 
         input_content.append(ContentImage(image=data_uri))
 
