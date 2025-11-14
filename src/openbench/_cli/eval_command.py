@@ -722,9 +722,14 @@ def run_eval(
 
     # Normalize epoch reducers (support repeated flags or comma-separated values)
     epoch_reducers = normalize_epoch_reducers(epochs_reducer) if epochs_reducer else []
-    epochs_config: int | Epochs = (
-        Epochs(epochs, reducer=epoch_reducers) if epoch_reducers else epochs
-    )
+    epochs_config: int | Epochs | None
+    if epoch_reducers:
+        if epochs is None:
+            raise typer.BadParameter("--epochs is required when using --epochs-reducer")
+        epoch_value = epochs
+        epochs_config = Epochs(epoch_value, reducer=epoch_reducers)
+    else:
+        epochs_config = epochs
 
     # Apply display patch
     patch_display_results()
