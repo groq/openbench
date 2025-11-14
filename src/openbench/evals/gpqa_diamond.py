@@ -2,6 +2,7 @@ import random
 from inspect_ai import Task, task, Epochs
 from inspect_ai.model import GenerateConfig
 from openbench.utils.mcq import MCQEval, MCQSample
+from openbench.utils.text import SIMPLE_EVALS_SYSTEM_MESSAGE
 from openbench.utils.text import MULTIPLE_CHOICE_PROMPT_TEMPLATE
 
 
@@ -40,7 +41,7 @@ def gpqa_diamond() -> Task:
         record_to_mcq_sample=record_to_mcq_sample,
         split="train",  # only train split available
         auto_id=True,
-        prompt_template="",
+        prompt_template=SIMPLE_EVALS_SYSTEM_MESSAGE,
         config=GenerateConfig(temperature=0.5),
         epochs=Epochs(10),
     )
