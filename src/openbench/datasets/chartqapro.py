@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-import base64
 from typing import Any
 
 from inspect_ai.dataset import Dataset, MemoryDataset, Sample, hf_dataset
 from inspect_ai.model import ChatMessageUser, ContentImage, ContentText
 
-from openbench.utils.image import detect_image_mime_type
+from openbench.utils.image import extract_image_bytes, image_bytes_to_data_uri
 
 
 def record_to_sample(record: dict[str, Any]) -> Sample:
@@ -33,16 +32,10 @@ def record_to_sample(record: dict[str, Any]) -> Sample:
         Sample with image, first question, and all metadata for solver/scorer
     """
     # Extract and convert image (stored as raw bytes in Parquet)
-    image_bytes = record["image"]
-
-    # Handle different image formats from HuggingFace
-    if isinstance(image_bytes, dict) and "bytes" in image_bytes:
-        image_bytes = image_bytes["bytes"]
+    image_bytes = extract_image_bytes(record["image"])
 
     # Convert to base64 data URI with proper MIME type detection
-    base64_image = base64.b64encode(image_bytes).decode("utf-8")
-    mime_type = detect_image_mime_type(image_bytes)
-    data_uri = f"data:{mime_type};base64,{base64_image}"
+    data_uri = image_bytes_to_data_uri(image_bytes)
 
     # Extract all fields
     questions = record["Question"]  # List of 1-7 questions

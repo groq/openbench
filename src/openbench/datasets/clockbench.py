@@ -1,30 +1,24 @@
 from __future__ import annotations
 
-from inspect_ai.dataset import Dataset, Sample, MemoryDataset
-from openbench.utils.image import detect_image_mime_type
-from inspect_ai.model import ContentImage, ChatMessageUser
-import base64
 import json
-from inspect_ai.dataset import hf_dataset
+
+from inspect_ai.dataset import Dataset, Sample, MemoryDataset, hf_dataset
+from inspect_ai.model import ContentImage, ChatMessageUser
+
+from openbench.utils.image import extract_image_bytes, image_bytes_to_data_uri
 
 
 def record_to_sample(record: dict) -> Sample:
     """Convert a Clockbench record to a Sample for multi-turn conversation."""
 
-    # handle the image data - stored as raw bytes in parquet
-    image_bytes = record["image"]
+    # Handle the image data - stored as raw bytes in parquet
+    image_data = record["image"]
 
-    if isinstance(image_bytes, dict) and "bytes" in image_bytes:
-        image_bytes = image_bytes["bytes"]
-    elif isinstance(image_bytes, bytes):
-        image_bytes = image_bytes
-    else:
-        image_bytes = None
+    # Extract bytes from various image formats (HF dict, raw bytes, or PIL)
+    image_bytes = extract_image_bytes(image_data)
 
-    # convert to base64 data URI with proper MIME type detection
-    base64_image = base64.b64encode(image_bytes).decode("utf-8")
-    mime_type = detect_image_mime_type(image_bytes)
-    data_uri = f"data:{mime_type};base64,{base64_image}"
+    # Convert to base64 data URI with proper MIME type detection
+    data_uri = image_bytes_to_data_uri(image_bytes)
 
     # create initial input with just image - solver will add questions dynamically
     image_content = ContentImage(image=data_uri)

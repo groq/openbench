@@ -6489,7 +6489,7 @@ EVAL_GROUPS = {
     ),
     "mmmu": EvalGroup(
         name="MMMU",
-        description="Aggregate of 29+ MMMU subject tasks",
+        description="Aggregate of 29 MMMU subject tasks",
         benchmarks=[
             "mmmu_accounting",
             "mmmu_agriculture",
@@ -6788,6 +6788,19 @@ EVAL_GROUPS = {
             "safemt_m2s",
             "cosafe_m2s",
             "mhj_m2s",
+        ],
+    ),
+    "multimodal": EvalGroup(
+        name="Multimodal Benchmarks",
+        description="Select suite of vision-language benchmarks (note: this is not a comprehensive list of all multimodal benchmarks)",
+        benchmarks=[
+            "chartqapro",
+            "mathvista",
+            "mmmu_pro_vision",
+            "mmstar",
+            "mmvetv2",
+            "ocrbenchv2",
+            "rocketscience",
         ],
     ),
 }

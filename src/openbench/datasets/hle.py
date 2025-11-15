@@ -1,8 +1,9 @@
+from typing import Any, List, Union, cast
+
 from inspect_ai.dataset import Dataset, Sample, MemoryDataset, hf_dataset
 from inspect_ai.model import ChatMessageUser, ContentText, ContentImage
-from typing import List, Union, cast, Any
-import base64
-from openbench.utils.image import detect_image_mime_type
+
+from openbench.utils.image import extract_image_bytes, image_bytes_to_data_uri
 
 
 def record_to_sample(record: dict) -> Sample:
@@ -24,26 +25,19 @@ def record_to_sample(record: dict) -> Sample:
     if record.get("image"):
         image_data = record["image"]
 
-        # Handle the image data - it should be in bytes format
-        if isinstance(image_data, dict) and "bytes" in image_data:
-            image_bytes = image_data["bytes"]
-        elif isinstance(image_data, bytes):
-            image_bytes = image_data
-        else:
-            # If it's a string, it might be base64 encoded or a URL
-            # For now, store in metadata and skip adding to content
-            metadata["image_url"] = str(image_data)
-            image_bytes = None
+        try:
+            # Extract bytes from various image formats (HF dict, raw bytes, or PIL)
+            image_bytes = extract_image_bytes(image_data)
 
-        if image_bytes:
             # Convert to base64 data URI with proper MIME type detection
-            base64_image = base64.b64encode(image_bytes).decode("utf-8")
-            mime_type = detect_image_mime_type(image_bytes)
-            data_uri = f"data:{mime_type};base64,{base64_image}"
+            data_uri = image_bytes_to_data_uri(image_bytes)
 
             # Add the image to the input content using data URI
             input_content.append(ContentImage(image=data_uri))
             metadata["image_url"] = data_uri
+        except ValueError:
+            # If it's a string or unsupported format, store in metadata and skip
+            metadata["image_url"] = str(image_data)
 
     return Sample(
         id=record["id"],

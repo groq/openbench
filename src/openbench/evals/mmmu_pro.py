@@ -1,11 +1,14 @@
 from typing import List, Union, Dict, Any, Optional, cast
-import base64
 import ast
 from inspect_ai import task, Task
 from inspect_ai.model import GenerateConfig, ChatMessageUser, ContentText, ContentImage
 from openbench.utils.mcq import MCQSample, MCQEval
 from openbench.utils.text import create_dynamic_multiple_choice_prompt
-from openbench.utils.image import detect_image_mime_type, compress_image
+from openbench.utils.image import (
+    compress_image,
+    extract_image_bytes,
+    image_bytes_to_data_uri,
+)
 
 
 def _parse_options_string(options_string: str) -> List[str]:
@@ -47,20 +50,18 @@ def record_to_mcq_sample(record: Dict[str, Any]) -> MCQSample:
     # Single image field
     if "image" in record and record["image"] is not None:
         image_val = record["image"]
-        image_bytes: Optional[bytes] = None
-        if isinstance(image_val, dict) and "bytes" in image_val:
-            image_bytes = image_val["bytes"]
-        elif isinstance(image_val, (bytes, bytearray)):
-            image_bytes = bytes(image_val)
-        if image_bytes:
+        try:
+            # Extract bytes from various image formats (HF dict, raw bytes, or PIL)
+            image_bytes = extract_image_bytes(image_val)
             compressed_bytes = compress_image(
                 image_bytes, max_size_mb=5.0, quality=75, max_dimension=1536
             )
-            base64_image = base64.b64encode(compressed_bytes).decode("utf-8")
-            mime_type = detect_image_mime_type(compressed_bytes)
-            data_uri = f"data:{mime_type};base64,{base64_image}"
+            data_uri = image_bytes_to_data_uri(compressed_bytes)
             input_content.append(ContentImage(image=data_uri))
             num_images += 1
+        except ValueError:
+            # Skip if image format is unsupported
+            pass
 
     # Multiple images
     for i in range(1, 8):
@@ -68,18 +69,18 @@ def record_to_mcq_sample(record: Dict[str, Any]) -> MCQSample:
         if image_key in record and record[image_key] is not None:
             image_data = record[image_key]
             try:
-                image_bytes2 = image_data["bytes"]
-            except Exception:
+                # Extract bytes from various image formats (HF dict, raw bytes, or PIL)
+                image_bytes = extract_image_bytes(image_data)
+                # Compress image if too large to avoid 413 errors
+                compressed_bytes = compress_image(
+                    image_bytes, max_size_mb=5.0, quality=75, max_dimension=1536
+                )
+                data_uri = image_bytes_to_data_uri(compressed_bytes)
+                input_content.append(ContentImage(image=data_uri))
+                num_images += 1
+            except (ValueError, Exception):
+                # Skip if image format is unsupported or extraction fails
                 continue
-            # Compress image if too large to avoid 413 errors
-            compressed_bytes2 = compress_image(
-                image_bytes2, max_size_mb=5.0, quality=75, max_dimension=1536
-            )
-            base64_image2 = base64.b64encode(compressed_bytes2).decode("utf-8")
-            mime_type2 = detect_image_mime_type(compressed_bytes2)
-            data_uri2 = f"data:{mime_type2};base64,{base64_image2}"
-            input_content.append(ContentImage(image=data_uri2))
-            num_images += 1
 
     metadata = {
         "question_id": record.get("id", ""),

@@ -1,6 +1,6 @@
 from inspect_ai.dataset import Dataset, Sample, hf_dataset
-import base64
-from openbench.utils.image import detect_image_mime_type
+
+from openbench.utils.image import extract_image_bytes, image_bytes_to_data_uri
 
 
 def record_to_sample(record: dict) -> Sample:
@@ -13,20 +13,16 @@ def record_to_sample(record: dict) -> Sample:
 
     image_data = record.get("image")
 
-    if isinstance(image_data, dict) and "bytes" in image_data:
-        image_bytes = image_data["bytes"]
-    elif isinstance(image_data, bytes):
-        image_bytes = image_data
-    else:
-        image_bytes = None
-
-    if image_bytes:
-        # Convert to base64 data URI with proper MIME type detection
-        base64_image = base64.b64encode(image_bytes).decode("utf-8")
-        mime_type = detect_image_mime_type(image_bytes)
-        data_uri = f"data:{mime_type};base64,{base64_image}"
-
-        meta_info["image_uri"] = data_uri
+    if image_data:
+        try:
+            # Extract bytes from various image formats (HF dict, raw bytes, or PIL)
+            image_bytes = extract_image_bytes(image_data)
+            # Convert to base64 data URI with proper MIME type detection
+            data_uri = image_bytes_to_data_uri(image_bytes)
+            meta_info["image_uri"] = data_uri
+        except ValueError:
+            # Image data format not supported, skip image
+            pass
 
     return Sample(
         id=record.get("index"),

@@ -3,10 +3,13 @@
 from inspect_ai.dataset import Dataset, hf_dataset, Sample, MemoryDataset
 from inspect_ai.model import ChatMessageUser, ContentText, ContentImage
 from typing import Dict, Any, List, Optional, Union, cast
-import base64
+
+from openbench.utils.image import (
+    compress_image,
+    extract_image_bytes,
+    image_bytes_to_data_uri,
+)
 from openbench.utils.text import MULTIPLE_CHOICE_PROMPT_TEMPLATE
-from openbench.utils.image import detect_image_mime_type
-from openbench.utils.image import compress_image
 
 
 def record_to_sample(record: Dict[str, Any]) -> Sample:
@@ -80,15 +83,14 @@ def record_to_sample(record: Dict[str, Any]) -> Sample:
         if image_key in record and record[image_key] is not None:
             image_data = record[image_key]
 
-            image_bytes = image_data["bytes"]
+            # Extract bytes from various image formats (HF dict, raw bytes, or PIL)
+            image_bytes = extract_image_bytes(image_data)
 
-            # Convert to base64 data URI with proper MIME type detection
+            # Compress and convert to base64 data URI with proper MIME type detection
             compressed_bytes = compress_image(
                 image_bytes, max_size_mb=5.0, quality=75, max_dimension=1536
             )
-            base64_image = base64.b64encode(compressed_bytes).decode("utf-8")
-            mime_type = detect_image_mime_type(compressed_bytes)
-            data_uri = f"data:{mime_type};base64,{base64_image}"
+            data_uri = image_bytes_to_data_uri(compressed_bytes)
 
             # Add the image to the input content using data URI
             input_content.append(ContentImage(image=data_uri))

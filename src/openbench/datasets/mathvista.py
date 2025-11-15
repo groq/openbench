@@ -8,13 +8,16 @@ Paper: https://arxiv.org/abs/2310.02255
 GitHub: https://github.com/lupantech/MathVista
 """
 
-import base64
 from typing import Any, Dict, List, Optional, Union, cast
 
 from inspect_ai.dataset import Dataset, MemoryDataset, Sample
 from inspect_ai.model import ChatMessageUser, ContentImage, ContentText
 
-from openbench.utils.image import compress_image, detect_image_mime_type
+from openbench.utils.image import (
+    compress_image,
+    extract_image_bytes,
+    image_bytes_to_data_uri,
+)
 
 
 def record_to_sample(record: Dict[str, Any]) -> Sample:
@@ -46,25 +49,14 @@ def record_to_sample(record: Dict[str, Any]) -> Sample:
     if "decoded_image" in record and record["decoded_image"] is not None:
         image_data = record["decoded_image"]
 
-        # Handle different image formats
-        if isinstance(image_data, dict) and "bytes" in image_data:
-            # HuggingFace dataset format: dict with 'bytes' and 'path' keys
-            image_bytes = image_data["bytes"]
-        else:
-            # PIL Image format
-            import io
+        # Extract bytes from various image formats (HF dict, raw bytes, or PIL)
+        image_bytes = extract_image_bytes(image_data)
 
-            img_byte_arr = io.BytesIO()
-            image_data.save(img_byte_arr, format="PNG")
-            image_bytes = img_byte_arr.getvalue()
-
-        # Compress and encode image
+        # Compress and encode image to data URI
         compressed_bytes = compress_image(
             image_bytes, max_size_mb=5.0, quality=75, max_dimension=1536
         )
-        base64_image = base64.b64encode(compressed_bytes).decode("utf-8")
-        mime_type = detect_image_mime_type(compressed_bytes)
-        data_uri = f"data:{mime_type};base64,{base64_image}"
+        data_uri = image_bytes_to_data_uri(compressed_bytes)
 
         # Add the image to input content
         input_content.append(ContentImage(image=data_uri))
