@@ -59,6 +59,9 @@ asyncio_default_fixture_loop_scope = "function"
 markers = [
     "integration: marks tests that require external services (deselect with '-m \"not integration\"')",
 ]
+filterwarnings = [
+    "ignore:install \"ipywidgets\" for Jupyter support:UserWarning:rich.live",
+]
 
 [tool.ruff]
 
@@ -122,4 +125,7 @@ ocrbenchv2 = [
 deep_research_bench = [
     "google-genai>=1.47.0",
     "requests>=2.32.0",
+]
+political_evenhandedness = [
+    "anthropic>=0.40.0",
 ]
