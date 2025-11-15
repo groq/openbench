@@ -348,6 +348,14 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.gpt_oss.aime",
         function_name="gpt_oss_aime25",
     ),
+    "gpt_oss_gpqa_diamond": BenchmarkMetadata(
+        name="GPT-OSS GPQA Diamond",
+        description="GPQA Diamond without system prompt and temp=1.0, mirroring OpenAI's GPT-oSS release",
+        category="core",
+        tags=["multiple-choice", "science", "graduate-level"],
+        module_path="openbench.evals.gpt_oss.gpqa_diamond",
+        function_name="gpt_oss_gpqa_diamond",
+    ),
     "humaneval": BenchmarkMetadata(
         name="HumanEval",
         description="Code generation benchmark with 164 programming problems",
