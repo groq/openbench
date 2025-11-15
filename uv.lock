@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version >= '3.13'",
@@ -2456,6 +2456,9 @@ ocrbenchv2 = [
     { name = "lxml" },
     { name = "nltk" },
 ]
+political-evenhandedness = [
+    { name = "anthropic" },
+]
 polyglotoxicity = [
     { name = "google-api-python-client" },
 ]
@@ -2514,6 +2517,7 @@ ocrbenchv2 = [
     { name = "lxml", specifier = ">=5.0.0" },
     { name = "nltk", specifier = ">=3.8" },
 ]
+political-evenhandedness = [{ name = "anthropic", specifier = ">=0.40.0" }]
 polyglotoxicity = [{ name = "google-api-python-client", specifier = ">=2.0.0" }]
 scicode = [{ name = "scicode", git = "https://github.com/TheFloatingString/SciCode-fork.git?rev=4f20d721ba3e2227196262083b9b7a70484d54f7" }]
 

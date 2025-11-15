@@ -142,6 +142,7 @@ Here are the currently available benchmarks. For an up-to-date list use `bench l
 | **Community**     | ClockBench, DetailBench                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | **MCP**           | LiveMCPBench (70 MCP servers and 527 tools)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | 
 | **Jailbreak**    | SafeMT_M2S (single turn conversion of SafeMT_Attack_600), CoSafe_M2S (single turn conversion of Cosafe_300), MHJ_M2S (single turn conversion of MHJ) |
+| **Political Bias** | political_evenhandedness (Anthropic's political bias eval with 1350+ samples and 7 subsets), political_evenhandedness subsets: historical_events, political_figures, policies, social_issues, us_constitution, social_identity, science |
 
 ## Configuration
 
@@ -240,6 +241,7 @@ The following benchmarks use a grader model:
 | `detailbench`  | `gpt-5-mini-2025-08-07`          |
 | `livemcpbench` | `openai/gpt-4.1-mini-2025-04-14` |
 | `otis_mock_aime` | `openai/gpt-4.1-mini-2025-04-14` |
+| `political_evenhandedness` | `anthropic/claude-sonnet-4-5-20250929` |
 
 ## Building Your Own Evals
 
