@@ -8,7 +8,6 @@ Reference: https://arxiv.org/abs/1907.00490 (original ANLS paper)
 
 from typing import Any, Dict, List
 
-import Levenshtein  # type: ignore[import-not-found]
 from inspect_ai.scorer import Score, Scorer, Target, scorer
 
 
@@ -41,6 +40,14 @@ def normalized_levenshtein_similarity(s1: str, s2: str) -> float:
     Returns:
         Similarity score between 0.0 (completely different) and 1.0 (identical)
     """
+    try:
+        import Levenshtein  # type: ignore[import-not-found]
+    except ModuleNotFoundError:
+        raise RuntimeError(
+            "The 'python-levenshtein' package is required for DocVQA evaluation. "
+            "Install it with: uv sync --group docvqa (or pip install python-levenshtein)."
+        ) from None
+
     if len(s1) == 0 and len(s2) == 0:
         return 1.0
 
