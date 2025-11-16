@@ -6,7 +6,6 @@ from openbench._cli.describe_command import describe_eval
 from openbench._cli.view_command import run_view
 from openbench._cli.cache_command import cache_app
 from openbench._cli.export_command import run_export
-from openbench.scorers import pass_hat as _register_pass_hat  # noqa: F401
 
 app = typer.Typer(rich_markup_mode="rich")
 

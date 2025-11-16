@@ -1,7 +1,7 @@
 import pytest
 from inspect_ai.scorer import Score
 
-from openbench.scorers.pass_hat import pass_hat
+from openbench.metrics.pass_hat import pass_hat
 
 
 def _score_series(values, **kwargs):
