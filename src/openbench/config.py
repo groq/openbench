@@ -529,7 +529,7 @@ _BUILTIN_BENCHMARKS = {
     ),
     "prbench_finance": BenchmarkMetadata(
         name="PRBench Finance",
-        description="Professional Reasoning Benchmark – rubric-based grading for high-stakes finance reasoning",
+        description="Professional Reasoning Benchmark (Scale AI) – rubric-based grading for high-stakes finance reasoning",
         category="community",
         tags=["reasoning", "professional", "graded", "rubrics"],
         module_path="openbench.evals.prbench",
@@ -537,7 +537,7 @@ _BUILTIN_BENCHMARKS = {
     ),
     "prbench_legal": BenchmarkMetadata(
         name="PRBench Legal",
-        description="Professional Reasoning Benchmark – rubric-based grading for high-stakes legal reasoning",
+        description="Professional Reasoning Benchmark (Scale AI) – rubric-based grading for high-stakes legal reasoning",
         category="community",
         tags=["reasoning", "professional", "graded", "rubrics"],
         module_path="openbench.evals.prbench",
