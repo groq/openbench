@@ -15,6 +15,7 @@ authors = [
 dependencies = [
     "datasets>=3.6.0",
     "groq>=0.33.0",
+    "anthropic>=0.40.0",
     "inspect-ai==0.3.125",
     "openai>=1.99.7",
     "pillow>=10.0.0",
@@ -120,7 +121,4 @@ ocrbenchv2 = [
 deep_research_bench = [
     "google-genai>=1.47.0",
     "requests>=2.32.0",
-]
-political_evenhandedness = [
-    "anthropic>=0.40.0",
 ]
