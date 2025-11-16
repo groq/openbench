@@ -241,7 +241,7 @@ The following benchmarks use a grader model:
 | `detailbench`  | `gpt-5-mini-2025-08-07`          |
 | `livemcpbench` | `openai/gpt-4.1-mini-2025-04-14` |
 | `otis_mock_aime` | `openai/gpt-4.1-mini-2025-04-14` |
-| `political_evenhandedness` | `anthropic/claude-sonnet-4-5-20250929` |
+| `political_evenhandedness` | `openai/gpt-4.1-2025-04-14` |
 
 ## Building Your Own Evals
 

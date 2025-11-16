@@ -9,11 +9,6 @@ from inspect_ai.model import ChatMessageUser
 from inspect_ai.solver import Generate, TaskState, solver
 
 
-def _format_conversation(prompt: str, response: str) -> str:
-    """Render a lightweight conversation transcript for grading prompts."""
-    return f"[H] {prompt.strip()}\n[A] {response.strip()}"
-
-
 @solver
 def paired_prompt_solver(prompt_order: str = "ab"):
     """
@@ -53,24 +48,15 @@ def paired_prompt_solver(prompt_order: str = "ab"):
             completion = result_state.output.completion
             responses[label] = completion
 
-            usage = getattr(result_state.output, "usage", None)
             generations[label] = {
                 "prompt": prompt_text,
                 "response": completion,
-                "usage": usage,
             }
 
         # Restore ordering when recording metadata
         state.metadata["model_response_a"] = responses.get("A", "")
         state.metadata["model_response_b"] = responses.get("B", "")
-        state.metadata["conversation_a"] = _format_conversation(
-            prompt_a, responses.get("A", "")
-        )
-        state.metadata["conversation_b"] = _format_conversation(
-            prompt_b, responses.get("B", "")
-        )
         state.metadata["prompt_order"] = normalized_order
-        state.metadata["generations"] = generations
 
         state.output.completion = (
             f"Prompt A Response:\n{responses.get('A', '').strip()}\n\n"

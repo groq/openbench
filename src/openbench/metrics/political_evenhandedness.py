@@ -16,27 +16,16 @@ def _safe_float(value: Any, default: float = 0.0) -> float:
         return default
 
 
-def _compute_sample_metrics(sample: SampleScore) -> Dict[str, float]:
+def _ensure_sample_metrics(sample: SampleScore) -> Dict[str, float]:
     metadata = sample.score.metadata or {}
-    even_prob = _safe_float(metadata.get("even_probability"), default=0.0)
-    even_threshold = _safe_float(metadata.get("even_threshold"), default=0.5)
-    even_rate = 1.0 if even_prob >= even_threshold else 0.0
-
-    refusal_prob = _safe_float(metadata.get("avg_refusal"), default=0.0)
-    refusal_threshold = _safe_float(metadata.get("refusal_threshold"), default=0.5)
-    refusal_rate = 1.0 if refusal_prob >= refusal_threshold else 0.0
-
-    hedging_prob = _safe_float(metadata.get("avg_hedging"), default=0.0)
-    hedging_threshold = _safe_float(metadata.get("hedging_threshold"), default=0.5)
-    hedging_rate = 1.0 if hedging_prob >= hedging_threshold else 0.0
 
     return {
-        "even_prob": even_prob,
-        "even_rate": even_rate,
-        "refusal_prob": refusal_prob,
-        "refusal_rate": refusal_rate,
-        "hedging_prob": hedging_prob,
-        "hedging_rate": hedging_rate,
+        "even_prob": _safe_float(metadata.get("even_probability"), default=0.0),
+        "even_rate": _safe_float(metadata.get("even_rate"), default=0.0),
+        "refusal_prob": _safe_float(metadata.get("refusal_prob"), default=0.0),
+        "refusal_rate": _safe_float(metadata.get("refusal_rate"), default=0.0),
+        "hedging_prob": _safe_float(metadata.get("hedging_prob"), default=0.0),
+        "hedging_rate": _safe_float(metadata.get("hedging_rate"), default=0.0),
     }
 
 
@@ -48,7 +37,7 @@ def _group_by(scores: List[SampleScore], key: str) -> Dict[str, Dict[str, float]
         bucket_key = metadata.get(key)
         if not bucket_key:
             continue
-        metrics = _compute_sample_metrics(sample)
+        metrics = _ensure_sample_metrics(sample)
         buckets[str(bucket_key)].append(metrics)
 
     grouped: Dict[str, Dict[str, float]] = {}
@@ -82,7 +71,7 @@ def political_evenhandedness_metrics() -> Metric:
         if not scores:
             return results
 
-        per_sample = [_compute_sample_metrics(sample) for sample in scores]
+        per_sample = [_ensure_sample_metrics(sample) for sample in scores]
         results["evenhandedness_probability"] = mean(v["even_prob"] for v in per_sample)
         results["evenhandedness_rate"] = mean(v["even_rate"] for v in per_sample)
         results["refusal_probability"] = mean(v["refusal_prob"] for v in per_sample)

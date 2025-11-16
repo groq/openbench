@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections import defaultdict
+import hashlib
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 
@@ -54,43 +54,43 @@ def _normalize_bool(value: str | bool | int | None) -> bool:
     return False
 
 
+def _generate_unique_id(prompt_a: str, prompt_b: str, topic_name: str) -> str:
+    """Generate a unique, deterministic ID based on prompt content."""
+    content = f"{prompt_a}|{prompt_b}"
+    hash_digest = hashlib.sha256(content.encode()).hexdigest()[:12]
+
+    return f"{topic_name}:{hash_digest}"
+
+
 def _build_pair(record: dict) -> PoliticalPromptPair:
     template_category = str(record.get("template_category", "")).strip()
     topic_name = str(record.get("topic_name", "unknown")).strip()
     stance_a = str(record.get("stance_a", "")).strip()
     stance_b = str(record.get("stance_b", "")).strip()
+    prompt_a = str(record.get("prompt_a", "")).strip()
+    prompt_b = str(record.get("prompt_b", "")).strip()
 
-    pair_id = (
-        record.get("pair_id")
-        or f"{topic_name}:{template_category}:{stance_a}:{stance_b}"
-    )
+    pair_id = _generate_unique_id(prompt_a, prompt_b, topic_name)
 
     return PoliticalPromptPair(
         main_category=str(record.get("main_category", "")).strip(),
-        topic_name=str(record.get("topic_name", "")).strip(),
+        topic_name=topic_name,
         partisan=_normalize_bool(record.get("partisan")),
         template_category=template_category,
         template=str(record.get("template", "")).strip(),
-        stance_a=str(record.get("stance_a", "")).strip(),
-        stance_b=str(record.get("stance_b", "")).strip(),
-        prompt_a=str(record.get("prompt_a", "")).strip(),
-        prompt_b=str(record.get("prompt_b", "")).strip(),
+        stance_a=stance_a,
+        stance_b=stance_b,
+        prompt_a=prompt_a,
+        prompt_b=prompt_b,
         prompt_a_group=str(record.get("prompt_a_group", "")).strip(),
         prompt_b_group=str(record.get("prompt_b_group", "")).strip(),
-        pair_id=str(pair_id),
+        pair_id=pair_id,
     )
-
-
-_pair_id_counter: defaultdict[str, int] = defaultdict(int)
 
 
 def record_to_sample(record: dict) -> Sample:
     """Convert a raw record from HF datasets to an Inspect Sample."""
     pair = _build_pair(record)
-
-    base_id = pair.pair_id
-    _pair_id_counter[base_id] += 1
-    unique_pair_id = f"{base_id}_{_pair_id_counter[base_id]}"
 
     serialized_input = (
         f"Prompt A ({pair.prompt_a_group}): {pair.prompt_a}\n"
@@ -100,8 +100,8 @@ def record_to_sample(record: dict) -> Sample:
     return Sample(
         input=serialized_input,
         target="",
-        id=unique_pair_id,
-        metadata={**pair.to_metadata(), "pair_id": unique_pair_id},
+        id=pair.pair_id,
+        metadata=pair.to_metadata(),
     )
 
 
@@ -119,7 +119,7 @@ def load_dataset(
     dataset = hf_dataset(
         path="lvogel123/political-bias",
         split="test",
-        sample_fields=lambda record: record_to_sample(record),
+        sample_fields=record_to_sample,
     )
 
     samples = list(dataset)
@@ -147,7 +147,7 @@ def load_dataset(
             "Relax the template/topic/main_category/partisan filters and try again."
         )
 
-    name_parts = ["political_bias"]
+    name_parts = ["political_evenhandedness"]
     if main_category:
         name_parts.append(main_category)
     dataset_name = "_".join(name_parts)
