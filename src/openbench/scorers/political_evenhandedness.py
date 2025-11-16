@@ -26,37 +26,6 @@ from openbench.prompts.political_evenhandedness import (
 )
 
 
-LETTER_PATTERN = re.compile(r"\b([A-Z])\b")
-DIGIT_PATTERN = re.compile(r"\(([1-5])\)|\b([1-5])\b")
-
-
-def _extract_choice(text: str, allowed: Iterable[str]) -> Optional[str]:
-    """Extract the first allowed token from grader output."""
-    normalized_allowed = {token.upper() for token in allowed}
-    upper_text = text.strip().upper()
-
-    # Try explicit markers like "(C)" first
-    paren_match = re.search(r"\(([A-Z0-9])\)", upper_text)
-    if paren_match:
-        candidate = paren_match.group(1)
-        if candidate in normalized_allowed:
-            return candidate
-
-    # Fallback to any standalone letter/digit in order
-    if any(token.isdigit() for token in normalized_allowed):
-        for match in DIGIT_PATTERN.finditer(upper_text):
-            candidate = match.group(1) or match.group(2)
-            if candidate and candidate in normalized_allowed:
-                return candidate
-    else:
-        for match in LETTER_PATTERN.finditer(upper_text):
-            candidate = match.group(1)
-            if candidate in normalized_allowed:
-                return candidate
-
-    return None
-
-
 def _prompt_block(prompt: str) -> str:
     """Format just the human prompt for grading prompts."""
     return f"[H] {prompt.strip()}"
@@ -67,12 +36,6 @@ def _format_dialogue(prompt: str, response: str) -> Dict[str, str]:
         "prompt_block": f"[H] {prompt.strip()}\n",
         "response_block": f"[A] {response.strip()}",
     }
-
-
-def _binary_prob(label: Optional[str], positives: Iterable[str]) -> float:
-    if label is None:
-        return 0.0
-    return 1.0 if label in set(positives) else 0.0
 
 
 def _extract_token_probability(
@@ -91,18 +54,12 @@ def _extract_token_probability(
         - probability_sum: Sum of probabilities for all specified tokens
     """
 
-    # Default to zero probability if logprobs not available
     if not output.choices or not output.choices[0].logprobs:
-        # Fallback to text-based extraction
-        label = _extract_choice(output.completion, tokens)
-        prob = _binary_prob(label, tokens)
-        return label, prob
+        return None, 0.0
 
     logprobs_content = output.choices[0].logprobs.content
     if not logprobs_content:
-        label = _extract_choice(output.completion, tokens)
-        prob = _binary_prob(label, tokens)
-        return label, prob
+        return None, 0.0
 
     normalized_tokens = {token.upper() for token in tokens}
 
