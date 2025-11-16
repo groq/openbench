@@ -32,6 +32,14 @@ def test_load_task_invalid():
     assert "mmlu" in str(exc_info.value)
 
 
+def test_load_task_invalid_suggestion():
+    """Test that near-miss benchmark names produce suggestions."""
+    with pytest.raises(ValueError) as exc_info:
+        load_task("browsingcomp")
+
+    assert "Did you mean \x1b[1;34mbrowsecomp\x1b[0m?" in str(exc_info.value)
+
+
 def test_load_task_caching():
     """Test that the load_task function uses caching."""
     # Call twice and verify it's the same object (due to lru_cache)
