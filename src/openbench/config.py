@@ -18,8 +18,14 @@ from importlib.metadata import entry_points
 import logging
 
 from openbench.utils import BenchmarkMetadata
+from openbench.utils.text import get_fuzzy_suggestions
 
 logger = logging.getLogger(__name__)
+
+ANSI_BOLD = "\033[1m"
+ANSI_BLUE = "\033[34m"
+ANSI_BOLD_BLUE = "\033[1;34m"
+ANSI_RESET = "\033[0m"
 
 
 def _load_entry_point_benchmarks() -> dict[str, BenchmarkMetadata]:
@@ -6029,10 +6035,17 @@ def load_task(benchmark_name: str, allow_alpha: bool = False) -> Callable:
         return _load_task_from_local_path(path)
 
     # Neither registry nor valid path
+    available_benchmarks = ", ".join(sorted(TASK_REGISTRY.keys()))
+    suggestions = get_fuzzy_suggestions(benchmark_name, TASK_REGISTRY.keys(), limit=3)
+    suggestion_text = ""
+    if suggestions:
+        bolded = ", ".join(
+            f"{ANSI_BOLD_BLUE}{suggestion}{ANSI_RESET}" for suggestion in suggestions
+        )
+        suggestion_text = f" Did you mean {bolded}?"
     raise ValueError(
-        f"Unknown benchmark: '{benchmark_name}'. "
-        # return available benchmarks alphabetically
-        f"Available benchmarks: {', '.join(sorted(TASK_REGISTRY.keys()))}"
+        f"Unknown benchmark: '{benchmark_name}'.{suggestion_text}\n\n"
+        f"Available benchmarks:\n\n{available_benchmarks}"
     )
 
 

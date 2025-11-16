@@ -8,6 +8,7 @@ from openbench.utils.text import (
     parse_numeric_answer,
     normalize_number,
     extract_confidence_score,
+    get_fuzzy_suggestions,
 )
 
 
@@ -426,3 +427,14 @@ class TestExtractConfidenceScore:
         response = "confidence: 75%"
         result = extract_confidence_score(response)
         assert result == 75
+
+
+def test_get_fuzzy_suggestions_prioritize_top_matches():
+    """Ensure fuzzy suggestions favor the closest names and drop weak matches."""
+
+    candidates = ["BrowseComp", "BrowseCamp", "AgentDojo"]
+
+    suggestions = get_fuzzy_suggestions("browsingcomp", candidates, limit=2)
+
+    assert suggestions == ["BrowseComp", "BrowseCamp"]
+    assert "AgentDojo" not in suggestions
