@@ -387,6 +387,11 @@ from .evals import polyglotoxicity  # noqa: F401, E402
 from .evals import race  # noqa: F401, E402
 from .evals import qa4mre  # noqa: F401, E402
 from .evals import qasper  # noqa: F401, E402
+from .evals.tau_bench import (  # noqa: F401, E402
+    tau_bench_airline,
+    tau_bench_retail,
+    tau_bench_telecom,
+)
 
 # Knowledge QA benchmarks
 from .evals import logiqa  # noqa: F401, E402
