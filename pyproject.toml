@@ -92,6 +92,7 @@ dev = [
     "ruff>=0.11.9",
     "types-jsonschema>=4.0.0",
     "types-pyyaml>=6.0.12.20250809",
+    "types-requests>=2.32.0",
 ]
 scicode = [
     "scicode",
@@ -116,4 +117,16 @@ factscore = [
 ]
 tau_bench = [
     "tau2",
+]
+docvqa = [
+    "python-levenshtein>=0.20.0",
+]
+ocrbenchv2 = [
+    "apted>=1.0.3",
+    "lxml>=5.0.0",
+    "nltk>=3.8",
+]
+deep_research_bench = [
+    "google-genai>=1.47.0",
+    "requests>=2.32.0",
 ]

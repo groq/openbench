@@ -28,11 +28,15 @@ class FriendliAPI(OpenAICompatibleAPI):
         base_url = base_url or os.environ.get(
             "FRIENDLI_BASE_URL", "https://api.friendli.ai/serverless/v1"
         )
-        api_key = api_key or os.environ.get("FRIENDLI_API_KEY")
+        api_key = (
+            api_key
+            or os.environ.get("FRIENDLI_TOKEN")
+            or os.environ.get("FRIENDLI_API_KEY")
+        )
 
         if not api_key:
             raise ValueError(
-                "Friendli API key not found. Set FRIENDLI_API_KEY environment variable."
+                "Friendli API key not found. Set FRIENDLI_TOKEN environment variable."
             )
 
         super().__init__(
@@ -41,7 +45,7 @@ class FriendliAPI(OpenAICompatibleAPI):
             api_key=api_key,
             config=config,
             service="friendli",
-            service_base_url="https://api.friendli.ai/serverless/v1",
+            service_base_url=base_url,
             **model_args,
         )
 

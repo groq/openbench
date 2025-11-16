@@ -18,8 +18,14 @@ from importlib.metadata import entry_points
 import logging
 
 from openbench.utils import BenchmarkMetadata
+from openbench.utils.text import get_fuzzy_suggestions
 
 logger = logging.getLogger(__name__)
+
+ANSI_BOLD = "\033[1m"
+ANSI_BLUE = "\033[34m"
+ANSI_BOLD_BLUE = "\033[1;34m"
+ANSI_RESET = "\033[0m"
 
 
 def _load_entry_point_benchmarks() -> dict[str, BenchmarkMetadata]:
@@ -568,6 +574,22 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.chartqapro",
         function_name="chartqapro",
     ),
+    "mmvetv2": BenchmarkMetadata(
+        name="MM-Vet v2",
+        description="Challenging benchmark evaluating large multimodal models for integrated capabilities using GPT-4 judge with 5-run grading average (configurable via --task-args num_grading_attempts=N)",
+        category="multimodal",
+        tags=["multimodal", "vision", "llm-judge"],
+        module_path="openbench.evals.mmvetv2",
+        function_name="mmvetv2",
+    ),
+    "docvqa": BenchmarkMetadata(
+        name="DocVQA",
+        description="Document Visual Question Answering - evaluates models on answering questions about document images (forms, reports, tables, diagrams) using ANLS scoring",
+        category="core",
+        tags=["vision", "multimodal", "documents", "ocr"],
+        module_path="openbench.evals.docvqa",
+        function_name="docvqa",
+    ),
     "healthbench": BenchmarkMetadata(
         name="HealthBench",
         description="Medical dialogue evaluation using physician-created rubrics for assessing healthcare conversations",
@@ -762,6 +784,15 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.math",
         function_name="math_500",
         subtask=True,
+    ),
+    "mathvista": BenchmarkMetadata(
+        name="MathVista",
+        description="Mathematical Reasoning in Visual Contexts - 6.1K multimodal math problems requiring fine-grained visual understanding across diverse visual contexts",
+        category="core",
+        tags=["multimodal", "math", "reasoning", "visual", "images", "math-vision"],
+        module_path="openbench.evals.mathvista",
+        function_name="mathvista",
+        is_alpha=False,
     ),
     # Math competitions
     # MathArena family aggregate
@@ -5745,6 +5776,30 @@ _BUILTIN_BENCHMARKS = {
         function_name="rocketscience",
         is_alpha=False,
     ),
+    "ocrbenchv2": BenchmarkMetadata(
+        name="OCRBench v2",
+        description="Visual text localization and reasoning benchmark across 31 diverse OCR and document understanding scenarios",
+        category="core",
+        tags=[
+            "multimodal",
+            "vision-language",
+            "ocr",
+            "document-understanding",
+            "images",
+            "vision",
+        ],
+        module_path="openbench.evals.ocrbenchv2",
+        function_name="ocrbenchv2",
+        is_alpha=False,
+    ),
+    "deep_research_bench": BenchmarkMetadata(
+        name="DeepResearch Bench",
+        description="A comprehensive benchmark for evaluating Deep Research Agents",
+        category="core",
+        tags=["research", "long-form", "multilingual"],
+        module_path="openbench.evals.deep_research_bench",
+        function_name="deep_research_bench",
+    ),
 }
 
 
@@ -6007,10 +6062,17 @@ def load_task(benchmark_name: str, allow_alpha: bool = False) -> Callable:
         return _load_task_from_local_path(path)
 
     # Neither registry nor valid path
+    available_benchmarks = ", ".join(sorted(TASK_REGISTRY.keys()))
+    suggestions = get_fuzzy_suggestions(benchmark_name, TASK_REGISTRY.keys(), limit=3)
+    suggestion_text = ""
+    if suggestions:
+        bolded = ", ".join(
+            f"{ANSI_BOLD_BLUE}{suggestion}{ANSI_RESET}" for suggestion in suggestions
+        )
+        suggestion_text = f" Did you mean {bolded}?"
     raise ValueError(
-        f"Unknown benchmark: '{benchmark_name}'. "
-        # return available benchmarks alphabetically
-        f"Available benchmarks: {', '.join(sorted(TASK_REGISTRY.keys()))}"
+        f"Unknown benchmark: '{benchmark_name}'.{suggestion_text}\n\n"
+        f"Available benchmarks:\n\n{available_benchmarks}"
     )
 
 
@@ -6467,7 +6529,7 @@ EVAL_GROUPS = {
     ),
     "mmmu": EvalGroup(
         name="MMMU",
-        description="Aggregate of 29+ MMMU subject tasks",
+        description="Aggregate of 29 MMMU subject tasks",
         benchmarks=[
             "mmmu_accounting",
             "mmmu_agriculture",
@@ -6766,6 +6828,19 @@ EVAL_GROUPS = {
             "safemt_m2s",
             "cosafe_m2s",
             "mhj_m2s",
+        ],
+    ),
+    "multimodal": EvalGroup(
+        name="Multimodal Benchmarks",
+        description="Select suite of vision-language benchmarks (note: this is not a comprehensive list of all multimodal benchmarks)",
+        benchmarks=[
+            "chartqapro",
+            "mathvista",
+            "mmmu_pro_vision",
+            "mmstar",
+            "mmvetv2",
+            "ocrbenchv2",
+            "rocketscience",
         ],
     ),
 }

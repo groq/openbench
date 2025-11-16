@@ -1,21 +1,24 @@
 import uuid
 from typing import Any, Dict, List
-from inspect_ai.dataset import hf_dataset, Sample, Dataset
-from inspect_ai.model import ContentImage, ContentText, ChatMessageUser
-from openbench.utils.image import detect_image_mime_type, compress_image
-import base64
+
+from inspect_ai.dataset import Dataset, Sample, hf_dataset
+from inspect_ai.model import ChatMessageUser, ContentImage, ContentText
+
+from openbench.utils.image import (
+    compress_image,
+    extract_image_bytes,
+    image_bytes_to_data_uri,
+)
 
 
 def preprocess_image(input: Dict[str, Any]) -> str:
     """Preprocess image to optimized data URI format"""
-    image_bytes = input["bytes"]
+    # Extract bytes from various image formats (HF dict, raw bytes, or PIL)
+    image_bytes = extract_image_bytes(input)
     compressed_bytes = compress_image(image_bytes, max_size_mb=10.0, max_dimension=1024)
 
     # Create data URI with proper MIME type
-    base64_image = base64.b64encode(compressed_bytes).decode("utf-8")
-    mime_type = detect_image_mime_type(compressed_bytes)
-
-    return f"data:{mime_type};base64,{base64_image}"
+    return image_bytes_to_data_uri(compressed_bytes)
 
 
 def record_to_sample_rocketscience(record: Dict[str, Any]) -> List[Sample]:

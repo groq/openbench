@@ -41,32 +41,61 @@ To access any major model, set the appropriate API key environment variable:
 | **W&B Inference**     | `WANDB_API_KEY`        | `wandb/model-name`               |
 | **vLLM**              | None (local)           | `vllm/model-name`                |
 
-### General Model Configuration
+## General Model Configuration
 | CLI Command        | Environment Variable   | Description                                   |
 |--------------------|------------------------|-----------------------------------------------|
 | `--model`          | `BENCH_MODEL`          | Model(s) to evaluate.                         |
 | `--model-base-url` | `BENCH_MODEL_BASE_URL` | Base URL for model(s).                        |
 | `--model-role`     | `BENCH_MODEL_ROLE`     | Map role(s) to specific models.               |
 
-Use `-M` Flag for Other Model-Specific Arguments  
-(e.g. `bench eval simpleqa --model openai/o3-2025-04-16 -M reasoning_effort=high`)
+<Tip>Use the `-M` flag for model-specific arguments
+(e.g. `bench eval simpleqa --model openai/o3-2025-04-16 -M reasoning_effort=high`)</Tip>
 
-## OpenRouter
-[OpenRouter](https://openrouter.ai/) allows access to 60+ providers and 500+ models, all through one centralized platform. See a comprehensive list of available models [here](https://openrouter.ai/models).
+## Provider-Specific Model Configuration
 
-To configure OpenRouter, set your API key:
+### Groq
+[Groq](https://groq.com/) provides fast inference with advanced features including tool calling and reasoning support. To begin using Groq, first set your API key:
+```bash
+export GROQ_API_KEY="gsk_..."
+```
+
+**Tool Calling**
+
+Groq supports built-in tools through the `-M tools` and `-M tool_choice` parameters:
+
+| Parameter | Description | Example |
+|-----------|-------------|---------|
+| **tools** | List of tool definitions | `-M tools='[{"type": "browser_search"}]'` |
+| **tool_choice** | Tool selection strategy: *auto* (model decides), *any* (at least one tool), or *none* (never call a tool) | `-M tool_choice=auto`|
+| **parallel_tool_calls** | Enable parallel tool execution | `-M parallel_tool_calls=true` |
+
+```bash
+# Using browser search tool with SimpleQA
+bench eval simpleqa \
+  --model groq/openai/gpt-oss-120b \
+  --limit 10 \
+  -M tools='[{"type": "browser_search"}]' \
+  -M tool_choice=auto
+```
+
+**Reasoning Effort**
+
+Control reasoning depth for models that support extended reasoning with the `-M reasoning_effort` parameter:
+
+```bash
+# Run MMLU with high reasoning effort level
+bench eval mmlu \
+  --model groq/openai/gpt-oss-120b \
+  -M reasoning_effort=high
+```
+
+### OpenRouter
+[OpenRouter](https://openrouter.ai/) allows access to 60+ providers and 500+ models, all through one centralized platform. See a comprehensive list of available models [here](https://openrouter.ai/models). To begin using OpenRouter, first set your API key:
 ```bash
 export OPENROUTER_API_KEY="sk-or-..."
 ```
-Then, set the model to evaluate using the openbench CLI format. Model naming follows the standard format:
-```bash
-# provider/model-name
-bench eval mrcr --model openrouter/openai/gpt-5
-bench eval mmlu --model openrouter/deepseek/deepseek-chat-v3.1
-bench eval graphwalks --model openrouter/anthropic/claude-sonnet-4.1
-```
 
-### OpenRouter Advanced Configuration
+**OpenRouter Configuration Options**  
 Provider routing parameters can be specified with the `-M` flag to control which providers are used.:
 
 | Parameter        | Description   | Example                                   |
@@ -80,8 +109,6 @@ Provider routing parameters can be specified with the `-M` flag to control which
 | **quantizations**    | Filter by quantization levels     | `-M quantizations=int4,int8`      |
 | **require_parameters**       | Require parameter support        | `-M require_parameters=False`         |
 | **data_collection** | Data collection setting | `-M data_collection=allow` or <br />`-M data_collection=deny` |
-
-### Sample Usage
 
 ```bash
 bench eval mmlu 

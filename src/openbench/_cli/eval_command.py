@@ -19,6 +19,7 @@ from openbench.utils.livemcpbench_cache import (
     prepare_livemcpbench_cache,
     clear_livemcpbench_root,
 )
+from openbench.utils.factscore_cache import download_factscore_db
 
 
 class SandboxType(str, Enum):
@@ -196,10 +197,20 @@ def display_group_summary(
     # Filter to only logs from this group's benchmarks
     # Handle both 'benchmark' and 'openbench/benchmark' task name formats
     def task_matches_benchmark(task_name: str, benchmark_name: str) -> bool:
-        """Check if task name matches benchmark, handling namespace prefixes."""
+        """Check if task name matches benchmark, handling namespace prefixes and suffixes."""
         # Strip namespace prefix if present (e.g., 'openbench/smt_algebra' -> 'smt_algebra')
         task_base = task_name.split("/")[-1] if "/" in task_name else task_name
-        return task_base == benchmark_name
+
+        # Exact match
+        if task_base == benchmark_name:
+            return True
+
+        # Check if task is a variant/subtask of benchmark (e.g., 'chartqapro_direct' matches 'chartqapro')
+        # This handles common suffixes like _direct, _testmini, _all, _mcq, _open, etc.
+        if task_base.startswith(benchmark_name + "_"):
+            return True
+
+        return False
 
     group_logs = [
         log
@@ -220,15 +231,20 @@ def display_group_summary(
         if log.results:
             # Extract accuracy from EvalScore.metrics (correct API per inspect_ai)
             # log.results.scores is a list of EvalScore objects, each with a .metrics dict
+            # Try multiple metric names: accuracy, group_score, overall
             accuracy_value = None
             if log.results.scores:
                 for score in log.results.scores:
                     if hasattr(score, "metrics") and isinstance(score.metrics, dict):
-                        if "accuracy" in score.metrics:
-                            metric = score.metrics["accuracy"]
-                            accuracy_value = (
-                                metric.value if hasattr(metric, "value") else metric
-                            )
+                        # Try to find an aggregate metric (in order of preference)
+                        for metric_name in ["accuracy", "group_score", "overall"]:
+                            if metric_name in score.metrics:
+                                metric = score.metrics[metric_name]
+                                accuracy_value = (
+                                    metric.value if hasattr(metric, "value") else metric
+                                )
+                                break
+                        if accuracy_value is not None:
                             break
 
             # Include benchmarks with accuracy in aggregate calculation
@@ -276,7 +292,7 @@ def display_group_summary(
     typer.echo("\n" + "=" * 60)
     typer.echo(f"📊 GROUP SUMMARY - {group_name}")
     typer.echo("=" * 60)
-    typer.echo(f"Total benchmarks:    {len(benchmark_accuracies)}")
+    typer.echo(f"Total benchmarks:    {len(group_logs)}")
     typer.echo(f"Total samples:       {total_samples:,}")
     typer.echo(f"Mean accuracy:       {mean_accuracy:.2%}")
     typer.echo(f"Median accuracy:     {median_accuracy:.2%}")
@@ -706,6 +722,16 @@ def run_eval(
             datasets = import_module("openbench_cyber.datasets.cvebench")
             plugin_dir = datasets._default_challenges_dir().resolve()
             os.environ["CVEBENCH_CHALLENGE_DIR"] = str(plugin_dir)
+
+        if "factscore" in expanded_benchmarks:
+            if os.getenv("ALLOW_FACTSCORE_DOWNLOAD") != "1":
+                typer.secho(
+                    "WARNING: In order to run the factscore benchmark, you need to download the FActScore wikipedia database (20GB). set ALLOW_FACTSCORE_DOWNLOAD=1 and then rerun the eval command to allow the download.",
+                    fg=typer.colors.YELLOW,
+                )
+                sys.exit(0)
+            else:
+                download_factscore_db()
     except Exception as e:
         raise typer.BadParameter(str(e))
 

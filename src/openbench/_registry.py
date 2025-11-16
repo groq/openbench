@@ -275,6 +275,7 @@ from .evals.exercism.exercism import (  # noqa: F401, E402
 )
 from .evals.livemcpbench import livemcpbench  # noqa: F401, E402
 from .evals.math import math, math_500  # noqa: F401, E402
+from .evals.mathvista import mathvista  # noqa: F401, E402
 from .evals.mbpp import mbpp  # noqa: F401, E402
 from .evals.medmcqa import medmcqa  # noqa: F401, E402
 from .evals.medqa import medqa  # noqa: F401, E402
@@ -284,6 +285,7 @@ from .evals.mmlu_pro import mmlu_pro  # noqa: F401, E402
 from .evals.multichallenge import multichallenge  # noqa: F401, E402
 from .evals.mrcr import openai_mrcr, openai_mrcr_2n, openai_mrcr_4n, openai_mrcr_8n  # noqa: F401, E402
 from .evals.mmstar import mmstar  # noqa: F401, E402
+from .evals.mmvetv2 import mmvetv2  # noqa: F401, E402
 from .evals.musr import musr  # noqa: F401, E402
 from .evals.openbookqa import openbookqa  # noqa: F401, E402
 from .evals.pubmedqa import pubmedqa  # noqa: F401, E402
@@ -340,6 +342,7 @@ from .evals.arc_agi import arc_agi, arc_agi_1, arc_agi_2  # noqa: F401, E402
 from .evals.agentdojo import agentdojo  # noqa: F401, E402
 from .evals.mockaime import otis_mock_aime, otis_mock_aime_2024, otis_mock_aime_2025  # noqa: F401, E402
 from .evals.chartqapro import chartqapro  # noqa: F401, E402
+from .evals.docvqa import docvqa  # noqa: F401, E402
 
 # cybench is defined in openbench-cyber package, not here
 # from .evals.cybench import cybench  # noqa: F401, E402
@@ -461,3 +464,6 @@ from .evals.legalsupport import legalsupport  # noqa: F401, E402
 
 # spatial reasoning benchmarks
 from .evals.rocketscience import rocketscience  # noqa: F401, E402
+
+# Vision & OCR benchmarks
+from .evals.ocrbenchv2 import ocrbenchv2  # noqa: F401, E402

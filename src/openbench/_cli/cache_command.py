@@ -282,10 +282,6 @@ def cache_upload(
         # Move a database file for FActScore
         openbench cache upload --db_file ./enwiki-20230401.db \\
             --path factscore/data/enwiki-20230401.db
-
-        # Move a text file for FActScore
-        openbench cache upload --txt_file ./prompt_entities.txt \\
-            --path factscore/data/labeled/prompt_entities.txt
     """
     # Validate inputs
     if not any([db_file, txt_file]):

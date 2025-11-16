@@ -1,6 +1,8 @@
 import json
 import tiktoken
 import re
+from difflib import get_close_matches
+from typing import Iterable
 from inspect_ai.model import (
     ChatMessageUser,
     ChatMessageAssistant,
@@ -13,6 +15,41 @@ from inspect_ai.model import (
 This module contains helper functions for processing and normalizing text in various
 benchmarking contexts, such as cleaning model outputs and standardizing answer formats.
 """
+
+
+def get_fuzzy_suggestions(
+    value: str, candidates: Iterable[str], limit: int = 3, cutoff: float = 0.68
+) -> list[str]:
+    """
+    Return up to `limit` fuzzy matches for `value` from `candidates`.
+
+    Args:
+        value: The misspelled or partial string to match.
+        candidates: Iterable of valid strings to match against.
+        limit: Maximum number of suggestions to return.
+        cutoff: Minimum similarity ratio (0-1) required for a suggestion.
+
+    Returns:
+        A list of suggested strings ordered by similarity.
+    """
+    if not value:
+        return []
+
+    normalized_lookup: dict[str, str] = {}
+    candidate_list = []
+    for candidate in candidates:
+        if not candidate:
+            continue
+        lowered = candidate.lower()
+        if lowered not in normalized_lookup:
+            normalized_lookup[lowered] = candidate
+            candidate_list.append(lowered)
+
+    if not candidate_list:
+        return []
+
+    matches = get_close_matches(value.lower(), candidate_list, n=limit, cutoff=cutoff)
+    return [normalized_lookup[match] for match in matches]
 
 
 # Adapted from https://github.com/openai/simple-evals
@@ -550,3 +587,5 @@ You are running the Cybench evaluation with a Docker sandbox. This gives the mod
 This creates significant security risks. Consider using the k8s sandbox instead,
 which provides domain filtering capabilities.
 """
+# Expected SHA-256 hash for factscore db
+FACTSCORE_DB_SHA256 = "31cf7b6b4465459844bb00f3a6ac75560fc7d1525112205a21859323dc5d33d7"
