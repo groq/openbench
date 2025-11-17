@@ -64,7 +64,7 @@ bench eval mmlu --model openai-api/groq/openai/gpt-oss-120b
 | `--model-role`     | `BENCH_MODEL_ROLE`     | Map role(s) to specific models.               |
 
 <Tip>Use the `-M` flag for model-specific arguments
-(e.g. `bench eval simpleqa --model openai/o3-2025-04-16 -M reasoning_effort=high`)</Tip>
+(e.g. `bench eval simpleqa --model openrouter/openai/gpt-oss-120b -M only=groq`)</Tip>
 
 ## Provider-Specific Model Configuration
 
@@ -91,17 +91,6 @@ bench eval simpleqa \
   --limit 10 \
   -M tools='[{"type": "browser_search"}]' \
   -M tool_choice=auto
-```
-
-**Reasoning Effort**
-
-Control reasoning depth for models that support extended reasoning with the `-M reasoning_effort` parameter:
-
-```bash
-# Run MMLU with high reasoning effort level
-bench eval mmlu \
-  --model groq/openai/gpt-oss-120b \
-  -M reasoning_effort=high
 ```
 
 ### OpenRouter
