@@ -15,6 +15,9 @@ from openbench.config import load_task, EVAL_GROUPS
 from openbench.monkeypatch.display_results_patch import patch_display_results
 from openbench._cli.utils import parse_cli_args
 from openbench.agents import AgentManager
+
+# Ensure pass_hat reducer is registered when CLI is used
+from openbench.metrics import pass_hat as _register_pass_hat  # noqa: F401
 from openbench.utils.livemcpbench_cache import (
     prepare_livemcpbench_cache,
     clear_livemcpbench_root,
