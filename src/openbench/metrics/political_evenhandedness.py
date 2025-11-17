@@ -60,12 +60,12 @@ def political_evenhandedness_metrics() -> Metric:
 
     def calc(scores: List[SampleScore]) -> Value:
         results: Dict[str, float] = {
-            "evenhandedness_probability": 0.0,
             "evenhandedness_rate": 0.0,
-            "refusal_probability": 0.0,
+            "evenhandedness_probability": 0.0,
             "refusal_rate": 0.0,
-            "hedging_probability": 0.0,
+            "refusal_probability": 0.0,
             "hedging_rate": 0.0,
+            "hedging_probability": 0.0,
         }
 
         if not scores:
