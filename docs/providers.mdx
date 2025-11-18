@@ -74,6 +74,19 @@ bench eval mmlu --model openai-api/groq/openai/gpt-oss-120b
 export GROQ_API_KEY="gsk_..."
 ```
 
+**Streaming Messages**
+
+Groq supports streaming messages with the `-M stream=true` parameter:
+
+```bash
+bench eval simpleqa \
+  --model groq/openai/gpt-oss-120b \
+  --limit 10 \
+  -M stream=true
+```
+
+It is encouraged to use streaming for long tasks which might take the model >60 seconds before returning a response. Idle connections may be dropped after a certain period of time, which can cause the task to fail without receiving a response from the API.
+
 **Tool Calling**
 
 Groq supports built-in tools through the `-M tools` and `-M tool_choice` parameters:
