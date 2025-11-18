@@ -2,11 +2,6 @@
 
 Loads the DocVQA (Document Visual Question Answering) benchmark from HuggingFace
 for evaluating models' ability to answer questions about document images.
-
-DocVQA evaluates vision-language models on understanding and reasoning about
-document content including forms, reports, tables, diagrams, and other real-world
-documents.
-
 Reference: https://arxiv.org/abs/2007.00398
 """
 
@@ -38,40 +33,33 @@ def record_to_sample(record: Dict[str, Any]) -> Sample:
     if answers is None:
         answers = []
 
-    # Get question types (may be None for some samples)
-    question_types = record.get("question_types", [])
-    if question_types is None:
-        question_types = []
-
-    # Target is first answer for validation split, empty for test
-    target = answers[0] if answers else ""
+    # Target is the list of all acceptable answers
+    target = answers
 
     # Build input with image and question
     input_content: List[Union[ContentText, ContentImage]] = []
 
     # Add image if present
     if "image" in record and record["image"] is not None:
-        image_data = record["image"]
-
-        # Extract bytes from various image formats (HF dict, raw bytes, or PIL)
-        image_bytes = extract_image_bytes(image_data)
+        # Extract image bytes from HuggingFace dict format
+        image_bytes = extract_image_bytes(record["image"])
 
         # Compress image to reduce size and speed up processing
         compressed_bytes = compress_image(
             image_bytes, max_size_mb=5.0, quality=85, max_dimension=2048
         )
+
+        # Convert to base64 data URI
         data_uri = image_bytes_to_data_uri(compressed_bytes)
 
         input_content.append(ContentImage(image=data_uri))
 
-    # DocVQA requires short, concise answers
-    prompt = f"{question}\n\nProvide only the specific answer from the document. Do not add any extra words, articles (a/an/the), punctuation, or context. Just the answer itself."
-    input_content.append(ContentText(text=prompt))
+    # Add question text
+    input_content.append(ContentText(text=question))
 
     metadata = {
         "questionId": record["questionId"],
         "question": question,
-        "question_types": question_types,
         "docId": record["docId"],
         "ucsf_document_id": record["ucsf_document_id"],
         "ucsf_document_page_no": record["ucsf_document_page_no"],
@@ -88,7 +76,7 @@ def record_to_sample(record: Dict[str, Any]) -> Sample:
 
 
 def get_docvqa_dataset(
-    split: str = "validation",
+    split: str,
 ) -> Dataset:
     """Load DocVQA dataset from HuggingFace.
 
@@ -105,18 +93,19 @@ def get_docvqa_dataset(
     Note:
         - Validation split has ground truth answers for evaluation
         - Test split has no answers (for leaderboard submission only)
-        - Images are compressed and converted lazily during evaluation
+        - Images are compressed and converted in-memory (no disk caching)
     """
     # Validate split parameter
     if split not in ["validation", "test"]:
         raise ValueError(f"Invalid split '{split}'. Must be 'validation' or 'test'")
 
     # Use hf_dataset for lazy loading - images are processed on-demand
-    # This is much faster than loading all images upfront
     return hf_dataset(
         path="lmms-lab/DocVQA",
         name="DocVQA",
         split=split,
         sample_fields=record_to_sample,
         trust=True,
+        shuffle=True,  # shuffle with fixed seed
+        seed=42,
     )
