@@ -95,3 +95,39 @@ def test_model_and_model_role_conflict():
         ],
     )
     assert result.exit_code != 0
+
+
+def test_streaming_enabled():
+    """Test streaming functionality with -M stream=true."""
+    result = runner.invoke(
+        app,
+        [
+            "eval",
+            "mmlu",
+            "--limit",
+            "1",
+            "--model",
+            "groq/llama-3.1-8b-instant",
+            "-M",
+            "stream=true",
+        ],
+    )
+    assert result.exit_code == 0
+
+
+def test_streaming_disabled():
+    """Test explicit streaming disabled with -M stream=false."""
+    result = runner.invoke(
+        app,
+        [
+            "eval",
+            "mmlu",
+            "--limit",
+            "1",
+            "--model",
+            "groq/llama-3.1-8b-instant",
+            "-M",
+            "stream=false",
+        ],
+    )
+    assert result.exit_code == 0
