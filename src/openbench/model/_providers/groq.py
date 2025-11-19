@@ -81,8 +81,8 @@ class GroqAPI(ModelAPI):
         if not self.api_key:
             raise environment_prerequisite_error("Groq", GROQ_API_KEY)
 
-        # Extract stream parameter for completion calls
-        self.stream = model_args.pop("stream", False)
+        # Extract stream parameter for completion calls (defaults to True)
+        self.stream = model_args.pop("stream", True)
 
         # Create httpx client with proper timeout configuration
         timeout_seconds = getattr(config, "timeout", None)
