@@ -171,8 +171,8 @@ class TestGroqProviderStreaming:
                 # Stream parameter should be extracted and set
                 assert groq_api.stream is False
 
-    def test_stream_parameter_default_false(self):
-        """Test that stream defaults to False when not provided."""
+    def test_stream_parameter_default_true(self):
+        """Test that stream defaults to True when not provided."""
         with patch("httpx.AsyncClient"):
             with patch("openbench.model._providers.groq.AsyncGroq"):
                 config = GenerateConfig()
@@ -185,8 +185,8 @@ class TestGroqProviderStreaming:
                     **model_args
                 )
                 
-                # Stream parameter should default to False
-                assert groq_api.stream is False
+                # Stream parameter should default to True
+                assert groq_api.stream is True
 
     def test_stream_parameter_removed_from_client_args(self):
         """Test that stream parameter is removed from model_args passed to AsyncGroq."""
@@ -214,6 +214,23 @@ class TestGroqProviderStreaming:
             with patch("openbench.model._providers.groq.AsyncGroq"):
                 config = GenerateConfig()
                 model_args = {"stream": True}
+                
+                groq_api = GroqAPI(
+                    model_name="test-model", 
+                    api_key="test-key", 
+                    config=config,
+                    **model_args
+                )
+                
+                params = groq_api.completion_params(config)
+                assert params["stream"] is True
+
+    def test_completion_params_includes_stream_by_default(self):
+        """Test that completion_params includes stream=True by default."""
+        with patch("httpx.AsyncClient"):
+            with patch("openbench.model._providers.groq.AsyncGroq"):
+                config = GenerateConfig()
+                model_args = {}  # No stream parameter specified
                 
                 groq_api = GroqAPI(
                     model_name="test-model", 
