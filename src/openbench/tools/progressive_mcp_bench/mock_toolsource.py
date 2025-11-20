@@ -37,6 +37,6 @@ def mock_mcp_tool_source(
     
     tools_arg = ["route", "execute-tool"]
     if strategy == "all":
-        tools_arg = None
+        tools_arg = "all"
         
     return mcp_tools(server, tools=tools_arg)
