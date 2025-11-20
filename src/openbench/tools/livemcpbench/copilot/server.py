@@ -141,9 +141,11 @@ def serve(config: dict[str, Any] | Path | None = None) -> None:
                 or os.getenv("EMBEDDING_API_KEY")
                 or os.getenv("ABSTRACT_API_KEY")
             ):
-                raise RuntimeError(
-                    "OPENAI_API_KEY is required to generate embeddings (or provide EMBEDDING_API_KEY/ABSTRACT_API_KEY)."
-                )
+                # Allow proceeding without keys (dummy embeddings) if forced
+                if os.getenv("OPENBENCH_COPILOT_NO_EMBEDDINGS", "0") not in {"1", "true", "True"}:
+                    raise RuntimeError(
+                        "OPENAI_API_KEY is required to generate embeddings (or provide EMBEDDING_API_KEY/ABSTRACT_API_KEY)."
+                    )
             
             config_path_env = os.getenv("MCP_SERVERS_CONFIG")
             if config_path_env and Path(config_path_env).exists():

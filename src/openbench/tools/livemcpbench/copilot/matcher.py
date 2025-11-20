@@ -46,6 +46,10 @@ class ToolMatcher:
             raise ValueError(f"Error loading tool data: {e}")
 
     def setup_openai_client(self, base_url: str, api_key: str) -> None:
+        if not api_key:
+            self.openai_client = None
+            return
+            
         self.openai_client = OpenAI(
             base_url=base_url,
             api_key=api_key,
@@ -161,6 +165,20 @@ class ToolMatcher:
                 "matched_servers": [],
                 "matched_tools": [],
             }
+            
+        # Fallback if no OpenAI client (return all tools)
+        if not self.openai_client:
+             matched_tools = []
+             for server in self.servers_data:
+                  for tool in server.get("tools", []):
+                        matched_tools.append({
+                            "server_name": server["server_name"],
+                            "tool_name": tool["name"],
+                            "tool_description": tool.get("description", ""),
+                            "inputschema": tool.get("parameter", {}),
+                        })
+             return {"success": True, "matched_tools": matched_tools}
+             
         try:
             matched_servers = self.match_servers(server_desc)
             matched_tools = self.match_tools(matched_servers, tool_desc)

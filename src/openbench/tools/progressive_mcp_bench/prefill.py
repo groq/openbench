@@ -35,8 +35,8 @@ def prepare_environment():
     # 2. Generate embeddings
     if not MCP_DATA_PATH.exists():
         print("Generating embeddings...")
-        if not os.environ.get("OPENAI_API_KEY"):
-             raise RuntimeError("OPENAI_API_KEY required for embedding generation")
+        # if not os.environ.get("OPENAI_API_KEY"):
+        #      raise RuntimeError("OPENAI_API_KEY required for embedding generation")
              
         generator = McpArgGenerator(config=TOOLS_JSON_PATH, output_file=MCP_DATA_PATH)
         asyncio.run(generator.generate())
@@ -77,6 +77,7 @@ def prefill_solver(db_path: Path, model_name: str):
             "MCP_SERVERS_CONFIG": str(SERVERS_CONFIG),
             "MCP_DATA_PATH": str(MCP_DATA_PATH),
             "OPENBENCH_COPILOT_AUTOGEN": "1",
+            "OPENBENCH_COPILOT_NO_EMBEDDINGS": "1",
         }
         
         tool_source = copilot_tool_source(

@@ -57,16 +57,24 @@ class McpArgGenerator:
                 self.config = json.load(f)
         else:
             raise TypeError("Config must be a dictionary or a Path to a JSON file.")
-        self.embedding_client = openai.AsyncOpenAI(
-            api_key=embedding_api_key, base_url=embedding_api_url
-        )
-        self.summary_client = openai.AsyncOpenAI(
-            api_key=abstract_api_key, base_url=abstract_api_url
-        )
+        self.embedding_client = None
+        if embedding_api_key:
+            self.embedding_client = openai.AsyncOpenAI(
+                api_key=embedding_api_key, base_url=embedding_api_url
+            )
+            
+        self.summary_client = None
+        if abstract_api_key:
+            self.summary_client = openai.AsyncOpenAI(
+                api_key=abstract_api_key, base_url=abstract_api_url
+            )
 
     async def _get_embedding(
         self, text: str, model: str = embedding_model
     ) -> List[float]:
+        if not self.embedding_client:
+            return [0.0] * embedding_dimensions
+            
         if not text:
             logger.warning("Empty text provided for embedding, returning empty list.")
             return []
@@ -88,6 +96,9 @@ class McpArgGenerator:
         tools: List[types.Tool],
         model: str = abstract_model,
     ) -> str:
+        if not self.summary_client:
+            return f"Summary for {server_name}: {server_desc}"
+            
         tool_descriptions = "\n".join(
             [f"- {tool.name}: {tool.description}" for tool in tools]
         )

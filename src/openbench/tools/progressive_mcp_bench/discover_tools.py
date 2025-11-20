@@ -1,59 +1,57 @@
-import asyncio
 import json
-import logging
+import asyncio
 import os
 from pathlib import Path
-from typing import Any, Dict, List
+from mcp.client.stdio import stdio_client, StdioServerParameters
+from mcp.client.session import ClientSession
 
-from openbench.tools.livemcpbench.copilot.mcp_connection import MCPConnection
-from openbench.tools.livemcpbench.copilot.schemas import Server, ServerConfig
-
-async def generate_tools_json(servers_config_path: Path, output_path: Path) -> None:
-    with open(servers_config_path, "r") as f:
-        config = json.load(f)
-        
-    mcp_servers = config.get("mcpServers", {})
-    servers_data = []
+async def get_tools_from_server(config):
+    env = os.environ.copy()
+    if config.get("env"):
+        env.update(config["env"])
     
-    for name, config_data in mcp_servers.items():
-        print(f"Discovering tools for {name}...")
-        cfg = dict(config_data)
-        server_config = ServerConfig(**cfg)
-        server = Server(name=name, config=server_config)
-        
+    server_params = StdioServerParameters(
+        command=config["command"],
+        args=config["args"],
+        env=env
+    )
+    
+    async with stdio_client(server_params) as (read, write):
+        async with ClientSession(read, write) as session:
+            await session.initialize()
+            result = await session.list_tools()
+            return result.tools
+
+async def generate_tools_json(servers_config_path: Path, output_path: Path):
+    with open(servers_config_path) as f:
+        config = json.load(f)
+    
+    tools_data = []
+    
+    mcp_servers = config.get("mcpServers", {})
+    
+    for name, server_config in mcp_servers.items():
         try:
-            async with MCPConnection(server) as conn:
-                tools = await conn.list_tools()
-                # Format compatible with McpArgGenerator
-                # It expects list of objects like:
-                # {
-                #   "config": { "mcpServers": { "name": { ... } } },
-                #   "description": "...",
-                #   "tools": { "name": { "tools": [ ... ] } }
-                # }
-                # This is a bit weird structure from upstream, let's replicate it.
-                
-                server_info = {
-                    "config": {
-                        "mcpServers": {
-                            name: config_data
-                        }
-                    },
-                    "description": f"MCP server for {name}",
-                    "tools": {
-                        name: {
-                            "tools": [t.model_dump() for t in tools]
-                        }
+            print(f"Discovering tools for {name}...")
+            tools = await get_tools_from_server(server_config)
+            
+            server_info = {
+                "server_name": name,
+                "server_description": f"MCP server for {name}", # Placeholder
+                "tools": [
+                    {
+                        "name": tool.name,
+                        "description": tool.description,
+                        "parameter": tool.inputSchema
                     }
-                }
-                
-                servers_data.append(server_info)
+                    for tool in tools
+                ]
+            }
+            tools_data.append(server_info)
         except Exception as e:
-            print(f"Failed to connect to {name}: {e}")
-            import traceback
-            traceback.print_exc()
+            print(f"Failed to get tools for {name}: {e}")
             
     with open(output_path, "w") as f:
-        json.dump(servers_data, f, indent=2)
-        
+        json.dump(tools_data, f, indent=2)
+    
     print(f"Saved tools to {output_path}")

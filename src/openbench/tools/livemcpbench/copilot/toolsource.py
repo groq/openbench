@@ -41,6 +41,7 @@ def copilot_tool_source(
         "ABSTRACT_BASE_URL",
         "ABSTRACT_MODEL",
         "MCP_DATA_PATH",
+        "MCP_SERVERS_CONFIG",
         "TOP_SERVERS",
         "TOP_TOOLS",
         "OPENBENCH_LIVEMCPBENCH_REFRESH",
