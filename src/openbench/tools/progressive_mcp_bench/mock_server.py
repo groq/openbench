@@ -265,7 +265,8 @@ if _STRATEGY == "all":
                     for srv_name, srv_tools in item["tools"].items():
                         for tool_def in srv_tools.get("tools", []):
                             tool_name = tool_def["name"]
-                            full_name = f"{srv_name}.{tool_name}"
+                            # Use double underscore to avoid confusion with dot notation
+                            full_name = f"{srv_name}__{tool_name}"
                             
                             # Correct way to make closure in loop
                             def create_handler(s, t):
