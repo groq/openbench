@@ -6,13 +6,10 @@ Paper: https://arxiv.org/abs/2501.00321
 
 from __future__ import annotations
 
-import base64
-from io import BytesIO
-
 from datasets import load_dataset as hf_load_dataset  # type: ignore[import-untyped]
 from inspect_ai.dataset import MemoryDataset, Sample
 
-from openbench.utils.image import detect_image_mime_type
+from openbench.utils.image import image_bytes_to_data_uri, pil_image_to_bytes
 
 # Import capability mapping from scorer
 # We need to add capability to metadata at dataset level for grouped metrics
@@ -119,12 +116,10 @@ def get_ocrbenchv2_dataset(
         # Convert to RGB if necessary (JPEG doesn't support RGBA)
         if pil_image.mode in ("RGBA", "LA", "P"):
             pil_image = pil_image.convert("RGB")
-        buffered = BytesIO()
-        pil_image.save(buffered, format="JPEG")
-        image_bytes = buffered.getvalue()
-        image_b64 = base64.b64encode(image_bytes).decode("utf-8")
-        mime_type = detect_image_mime_type(image_bytes)
-        image_uri = f"data:{mime_type};base64,{image_b64}"
+
+        # Convert PIL Image to bytes and create data URI
+        image_bytes = pil_image_to_bytes(pil_image, format="JPEG")
+        image_uri = image_bytes_to_data_uri(image_bytes)
 
         # Target is list of acceptable answers
         target = item["answers"] if item["answers"] else [""]

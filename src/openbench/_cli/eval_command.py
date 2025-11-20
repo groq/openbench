@@ -1,4 +1,6 @@
 from typing import Optional, List, Dict, Annotated, Tuple, Union
+
+import re
 from rich.console import Console
 from enum import Enum
 import sys
@@ -6,13 +8,16 @@ import time
 import os
 import typer
 import asyncio
-from inspect_ai import eval
+from inspect_ai import Epochs, eval
 from inspect_ai.model import Model
 from inspect_ai.log import EvalLog
 from openbench.config import load_task, EVAL_GROUPS
 from openbench.monkeypatch.display_results_patch import patch_display_results
 from openbench._cli.utils import parse_cli_args
 from openbench.agents import AgentManager
+
+# Ensure pass_hat reducer is registered when CLI is used
+from openbench.metrics import pass_hat as _register_pass_hat  # noqa: F401
 from openbench.utils.livemcpbench_cache import (
     prepare_livemcpbench_cache,
     clear_livemcpbench_root,
@@ -382,6 +387,17 @@ def run_eval(
             help="Number of epochs to run each evaluation", envvar="BENCH_EPOCHS"
         ),
     ] = None,
+    epochs_reducer: Annotated[
+        List[str],
+        typer.Option(
+            "--epochs-reducer",
+            help=(
+                "Reducer(s) to aggregate epoch scores (repeat or comma-separate). "
+                "Examples: --epochs-reducer pass_hat_5 --epochs-reducer mean"
+            ),
+            envvar="BENCH_EPOCHS_REDUCER",
+        ),
+    ] = [],
     limit: Annotated[
         Optional[str],
         typer.Option(
@@ -733,6 +749,17 @@ def run_eval(
     # Parse limit string to int or tuple
     parsed_limit = parse_limit(limit)
 
+    # Normalize epoch reducers (support repeated flags or comma-separated values)
+    epoch_reducers = normalize_epoch_reducers(epochs_reducer) if epochs_reducer else []
+    epochs_config: int | Epochs | None
+    if epoch_reducers:
+        if epochs is None:
+            raise typer.BadParameter("--epochs is required when using --epochs-reducer")
+        epoch_value = epochs
+        epochs_config = Epochs(epoch_value, reducer=epoch_reducers)
+    else:
+        epochs_config = epochs
+
     # Apply display patch
     patch_display_results()
 
@@ -767,7 +794,7 @@ def run_eval(
                 model_args=model_args,
                 model_roles=role_models if role_models else None,
                 task_args=task_args,
-                epochs=epochs,
+                epochs=epochs_config,
                 limit=parsed_limit,
                 fail_on_error=fail_on_error,
                 message_limit=message_limit,
@@ -838,3 +865,29 @@ def run_eval(
             except Exception:
                 # Silently ignore cleanup errors
                 pass
+
+
+def normalize_epoch_reducers(raw_reducers: List[str]) -> List[str]:
+    """Expand CLI epoch reducer flags into the list Inspect expects.
+    Also, auto-expands pass^k into pass^1...pass^k"""
+
+    tokens: list[str] = []
+    for reducer in raw_reducers:
+        tokens.extend(
+            token.strip() for token in reducer.split(",") if token and token.strip()
+        )
+
+    expanded: list[str] = []
+    for token in tokens:
+        match = re.fullmatch(r"pass_hat_(\d+)", token)
+        if match:
+            k = int(match.group(1))
+            for i in range(1, k + 1):
+                name = f"pass_hat_{i}"
+                if name not in expanded:
+                    expanded.append(name)
+        else:
+            if token not in expanded:
+                expanded.append(token)
+
+    return expanded

@@ -41,6 +41,21 @@ To access any major model, set the appropriate API key environment variable:
 | **W&B Inference**     | `WANDB_API_KEY`        | `wandb/model-name`               |
 | **vLLM**              | None (local)           | `vllm/model-name`                |
 
+## Using Unsupported Providers
+
+openbench works with any OpenAI-compatible API endpoint, even if the provider isn't listed above. This allows you to benchmark models from new or specialized providers that support the OpenAI Chat Completions API format.
+
+1. Use the model string format: `openai-api/<provider>/<model-name>`
+2. Set environment variables: `<PROVIDER>_API_KEY` and `<PROVIDER>_BASE_URL`
+
+```bash
+# Example with Groq (shown for demonstration since Groq is natively supported)
+export GROQ_API_KEY="gsk_..."
+export GROQ_BASE_URL=https://api.groq.com/openai/v1
+
+bench eval mmlu --model openai-api/groq/openai/gpt-oss-120b
+```
+
 ## General Model Configuration
 | CLI Command        | Environment Variable   | Description                                   |
 |--------------------|------------------------|-----------------------------------------------|
@@ -49,7 +64,7 @@ To access any major model, set the appropriate API key environment variable:
 | `--model-role`     | `BENCH_MODEL_ROLE`     | Map role(s) to specific models.               |
 
 <Tip>Use the `-M` flag for model-specific arguments
-(e.g. `bench eval simpleqa --model openai/o3-2025-04-16 -M reasoning_effort=high`)</Tip>
+(e.g. `bench eval simpleqa --model openrouter/openai/gpt-oss-120b -M only=groq`)</Tip>
 
 ## Provider-Specific Model Configuration
 
@@ -57,6 +72,23 @@ To access any major model, set the appropriate API key environment variable:
 [Groq](https://groq.com/) provides fast inference with advanced features including tool calling and reasoning support. To begin using Groq, first set your API key:
 ```bash
 export GROQ_API_KEY="gsk_..."
+```
+
+**Streaming Messages**
+
+Groq has streaming enabled by default. It is encouraged to use streaming for long tasks which might take the model >60 seconds before returning a response. Idle connections may be dropped after a certain period of time, which can cause the task to fail by timing out before receiving a response from the API. However, streaming can be disabled with `-M stream=false`:
+
+```bash
+# Streaming enabled by default
+bench eval simpleqa \
+  --model groq/llama-3.1-70b-versatile \
+  --limit 10
+
+# Explicitly disable streaming
+bench eval simpleqa \
+  --model groq/llama-3.1-70b-versatile \
+  --limit 10 \
+  -M stream=false
 ```
 
 **Tool Calling**
@@ -76,17 +108,6 @@ bench eval simpleqa \
   --limit 10 \
   -M tools='[{"type": "browser_search"}]' \
   -M tool_choice=auto
-```
-
-**Reasoning Effort**
-
-Control reasoning depth for models that support extended reasoning with the `-M reasoning_effort` parameter:
-
-```bash
-# Run MMLU with high reasoning effort level
-bench eval mmlu \
-  --model groq/openai/gpt-oss-120b \
-  -M reasoning_effort=high
 ```
 
 ### OpenRouter

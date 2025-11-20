@@ -10,7 +10,6 @@ from groq import (
     AsyncGroq,
 )
 from groq.types.chat import (
-    ChatCompletion,
     ChatCompletionAssistantMessageParam,
     ChatCompletionContentPartImageParam,
     ChatCompletionContentPartParam,
@@ -82,6 +81,9 @@ class GroqAPI(ModelAPI):
         if not self.api_key:
             raise environment_prerequisite_error("Groq", GROQ_API_KEY)
 
+        # Extract stream parameter for completion calls (defaults to True)
+        self.stream = model_args.pop("stream", True)
+
         # Create httpx client with proper timeout configuration
         timeout_seconds = getattr(config, "timeout", None)
         if timeout_seconds is not None:
@@ -152,9 +154,17 @@ class GroqAPI(ModelAPI):
         )
 
         try:
-            completion: ChatCompletion = await self.client.chat.completions.create(
-                **request,
-            )
+            if self.stream:
+                # Handle streaming response
+                stream = await self.client.chat.completions.create(
+                    **request,
+                )
+                completion = await self._handle_streaming_response(stream, tools)
+            else:
+                # Handle non-streaming response
+                completion = await self.client.chat.completions.create(
+                    **request,
+                )
 
             response = completion.model_dump()
 
@@ -233,6 +243,11 @@ class GroqAPI(ModelAPI):
         # reasoning_effort support
         if config.reasoning_effort is not None:
             params["reasoning_effort"] = config.reasoning_effort
+
+        # stream support
+        if self.stream:
+            params["stream"] = True
+
         return params
 
     def _chat_choices_from_response(
@@ -293,6 +308,156 @@ class GroqAPI(ModelAPI):
                 )
 
         return ex
+
+    async def _handle_streaming_response(self, stream, tools: list[ToolInfo]):
+        """Handle streaming response and accumulate into a complete response."""
+        accumulated_reasoning = ""
+        accumulated_content = ""
+        accumulated_tool_calls: list[dict[str, Any]] = []
+        accumulated_executed_tools: list[dict[str, Any]] = []
+        finish_reason = None
+        usage = None
+        metadata: dict[str, Any] = {}
+        model_name = ""
+
+        async for chunk in stream:
+            if chunk.choices:
+                choice = chunk.choices[0]
+
+                # Accumulate reasoning
+                if choice.delta.reasoning:
+                    accumulated_reasoning += choice.delta.reasoning
+
+                # Accumulate content
+                if choice.delta.content:
+                    accumulated_content += choice.delta.content
+
+                # Accumulate standard tool calls
+                if choice.delta.tool_calls:
+                    for tool_call in choice.delta.tool_calls:
+                        # Handle tool call accumulation
+                        while tool_call.index >= len(accumulated_tool_calls):
+                            # Create proper tool call objects with attributes (not dicts)
+                            accumulated_tool_calls.append(
+                                type(
+                                    "ToolCall",
+                                    (),
+                                    {
+                                        "id": "",
+                                        "type": "function",
+                                        "function": type(
+                                            "Function",
+                                            (),
+                                            {"name": "", "arguments": ""},
+                                        )(),
+                                    },
+                                )()
+                            )
+
+                        # Update the accumulated tool call
+                        tc = accumulated_tool_calls[tool_call.index]
+                        if tool_call.id:
+                            tc.id = tool_call.id
+                        if tool_call.type:
+                            tc.type = tool_call.type
+                        if tool_call.function and tool_call.function.name:
+                            tc.function.name = tool_call.function.name
+                        if tool_call.function and tool_call.function.arguments:
+                            tc.function.arguments += tool_call.function.arguments
+
+                # Accumulate executed tools (Groq-specific)
+                if choice.delta.executed_tools:
+                    accumulated_executed_tools += choice.delta.executed_tools
+
+                # Get finish reason
+                if choice.finish_reason:
+                    finish_reason = choice.finish_reason
+
+            # Get metadata from first chunk
+            if chunk.id and not metadata.get("id"):
+                metadata.update(
+                    {
+                        "id": chunk.id,
+                        "system_fingerprint": chunk.system_fingerprint,
+                        "created": chunk.created,
+                    }
+                )
+                model_name = chunk.model
+
+            # Get usage from final chunk
+            if (
+                hasattr(chunk, "x_groq")
+                and chunk.x_groq
+                and hasattr(chunk.x_groq, "usage")
+                and chunk.x_groq.usage
+            ):
+                usage = chunk.x_groq.usage
+
+        # Create a mock completion object that matches the non-streaming format
+        mock_completion = type(
+            "MockCompletion",
+            (),
+            {
+                "id": metadata.get("id", ""),
+                "model": model_name,
+                "system_fingerprint": metadata.get("system_fingerprint"),
+                "created": metadata.get("created", 0),
+                "choices": [
+                    type(
+                        "Choice",
+                        (),
+                        {
+                            "message": type(
+                                "Message",
+                                (),
+                                {
+                                    "reasoning": accumulated_reasoning
+                                    if accumulated_reasoning
+                                    else None,
+                                    "content": accumulated_content,
+                                    "tool_calls": accumulated_tool_calls
+                                    if accumulated_tool_calls
+                                    else None,
+                                    "executed_tools": accumulated_executed_tools
+                                    if accumulated_executed_tools
+                                    else None,
+                                },
+                            )(),
+                            "finish_reason": finish_reason,
+                            "index": 0,
+                        },
+                    )()
+                ],
+                "usage": usage,
+                "model_dump": lambda self: {
+                    "id": metadata.get("id", ""),
+                    "model": model_name,
+                    "system_fingerprint": metadata.get("system_fingerprint"),
+                    "created": metadata.get("created", 0),
+                    "choices": [
+                        {
+                            "message": {
+                                "reasoning": accumulated_reasoning
+                                if accumulated_reasoning
+                                else None,
+                                "content": accumulated_content,
+                                "tool_calls": accumulated_tool_calls
+                                if accumulated_tool_calls
+                                else None,
+                                "executed_tools": accumulated_executed_tools
+                                if accumulated_executed_tools
+                                else None,
+                            },
+                            "finish_reason": finish_reason,
+                            "index": 0,
+                        }
+                    ],
+                    "usage": usage.model_dump() if usage else None,
+                },
+            },
+        )()
+
+        return mock_completion
 
 
 async def as_groq_chat_messages(

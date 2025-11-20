@@ -18,8 +18,14 @@ from importlib.metadata import entry_points
 import logging
 
 from openbench.utils import BenchmarkMetadata
+from openbench.utils.text import get_fuzzy_suggestions
 
 logger = logging.getLogger(__name__)
+
+ANSI_BOLD = "\033[1m"
+ANSI_BLUE = "\033[34m"
+ANSI_BOLD_BLUE = "\033[1;34m"
+ANSI_RESET = "\033[0m"
 
 
 def _load_entry_point_benchmarks() -> dict[str, BenchmarkMetadata]:
@@ -5750,6 +5756,33 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.cosafe_m2s",
         function_name="cosafe_m2s",
     ),
+    "tau_bench_retail": BenchmarkMetadata(
+        name="TauBench Retail",
+        description="Tau-bench dual-control customer support simulation in the retail domain.",
+        category="agents",
+        tags=["agents", "tools", "graded"],
+        module_path="openbench.evals.tau_bench",
+        function_name="tau_bench_retail",
+        is_alpha=True,
+    ),
+    "tau_bench_airline": BenchmarkMetadata(
+        name="TauBench Airline",
+        description="Tau-bench airline operations benchmark with simulated users and shared tools.",
+        category="agents",
+        tags=["agents", "tools", "graded"],
+        module_path="openbench.evals.tau_bench",
+        function_name="tau_bench_airline",
+        is_alpha=True,
+    ),
+    "tau_bench_telecom": BenchmarkMetadata(
+        name="TauBench Telecom",
+        description="Tau-bench telecom troubleshooting scenarios exercising complex tool flows.",
+        category="agents",
+        tags=["agents", "tools", "graded"],
+        module_path="openbench.evals.tau_bench",
+        function_name="tau_bench_telecom",
+        is_alpha=True,
+    ),
     "rocketscience": BenchmarkMetadata(
         name="RocketScience",
         description="Contrastive spatial reasoning benchmark",
@@ -6045,10 +6078,17 @@ def load_task(benchmark_name: str, allow_alpha: bool = False) -> Callable:
         return _load_task_from_local_path(path)
 
     # Neither registry nor valid path
+    available_benchmarks = ", ".join(sorted(TASK_REGISTRY.keys()))
+    suggestions = get_fuzzy_suggestions(benchmark_name, TASK_REGISTRY.keys(), limit=3)
+    suggestion_text = ""
+    if suggestions:
+        bolded = ", ".join(
+            f"{ANSI_BOLD_BLUE}{suggestion}{ANSI_RESET}" for suggestion in suggestions
+        )
+        suggestion_text = f" Did you mean {bolded}?"
     raise ValueError(
-        f"Unknown benchmark: '{benchmark_name}'. "
-        # return available benchmarks alphabetically
-        f"Available benchmarks: {', '.join(sorted(TASK_REGISTRY.keys()))}"
+        f"Unknown benchmark: '{benchmark_name}'.{suggestion_text}\n\n"
+        f"Available benchmarks:\n\n{available_benchmarks}"
     )
 
 
@@ -6503,41 +6543,6 @@ EVAL_GROUPS = {
             "mgsm_non_latin",
         ],
     ),
-    "mmmu": EvalGroup(
-        name="MMMU",
-        description="Aggregate of 29+ MMMU subject tasks",
-        benchmarks=[
-            "mmmu_accounting",
-            "mmmu_agriculture",
-            "mmmu_architecture_and_engineering",
-            "mmmu_art",
-            "mmmu_art_theory",
-            "mmmu_basic_medical_science",
-            "mmmu_biology",
-            "mmmu_chemistry",
-            "mmmu_clinical_medicine",
-            "mmmu_design",
-            "mmmu_diagnostics_and_laboratory_medicine",
-            "mmmu_electronics",
-            "mmmu_energy_and_power",
-            "mmmu_finance",
-            "mmmu_geography",
-            "mmmu_history",
-            "mmmu_literature",
-            "mmmu_manage",
-            "mmmu_marketing",
-            "mmmu_materials",
-            "mmmu_math",
-            "mmmu_mcq",
-            "mmmu_mechanical_engineering",
-            "mmmu_music",
-            "mmmu_open",
-            "mmmu_pharmacy",
-            "mmmu_physics",
-            "mmmu_public_health",
-            "mmmu_sociology",
-        ],
-    ),
     "arabic_exams": EvalGroup(
         name="Arabic Exams",
         description="Aggregate of 40+ Arabic exam tasks",
@@ -6804,6 +6809,19 @@ EVAL_GROUPS = {
             "safemt_m2s",
             "cosafe_m2s",
             "mhj_m2s",
+        ],
+    ),
+    "multimodal": EvalGroup(
+        name="Multimodal Benchmarks",
+        description="Select suite of vision-language benchmarks (note: this is not a comprehensive list of all multimodal benchmarks)",
+        benchmarks=[
+            "chartqapro",
+            "mathvista",
+            "mmmu_pro_vision",
+            "mmstar",
+            "mmvetv2",
+            "ocrbenchv2",
+            "rocketscience",
         ],
     ),
 }
