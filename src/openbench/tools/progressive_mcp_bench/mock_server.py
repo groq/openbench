@@ -301,10 +301,6 @@ if _STRATEGY == "all":
                 if "tools" in item:
                     for srv_name, srv_tools in item["tools"].items():
                         for tool_def in srv_tools.get("tools", []):
-                            # DEBUG: Limit to 20 tools to see if it fixes the model error
-                            if tools_count >= 20:
-                                break
-                            
                             tool_name = tool_def["name"]
                             # Use double underscore to avoid confusion with dot notation
                             full_name = f"{srv_name}__{tool_name}"
@@ -346,7 +342,6 @@ if _STRATEGY == "all":
                             )
                             
                             server._tool_manager._tools[tool.name] = tool
-                            tools_count += 1
 
         except Exception as e:
             logger.error(f"Failed to load tools from {TOOLS_JSON_PATH}: {e}")
