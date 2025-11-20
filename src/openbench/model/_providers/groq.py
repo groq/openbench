@@ -8,6 +8,7 @@ from groq import (
     APIStatusError,
     APITimeoutError,
     AsyncGroq,
+    APIError,
 )
 from groq.types.chat import (
     ChatCompletionAssistantMessageParam,
@@ -137,6 +138,18 @@ class GroqAPI(ModelAPI):
         params = self.completion_params(config)
         if tools:
             params["tools"] = chat_tools(tools)
+            
+            # Debug: check if ppt__get_presentation_info is in tools
+            tool_names = [t["function"]["name"] for t in params["tools"]]
+            if "ppt__get_presentation_info" not in tool_names:
+                print(f"WARNING: ppt__get_presentation_info NOT FOUND in tools! Total tools: {len(tool_names)}")
+            else:
+                print("DEBUG: ppt__get_presentation_info FOUND in tools.")
+                # Print the tool definition for ppt__get_presentation_info
+                for t in params["tools"]:
+                    if t["function"]["name"] == "ppt__get_presentation_info":
+                        print(f"DEBUG: Tool definition: {json.dumps(t, indent=2)}")
+                        break
             params["tool_choice"] = (
                 chat_tool_choice(tool_choice) if tool_choice else "auto"
             )
@@ -206,6 +219,10 @@ class GroqAPI(ModelAPI):
 
             # return
             return output, model_call()
+        except APIError as ex:
+            if hasattr(ex, "body") and ex.body:
+                print(f"DEBUG: API Error Body: {json.dumps(ex.body, indent=2)}")
+            return ex, model_call()
         except APIStatusError as ex:
             return self.handle_bad_request(ex), model_call()
 

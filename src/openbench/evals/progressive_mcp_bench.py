@@ -73,7 +73,13 @@ def progressive_mock_solver(strategy: str = "all") -> Solver:
             ),
             tools=[tool_source],
         )
-        return await agent(state)
+        try:
+            return await agent(state)
+        except Exception as e:
+            # If the agent crashes (e.g. due to APIError from malformed tool calls),
+            # we catch it and return a failed state so the eval continues.
+            state.output.completion = f"FAILED: Agent crashed with error: {str(e)}"
+            return state
 
     return solve
 
