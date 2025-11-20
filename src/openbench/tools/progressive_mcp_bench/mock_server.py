@@ -255,6 +255,42 @@ if _STRATEGY == "all":
 
     TOOLS_JSON_PATH = Path(os.path.expanduser("~/.openbench/progressive_mcp_bench/config/tools.json"))
     
+    def sanitize_schema(schema: dict[str, Any]) -> dict[str, Any]:
+        """Simplify schema for better model compatibility."""
+        if not isinstance(schema, dict):
+            return schema
+            
+        # Handle anyOf with null
+        if "anyOf" in schema:
+            options = schema["anyOf"]
+            non_null_options = [opt for opt in options if opt.get("type") != "null"]
+            
+            if len(non_null_options) == 1:
+                # Replace anyOf with the single non-null option
+                # Merge the properties of the option into the parent, 
+                # but keep parent's other props if they don't conflict
+                single_opt = non_null_options[0]
+                new_schema = schema.copy()
+                del new_schema["anyOf"]
+                new_schema.update(single_opt)
+                return sanitize_schema(new_schema)
+            elif len(non_null_options) < len(options):
+                # We removed some nulls but still have multiple options
+                new_schema = schema.copy()
+                new_schema["anyOf"] = [sanitize_schema(opt) for opt in non_null_options]
+                return new_schema
+
+        # Recursively sanitize properties
+        if "properties" in schema:
+            new_schema = schema.copy()
+            new_schema["properties"] = {
+                k: sanitize_schema(v) 
+                for k, v in schema["properties"].items()
+            }
+            return new_schema
+            
+        return schema
+
     if TOOLS_JSON_PATH.exists():
         try:
             with open(TOOLS_JSON_PATH) as f:
@@ -297,11 +333,14 @@ if _STRATEGY == "all":
                                 arg_model=ArgModelBase # Dummy
                             )
                             
+                            # Sanitize schema
+                            input_schema = sanitize_schema(tool_def.get("inputSchema", {}))
+
                             tool = Tool(
                                 fn=handler,
                                 name=full_name,
                                 description=tool_def.get("description", "") or "",
-                                parameters=tool_def.get("inputSchema", {}),
+                                parameters=input_schema,
                                 fn_metadata=meta,
                                 is_async=True
                             )
