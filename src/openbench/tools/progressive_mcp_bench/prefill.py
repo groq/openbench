@@ -43,7 +43,7 @@ def prepare_environment():
 
 def get_samples():
     ppt_path = DATA_DIR / "ppt/build_effective_agents.pptx"
-    word_path = DATA_DIR / "word/CV.docx"
+    word_path = DATA_DIR / "word/exchange.docx"
     
     return [
         Sample(
@@ -53,7 +53,7 @@ def get_samples():
         ),
         Sample(
             id="word_1",
-            input=f"What is the email address in {word_path}?",
+            input=f"Summarize the document at {word_path}",
             metadata={"server": "word"}
         ),
         Sample(

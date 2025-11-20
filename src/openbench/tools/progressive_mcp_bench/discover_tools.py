@@ -1,62 +1,59 @@
 import asyncio
 import json
+import logging
 import os
 from pathlib import Path
 from typing import Any, Dict, List
 
-from mcp.client.stdio import StdioServerParameters, stdio_client
-from mcp.client.session import ClientSession
+from openbench.tools.livemcpbench.copilot.mcp_connection import MCPConnection
+from openbench.tools.livemcpbench.copilot.schemas import Server, ServerConfig
 
-async def discover_tools_for_server(name: str, config: Dict[str, Any]) -> List[Dict[str, Any]]:
-    server_params = StdioServerParameters(
-        command=config["command"],
-        args=config.get("args", []),
-        env={**os.environ, **config.get("env", {})},
-    )
-    
-    async with stdio_client(server_params) as (read, write):
-        async with ClientSession(read, write) as session:
-            await session.initialize()
-            result = await session.list_tools()
-            return [tool.model_dump() for tool in result.tools]
-
-async def generate_tools_json(servers_config_path: Path, output_path: Path):
-    with open(servers_config_path) as f:
+async def generate_tools_json(servers_config_path: Path, output_path: Path) -> None:
+    with open(servers_config_path, "r") as f:
         config = json.load(f)
-    
+        
     mcp_servers = config.get("mcpServers", {})
-    output_list = []
+    servers_data = []
     
-    for name, server_config in mcp_servers.items():
+    for name, config_data in mcp_servers.items():
         print(f"Discovering tools for {name}...")
+        cfg = dict(config_data)
+        server_config = ServerConfig(**cfg)
+        server = Server(name=name, config=server_config)
+        
         try:
-            tools = await discover_tools_for_server(name, server_config)
-            
-            # Construct the entry in the format expected by McpArgGenerator
-            entry = {
-                "config": {
-                    "mcpServers": {
-                        name: server_config
+            async with MCPConnection(server) as conn:
+                tools = await conn.list_tools()
+                # Format compatible with McpArgGenerator
+                # It expects list of objects like:
+                # {
+                #   "config": { "mcpServers": { "name": { ... } } },
+                #   "description": "...",
+                #   "tools": { "name": { "tools": [ ... ] } }
+                # }
+                # This is a bit weird structure from upstream, let's replicate it.
+                
+                server_info = {
+                    "config": {
+                        "mcpServers": {
+                            name: config_data
+                        }
+                    },
+                    "description": f"MCP server for {name}",
+                    "tools": {
+                        name: {
+                            "tools": [t.model_dump() for t in tools]
+                        }
                     }
-                },
-                "tools": {
-                    name: {
-                        "tools": tools
-                    }
-                },
-                "description": f"MCP server for {name}" 
-            }
-            output_list.append(entry)
+                }
+                
+                servers_data.append(server_info)
         except Exception as e:
-            print(f"Error discovering tools for {name}: {e}")
+            print(f"Failed to connect to {name}: {e}")
+            import traceback
+            traceback.print_exc()
             
     with open(output_path, "w") as f:
-        json.dump(output_list, f, indent=2)
-    
-    print(f"Tools discovery complete. Saved to {output_path}")
-
-if __name__ == "__main__":
-    # Test usage
-    import sys
-    if len(sys.argv) > 2:
-        asyncio.run(generate_tools_json(Path(sys.argv[1]), Path(sys.argv[2])))
+        json.dump(servers_data, f, indent=2)
+        
+    print(f"Saved tools to {output_path}")
