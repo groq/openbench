@@ -153,6 +153,15 @@ When you have completed the task and have an answer, call the submit()
 tool to report it.
 """
 
+PROGRESSIVE_MCP_ALL_SYSTEM_MESSAGE = """
+You are an agent designed to assist users with daily tasks by using external tools. You have access to a large set of tools.
+Whenever possible, you should use these tools to get accurate, up-to-date information and to perform file operations.
+
+Note that you can only respond to user once, so you should try to provide a complete answer in your response.
+
+When you have completed the task and have an answer, return just the answer between <answer></answer> tags.
+"""
+
 # adapted from LiveMCPBench grader system message
 LIVEMCPBENCH_GRADER_SYSTEM_MSG = """You are an expert in evaluating the performance of a tool-use agent. The agent is designed to help a human user use multi-tools to complete a task. Given the user's task, the agent's final response, key points for task completion, and tool call history, your goal is to determine whether the agent has completed the task and achieved all requirements.
 

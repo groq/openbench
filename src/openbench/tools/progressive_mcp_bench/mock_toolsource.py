@@ -34,4 +34,9 @@ def mock_mcp_tool_source(
         args=["-m", "openbench.tools.progressive_mcp_bench.mock_server"],
         env=env,
     )
-    return mcp_tools(server, tools=["route", "execute-tool"])
+    
+    tools_arg = ["route", "execute-tool"]
+    if strategy == "all":
+        tools_arg = None
+        
+    return mcp_tools(server, tools=tools_arg)

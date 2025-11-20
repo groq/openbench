@@ -230,5 +230,80 @@ async def execute_tool(
     result = json.loads(row["result_json"])
     return types.CallToolResult.model_validate(result)
 
+# Patch for "all" strategy to load tools dynamically
+if _STRATEGY == "all":
+    from mcp.server.fastmcp.tools.base import Tool
+    from mcp.server.fastmcp.utilities.func_metadata import FuncMetadata, ArgModelBase
+    from typing import Callable
+    
+    class PassthroughFuncMetadata(FuncMetadata):
+        async def call_fn_with_arg_validation(
+            self,
+            fn: Callable,
+            fn_is_async: bool,
+            arguments_to_validate: dict[str, Any],
+            arguments_to_pass_directly: dict[str, Any] | None,
+        ) -> Any:
+            kwargs = arguments_to_validate.copy()
+            if arguments_to_pass_directly:
+                kwargs.update(arguments_to_pass_directly)
+            
+            if fn_is_async:
+                return await fn(**kwargs)
+            else:
+                return fn(**kwargs)
+
+    TOOLS_JSON_PATH = Path(os.path.expanduser("~/.openbench/progressive_mcp_bench/config/tools.json"))
+    
+    if TOOLS_JSON_PATH.exists():
+        try:
+            with open(TOOLS_JSON_PATH) as f:
+                tools_data = json.load(f)
+            
+            for item in tools_data:
+                if "tools" in item:
+                    for srv_name, srv_tools in item["tools"].items():
+                        for tool_def in srv_tools.get("tools", []):
+                            tool_name = tool_def["name"]
+                            full_name = f"{srv_name}.{tool_name}"
+                            
+                            # Correct way to make closure in loop
+                            def create_handler(s, t):
+                                async def handler(**kwargs):
+                                    row = _find_matching_execute_call(s, t, kwargs)
+                                    if not row:
+                                        # Try to return a helpful error message
+                                        return f"Error: No recorded execution found for {s}.{t} with these parameters."
+                                    
+                                    result_json = json.loads(row["result_json"])
+                                    content = result_json.get("content", [])
+                                    
+                                    # Extract text if possible
+                                    texts = [c["text"] for c in content if c["type"] == "text"]
+                                    return "\n".join(texts)
+                                return handler
+                            
+                            handler = create_handler(srv_name, tool_name)
+                            handler.__name__ = full_name.replace(".", "_")
+                            
+                            # Create metadata
+                            meta = PassthroughFuncMetadata(
+                                arg_model=ArgModelBase # Dummy
+                            )
+                            
+                            tool = Tool(
+                                fn=handler,
+                                name=full_name,
+                                description=tool_def.get("description", "") or "",
+                                parameters=tool_def.get("inputSchema", {}),
+                                fn_metadata=meta,
+                                is_async=True
+                            )
+                            
+                            server._tool_manager._tools[tool.name] = tool
+
+        except Exception as e:
+            logger.error(f"Failed to load tools from {TOOLS_JSON_PATH}: {e}")
+
 if __name__ == "__main__":
     server.run(transport="stdio")
