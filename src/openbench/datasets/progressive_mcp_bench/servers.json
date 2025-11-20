@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "ppt": {
+      "command": "uvx",
+      "args": ["--from", "office-powerpoint-mcp-server", "ppt_mcp_server"]
+    },
+    "word": {
+      "command": "uvx",
+      "args": ["--from", "office-word-mcp-server", "word_mcp_server"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@executeautomation/playwright-mcp-server"]
+    }
+  }
+}

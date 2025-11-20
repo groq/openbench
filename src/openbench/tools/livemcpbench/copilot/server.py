@@ -15,11 +15,13 @@ from typing import Any
 import asyncio
 import logging
 import os
+import json
 
 import mcp.types as types
 from mcp.server.fastmcp import Context, FastMCP
 
 from .router import Router, dump_to_yaml
+from .recorder import Recorder
 
 # Reuse OpenBench arg generator to build per-server embeddings
 from .arg_generation import McpArgGenerator
@@ -29,6 +31,19 @@ from .upstream_cache import (
 )
 
 logger = logging.getLogger(__name__)
+
+_RECORD_DB = os.getenv("PROGRESSIVE_MCP_DB")
+_RECORD_MODE = os.getenv("PROGRESSIVE_MCP_RECORD", "0") in {"1", "true", "True"}
+_STEP_INDEX = 0
+_RECORDER = None
+
+def _get_recorder():
+    global _RECORDER
+    if _RECORDER is None and _RECORD_MODE and _RECORD_DB:
+        task_id = os.getenv("PROGRESSIVE_MCP_TASK_ID", "unknown")
+        model = os.getenv("PROGRESSIVE_MCP_MODEL", "unknown")
+        _RECORDER = Recorder(Path(_RECORD_DB), task_id, model)
+    return _RECORDER
 
 
 def _configure_logging():
@@ -103,10 +118,18 @@ def serve(config: dict[str, Any] | Path | None = None) -> None:
 
     output_dir = _user_cache_dir() / "config"
     _ensure_parent_dir(output_dir)
-    mcp_arg_path = output_dir / f"mcp_arg_{embedding_model}_{abstract_model}.json"
-
-    # Point Router to this path
-    os.environ.setdefault("MCP_DATA_PATH", str(mcp_arg_path))
+    
+    # Allow override via MCP_DATA_PATH, else default to cache
+    env_data_path = os.getenv("MCP_DATA_PATH")
+    if env_data_path:
+        mcp_arg_path = Path(env_data_path)
+        # Ensure parent exists
+        if not mcp_arg_path.parent.exists():
+             mcp_arg_path.parent.mkdir(parents=True, exist_ok=True)
+    else:
+        mcp_arg_path = output_dir / f"mcp_arg_{embedding_model}_{abstract_model}.json"
+        # Point Router to this path
+        os.environ["MCP_DATA_PATH"] = str(mcp_arg_path)
 
     # Generate embeddings file if missing
     if not mcp_arg_path.exists():
@@ -121,7 +144,13 @@ def serve(config: dict[str, Any] | Path | None = None) -> None:
                 raise RuntimeError(
                     "OPENAI_API_KEY is required to generate embeddings (or provide EMBEDDING_API_KEY/ABSTRACT_API_KEY)."
                 )
-            asyncio.run(_generate_embeddings_file(mcp_arg_path))
+            
+            config_path_env = os.getenv("MCP_SERVERS_CONFIG")
+            if config_path_env and Path(config_path_env).exists():
+                generator = McpArgGenerator(config=Path(config_path_env), output_file=mcp_arg_path)
+                asyncio.run(generator.generate())
+            else:
+                asyncio.run(_generate_embeddings_file(mcp_arg_path))
         else:
             raise RuntimeError(
                 "Copilot embeddings file not found. Ensure the embeddings cache exists (it's auto-prepared by 'openbench eval livemcpbench'), "
@@ -129,13 +158,18 @@ def serve(config: dict[str, Any] | Path | None = None) -> None:
             )
 
     # Prepare Router config
+    config_path_env = os.getenv("MCP_SERVERS_CONFIG")
     if config is None:
-        try:
-            config = _load_clean_config_from_cache()
-        except Exception as e:
-            raise RuntimeError(
-                f"Failed to load curated clean_config.json (online or cached): {e}"
-            )
+        if config_path_env:
+             with open(config_path_env) as f:
+                 config = json.load(f)
+        else:
+            try:
+                config = _load_clean_config_from_cache()
+            except Exception as e:
+                raise RuntimeError(
+                    f"Failed to load curated clean_config.json (online or cached): {e}"
+                )
 
     @asynccontextmanager
     async def copilot_lifespan(server: FastMCP) -> AsyncIterator[dict]:
@@ -186,6 +220,23 @@ This is a tool used to find MCP servers and tools that can solve user needs
             )
         try:
             result = await router.route(query)
+            
+            if _RECORD_MODE and _RECORD_DB:
+                task_id = os.getenv("PROGRESSIVE_MCP_TASK_ID", "unknown")
+                model = os.getenv("PROGRESSIVE_MCP_MODEL", "unknown")
+                result_dict = {"content": [{"type": "text", "text": dump_to_yaml(result)}]}
+                
+                global _STEP_INDEX
+                rec = _get_recorder()
+                if rec:
+                    rec.log_tool_call(
+                        step_index=_STEP_INDEX,
+                        call_type="route",
+                        request={"query": query},
+                        result=result_dict,
+                    )
+                _STEP_INDEX += 1
+
             return types.CallToolResult(
                 content=[types.TextContent(type="text", text=dump_to_yaml(result))]
             )
@@ -237,6 +288,30 @@ Parameters explained:
                 ],
             )
         result = await router.call_tool(server_name, tool_name, params)
+        
+        if _RECORD_MODE and _RECORD_DB:
+            task_id = os.getenv("PROGRESSIVE_MCP_TASK_ID", "unknown")
+            model = os.getenv("PROGRESSIVE_MCP_MODEL", "unknown")
+            
+            # result is CallToolResult, verify if model_dump is available (pydantic model)
+            # mcp.types.CallToolResult is a Pydantic model
+            result_dict = result.model_dump()
+            
+            global _STEP_INDEX
+            rec = _get_recorder()
+            if rec:
+                rec.log_tool_call(
+                    step_index=_STEP_INDEX,
+                    call_type="execute",
+                    request={
+                        "server_name": server_name,
+                        "tool_name": tool_name,
+                        "params": params or {},
+                    },
+                    result=result_dict,
+                )
+            _STEP_INDEX += 1
+            
         return result
 
     server.run(transport="stdio")

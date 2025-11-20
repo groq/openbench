@@ -348,6 +348,11 @@ from .evals.chartqapro import chartqapro  # noqa: F401, E402
 from .evals.mhj_m2s import mhj_m2s  # noqa: F401, E402
 from .evals.safemt_m2s import safemt_m2s  # noqa: F401, E402
 from .evals.cosafe_m2s import cosafe_m2s  # noqa: F401, E402
+from .evals.progressive_mcp_bench import (  # noqa: F401, E402
+    progressive_mcp_bench_all,
+    progressive_mcp_bench_minimal,
+    progressive_mcp_bench_relevant,
+)
 
 # GLUE/SuperGLUE benchmarks
 from .evals import anli  # noqa: F401, E402
