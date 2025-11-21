@@ -1,13 +1,15 @@
-## Auto-generated at runtime by DockerManager.generate_eval_files()
 services:
   default:
     build:
       context: .
-      tags:
+      dockerfile: Dockerfile
     init: true
+    working_dir: /workspace
     command: tail -f /dev/null
-    networks: [eval_net]
+    networks:
+      - eval_net
 
 networks:
-  eval_net: { driver: bridge, internal: false }
-
+  eval_net:
+    driver: bridge
+    internal: false

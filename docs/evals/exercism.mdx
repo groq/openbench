@@ -5,7 +5,7 @@ description: "Real-world coding exercises evaluating code agents across 5 progra
 
 ## Overview
 
-Exercism is a comprehensive coding benchmark that evaluates AI code agents' ability to solve real-world programming exercises across multiple programming languages. Based on the popular [Exercism platform](https://exercism.org/), this evaluation tests not just code generation capabilities, but the full coding workflow including reading specifications, navigating file systems, implementing solutions, and passing test suites.
+Exercism is a comprehensive coding benchmark that evaluates AI code agents' ability to solve real-world programming exercises across multiple programming languages. Based on the popular [Exercism platform](https://exercism.org/), this evaluation tests not just code generation capabilities, but the full coding workflow including reading specifications, navigating file systems, implementing solutions, and passing test suites. We run agents through the [Inspect SWE](https://github.com/meridianlabs-ai/inspect_swe) harness so they behave like fully autonomous developers inside the sandbox.
 
 The benchmark places agents in realistic development environments where they must read instructions, understand existing code structures, and modify multiple files to create working solutions—mirroring actual software development workflows.
 
@@ -18,11 +18,9 @@ The benchmark places agents in realistic development environments where they mus
   - Java
   - Rust
   
-- **Multiple Code Agent Harnesses**: Evaluate models across different code agent frameworks on identical tasks for fair comparison:
-  - **Aider** - AI-powered pair programming tool with git integration
-  - **OpenCode** - OpenAI-compatible code generation tool
-  - **Claude** - Claude-based code editor with file system access
-  - **Roo** - VS Code extension with interactive development
+- **Inspect SWE Agents**: Choose between two coding agents:
+  - **Codex CLI** – OpenAI-compatible harness
+  - **Claude Code** – Requires an Anthropic-compatible endpoint
 
 - **Realistic Development Environment**: Agents work in full file system workspaces with multiple files, build configurations, and test suites
 
@@ -32,24 +30,27 @@ The benchmark places agents in realistic development environments where they mus
 
 ## Usage
 
-Run Exercism evaluation across all languages with the default code agent (opencode):
+Run Exercism evaluation across all languages with the default code agent (codex):
 
 ```bash
 bench eval exercism
 ```
 
-Specify a different code agent:
+Specify a different Inspect SWE agent:
 
 ```bash
-bench eval exercism --code-agent aider
-bench eval exercism --code-agent claude
-bench eval exercism --code-agent roo
+bench eval exercism --code-agent codex
+bench eval exercism --code-agent claude_code
 ```
 
 Evaluate with a specific model:
 
 ```bash
-bench eval exercism --code-agent opencode --model groq/gpt-oss-120b
+# Codex hitting an OpenAI-compatible provider
+bench eval exercism --code-agent codex --model groq/moonshotai/kimi-k2-instruct-0905
+
+# Claude Code requires Anthropic-compatible models
+bench eval exercism --code-agent claude_code --model anthropic/claude-3.7-sonnet
 ```
 
 Run evaluation for a single language:
@@ -112,4 +113,3 @@ The multi-agent design allows for unique comparative analysis:
 - Compare how different models perform on identical tasks
 - Evaluate which code agent harness works best for different languages and models
 - Identify model strengths and weaknesses across programming paradigms
-
