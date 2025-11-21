@@ -2632,6 +2632,7 @@ dependencies = [
     { name = "datasets" },
     { name = "groq" },
     { name = "inspect-ai" },
+    { name = "inspect-swe" },
     { name = "jsonschema" },
     { name = "mcp" },
     { name = "numpy" },
@@ -2667,9 +2668,6 @@ dev = [
 docvqa = [
     { name = "python-levenshtein" },
 ]
-exercism = [
-    { name = "inspect-swe" },
-]
 factscore = [
     { name = "factscorelite" },
     { name = "rank-bm25" },
@@ -2702,6 +2700,7 @@ requires-dist = [
     { name = "datasets", specifier = ">=3.6.0" },
     { name = "groq", specifier = ">=0.33.0" },
     { name = "inspect-ai", specifier = "==0.3.141" },
+    { name = "inspect-swe", specifier = ">=0.2.26" },
     { name = "jsonschema", specifier = ">=4.23.0" },
     { name = "mcp", specifier = ">=1.13.1" },
     { name = "numpy", specifier = "==2.2.6" },
@@ -2735,7 +2734,6 @@ dev = [
     { name = "types-requests", specifier = ">=2.32.0" },
 ]
 docvqa = [{ name = "python-levenshtein", specifier = ">=0.20.0" }]
-exercism = [{ name = "inspect-swe", specifier = "==0.2.26" }]
 factscore = [
     { name = "factscorelite", specifier = ">=1.3.0,<2.0.0" },
     { name = "rank-bm25", specifier = ">=0.2.2" },
