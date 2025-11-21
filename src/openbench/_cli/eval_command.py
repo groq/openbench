@@ -689,15 +689,6 @@ def run_eval(
             "Cannot specify both --model and --model-role candidate=<model>"
         )
 
-    # If using Roo code agent, enforce OpenRouter models
-    if code_agent and code_agent.lower() == "roo":
-        for model_name in model:
-            if not model_name.startswith("openrouter/"):
-                raise typer.BadParameter(
-                    "For --code-agent roo, --model must be an OpenRouter model id prefixed with 'openrouter/'. "
-                    "Example: --model openrouter/anthropic/claude-sonnet-4-20250514"
-                )
-
     # Validate model names
     for model_name in model:
         validate_model_name(model_name)

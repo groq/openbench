@@ -15,7 +15,6 @@ from openbench.datasets.exercism import get_exercism_dataset
 from openbench.solvers.exercism_solver import exercism_solver
 from openbench.scorers.exercism import exercism_scorer
 from openbench.agents import AgentManager
-from openbench.agents.docker_manager import DockerManager
 
 
 TASK_DIR = Path(__file__).parent
@@ -25,7 +24,7 @@ COMPOSE_PATH = (TASK_DIR / "compose.yaml").resolve()
 @task
 def exercism(
     languages: Optional[List[str]] = None,
-    code_agent: str = "opencode",
+    code_agent: str = "codex",
 ) -> Task:
     """
     Exercism: Multi-language coding benchmark.
@@ -36,9 +35,8 @@ def exercism(
     Args:
         languages: List of programming languages to include (python, go, javascript, java, rust).
                   If None, includes all supported languages.
-        code_agent: CLI code agent to use for code evaluation.
-                   Defaults to 'opencode'. Can also be set via --code-agent flag.
-                   Valid options: aider, opencode, claude, roo
+        code_agent: Inspect SWE agent to use for code evaluation.
+                   Defaults to 'codex'. Valid options: codex, claude_code.
 
     Returns:
         Task configured for Exercism evaluation
@@ -50,12 +48,9 @@ def exercism(
             f"Invalid code agent: {code_agent}. Valid options: {', '.join(valid_agents)}"
         )
 
-    # Generate dynamic Docker files for this specific agent
-    DockerManager.generate_eval_files(code_agent, TASK_DIR)
-
     dataset = get_exercism_dataset(languages=languages)
 
-    # Add code agent to each sample's metadata so the solver can access it
+    # Add code agent to each sample's metadata
     for sample in dataset:
         if not hasattr(sample, "metadata") or sample.metadata is None:
             sample.metadata = {}
@@ -81,7 +76,7 @@ def exercism(
 
 
 @task
-def exercism_python(code_agent: str = "opencode") -> Task:
+def exercism_python(code_agent: str = "codex") -> Task:
     """
     Exercism: Python coding tasks only.
 
@@ -92,7 +87,7 @@ def exercism_python(code_agent: str = "opencode") -> Task:
 
 
 @task
-def exercism_javascript(code_agent: str = "opencode") -> Task:
+def exercism_javascript(code_agent: str = "codex") -> Task:
     """
     Exercism: JavaScript coding tasks only.
 
@@ -103,7 +98,7 @@ def exercism_javascript(code_agent: str = "opencode") -> Task:
 
 
 @task
-def exercism_go(code_agent: str = "opencode") -> Task:
+def exercism_go(code_agent: str = "codex") -> Task:
     """
     Exercism: Go coding tasks only.
 
@@ -114,7 +109,7 @@ def exercism_go(code_agent: str = "opencode") -> Task:
 
 
 @task
-def exercism_java(code_agent: str = "opencode") -> Task:
+def exercism_java(code_agent: str = "codex") -> Task:
     """
     Exercism: Java coding tasks only.
 
@@ -125,7 +120,7 @@ def exercism_java(code_agent: str = "opencode") -> Task:
 
 
 @task
-def exercism_rust(code_agent: str = "opencode") -> Task:
+def exercism_rust(code_agent: str = "codex") -> Task:
     """
     Exercism: Rust coding tasks only.
 
