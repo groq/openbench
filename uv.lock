@@ -2406,7 +2406,6 @@ name = "openbench"
 version = "0.5.2"
 source = { editable = "." }
 dependencies = [
-    { name = "anthropic" },
     { name = "datasets" },
     { name = "groq" },
     { name = "inspect-ai" },
@@ -2467,7 +2466,6 @@ scicode = [
 
 [package.metadata]
 requires-dist = [
-    { name = "anthropic", specifier = ">=0.69.0" },
     { name = "datasets", specifier = ">=3.6.0" },
     { name = "groq", specifier = ">=0.33.0" },
     { name = "inspect-ai", specifier = "==0.3.125" },
