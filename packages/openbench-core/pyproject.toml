@@ -15,7 +15,6 @@ authors = [
 dependencies = [
     "datasets>=3.6.0",
     "groq>=0.33.0",
-    "anthropic>=0.69.0",
     "inspect-ai==0.3.125",
     "openai>=2.0.0",
     "pillow>=10.0.0",
