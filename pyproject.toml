@@ -17,7 +17,7 @@ dependencies = [
     "datasets>=3.6.0",
     "groq>=0.33.0",
     "inspect-ai==0.3.125",
-    "openai>=1.99.7",
+    "openai>=2.0.0",
     "pillow>=10.0.0",
     "jsonschema>=4.23.0",
     "mcp>=1.13.1",
@@ -58,6 +58,9 @@ asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 markers = [
     "integration: marks tests that require external services (deselect with '-m \"not integration\"')",
+]
+filterwarnings = [
+    "ignore:install \"ipywidgets\" for Jupyter support:UserWarning:rich.live",
 ]
 
 [tool.ruff]
