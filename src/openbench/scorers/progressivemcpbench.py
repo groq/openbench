@@ -8,7 +8,7 @@ checking against the 'answers' list from the dataset. No LLM-as-a-judge.
 import json
 import re
 from difflib import SequenceMatcher
-from typing import Callable, List, Any
+from typing import Callable, List
 
 from inspect_ai.scorer import (
     accuracy,
