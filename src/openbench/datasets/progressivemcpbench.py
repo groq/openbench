@@ -112,4 +112,4 @@ def get_dataset() -> Dataset:
             # Should be rare since we filtered earlier, but stay robust
             logger.warning("Skipping record with empty or invalid answers: %s", record.get("task_id"))
 
-    return Dataset(samples=samples)
+    return samples
