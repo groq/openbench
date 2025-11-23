@@ -3385,6 +3385,26 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.livemcpbench",
         function_name="livemcpbench",
         is_alpha=False,
+    ),
+    "progressivemcpbench": BenchmarkMetadata(
+        name="ProgressiveMCPBench",
+        description=(
+            "Clone of LiveMCPBench using MCP tools with JSON-structured outputs "
+            "and exact/fuzzy answer scoring from the dataset's 'answers' field "
+            "(no LLM-as-a-judge)."
+        ),
+        category="agents",
+        tags=[
+            "agents",
+            "tools",
+            "mcp",
+            "json-output",
+            "exact-match",
+            "fuzzy-match",
+        ],
+        module_path="openbench.evals.progressivemcpbench",
+        function_name="progressivemcpbench",
+        is_alpha=True,
     ),  # GLUE/SuperGLUE benchmarks
     "anli": BenchmarkMetadata(
         name="ANLI (All Rounds)",
