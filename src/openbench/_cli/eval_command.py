@@ -22,6 +22,10 @@ from openbench.utils.livemcpbench_cache import (
     prepare_livemcpbench_cache,
     clear_livemcpbench_root,
 )
+from openbench.utils.progressivemcpbench_cache import (
+    prepare_progressivemcpbench_cache,
+    clear_progressivemcpbench_root,
+)
 from openbench.utils.factscore_cache import download_factscore_db
 
 
@@ -636,6 +640,14 @@ def run_eval(
             envvar="BENCH_KEEP_LIVEMCP_ROOT",
         ),
     ] = False,
+    keep_progressivemcp_root: Annotated[
+        bool,
+        typer.Option(
+            "--keep-progressivemcp-root",
+            help="Do not auto-clean ~/.openbench/progressivemcpbench/root after eval",
+            envvar="BENCH_KEEP_PROGRESSIVEMCP_ROOT",
+        ),
+    ] = False,
     alpha: Annotated[
         bool,
         typer.Option(
@@ -718,6 +730,8 @@ def run_eval(
         # auto-prepare caches for livemcpbench
         if "livemcpbench" in expanded_benchmarks:
             prepare_livemcpbench_cache()
+        if "progressivemcpbench" in expanded_benchmarks:
+            prepare_progressivemcpbench_cache()
         # auto-prepare CVEBench challenges directory
         if "cvebench" in expanded_benchmarks:
             from importlib import import_module
@@ -857,6 +871,8 @@ def run_eval(
         # Auto-clean root sandbox for livemcpbench unless opted out
         if "livemcpbench" in expanded_benchmarks and not keep_livemcp_root:
             clear_livemcpbench_root(quiet=False)
+        if "progressivemcpbench" in expanded_benchmarks and not keep_progressivemcp_root:
+            clear_progressivemcpbench_root(quiet=False)
         if "factscore" in expanded_benchmarks:
             from openbench.scorers.factscore import cleanup_factscore_runners
 
