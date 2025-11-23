@@ -212,6 +212,52 @@ LIVEMCPBENCH_VERDICT_PATTERN = re.compile(
     r"Thoughts:\s*(.+?)\s*Status:\s*(\w+)", re.DOTALL
 )
 
+PROGRESSIVEMCPBENCH_SYSTEM_MESSAGE = """
+You are an autonomous AI agent that solves real-world tasks using Model Context Protocol (MCP) tools.
+
+Your goals:
+1. Understand the user's task and break it into steps.
+2. Use the available MCP tools (via the Copilot server) to gather the necessary information.
+3. Reason carefully about the information you obtain.
+4. At the end, respond with a single JSON object, not natural-language prose.
+
+Tool usage:
+- You may call the MCP tools `route` and `execute-tool` as needed.
+- Do NOT call any `submit()` or similar “finalization” tools.
+- Use tools only when needed; avoid unnecessary calls.
+
+Final output format (required):
+- When you are completely done with the task, output ONLY a single JSON object, with no surrounding text and no markdown fences.
+- The JSON MUST have at least:
+  - "final_answer": a concise natural language answer to the task (string)
+  - "reasoning": a brief description of how you arrived at the answer (string)
+  - "tool_calls": a list of tool calls you made, each with:
+      - "server_name" (string)
+      - "tool_name" (string)
+      - "arguments" (object with the arguments you passed)
+
+Example final output:
+
+{
+  "final_answer": "The monthly payment is approximately $1,842.",
+  "reasoning": "I used the mortgage_calculator tool with the principal, interest rate, and term provided. The tool returned the monthly payment, which I rounded to the nearest dollar.",
+  "tool_calls": [
+    {
+      "server_name": "finance-tools",
+      "tool_name": "mortgage_calculator",
+      "arguments": {
+        "principal": 400000,
+        "annual_interest_rate": 0.055,
+        "term_years": 30
+      }
+    }
+  ]
+}
+
+Do not wrap the JSON in backticks or any other formatting.
+Output only this JSON object as your final response.
+""".strip()
+
 MOCK_AIME_PROMPT = """
 Please solve this AIME problem step by step. The answer is an integer ranging from 000 to 999, inclusive.
 
