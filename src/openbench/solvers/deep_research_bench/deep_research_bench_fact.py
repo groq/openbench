@@ -13,7 +13,7 @@ from typing import Any, Dict, List
 from inspect_ai.solver import TaskState, Generate
 from google import genai  # type: ignore[import-not-found]
 from google.genai import types  # type: ignore[import-not-found]
-import requests
+import requests  # type: ignore[import-untyped]
 
 from openbench.utils.deep_research_bench_prompts import (
     get_extract_citations_prompt,

@@ -295,6 +295,16 @@ from .evals.scicode import scicode  # noqa: F401, E402
 from .evals.sealqa import sealqa  # noqa: F401, E402
 from .evals.swag import swag  # noqa: F401, E402
 from .evals.simpleqa import simpleqa  # noqa: F401, E402
+from .evals.political_evenhandedness import (  # noqa: F401, E402
+    political_evenhandedness,
+    political_evenhandedness_historical_events,
+    political_evenhandedness_political_figures,
+    political_evenhandedness_policies,
+    political_evenhandedness_social_issues,
+    political_evenhandedness_us_constitution,
+    political_evenhandedness_social_identity,
+    political_evenhandedness_scientific,
+)
 from .evals.simpleqa_verified import simpleqa_verified  # noqa: F401, E402
 from .evals.tumlu import tumlu  # noqa: F401, E402
 from .evals.winogrande import winogrande  # noqa: F401, E402
