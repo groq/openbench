@@ -1,7 +1,7 @@
 """Generalized QA scorer for extractive and open-domain QA tasks.
 
-Provides exact match (EM) and F1 scoring, extracted from DROP scorer logic.
-Used by: NaturalQuestions, TriviaQA, SQuAD, and similar QA benchmarks.
+Provides exact match (EM) and F1 scoring.
+Used by: NaturalQuestions, TriviaQA, SQuAD, CoQA, and similar QA benchmarks.
 """
 
 import re
@@ -10,6 +10,17 @@ from typing import Callable, List, Tuple
 
 from inspect_ai.scorer import Score, Target, accuracy, scorer, stderr
 from inspect_ai.solver import TaskState
+
+EXCLUDE = set(string.punctuation)
+
+
+def _is_number(text: str) -> bool:
+    """Check if text represents a number."""
+    try:
+        float(text)
+        return True
+    except ValueError:
+        return False
 
 
 def _remove_articles(text: str) -> str:
@@ -23,13 +34,37 @@ def _white_space_fix(text: str) -> str:
 
 
 def _remove_punc(text: str) -> str:
-    """Remove punctuation from text."""
-    return "".join(ch for ch in text if ch not in string.punctuation)
+    """Remove punctuation from text unless it's a number."""
+    if not _is_number(text):
+        return "".join(ch for ch in text if ch not in EXCLUDE)
+    return text
+
+
+def _normalize_number(text: str) -> str:
+    """Normalize a number to its float representation."""
+    if _is_number(text):
+        return str(float(text))
+    return text
+
+
+def _tokenize(text: str) -> List[str]:
+    """Tokenize text by spaces and hyphens."""
+    return re.split(" |-", text)
 
 
 def _normalize_answer(text: str) -> str:
-    """Normalize answer: lowercase, remove articles, punctuation, whitespace."""
-    return _white_space_fix(_remove_articles(_remove_punc(text.lower())))
+    """Normalize answer: lowercase, remove articles, punctuation, whitespace.
+
+    Numbers are preserved and normalized to their float representation.
+    """
+    parts = [
+        _white_space_fix(
+            _remove_articles(_normalize_number(_remove_punc(token.lower())))
+        )
+        for token in _tokenize(text)
+    ]
+    parts = [part for part in parts if part.strip()]
+    return " ".join(parts).strip()
 
 
 def compute_exact_match(prediction: str, ground_truth: str) -> float:
