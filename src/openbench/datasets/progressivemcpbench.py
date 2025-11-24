@@ -50,59 +50,15 @@ def record_to_sample(record: dict[str, Any]) -> Sample:
     )
 
 
-def _ensure_local_json_dataset() -> None:
-    """Download ICIP/LiveMCPBench from Hugging Face and cache to local JSON."""
-    if DATA_FILE.is_file():
-        return
-
-    from datasets import load_dataset  # lazy import to avoid heavy dependency if not needed
-
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    logger.info("Downloading ICIP/LiveMCPBench test split to %s", DATA_FILE)
-
-    try:
-        ds = load_dataset("ICIP/LiveMCPBench", split="test")
-    except Exception as e:
-        logger.error(f"Failed to download dataset: {e}")
-        raise
-
-    records: List[dict[str, Any]] = []
-
-    for rec in ds:
-        answers = rec.get("answers") or []
-        # Normalize to list and filter empties here so JSON file only has graded tasks
-        if isinstance(answers, str):
-            answers_list = [answers.strip()] if answers.strip() else []
-        else:
-            answers_list = [str(a).strip() for a in answers if str(a).strip()]
-
-        if not answers_list:
-            continue
-
-        # Create a clean dict
-        clean_rec = dict(rec)
-        clean_rec["answers"] = answers_list
-        records.append(clean_rec)
-
-    with DATA_FILE.open("w", encoding="utf-8") as f:
-        json.dump(records, f, ensure_ascii=False, indent=2)
-    
-    logger.info(f"Saved {len(records)} records to {DATA_FILE}")
-
-
 def get_dataset() -> Dataset:
-    """Load ProgressiveMCPBench dataset from a local JSON file.
-    
-    Automatically downloads the dataset if it doesn't exist.
-    """
-    _ensure_local_json_dataset()
-
+    """Load ProgressiveMCPBench dataset from a local JSON file."""
     try:
         with DATA_FILE.open("r", encoding="utf-8") as f:
             raw_records: list[dict[str, Any]] = json.load(f)
     except (json.JSONDecodeError, FileNotFoundError) as e:
         logger.error(f"Failed to read dataset file {DATA_FILE}: {e}")
-        raise
+        # If file is missing, we raise instead of downloading, as we now commit the dataset
+        raise FileNotFoundError(f"Dataset file not found at {DATA_FILE}. Please ensure it is present.") from e
 
     samples: list[Sample] = []
     for record in raw_records:
