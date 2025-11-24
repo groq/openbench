@@ -38,7 +38,9 @@ REPO_ZIP_URL = "https://github.com/icip-cas/LiveMCPBench/archive/refs/heads/main
 
 
 def _base_cache_dir() -> Path:
-    return Path(os.path.expanduser("~/.openbench/progressivemcpbench/copilot/raw")).resolve()
+    return Path(
+        os.path.expanduser("~/.openbench/progressivemcpbench/copilot/raw")
+    ).resolve()
 
 
 def _write_json(path: Path, data: Any) -> None:
@@ -55,7 +57,11 @@ def _fetch_json(url: str) -> Any:
 def _should_refresh(force: bool | None = None) -> bool:
     if force is not None:
         return force
-    return os.getenv("OPENBENCH_PROGRESSIVEMCPBENCH_REFRESH", "0") in {"1", "true", "True"}
+    return os.getenv("OPENBENCH_PROGRESSIVEMCPBENCH_REFRESH", "0") in {
+        "1",
+        "true",
+        "True",
+    }
 
 
 def get_annotated_data_cached(force_refresh: bool | None = None) -> Path:

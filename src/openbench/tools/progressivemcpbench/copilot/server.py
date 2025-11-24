@@ -60,7 +60,9 @@ _GLOBAL_ROUTER: "Router | None" = None
 def _user_cache_dir() -> Path:
     # Avoid introducing a hard dependency on platformdirs
     # Migrate caches to ~/.openbench
-    return Path(os.path.expanduser("~/.openbench/progressivemcpbench/copilot")).resolve()
+    return Path(
+        os.path.expanduser("~/.openbench/progressivemcpbench/copilot")
+    ).resolve()
 
 
 def _ensure_parent_dir(path: Path) -> None:

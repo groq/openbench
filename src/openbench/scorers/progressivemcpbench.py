@@ -8,13 +8,14 @@ checking against the 'answers' list from the dataset. No LLM-as-a-judge.
 import json
 import re
 from difflib import SequenceMatcher
-from typing import Callable, List
+from typing import List
 
 from inspect_ai.scorer import (
     accuracy,
     scorer,
     stderr,
     Score,
+    Scorer,
     Target,
     metric,
     Metric,
@@ -122,9 +123,9 @@ def progressivemcpbench_metrics() -> Metric:
 )
 def progressivemcpbench_scorer(
     fuzzy_threshold: float = 0.85,
-) -> Callable[[TaskState, Target], Score]:
+) -> Scorer:
     """Scorer for ProgressiveMCPBench using exact + fuzzy match on answers.
-    
+
     Args:
         fuzzy_threshold: Minimum similarity ratio (0-1) to count as partial match (score 0.5).
     """
@@ -142,7 +143,9 @@ def progressivemcpbench_scorer(
         # Safety: we should have already filtered empty answers at dataset time
         if not expected_list:
             # Treat as ungraded / auto-skip
-            return Score(value=0.0, answer="", metadata={"skipped_no_expected_answer": True})
+            return Score(
+                value=0.0, answer="", metadata={"skipped_no_expected_answer": True}
+            )
 
         model_answer = _extract_final_answer(state)
         if not model_answer:
@@ -170,7 +173,7 @@ def progressivemcpbench_scorer(
         category = (
             state.metadata.get("category", "unknown") if state.metadata else "unknown"
         )
-        
+
         # Set grade letter for display
         if value >= 1.0:
             grade_letter = "A"
