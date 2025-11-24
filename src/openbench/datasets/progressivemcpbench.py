@@ -35,8 +35,8 @@ def record_to_sample(record: dict[str, Any]) -> Sample:
         answers_list = [str(a).strip() for a in answers if str(a).strip()]
 
     # Skip records with no usable answers (requirement 3: skip empty answers)
-    if not answers_list:
-        raise ValueError("Empty answers list; record should be filtered before Sample creation")
+    # if not answers_list:
+    #    raise ValueError("Empty answers list; record should be filtered before Sample creation")
 
     return Sample(
         id=record["task_id"],
@@ -62,10 +62,6 @@ def get_dataset() -> Dataset:
 
     samples: list[Sample] = []
     for record in raw_records:
-        try:
-            samples.append(record_to_sample(record))
-        except ValueError:
-            # Should be rare since we filtered earlier, but stay robust
-            logger.warning("Skipping record with empty or invalid answers: %s", record.get("task_id"))
+        samples.append(record_to_sample(record))
 
     return samples
