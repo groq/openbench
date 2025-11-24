@@ -279,6 +279,7 @@ from .evals.mathvista import mathvista  # noqa: F401, E402
 from .evals.mbpp import mbpp  # noqa: F401, E402
 from .evals.medmcqa import medmcqa  # noqa: F401, E402
 from .evals.medqa import medqa  # noqa: F401, E402
+from .evals.gsm8k import gsm8k  # noqa: F401, E402
 from .evals.mgsm import mgsm, mgsm_en, mgsm_latin, mgsm_non_latin  # noqa: F401, E402
 from .evals.mmlu import mmlu  # noqa: F401, E402
 from .evals.mmlu_pro import mmlu_pro  # noqa: F401, E402

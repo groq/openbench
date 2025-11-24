@@ -696,6 +696,14 @@ _BUILTIN_BENCHMARKS = {
         function_name="healthbench_consensus",
         subtask=True,
     ),
+    "gsm8k": BenchmarkMetadata(
+        name="GSM8K",
+        description="Grade School Math 8K - 8,500 diverse grade school math word problems requiring multi-step reasoning",
+        category="core",
+        tags=["math", "reasoning", "chain-of-thought", "word-problems"],
+        module_path="openbench.evals.gsm8k",
+        function_name="gsm8k",
+    ),
     "mgsm": BenchmarkMetadata(
         name="MGSM",
         description="Multilingual Grade School Math benchmark across 11 languages for testing mathematical reasoning",
