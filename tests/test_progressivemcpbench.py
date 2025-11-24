@@ -58,7 +58,7 @@ def test_get_dataset_mocked():
     mock_json = json.dumps(mock_data)
     
     with patch("openbench.datasets.progressivemcpbench.DATA_FILE", Path("/mock/path.json")), \
-         patch("builtins.open", mock_open(read_data=mock_json)), \
+         patch("pathlib.Path.open", mock_open(read_data=mock_json)), \
          patch("openbench.datasets.progressivemcpbench._ensure_local_json_dataset") as mock_ensure:
         
         dataset = get_dataset()
