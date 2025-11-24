@@ -2,7 +2,7 @@
   {
     "task_id": "0e3287cb-c0ff-4d2a-8c3d-d8833014a7b0",
     "Question": "Generate a well-formatted PDF report titled wechat_reading_report.pdf in /root/pdf, summarizing current WeChat Reading trends and including a word cloud.",
-    "answers": "file /root/pdf/wechat_reading_report.pdf",
+    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -93,7 +93,7 @@
   {
     "task_id": "2b96c022-a2db-47a5-981a-03cc6ad8f95e",
     "Question": "Run a full reconnaissance on www.baidu.com. Give me a markdown report on /root/markdown/baidu_report.md with whois information and sitemap.",
-    "answers": "file /root/markdown/baidu_report.md",
+    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -119,7 +119,7 @@
   {
     "task_id": "88ccea26-01f6-4db6-ba95-6b2a73c0488b",
     "Question": "Analyze Apple's stock for the past year and summarize it in a PPT in /root/ppt/apple.pptx.",
-    "answers": "file /root/ppt/apple.pptx",
+    "answers": null,
     "category": "Finance",
     "file_name": "",
     "Annotator Metadata": {
@@ -132,7 +132,7 @@
   {
     "task_id": "6b7fc66e-fe96-4403-9a52-df5afa53ab68",
     "Question": "Generate a research summary for NCT04280705 and save it as Markdown to /root/markdown/NCT04280705.md.",
-    "answers": "file /root/markdown/NCT04280705.md",
+    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -171,7 +171,7 @@
   {
     "task_id": "230fb273-b316-4a8f-9297-89ce5558bc6c",
     "Question": "Find today's LeetCode Daily Challenge and generate a detailed markdown document in /root/markdown/leetcode_daily.md that provides a comprehensive walkthrough of the problem. ",
-    "answers": "file /root/markdown/leetcode_daily.md",
+    "answers": null,
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -197,7 +197,7 @@
   {
     "task_id": "4de2e9f7-f3ea-4d02-8532-0a1b0b530609",
     "Question": "Read the sales data under /root/excel/Local_Electronic_Sales.xlsx, plot it as a bar chart by month and save it in /root/figs/sale.png",
-    "answers": "file /root/figs/sale.png",
+    "answers": null,
     "category": "Office",
     "file_name": "/root/excel/Local_Electronic_Sales.xlsx",
     "Annotator Metadata": {
@@ -210,7 +210,7 @@
   {
     "task_id": "56d7fbdb-ebd6-41fe-a5d6-cd21dbc59fd8",
     "Question": "Find the trending GitHub repositories. For the top one, read its Deepwiki. Then, draft a Markdown intro document for it in /root/markdown/github_trends.md.",
-    "answers": "file /root/markdown/github_trends.md",
+    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -236,7 +236,7 @@
   {
     "task_id": "f2a9eb67-efec-4c86-abad-efa55a72f86d",
     "Question": "Generate a deep report of bitcoin and save it in /root/markdown/bitcoin.md",
-    "answers": "file /root/markdown/bitcoin.md",
+    "answers": null,
     "category": "Finance",
     "file_name": "",
     "Annotator Metadata": {
@@ -249,7 +249,7 @@
   {
     "task_id": "9fc8b7f3-776c-4756-bb84-a7ae667521a9",
     "Question": "Help me find Mr. Lu Yaojie's resume in the Chinese Information Processing Laboratory of the Institute of Software and save it to /root/markdown/cv.md.",
-    "answers": "file /root/markdown/cv.md.",
+    "answers": null,
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -353,7 +353,7 @@
   {
     "task_id": "2bf318d4-754d-43f3-a1b5-cb2f50a7d144",
     "Question": "What are the emerging treatment strategies for head and neck cancer, write the report to /root/markdown/cancer.md?",
-    "answers": "file /root/markdown/cancer.md",
+    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -379,7 +379,7 @@
   {
     "task_id": "7180c69a-bbf2-4912-a0ca-a6345c5fe7f1",
     "Question": "Make a web page about the history of AI based on Wikipedia saved at /root/html/ai.html.",
-    "answers": "file /root/html/ai.html",
+    "answers": null,
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -509,7 +509,7 @@
   {
     "task_id": "4aa079dd-9d2d-440d-a654-9ba9cb3868b0",
     "Question": "Read the paper webarena, mind2web and mind2web2, then create a Comparison Report in /root/markdown/compare_webagent.md",
-    "answers": "file /root/markdown/compare_webagent.md",
+    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -522,7 +522,7 @@
   {
     "task_id": "e023dd0e-1212-47e0-a73c-97739c78b849",
     "Question": "Generate a presentation on the latest Apple product information. Save it to /root/ppt/apple_news.pptx.",
-    "answers": "file /root/ppt/apple_news.pptx",
+    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -535,7 +535,7 @@
   {
     "task_id": "ef7126b3-45ad-41ab-a191-2272c644d057",
     "Question": "I need a daily financial brief. Fetch today's economic news, cross-reference it with relevant stock movements, and then generate a report at /root/markdown/daily_fin.md.",
-    "answers": "file /root/markdown/daily_fin.md",
+    "answers": null,
     "category": "Finance",
     "file_name": "",
     "Annotator Metadata": {
@@ -574,7 +574,7 @@
   {
     "task_id": "ec6f4fe5-e650-48b1-8805-285d8f52eb10",
     "Question": "Create a Next.js middleware that checks for a valid JWT in cookies and redirects unauthenticated users to `/login` in /root/code/middleware.ts. use context7",
-    "answers": "file /root/code/middleware.ts",
+    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -587,7 +587,7 @@
   {
     "task_id": "4d7582c4-5013-4275-9621-1e7fbb5fb0c1",
     "Question": "Download New York's Air Quality report from Government Data, saved at /root/csv/NY_AIR_QUALITY.csv",
-    "answers": "file /root/csv/NY_AIR_QUALITY.csv",
+    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -600,7 +600,7 @@
   {
     "task_id": "83da9f72-640f-439d-861e-97b449e02da7",
     "Question": "Analyze the visual marketing strategy from the iPhone 16 page at https://www.apple.com/iphone-16/ and save the summary as a Markdown report to /root/markdown/iphone16_visual_strategy.md",
-    "answers": "file /root/markdown/iphone16_visual_strategy.md",
+    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -639,7 +639,7 @@
   {
     "task_id": "cf1fca1e-8e56-4b26-ae34-dfdb1d982080",
     "Question": "Analyze and compare echarts-for-react, react-chartjs-2, and Tremor. It's for a FinTech app, so my top priorities are a deep security scan of all dependencies and performance, especially bundle size. Give me a comparison table and a final recommendation in a markdown report in /root/markdown/package_compare.md.",
-    "answers": "file /root/markdown/package_compare.md",
+    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -652,7 +652,7 @@
   {
     "task_id": "1ef11556-37d6-4585-b4b2-cf2f782141e6",
     "Question": "Read all the articles in the /root/pdf/embodied_ai_papers directory. Compare their similarities and differences, then write a report summarizing your analysis. Save the final report as a Markdown file at /root/markdown/embodied_ai_report.md.",
-    "answers": "file /root/markdown/embodied_ai_report.md",
+    "answers": null,
     "category": "Office",
     "file_name": "/root/pdf/embodied_ai_papers",
     "Annotator Metadata": {
@@ -665,7 +665,7 @@
   {
     "task_id": "fbe982c3-4142-40ec-8541-e06d7ab2e399",
     "Question": "I need a Word document summarizing NIO. Please title it 'NIO Company Overview' and include three headed sections: a brief introduction from Wikipedia, three major news updates from the last quarter as bullet points, and a list of their main vehicle models. Finally, save it in /root/word/nio.docx",
-    "answers": "file /root/word/nio.docx",
+    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -717,7 +717,7 @@
   {
     "task_id": "90098a9c-2a37-4655-82b1-6b58c5154660",
     "Question": "I'm using shadcn/ui to build a 'create post' page. I have two input fields, one for the title and one for the content. I want the 'Publish' button at the bottom to be disabled if either the title or content is empty. It should only become clickable when both fields are filled. How can I achieve this? Please provide a complete React/TypeScript example using the Input and Button components from shadcn/ui and save the code to /root/code/shadcn_ui.ts",
-    "answers": "file /root/code/shadcn_ui.ts",
+    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -730,7 +730,7 @@
   {
     "task_id": "17a4aef0-bb60-47b1-9b47-3686bca29db3",
     "Question": "Generate a well-formatted PDF report  in /root/pdf/douban_report.pdf, summarizing current douban trends.",
-    "answers": "file /root/pdf/douban_report.pdf",
+    "answers": null,
     "category": "Leisure",
     "file_name": "",
     "Annotator Metadata": {
@@ -860,7 +860,7 @@
   {
     "task_id": "71a7a42a-54af-4552-ad9b-d36f4912cc1c",
     "Question": "Convert the reference list in /root/txt/paper_list.bib into a Word document. Please use APA formatting and save the final file at /root/word/paper_list.docx.",
-    "answers": "file /root/word/paper_list.docx",
+    "answers": null,
     "category": "Office",
     "file_name": "/root/txt/paper_list.bib",
     "Annotator Metadata": {
@@ -873,7 +873,7 @@
   {
     "task_id": "9bc7feb8-2db9-4c5b-8ad9-44ff15748bf6",
     "Question": "Provide a foundational overview of Convolutional Neural Networks (CNNs), referencing Wikipedia. Generate a simple CNN example as a Python script and save it to /root/code/cnn_example.py.",
-    "answers": "file /root/code/cnn_example.py",
+    "answers": null,
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -1094,7 +1094,7 @@
   {
     "task_id": "423f89ba-be77-4f93-99d7-936548513eef",
     "Question": "Help me create an example word that needs to have headings, tables, body, footnotes and insert clock.png under /root/picture and save it in /root/word/example.docx",
-    "answers": "file /root/word/example.docx",
+    "answers": null,
     "category": "Office",
     "file_name": "/root/picture/clock.png",
     "Annotator Metadata": {
@@ -1159,7 +1159,7 @@
   {
     "task_id": "4cbd9682-cce7-444e-a878-36283a865b2a",
     "Question": "I am writing a popular science article on ‘Causes of the Fall of the Roman Empire’. Please help me to list at least three main causes that are generally recognized by historians and find one authoritative reference for each. Finally, organize all this information into a structured document and save it to /root/markdown/Rome.md.",
-    "answers": "file /root/markdown/Rome.md",
+    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -1211,7 +1211,7 @@
   {
     "task_id": "b050f277-0a92-4cfc-933b-5f01430e77dd",
     "Question": "Convert /root/word/CV.docx and /root/word/Report_Card.docx to PDF, merge the two resulting files, and save the final combined document as /root/pdf/full_cv.pdf.",
-    "answers": "file /root/pdf/full_cv.pdf",
+    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
