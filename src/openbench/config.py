@@ -160,6 +160,14 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.mmlu_pro",
         function_name="mmlu_pro",
     ),
+    "mmlu-redux": BenchmarkMetadata(
+        name="MMLU-Redux",
+        description="Manually re-annotated subset of 5,700 MMLU questions addressing annotation errors in the original dataset.",
+        category="core",
+        tags=["multiple-choice", "knowledge", "reasoning", "multitask"],
+        module_path="openbench.evals.mmlu_redux",
+        function_name="mmlu_redux",
+    ),
     "mmmlu": BenchmarkMetadata(
         name="MMMLU (openai/MMMLU)",
         description="MMLU translated to 15 languages.",
