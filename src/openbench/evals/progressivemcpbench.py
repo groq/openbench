@@ -24,7 +24,7 @@ def progressive_copilot_solver() -> Solver:
                     instructions=PROGRESSIVEMCPBENCH_SYSTEM_MESSAGE,
                     assistant_prompt=None,
                     handoff_prompt=None,
-                    submit_prompt=None,
+                    submit_prompt="",  # Suppress default submit instruction
                 ),
                 tools=[tool_source],
             )
