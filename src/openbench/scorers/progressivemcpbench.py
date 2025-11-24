@@ -76,11 +76,10 @@ def progressivemcpbench_metrics() -> Metric:
     """Custom metrics including category breakdown and partial (fuzzy) accuracy."""
 
     def metric_calculator(scores: list[SampleScore]) -> Value:
-        correct_count = sum(1 for s in scores if s.score.value == 1.0)
-        partial_count = sum(1 for s in scores if s.score.value == 0.5)
+        total_score = sum(s.score.value for s in scores)
         total_count = len(scores)
 
-        category_stats: dict[str, dict[str, int]] = {}
+        category_stats: dict[str, dict[str, float]] = {}
         for s in scores:
             category = (
                 s.score.metadata.get("category", "unknown")
@@ -88,24 +87,20 @@ def progressivemcpbench_metrics() -> Metric:
                 else "unknown"
             )
             stats = category_stats.setdefault(
-                category, {"correct": 0, "partial": 0, "total": 0}
+                category, {"total_score": 0.0, "count": 0}
             )
-            stats["total"] += 1
-            if s.score.value == 1.0:
-                stats["correct"] += 1
-            elif s.score.value == 0.5:
-                stats["partial"] += 1
+            stats["count"] += 1
+            stats["total_score"] += s.score.value
 
         category_accuracies = {}
         for category, stats in category_stats.items():
-            if stats["total"] > 0:
-                category_accuracies[f"{category}_partial_or_better_accuracy"] = (
-                    stats["correct"] + stats["partial"]
-                ) / stats["total"]
+            if stats["count"] > 0:
+                category_accuracies[f"{category}_accuracy"] = (
+                    stats["total_score"] / stats["count"]
+                )
 
         return {
-            "correct_count": correct_count,
-            "partial_count": partial_count,
+            "accuracy": total_score / total_count if total_count > 0 else 0.0,
             "total_count": total_count,
             **category_accuracies,
         }
