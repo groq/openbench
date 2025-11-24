@@ -257,6 +257,8 @@ from .evals import bigbench, bigbench_hard, global_mmlu  # noqa: F401, E402
 from .evals.clockbench import clockbench  # noqa: F401, E402
 from .evals.drop import drop  # noqa: F401, E402
 from .evals.gpqa_diamond import gpqa_diamond  # noqa: F401, E402
+from .evals.commonsenseqa import commonsenseqa  # noqa: F401, E402
+from .evals.coqa import coqa  # noqa: F401, E402
 from .evals.gpqa import gpqa  # noqa: F401, E402
 from .evals.gpt_oss.aime import gpt_oss_aime25  # noqa: F401, E402
 from .evals.graphwalks import graphwalks  # noqa: F401, E402
@@ -265,6 +267,8 @@ from .evals.healthbench import healthbench, healthbench_hard, healthbench_consen
 from .evals.hellaswag import hellaswag  # noqa: F401, E402
 from .evals.hle import hle, hle_text  # noqa: F401, E402
 from .evals.humaneval import humaneval  # noqa: F401, E402
+from .evals.imdb import imdb  # noqa: F401, E402
+from .evals.lambada import lambada  # noqa: F401, E402
 from .evals.exercism.exercism import (  # noqa: F401, E402
     exercism,
     exercism_python,
