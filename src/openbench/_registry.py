@@ -280,6 +280,7 @@ from .evals.mbpp import mbpp  # noqa: F401, E402
 from .evals.medmcqa import medmcqa  # noqa: F401, E402
 from .evals.medqa import medqa  # noqa: F401, E402
 from .evals.gsm8k import gsm8k  # noqa: F401, E402
+from .evals.gsm_plus import gsm_plus, gsm_plus_mini  # noqa: F401, E402
 from .evals.mgsm import mgsm, mgsm_en, mgsm_latin, mgsm_non_latin  # noqa: F401, E402
 from .evals.mmlu import mmlu  # noqa: F401, E402
 from .evals.mmlu_pro import mmlu_pro  # noqa: F401, E402
@@ -289,6 +290,7 @@ from .evals.mrcr import openai_mrcr, openai_mrcr_2n, openai_mrcr_4n, openai_mrcr
 from .evals.mmstar import mmstar  # noqa: F401, E402
 from .evals.mmvetv2 import mmvetv2  # noqa: F401, E402
 from .evals.musr import musr  # noqa: F401, E402
+from .evals.natural_questions import natural_questions  # noqa: F401, E402
 from .evals.openbookqa import openbookqa  # noqa: F401, E402
 from .evals.pubmedqa import pubmedqa  # noqa: F401, E402
 from .evals.piqa import piqa  # noqa: F401, E402
@@ -308,6 +310,8 @@ from .evals.political_evenhandedness import (  # noqa: F401, E402
     political_evenhandedness_scientific,
 )
 from .evals.simpleqa_verified import simpleqa_verified  # noqa: F401, E402
+from .evals.squad_v2 import squad_v2  # noqa: F401, E402
+from .evals.triviaqa import triviaqa  # noqa: F401, E402
 from .evals.tumlu import tumlu  # noqa: F401, E402
 from .evals.winogrande import winogrande  # noqa: F401, E402
 from .evals.wsc273 import wsc273  # noqa: F401, E402
