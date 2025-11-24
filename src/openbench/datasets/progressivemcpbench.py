@@ -8,9 +8,9 @@ but uses a local JSON dataset and exact/fuzzy answer matching.
 import json
 import logging
 from pathlib import Path
-from typing import Any, List
+from typing import Any, List, Optional
 
-from inspect_ai.dataset import Dataset, Sample
+from inspect_ai.dataset import Dataset, MemoryDataset, Sample
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ DATA_DIR = Path(__file__).resolve().parent / "data"
 DATA_FILE = DATA_DIR / "progressivemcpbench.json"
 
 
-def record_to_sample(record: dict[str, Any]) -> Sample:
+def record_to_sample(record: dict[str, Any]) -> Optional[Sample]:
     """Convert a ProgressiveMCPBench record to an Inspect Sample.
 
     Args:
@@ -27,7 +27,12 @@ def record_to_sample(record: dict[str, Any]) -> Sample:
 
     Returns:
         Sample: Converted sample for evaluation.
+        None: If the record should be skipped (e.g. answers is None).
     """
+    # specific user request: if answers is explicitly null, skip the task
+    if record.get("answers") is None:
+        return None
+
     answers = record.get("answers") or []
     if isinstance(answers, str):
         answers_list: List[str] = [answers.strip()] if answers.strip() else []
@@ -58,10 +63,14 @@ def get_dataset() -> Dataset:
     except (json.JSONDecodeError, FileNotFoundError) as e:
         logger.error(f"Failed to read dataset file {DATA_FILE}: {e}")
         # If file is missing, we raise instead of downloading, as we now commit the dataset
-        raise FileNotFoundError(f"Dataset file not found at {DATA_FILE}. Please ensure it is present.") from e
+        raise FileNotFoundError(
+            f"Dataset file not found at {DATA_FILE}. Please ensure it is present."
+        ) from e
 
     samples: list[Sample] = []
     for record in raw_records:
-        samples.append(record_to_sample(record))
+        sample = record_to_sample(record)
+        if sample:
+            samples.append(sample)
 
-    return samples
+    return MemoryDataset(samples=samples, name="progressivemcpbench")

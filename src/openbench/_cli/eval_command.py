@@ -871,7 +871,10 @@ def run_eval(
         # Auto-clean root sandbox for livemcpbench unless opted out
         if "livemcpbench" in expanded_benchmarks and not keep_livemcp_root:
             clear_livemcpbench_root(quiet=False)
-        if "progressivemcpbench" in expanded_benchmarks and not keep_progressivemcp_root:
+        if (
+            "progressivemcpbench" in expanded_benchmarks
+            and not keep_progressivemcp_root
+        ):
             clear_progressivemcpbench_root(quiet=False)
         if "factscore" in expanded_benchmarks:
             from openbench.scorers.factscore import cleanup_factscore_runners

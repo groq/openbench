@@ -34,15 +34,15 @@ def test_record_to_sample_single_answer():
     sample = record_to_sample(record)
     assert sample.target == ["Hello"]
 
-def test_record_to_sample_empty_answer_raises():
+def test_record_to_sample_null_answer_returns_none():
     record = {
         "task_id": "task_3",
-        "Question": "Bad",
-        "answers": [],
-        "category": "Bad",
+        "Question": "Skip me",
+        "answers": None,
+        "category": "Skip",
     }
-    with pytest.raises(ValueError, match="Empty answers list"):
-        record_to_sample(record)
+    sample = record_to_sample(record)
+    assert sample is None
 
 def test_get_dataset_mocked():
     mock_data = [
@@ -53,15 +53,21 @@ def test_get_dataset_mocked():
             "category": "Test",
             "file_name": "f1",
             "Annotator Metadata": {}
+        },
+        {
+            "task_id": "2",
+            "Question": "Q2",
+            "answers": None,
+            "category": "Test",
+            "file_name": "f2",
+            "Annotator Metadata": {}
         }
     ]
     mock_json = json.dumps(mock_data)
     
     with patch("openbench.datasets.progressivemcpbench.DATA_FILE", Path("/mock/path.json")), \
-         patch("pathlib.Path.open", mock_open(read_data=mock_json)), \
-         patch("openbench.datasets.progressivemcpbench._ensure_local_json_dataset") as mock_ensure:
+         patch("pathlib.Path.open", mock_open(read_data=mock_json)):
         
         dataset = get_dataset()
         assert len(dataset) == 1
         assert dataset[0].id == "1"
-        mock_ensure.assert_called_once()
