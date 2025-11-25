@@ -731,7 +731,9 @@ def run_eval(
         if "livemcpbench" in expanded_benchmarks:
             prepare_livemcpbench_cache()
         if "progressivemcpbench" in expanded_benchmarks:
-            prepare_progressivemcpbench_cache()
+            # Pass strategy to cache preparation so it knows whether embeddings are needed
+            strategy = task_args.get("strategy")
+            prepare_progressivemcpbench_cache(strategy=strategy)
         # auto-prepare CVEBench challenges directory
         if "cvebench" in expanded_benchmarks:
             from importlib import import_module
