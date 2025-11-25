@@ -326,7 +326,7 @@
   },
   {
     "task_id": "d116bda4-e70c-4ef1-ab1a-b68b4855e1bf",
-    "Question": "Read the data under /root/excel/people_data.xlsx and tell me Sophia Moore's bmi.",
+    "Question": "Read the data under /root/excel/people_data.xlsx and tell me Sophia Moore's bmi. Format the answer as a floating point number to 2 decimal places.",
     "answers": "20.76",
     "category": "Lifestyle",
     "file_name": "",
@@ -807,8 +807,8 @@
   },
   {
     "task_id": "086e2393-dc1a-4c55-bf54-1e9a94951db7",
-    "Question": "Read the file /root/word/exchange.docx, tell me who did not give a gift",
-    "answers": "Fred",
+    "Question": "Read the file /root/word/exchange.docx, tell me who did not give a gift. Format the answer as a JSON array of double-quoted strings.",
+    "answers": "[]",
     "category": "Leisure",
     "file_name": "/root/word/exchange.docx",
     "Annotator Metadata": {
@@ -820,7 +820,7 @@
   },
   {
     "task_id": "507f592a-f21f-45f6-bbde-dadb86441791",
-    "Question": "Read the customer information in /root/csv/customers-100.csv and tell me Sheryl Meyers's email address",
+    "Question": "Read the customer information in /root/csv/customers-100.csv and tell me Sheryl Meyers's email address. Return just the email address.",
     "answers": "mariokhan@ryan-pope.org",
     "category": "Office",
     "file_name": "",
@@ -989,7 +989,7 @@
   },
   {
     "task_id": "31086c2d-e183-42c3-9ee7-7c1278c4317f",
-    "Question": "What files are in my /root/music folder?",
+    "Question": "What files are in my /root/music folder? Return only the file names, separated by commas.",
     "answers": "mixkit-retro-game-emergency-alarm-1000.wav",
     "category": "Lifestyle",
     "file_name": "/root/music",
@@ -1119,7 +1119,7 @@
   },
   {
     "task_id": "2e190c2a-8aab-44e1-896d-671cb3fcc495",
-    "Question": "What are the changes in my log files /root/txt/log_today.txt and /root/txt/log_yesterday.txt, help me to find out all the different lines which contain 'ERROR' ?",
+    "Question": "What are the changes in my log files /root/txt/log_today.txt and /root/txt/log_yesterday.txt, help me to find out all the different lines which contain 'ERROR' ? Answer with the exact text of the lines only, separated by commas.",
     "answers": "[ERROR] Database connection failed.",
     "category": "Office",
     "file_name": "/root/txt/log_today.txt, /root/txt/log_yesterday.txt",
