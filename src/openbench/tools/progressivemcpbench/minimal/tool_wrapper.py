@@ -111,7 +111,7 @@ def create_mcp_tool_wrapper(
 
     Args:
         server: Server configuration
-        tool_name: Name of the tool
+        tool_name: Name of the tool (will be prefixed with server name)
         tool_description: Description of the tool
         input_schema: JSON schema for tool parameters
         timeout: Timeout in seconds for tool execution
@@ -119,6 +119,7 @@ def create_mcp_tool_wrapper(
     Returns:
         Inspect AI Tool that executes the MCP tool
     """
+    server_name = server.name
 
     async def execute(**kwargs: Any) -> str:
         """Execute the MCP tool with the provided arguments."""
@@ -141,10 +142,14 @@ def create_mcp_tool_wrapper(
     else:
         params = ToolParams(type="object", properties={}, required=[])
 
+    # Prefix tool name with server name to avoid collisions
+    # e.g., "filesystem__read_file" instead of just "read_file"
+    prefixed_name = f"{server_name}__{tool_name}"
+
     # Create ToolDef and convert to Tool
     tool_def = ToolDef(
         tool=execute,
-        name=tool_name,
+        name=prefixed_name,
         description=tool_description,
         parameters=params,
         parallel=False,  # MCP tools use a shared connection lock
