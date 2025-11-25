@@ -22,7 +22,7 @@ _NLTK_RESOURCES: set[str] = set()
 
 
 def _nltk():
-    import nltk  # type: ignore[import-untyped]
+    import nltk  # type: ignore[import-untyped,import-not-found]
 
     return nltk
 

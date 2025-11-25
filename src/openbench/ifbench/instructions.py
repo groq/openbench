@@ -29,19 +29,19 @@ from openbench.ifbench.instructions_util import ensure_nltk_resource
 
 
 def _nltk():
-    import nltk  # type: ignore[import-untyped]
+    import nltk  # type: ignore[import-untyped,import-not-found]
 
     return nltk
 
 
 def _emoji():
-    import emoji
+    import emoji  # type: ignore[import-not-found]
 
     return emoji
 
 
 def _syllapy():
-    import syllapy  # type: ignore[import-untyped]
+    import syllapy  # type: ignore[import-untyped,import-not-found]
 
     return syllapy
 
