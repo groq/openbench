@@ -74,4 +74,4 @@ def copilot_tool_source(
         env=env,
     )
 
-    return mcp_tools(server, tools=["route", "execute-tool"])
+    return mcp_tools(server, tools=["meta__route", "meta__execute-tool"])
