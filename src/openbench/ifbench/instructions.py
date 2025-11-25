@@ -19,9 +19,6 @@ import random
 import re
 import string
 from typing import Dict, Optional, Sequence, Union
-import nltk  # type: ignore[import-untyped]
-import emoji
-import syllapy  # type: ignore[import-untyped]
 import unicodedata
 from collections import Counter
 import csv
@@ -29,6 +26,25 @@ import io
 
 from openbench.ifbench import instructions_util
 from openbench.ifbench.instructions_util import ensure_nltk_resource
+
+
+def _nltk():
+    import nltk  # type: ignore[import-untyped]
+
+    return nltk
+
+
+def _emoji():
+    import emoji
+
+    return emoji
+
+
+def _syllapy():
+    import syllapy  # type: ignore[import-untyped]
+
+    return syllapy
+
 
 logger = logging.getLogger(__name__)
 
@@ -440,8 +456,8 @@ class NGramOverlapChecker(Instruction):
     def check_following(self, value):
         """Checks if the response maintains a trigram overlap with the reference text within 2% of {percent}."""
         n = 3
-        ngrams = set(nltk.ngrams(value, n))
-        ref_ngrams = set(nltk.ngrams(self._reference_text, n))
+        ngrams = set(_nltk().ngrams(value, n))
+        ref_ngrams = set(_nltk().ngrams(self._reference_text, n))
         if not ngrams or not ref_ngrams:
             return False
         overlap = len(ngrams.intersection(ref_ngrams)) / len(ngrams)
@@ -928,7 +944,9 @@ class EmojiSentenceChecker(Instruction):
             last_char = stripped[-1]
             # because blank spaces are treated oddly
             second_last_char = stripped[-2] if len(stripped) > 1 else stripped[-1]
-            if not emoji.is_emoji(last_char) and not emoji.is_emoji(second_last_char):
+            if not _emoji().is_emoji(last_char) and not _emoji().is_emoji(
+                second_last_char
+            ):
                 if i < len(sentences) - 1:
                     stripped = (
                         sentences[i + 1]
@@ -939,7 +957,7 @@ class EmojiSentenceChecker(Instruction):
                     if not stripped:
                         return False
                     first_char = stripped[0]
-                    if not emoji.is_emoji(first_char):
+                    if not _emoji().is_emoji(first_char):
                         return False
                 else:
                     return False
@@ -1062,11 +1080,11 @@ class StartWithVerbChecker(Instruction):
 
     def check_following(self, value):
         """Checks if the response starts with a verb."""
-        text = nltk.word_tokenize(value)
+        text = _nltk().word_tokenize(value)
         return (
             len(text) > 0
-            and len(nltk.pos_tag(text)) > 0
-            and "VB" in nltk.pos_tag(text)[0][1]
+            and len(_nltk().pos_tag(text)) > 0
+            and "VB" in _nltk().pos_tag(text)[0][1]
         )
 
 
@@ -1259,7 +1277,7 @@ class AlternateParitySyllablesChecker(Instruction):
         words = (
             value.translate(str.maketrans("", "", string.punctuation)).lower().split()
         )
-        syllables = [syllapy.count(word) % 2 for word in words if word.strip()]
+        syllables = [_syllapy().count(word) % 2 for word in words if word.strip()]
         return all(syllables[i] != syllables[i + 1] for i in range(len(syllables) - 1))
 
 
@@ -2172,7 +2190,7 @@ class KeywordSpecificPositionChecker(Instruction):
         sentences = instructions_util.split_into_sentences(value)
         if len(sentences) < self._n:
             return False
-        words = instructions_util.nltk.word_tokenize(sentences[self._n - 1])
+        words = _nltk().word_tokenize(sentences[self._n - 1])
         if len(words) < self._m:
             return False
         if words[self._m - 1] == self._keyword:
@@ -2218,7 +2236,7 @@ class WordsPositionChecker(Instruction):
           True if the second word and the second to last word are the same;
           otherwise, False.
         """
-        words = instructions_util.nltk.word_tokenize(value)
+        words = _nltk().word_tokenize(value)
         if len(words) < 2:
             return False
         if words[1] == words[-2] == self._keyword:
@@ -2387,7 +2405,7 @@ class TitleCaseChecker(Instruction):
           True if the response is in title case;
           otherwise, False.
         """
-        words = instructions_util.nltk.word_tokenize(value)
+        words = _nltk().word_tokenize(value)
         for word in words:
             if word[0].isupper() and word[1:].islower():
                 continue

@@ -18,9 +18,13 @@ import functools
 import random
 import re
 
-import nltk  # type: ignore[import-untyped]
-
 _NLTK_RESOURCES: set[str] = set()
+
+
+def _nltk():
+    import nltk  # type: ignore[import-untyped]
+
+    return nltk
 
 
 def ensure_nltk_resource(resource: str) -> None:
@@ -28,7 +32,7 @@ def ensure_nltk_resource(resource: str) -> None:
     if resource in _NLTK_RESOURCES:
         return
     try:
-        nltk.download(resource, quiet=True)
+        _nltk().download(resource, quiet=True)
     except Exception:
         # Allow scoring to continue in offline environments
         pass
@@ -1636,7 +1640,7 @@ def split_into_sentences(text):
 
 def count_words(text):
     """Counts the number of words."""
-    tokenizer = nltk.tokenize.RegexpTokenizer(r"\w+")
+    tokenizer = _nltk().tokenize.RegexpTokenizer(r"\w+")
     tokens = tokenizer.tokenize(text)
     num_words = len(tokens)
     return num_words
@@ -1644,14 +1648,14 @@ def count_words(text):
 
 @functools.lru_cache(maxsize=None)
 def _get_sentence_tokenizer():
-    return nltk.data.load("nltk:tokenizers/punkt/english.pickle")
+    return _nltk().data.load("nltk:tokenizers/punkt/english.pickle")
 
 
 def count_stopwords(text):
     """Counts the number of stopwords."""
     ensure_nltk_resource("stopwords")
-    stopwords = nltk.corpus.stopwords.words("english")
-    tokenizer = nltk.tokenize.RegexpTokenizer(r"\w+")
+    stopwords = _nltk().corpus.stopwords.words("english")
+    tokenizer = _nltk().tokenize.RegexpTokenizer(r"\w+")
     tokens = tokenizer.tokenize(text)
     num_stopwords = len([t for t in tokens if t.lower() in stopwords])
     return num_stopwords
