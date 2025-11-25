@@ -43,15 +43,23 @@ def record_to_sample(record: dict[str, Any]) -> Optional[Sample]:
     # if not answers_list:
     #    raise ValueError("Empty answers list; record should be filtered before Sample creation")
 
+    metadata = {
+        "category": record.get("category"),
+        "file_name": record.get("file_name"),
+        "annotator_metadata": record.get("Annotator Metadata", {}),
+    }
+
+    # Add tool requirement annotations if present (for minimal strategies)
+    if "required_servers" in record:
+        metadata["required_servers"] = record["required_servers"]
+    if "required_tools" in record:
+        metadata["required_tools"] = record["required_tools"]
+
     return Sample(
         id=record["task_id"],
         input=record["Question"],
         target=answers_list,  # list of acceptable answers
-        metadata={
-            "category": record.get("category"),
-            "file_name": record.get("file_name"),
-            "annotator_metadata": record.get("Annotator Metadata", {}),
-        },
+        metadata=metadata,
     )
 
 
