@@ -1,0 +1,151 @@
+"""
+Create Inspect AI Tool wrappers for MCP tools.
+
+This module provides a way to wrap individual MCP tools as Inspect AI Tool
+objects, allowing them to be used directly by the agent without the
+route/execute-tool indirection.
+"""
+
+from __future__ import annotations
+
+import asyncio
+import os
+from pathlib import Path
+from typing import Any
+
+from inspect_ai.tool import Tool
+from inspect_ai.tool._tool_def import ToolDef
+from inspect_ai.tool._tool_params import ToolParams
+from inspect_ai.util._json import JSONSchema
+import mcp.types as types
+
+from ..copilot.schemas import Server
+from ..copilot.mcp_connection import MCPConnection
+
+
+def _root_sandbox_dir() -> Path:
+    return Path(os.path.expanduser("~/.openbench/progressivemcpbench/root")).resolve()
+
+
+def _rewrite_root_path(value: str) -> str:
+    if value.startswith("/root/"):
+        base = _root_sandbox_dir()
+        rel = value[len("/root/") :]
+        return str(base / rel)
+    return value
+
+
+def _rewrite_params_for_root(obj: Any) -> Any:
+    if isinstance(obj, dict):
+        return {k: _rewrite_params_for_root(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_rewrite_params_for_root(v) for v in obj]
+    if isinstance(obj, str):
+        new_path = _rewrite_root_path(obj)
+        if new_path != obj:
+            p = Path(new_path)
+            try:
+                p.parent.mkdir(parents=True, exist_ok=True)
+            except Exception:
+                pass
+        return new_path
+    return obj
+
+
+def _format_result(result: types.CallToolResult) -> str:
+    """Format a CallToolResult as a string."""
+    if result.isError:
+        error_text = ""
+        for content in result.content:
+            if isinstance(content, types.TextContent):
+                error_text += content.text
+        return f"Error: {error_text}" if error_text else "Error: Unknown error"
+
+    text_parts = []
+    for content in result.content:
+        if isinstance(content, types.TextContent):
+            text_parts.append(content.text)
+        elif isinstance(content, types.ImageContent):
+            text_parts.append(f"[Image: {content.mimeType}]")
+        elif isinstance(content, types.EmbeddedResource):
+            text_parts.append(f"[Resource: {content.resource}]")
+
+    return "\n".join(text_parts) if text_parts else "(no output)"
+
+
+def _json_schema_to_tool_params(schema: dict[str, Any]) -> ToolParams:
+    """Convert a JSON schema to ToolParams."""
+    properties_dict: dict[str, JSONSchema] = {}
+    properties = schema.get("properties", {})
+    required = list(schema.get("required", []))
+
+    for name, prop in properties.items():
+        # Map JSON schema type to the expected literal type
+        prop_type = prop.get("type", "string")
+        json_schema = JSONSchema(
+            type=prop_type,  # type: ignore[arg-type]
+            description=prop.get("description"),
+        )
+        properties_dict[name] = json_schema
+
+    return ToolParams(
+        type="object",
+        properties=properties_dict,
+        required=required,
+    )
+
+
+_connection_lock = asyncio.Lock()
+
+
+def create_mcp_tool_wrapper(
+    server: Server,
+    tool_name: str,
+    tool_description: str,
+    input_schema: dict[str, Any],
+    timeout: int = 300,
+) -> Tool:
+    """Create an Inspect AI Tool that wraps an MCP tool.
+
+    Args:
+        server: Server configuration
+        tool_name: Name of the tool
+        tool_description: Description of the tool
+        input_schema: JSON schema for tool parameters
+        timeout: Timeout in seconds for tool execution
+
+    Returns:
+        Inspect AI Tool that executes the MCP tool
+    """
+
+    async def execute(**kwargs: Any) -> str:
+        """Execute the MCP tool with the provided arguments."""
+        async with _connection_lock:
+            async with MCPConnection(server) as connection:
+                try:
+                    rewritten = _rewrite_params_for_root(kwargs)
+                    result = await asyncio.wait_for(
+                        connection.call_tool(tool_name, rewritten), timeout=timeout
+                    )
+                    return _format_result(result)
+                except asyncio.TimeoutError:
+                    return f"Error: Tool {tool_name} timed out after {timeout}s"
+                except Exception as e:
+                    return f"Error executing {tool_name}: {str(e)}"
+
+    # Create ToolParams from the JSON schema
+    if input_schema:
+        params = _json_schema_to_tool_params(input_schema)
+    else:
+        params = ToolParams(type="object", properties={}, required=[])
+
+    # Create ToolDef and convert to Tool
+    tool_def = ToolDef(
+        tool=execute,
+        name=tool_name,
+        description=tool_description,
+        parameters=params,
+        parallel=False,  # MCP tools use a shared connection lock
+    )
+
+    return tool_def.as_tool()

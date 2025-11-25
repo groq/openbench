@@ -335,7 +335,14 @@
       "Number of tools": "2",
       "Steps": "1. read the excel\n2. caculate the bmi",
       "Tools": "1. excel_read_sheet\n2. calculate"
-    }
+    },
+    "required_servers": [
+      "excel"
+    ],
+    "required_tools": [
+      "excel_describe_sheets",
+      "excel_read_sheet"
+    ]
   },
   {
     "task_id": "7bda47e8-1b8b-4f1f-b67c-573a81417d36",
@@ -816,7 +823,15 @@
       "Number of tools": "1",
       "Steps": "1. open the word document\n2. answer the question",
       "Tools": "1. get_document_text"
-    }
+    },
+    "required_servers": [
+      "filesystem",
+      "word-document-server"
+    ],
+    "required_tools": [
+      "get_document_text",
+      "read_file"
+    ]
   },
   {
     "task_id": "507f592a-f21f-45f6-bbde-dadb86441791",
@@ -829,7 +844,13 @@
       "Number of tools": "1",
       "Steps": "1. read the file\n2. find the information about Sheryl Meyers",
       "Tools": "1. document_reader"
-    }
+    },
+    "required_servers": [
+      "filesystem"
+    ],
+    "required_tools": [
+      "read_file"
+    ]
   },
   {
     "task_id": "b6281fad-0da4-4fd4-b669-7e4ff9083a82",
@@ -998,7 +1019,14 @@
       "Number of tools": "1",
       "Steps": "1. list the dir",
       "Tools": "1. list_directory"
-    }
+    },
+    "required_servers": [
+      "filesystem"
+    ],
+    "required_tools": [
+      "list_allowed_directories",
+      "list_directory"
+    ]
   },
   {
     "task_id": "cf6ea2ca-5011-46ec-96a6-a15c46178de9",
@@ -1128,7 +1156,13 @@
       "Number of tools": "1",
       "Steps": "1. Compare two text files and show differences\n2. Find different lines which contain 'ERROR'",
       "Tools": "1. text_diff"
-    }
+    },
+    "required_servers": [
+      "filesystem"
+    ],
+    "required_tools": [
+      "read_file"
+    ]
   },
   {
     "task_id": "80bb6782-58c0-4d5e-9022-5173be685833",

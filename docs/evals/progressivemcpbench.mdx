@@ -1,0 +1,166 @@
+---
+title: ProgressiveMCPBench
+description: Evaluating LLM agents with progressive tool discovery strategies using MCP
+---
+
+# ProgressiveMCPBench
+
+ProgressiveMCPBench is a benchmark for evaluating how effectively language models can discover and use Model Context Protocol (MCP) tools. It extends LiveMCPBench by supporting multiple **strategies** for presenting tools to the model, allowing researchers to measure the impact of different tool discovery mechanisms on agent performance.
+
+## Overview
+
+The benchmark tests agents on real-world tasks that require using MCP tools - from file operations to API calls. The key innovation is that you can control *how* tools are presented to the model, ranging from semantic search to filesystem-like exploration to direct tool access.
+
+## Strategies
+
+ProgressiveMCPBench supports five strategies, each representing a different approach to tool discovery:
+
+### 1. Copilot (Semantic Search)
+
+```bash
+bench eval progressivemcpbench --model openai/gpt-4o -T strategy=copilot
+```
+
+The model uses two meta-tools:
+- `route(query)` - Semantic search across all available tools using embeddings
+- `execute-tool(server, tool, params)` - Execute a discovered tool
+
+This simulates an AI assistant with a large library of tools that uses RAG-style retrieval.
+
+### 2. Directory (Filesystem Exploration)
+
+```bash
+bench eval progressivemcpbench --model openai/gpt-4o -T strategy=directory
+```
+
+Tools are presented as a directory structure:
+- `ls(path)` - List available servers or tools within a server
+- `read-tool-file(paths)` - Read tool descriptions (can batch multiple)
+- `execute-tool(tool_path, params)` - Execute a tool by its path
+
+Example exploration:
+```
+ls("/tools")              → "filesystem/\nweather/\ncalendar/..."
+ls("/tools/filesystem")   → "read_file.md\nwrite_file.md\n..."
+read-tool-file("/tools/filesystem/read_file.md")
+execute-tool("/tools/filesystem/read_file.md", {"path": "/root/data.txt"})
+```
+
+### 3. Minimal Servers (Direct Server Access)
+
+```bash
+bench eval progressivemcpbench --model openai/gpt-4o -T strategy=minimal-servers
+```
+
+The model receives all tools from only the server(s) required for each task. No discovery needed - tools are provided directly based on task annotations.
+
+**Requires annotations:** The dataset must include `required_servers` for each task.
+
+### 4. Minimal Tools (Exact Tool Access)
+
+```bash
+bench eval progressivemcpbench --model openai/gpt-4o -T strategy=minimal-tools
+```
+
+The model receives only the exact tools needed for each task. This represents the ideal scenario where tool selection is perfect.
+
+**Requires annotations:** The dataset must include `required_servers` and `required_tools` for each task.
+
+### 5. Distraction-128 (Noise Testing)
+
+```bash
+bench eval progressivemcpbench --model openai/gpt-4o -T strategy=distraction-128
+```
+
+The model receives the required tools plus additional "distractor" tools, padded to exactly 128 tools total. Distractors are selected deterministically based on the task ID, ensuring reproducibility.
+
+**Requires annotations:** The dataset must include `required_servers` for each task.
+
+## Annotating the Dataset
+
+The minimal strategies require annotations about which servers and tools each task needs. Here's the workflow:
+
+### Step 1: Run with copilot or directory strategy
+
+```bash
+bench eval progressivemcpbench --model openai/gpt-4o -T strategy=copilot \
+  --log-dir logs/copilot-run
+```
+
+### Step 2: Extract success annotations
+
+```bash
+python scripts/extract_success_logs.py logs/copilot-run -o annotations.json
+```
+
+This extracts which servers and tools were used in successful task completions.
+
+### Step 3: Apply annotations to dataset
+
+```bash
+python scripts/annotate_dataset.py annotations.json
+```
+
+This adds `required_servers` and `required_tools` fields to each task in the dataset.
+
+### Step 4: Run with minimal strategies
+
+```bash
+bench eval progressivemcpbench --model openai/gpt-4o -T strategy=minimal-servers
+```
+
+## Expected Results
+
+Different strategies should yield different performance characteristics:
+
+| Strategy | Tool Discovery | Distractions | Expected Performance |
+|----------|---------------|--------------|---------------------|
+| copilot | Semantic search | All tools via retrieval | Baseline |
+| directory | Explicit exploration | All tools browsable | Similar to copilot |
+| minimal-servers | None | Server-level | Better than baseline |
+| minimal-tools | None | None | Best possible |
+| distraction-128 | None | 128 total tools | Measures distraction resistance |
+
+## CLI Options
+
+```bash
+bench eval progressivemcpbench --model <model> -T strategy=<strategy> [options]
+
+# Required:
+-T strategy=<copilot|directory|minimal-servers|minimal-tools|distraction-128>
+
+# Common options:
+--limit N          # Run only N tasks
+--epochs N         # Run each task N times
+--epochs-reducer   # How to combine epoch scores (mean, max, etc.)
+--alpha            # Use alpha benchmarks
+```
+
+## Understanding the Benchmark
+
+The core research question ProgressiveMCPBench addresses is: **How does tool discovery mechanism affect agent performance?**
+
+- **Copilot** tests whether semantic search can effectively surface relevant tools
+- **Directory** tests whether explicit browsing is more or less effective than semantic search
+- **Minimal-servers** tests the real-world scenario of attaching the right MCP server
+- **Minimal-tools** establishes an upper bound on performance with perfect tool selection
+- **Distraction-128** tests robustness to irrelevant tools in the context
+
+## Scoring
+
+Tasks are scored using exact and fuzzy string matching against expected answers:
+- **Exact match (1.0)**: Answer matches one of the acceptable answers
+- **Fuzzy match (0.5)**: Answer is similar enough (≥85% similarity)
+- **No match (0.0)**: Answer doesn't match
+
+The model must output a JSON object with a `final_answer` field.
+
+## Requirements
+
+- OPENAI_API_KEY (for embeddings in copilot strategy)
+- Node.js (for running MCP servers)
+- Various MCP server dependencies (automatically managed)
+
+## References
+
+Based on [LiveMCPBench](https://github.com/icip-cas/LiveMCPBench) with extensions for progressive tool discovery research.
