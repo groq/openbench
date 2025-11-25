@@ -202,6 +202,8 @@ class StopWordPercentageChecker(Instruction):
 	def check_following(self, value):
 		"""Checks if the response contains the expected percentage of stop words."""
 		num_words = instructions_util.count_words(value)
+		if num_words == 0:
+			return False
 		num_stopwords = instructions_util.count_stopwords(value)
 		stopword_percentage = (num_stopwords / num_words) * 100
 		return stopword_percentage <= self._percentage
@@ -418,6 +420,8 @@ class NGramOverlapChecker(Instruction):
 		n = 3
 		ngrams = set(nltk.ngrams(value, n))
 		ref_ngrams = set(nltk.ngrams(self._reference_text, n))
+		if not ngrams or not ref_ngrams:
+			return False
 		overlap = len(ngrams.intersection(ref_ngrams)) / len(ngrams)
 		return self._percentage - 2 <= overlap * 100 <= self._percentage + 2
 
@@ -927,13 +931,20 @@ class NthWordJapaneseChecker(Instruction):
 		if self._japanese_position is None or self._japanese_position < 0:
 			self._japanese_position = random.randint(1, _NUM_WORD_CYCLE)
 
-		self._description_pattern = "Every {N}th word of your response must be in Japanese."
-		if N % 10 == 1:
-			self._description_pattern = "Every {N}st of your response must be in Japanese."
-		if N % 10 == 2:
-			self._description_pattern = "Every {N}nd of your response must be in Japanese."
-		elif N % 10 == 3:
-			self._description_pattern = "Every {N}rd of your response must be in Japanese."
+		def _ordinal_suffix(value: int) -> str:
+			if 10 < value % 100 < 14:
+				return "th"
+			last = value % 10
+			if last == 1:
+				return "st"
+			if last == 2:
+				return "nd"
+			if last == 3:
+				return "rd"
+			return "th"
+
+		suffix = _ordinal_suffix(self._japanese_position)
+		self._description_pattern = f"Every {{N}}{suffix} word of your response must be in Japanese."
 		return self._description_pattern.format(N=self._japanese_position)
 
 	def get_instruction_args(self):
@@ -1292,10 +1303,7 @@ class IndentStairsChecker(Instruction):
 
 	def check_following(self, value):
 		"""Checks if the response incrementally indents each new line."""
-		lines = value.split('\n')
-		for line in lines:
-			if not line.strip():
-				lines.remove(line)
+		lines = [line for line in value.split('\n') if line.strip()]
 		for i in range(len(lines) - 1):
 			if len(lines[i + 1]) - len(lines[i + 1].lstrip(' ')) <= len(lines[i]) - len(lines[i].lstrip(' ')):
 				return False
