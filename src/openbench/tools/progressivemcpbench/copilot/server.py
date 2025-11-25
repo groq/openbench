@@ -152,7 +152,7 @@ def serve(config: dict[str, Any] | Path | None = None) -> None:
     server = FastMCP("mcp-copilot", lifespan=copilot_lifespan)
 
     @server.tool(
-        name="route",
+        name="meta__route",
         description=(
             """
 This is a tool used to find MCP servers and tools that can solve user needs    
@@ -200,10 +200,10 @@ This is a tool used to find MCP servers and tools that can solve user needs
             )
 
     @server.tool(
-        name="execute-tool",
+        name="meta__execute-tool",
         description=(
             """
-A tool for executing a specific tool on a specific server.Select tools only from the results obtained from the previous route each time.
+A tool for executing a specific tool on a specific server.Select tools only from the results obtained from the previous meta__route each time.
 
 When to use this tool:
     - When using the route tool to route to a specific MCP server and tool
