@@ -1,4 +1,5 @@
 from typing import Optional, List, Dict, Annotated, Tuple, Union
+from pathlib import Path
 
 import re
 from rich.console import Console
@@ -648,6 +649,14 @@ def run_eval(
             envvar="BENCH_KEEP_PROGRESSIVEMCP_ROOT",
         ),
     ] = False,
+    progressivemcp_success_log: Annotated[
+        Optional[Path],
+        typer.Option(
+            "--progressivemcp-success-log",
+            help="Write successful ProgressiveMCPBench server/tool usage to a JSON file",
+            envvar="BENCH_PROGRESSIVEMCP_SUCCESS_LOG",
+        ),
+    ] = None,
     alpha: Annotated[
         bool,
         typer.Option(
@@ -836,6 +845,21 @@ def run_eval(
             )
 
             typer.echo("Evaluation complete!")
+
+            # Optional: write ProgressiveMCPBench success usage log
+            if progressivemcp_success_log:
+                from openbench.utils.progressivemcpbench_logs import (
+                    extract_progressivemcp_success,
+                    write_progressivemcp_success_log,
+                )
+
+                records = extract_progressivemcp_success(eval_logs or [])
+                output_path = write_progressivemcp_success_log(
+                    records, progressivemcp_success_log
+                )
+                typer.echo(
+                    f"ProgressiveMCPBench success log saved to {output_path} ({len(records)} records)"
+                )
 
             # Display group summary if groups were used
             # Display separate summary for each group

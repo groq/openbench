@@ -24,6 +24,7 @@ from inspect_ai.scorer import (
 )
 from inspect_ai.solver import TaskState
 from openbench.metrics.grouped import grouped
+from openbench.utils.progressivemcp_output import parse_progressivemcp_output
 
 
 def _normalize(s: str) -> str:
@@ -41,34 +42,20 @@ def _similarity(a: str, b: str) -> float:
     return SequenceMatcher(None, a, b).ratio()
 
 
-def _extract_final_answer(state: TaskState) -> str | None:
-    """Extract the 'final_answer' field from the JSON output."""
+def _extract_final_answer(state: TaskState) -> tuple[str | None, dict | None]:
+    """Extract the final answer and parsed JSON from the model output."""
     if not state.output or not state.output.completion:
-        return None
+        return None, None
 
-    raw = state.output.completion.strip()
+    parsed = parse_progressivemcp_output(state.output.completion)
+    if not parsed:
+        return None, None
 
-    # Try direct JSON parse
-    try:
-        obj = json.loads(raw)
-    except json.JSONDecodeError:
-        # Fallback: try to find the first {...} block
-        m = re.search(r"\{.*\}", raw, flags=re.DOTALL)
-        if not m:
-            return None
-        try:
-            obj = json.loads(m.group(0))
-        except json.JSONDecodeError:
-            return None
-
-    if not isinstance(obj, dict):
-        return None
-
-    value = obj.get("final_answer")
+    value = parsed.get("final_answer")
     if value is None:
-        return None
+        return None, parsed
 
-    return str(value).strip() or None
+    return str(value).strip() or None, parsed
 
 
 @metric
@@ -142,7 +129,11 @@ def progressivemcpbench_scorer(
                 value=0.0, answer="", metadata={"skipped_no_expected_answer": True}
             )
 
-        model_answer = _extract_final_answer(state)
+        model_answer, parsed_output = _extract_final_answer(state)
+        tool_calls = []
+        if parsed_output and isinstance(parsed_output.get("tool_calls"), list):
+            tool_calls = parsed_output.get("tool_calls") or []
+
         if not model_answer:
             value = 0.0
             match_type = "no_answer"
@@ -186,6 +177,7 @@ def progressivemcpbench_scorer(
                 "best_similarity": best_similarity,
                 "category": category,
                 "grade_letter": grade_letter,
+                "tool_calls": tool_calls,
             },
         )
 
