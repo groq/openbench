@@ -12,6 +12,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import os
 from contextlib import asynccontextmanager
 from pathlib import PurePosixPath
 from typing import Any, Iterable
@@ -30,6 +31,26 @@ from openbench.tools.progressivemcpbench.common.paths import rewrite_params_for_
 from openbench.tools.progressivemcpbench.copilot.mcp_connection import MCPConnection
 
 logger = logging.getLogger(__name__)
+
+
+def _configure_logging():
+    """Reduce noisy logs from the directory server and dependencies."""
+    silent = os.getenv("OPENBENCH_DIRECTORY_SILENT", "1") in {"1", "true", "True"}
+    if not silent:
+        return
+    logging.basicConfig(level=logging.ERROR)
+    for name in [
+        "mcp",
+        "mcp.client",
+        "mcp.server",
+        "httpx",
+        "urllib3",
+        "anyio",
+        "asyncio",
+        "fastmcp",
+        __name__,
+    ]:
+        logging.getLogger(name).setLevel(logging.ERROR)
 
 
 def _normalize_path(path: str | None) -> str:
@@ -193,6 +214,7 @@ def _get_index(ctx: "Context | None") -> DirectoryIndex:
 
 def serve(config: dict[str, Any] | None = None) -> None:
     """Run the directory-style MCP server (stdio)."""
+    _configure_logging()
     servers = load_servers_from_config(config)
     tool_files, _ = load_tool_files(allow_servers=set(servers))
     index = DirectoryIndex(tool_files, servers)
