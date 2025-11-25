@@ -33,13 +33,19 @@ logger = logging.getLogger(__name__)
 
 
 def _normalize_path(path: str | None) -> str:
-    """Normalize user-supplied paths to /server/tool.md form."""
+    """Normalize user-supplied paths to /server/tool.md form (allow /tools prefix)."""
     if not path:
         return "/"
     # Ensure leading slash and collapse repeats
     norm = str(PurePosixPath("/" + path.strip().lstrip("/")))
-    # Keep root as "/"
-    return norm if norm else "/"
+    if norm in {"/", ""}:
+        return "/"
+    # Strip optional /tools prefix to fit metaphor
+    parts = norm.strip("/").split("/")
+    if parts and parts[0].lower() == "tools":
+        parts = parts[1:]
+    rebuilt = "/" + "/".join(parts) if parts else "/"
+    return rebuilt
 
 
 class DirectoryIndex:
@@ -174,11 +180,24 @@ def _format_tool_markdown(tf: ToolFile) -> str:
     return "\n".join(sections)
 
 
+_GLOBAL_INDEX: DirectoryIndex | None = None
+
+
+def _get_index(ctx: "Context | None") -> DirectoryIndex:
+    if ctx and ctx.request_context and ctx.request_context.lifespan_context:
+        return ctx.request_context.lifespan_context["index"]  # type: ignore[return-value, index]
+    if _GLOBAL_INDEX is None:
+        raise RuntimeError("Directory index unavailable")
+    return _GLOBAL_INDEX
+
+
 def serve(config: dict[str, Any] | None = None) -> None:
     """Run the directory-style MCP server (stdio)."""
     servers = load_servers_from_config(config)
     tool_files, _ = load_tool_files(allow_servers=set(servers))
     index = DirectoryIndex(tool_files, servers)
+    global _GLOBAL_INDEX
+    _GLOBAL_INDEX = index
 
     if not index.tool_files:
         raise RuntimeError(
@@ -199,8 +218,8 @@ def serve(config: dict[str, Any] | None = None) -> None:
         path: str | None = None,
         ctx: "Context | None" = None,
     ) -> types.CallToolResult:
-        index_ctx: DirectoryIndex = ctx.request_context.lifespan_context["index"]  # type: ignore[union-attr]
         try:
+            index_ctx = _get_index(ctx)
             entries = index_ctx.list_dir(path or "/")
             text = "\n".join(entries) if entries else "(empty)"
             return types.CallToolResult(
@@ -219,8 +238,8 @@ def serve(config: dict[str, Any] | None = None) -> None:
         paths: list[str] | str,
         ctx: "Context | None" = None,
     ) -> types.CallToolResult:
-        index_ctx: DirectoryIndex = ctx.request_context.lifespan_context["index"]  # type: ignore[union-attr]
         try:
+            index_ctx = _get_index(ctx)
             path_list = [paths] if isinstance(paths, str) else list(paths)
             resolved = index_ctx.read_files(path_list)
             chunks = []
@@ -246,8 +265,8 @@ def serve(config: dict[str, Any] | None = None) -> None:
         params: dict[str, Any] | None = None,
         ctx: "Context | None" = None,
     ) -> types.CallToolResult:
-        index_ctx: DirectoryIndex = ctx.request_context.lifespan_context["index"]  # type: ignore[union-attr]
         try:
+            index_ctx = _get_index(ctx)
             return await index_ctx.execute(tool_path, params)
         except FileNotFoundError as e:
             return types.CallToolResult(
