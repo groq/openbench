@@ -222,7 +222,7 @@ Your goals:
 4. At the end, respond with a single JSON object, not natural-language prose.
 
 Tool usage:
-- You may call the MCP tools `route` and `execute-tool` as needed.
+- You may call the MCP tools `meta__route` and `meta__execute-tool` as needed.
 - Do NOT call any `submit()` or similar “finalization” tools.
 - Use tools only when needed; avoid unnecessary calls.
 
@@ -266,10 +266,10 @@ The tools are organized in a directory structure:
 - Each server directory contains .md files describing individual tools
 
 Available commands:
-- ls(path): List contents of a directory. Start with ls("/tools") to see available servers.
-- read-tool-file(paths): Read one or more tool files to see their descriptions and parameters.
+- meta__ls(path): List contents of a directory. Start with meta__ls("/tools") to see available servers.
+- meta__read-tool-file(paths): Read one or more tool files to see their descriptions and parameters.
   Accepts a single path or a list of paths for efficiency.
-- execute-tool(tool_path, params): Execute a tool by providing its path and parameters.
+- meta__execute-tool(tool_path, params): Execute a tool by providing its path and parameters.
 
 Your goals:
 1. Understand the user's task and break it into steps.
@@ -279,10 +279,10 @@ Your goals:
 5. At the end, respond with a single JSON object.
 
 Strategy:
-- Start by listing /tools to see available servers
+- Start by calling meta__ls("/tools") to see available servers
 - Then list specific server directories to find relevant tools
 - Read tool files before executing to understand required parameters
-- Use read-tool-file with multiple paths to reduce round trips
+- Use meta__read-tool-file with multiple paths to reduce round trips
 
 Final output format (required):
 - When you are completely done with the task, output ONLY a single JSON object, with no surrounding text and no markdown fences.
