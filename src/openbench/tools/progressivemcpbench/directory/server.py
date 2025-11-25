@@ -81,7 +81,7 @@ def serve(config: dict[str, Any] | Path | None = None) -> None:
     server = FastMCP("mcp-directory", lifespan=directory_lifespan)
 
     @server.tool(
-        name="ls",
+        name="meta__ls",
         description=(
             """
 List the contents of a path in the tool directory.
@@ -123,7 +123,7 @@ To see a tool's description and parameters, use read-tool-file.
             )
 
     @server.tool(
-        name="read-tool-file",
+        name="meta__read-tool-file",
         description=(
             """
 Read the description and parameters of one or more tools.
@@ -176,7 +176,7 @@ Example:
             )
 
     @server.tool(
-        name="execute-tool",
+        name="meta__execute-tool",
         description=(
             """
 Execute a tool from the directory.
