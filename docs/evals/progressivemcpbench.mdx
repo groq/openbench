@@ -1,0 +1,77 @@
+---
+title: "ProgressiveMCPBench - Tool Exposure Strategies"
+description: "Evaluates how tool discovery/exposure shapes model performance across MCP workloads"
+---
+
+## Overview
+
+ProgressiveMCPBench is a derivative of LiveMCPBench that focuses on **how** tools are exposed to the model. Each strategy surfaces the same underlying MCP servers/tools but with different discovery and distraction patterns, enabling side-by-side evaluation of tool presentation effects.
+
+- **Rooted in LiveMCPBench**: Uses the curated `clean_config.json`, `tools.json`, and `annotated_data` caches.
+- **Local dataset**: Tasks come from `src/openbench/datasets/data/progressivemcpbench.json`.
+- **System JSON output**: Agents must return a final JSON object with `final_answer`, `reasoning`, and `tool_calls`.
+
+## Strategies
+
+- **`copilot`**: Semantic routing via `route` → `execute-tool` (embeddings required). Mirrors the Copilot experience from LiveMCPBench.
+- **`directory`**: File-system metaphor for discovery. Use `ls` to list servers/tools, `read-tool-file` to inspect Markdown tool docs, and `execute-tool` with the tool file path.
+- **`minimal-servers`**: Exposes only the tools from the annotated `required_servers` for each task (no meta tools). Requires dataset annotations.
+- **`minimal-tasks`**: Exposes only the annotated `required_tools` per task (server+tool pairs). Requires dataset annotations.
+- **`distraction-128`**: Guarantees the required tools, then deterministically adds distraction tools from other servers until 128 tools are visible. Base tools come from `required_tools` or all tools on `required_servers`.
+
+If no strategy is provided, the benchmark aborts. Select a strategy with the `-T` task argument.
+
+## Usage
+
+Run a quick smoke test with the directory strategy:
+
+```bash
+bench eval progressivemcpbench \
+  --model groq/openai/gpt-oss-20b \
+  --alpha \
+  --epochs 1 \
+  --epochs-reducer mean \
+  --limit 1 \
+  -T strategy=directory
+```
+
+Other strategy examples:
+
+- Copilot (semantic routing): `-T strategy=copilot`
+- Minimal servers: `-T strategy=minimal-servers`
+- Minimal tasks: `-T strategy=minimal-tasks`
+- Distraction set: `-T strategy=distraction-128`
+
+### Success Log Capture
+
+Capture successful runs (server + tool usage) during evaluation:
+
+```bash
+bench eval progressivemcpbench ... \
+  -T strategy=directory \
+  --progressivemcp-success-log logs/progressivemcp_success.json
+```
+
+Summarize those logs into per-task server/tool counts:
+
+```bash
+python scripts/progressivemcpbench_extract_success.py \
+  --input logs/progressivemcp_success.json \
+  --output logs/progressivemcp_success_summary.json
+```
+
+## Annotation Workflow for Minimal Strategies
+
+- Add `required_servers` to each task for **minimal-servers**.
+- Add `required_tools` (list of `{server_name, tool_name}`) for **minimal-tasks**.
+- For **distraction-128**, `required_tools` is preferred; otherwise, all tools on `required_servers` are used as the base set before adding distractions.
+- Use the success log + summary script to seed annotations, especially where multiple runs agree on the same server/tool.
+
+Records without annotations should be left blank; the strategies will error on missing metadata to highlight gaps.
+
+## Cache & API Requirements
+
+- **Copilot**: Requires embeddings; set `OPENAI_API_KEY` (or `EMBEDDING_API_KEY/ABSTRACT_API_KEY`). `prepare_progressivemcpbench_cache` will build embeddings and set `MCP_DATA_PATH`.
+- **Directory/Minimal/Distraction**: Skip embeddings; still rely on the cached `clean_config.json`, `tools.json`, and `annotated_data` populated under `~/.openbench/progressivemcpbench`.
+
+Use `--keep-progressivemcp-root` to retain the sandbox after a run if you need to inspect intermediate files.
