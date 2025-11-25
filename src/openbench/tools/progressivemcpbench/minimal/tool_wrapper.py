@@ -82,9 +82,11 @@ def _json_schema_to_tool_params(schema: dict[str, Any]) -> ToolParams:
     for name, prop in properties.items():
         # Map JSON schema type to the expected literal type
         prop_type = prop.get("type", "string")
+        # Inspect AI requires descriptions - provide a default if missing
+        description = prop.get("description") or f"The {name} parameter"
         json_schema = JSONSchema(
             type=prop_type,  # type: ignore[arg-type]
-            description=prop.get("description"),
+            description=description,
         )
         properties_dict[name] = json_schema
 
