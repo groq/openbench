@@ -105,14 +105,6 @@ class OpenCodeCommands:
     BASE_PACKAGES = ["curl", "gnupg", "ca-certificates"]
 
 
-class ClaudeCommands:
-    """Docker commands for Claude agent installation."""
-
-    DOCKERFILE_COMMANDS = ["RUN npm install -g @anthropic-ai/claude-code"]
-
-    BASE_PACKAGES = ["curl", "gnupg", "ca-certificates"]
-
-
 class RooCommands:
     """Docker commands for Roo agent installation."""
 
@@ -250,7 +242,8 @@ def get_agent_docker_commands(agent_name: str) -> List[str]:
     commands_map = {
         "aider": AiderCommands.DOCKERFILE_COMMANDS,
         "opencode": OpenCodeCommands.DOCKERFILE_COMMANDS,
-        "claude": ClaudeCommands.DOCKERFILE_COMMANDS,
+        "claude_code": [],
+        "codex": [],
         "roo": RooCommands.get_dockerfile_commands(),
     }
 
@@ -275,7 +268,8 @@ def get_agent_base_packages(agent_name: str) -> List[str]:
     packages_map = {
         "aider": AiderCommands.BASE_PACKAGES,
         "opencode": OpenCodeCommands.BASE_PACKAGES,
-        "claude": ClaudeCommands.BASE_PACKAGES,
+        "claude_code": [],
+        "codex": [],
         "roo": RooCommands.BASE_PACKAGES,
     }
 

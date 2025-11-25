@@ -1,19 +1,22 @@
 """
 Unified CLI solver for exercism tasks that supports multiple code agents.
 
-This solver provides a unified interface for different CLI code agents (aider, opencode, claude, roo)
+This solver provides a unified interface for different CLI code agents
+(codex, aider, opencode, claude_code, roo)
 and selects the appropriate tool based on the --code-agent flag or task arguments.
 
 Supported code agents:
+- codex: Codex CLI agent powered by inspect_swe (default)
 - aider: AI-powered pair programming tool with git integration
 - opencode: OpenAI-compatible code generation tool
-- claude: Claude-based code editor with file system access
+- claude_code: Claude Code editor powered by inspect_swe
 - roo: Roo extension for VS Code with interactive development
 
 Usage:
-    openbench eval exercism --code-agent aider --model groq/llama-3.1-70b
+    openbench eval exercism --code-agent codex --model openai/gpt-5
     openbench eval exercism --code-agent opencode --model openai/gpt-4o-mini
-    openbench eval exercism --code-agent claude --model anthropic/claude-sonnet-4-20250514
+    openbench eval exercism --code-agent claude_code --model anthropic/claude-sonnet-4-5-20250929
+    openbench eval exercism --code-agent aider --model groq/llama-3.1-70b
     openbench eval exercism --code-agent roo --model openrouter/anthropic/claude-sonnet-4-20250514
 """
 
@@ -39,8 +42,8 @@ def exercism_solver() -> Solver:
     the appropriate tool based on the code agent specified in task arguments.
 
     The code agent can be specified via:
-    - CLI flag: --code-agent aider|opencode|claude|roo
-    - Defaults to 'aider' if not specified
+    - CLI flag: --code-agent codex|aider|opencode|claude_code|roo
+    - Defaults to 'codex' if not specified
 
     Returns:
         Solver function that handles the task execution
@@ -63,13 +66,13 @@ def exercism_solver() -> Solver:
         if not isinstance(setup_commands, list):
             setup_commands = []
 
-        code_agent = state.metadata.get("code_agent", "aider")
+        code_agent = state.metadata.get("code_agent", "codex")
 
         # Validate code agent input
         if isinstance(code_agent, list) and len(code_agent) > 0:
             code_agent = code_agent[0]
         elif not isinstance(code_agent, str):
-            code_agent = "aider"
+            code_agent = "codex"
 
         code_agent = code_agent.lower()
 
