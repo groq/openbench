@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version >= '3.13'",
@@ -782,6 +782,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/f5/22/900cb125c76b7aaa450ce02fd727f452243f2e91a61af068b40adba60ea9/email_validator-2.3.0.tar.gz", hash = "sha256:9fc05c37f2f6cf439ff414f8fc46d917929974a82244c20eb10231ba60c54426", size = 51238, upload-time = "2025-08-26T13:09:06.831Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/de/15/545e2b6cf2e3be84bc1ed85613edd75b8aea69807a71c26f4ca6a9258e82/email_validator-2.3.0-py3-none-any.whl", hash = "sha256:80f13f623413e6b197ae73bb10bf4eb0908faf509ad8362c5edeb0be7fd450b4", size = 35604, upload-time = "2025-08-26T13:09:05.858Z" },
+]
+
+[[package]]
+name = "emoji"
+version = "2.15.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a2/78/0d2db9382c92a163d7095fc08efff7800880f830a152cfced40161e7638d/emoji-2.15.0.tar.gz", hash = "sha256:eae4ab7d86456a70a00a985125a03263a5eac54cd55e51d7e184b1ed3b6757e4", size = 615483, upload-time = "2025-09-21T12:13:02.755Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e1/5e/4b5aaaabddfacfe36ba7768817bd1f71a7a810a43705e531f3ae4c690767/emoji-2.15.0-py3-none-any.whl", hash = "sha256:205296793d66a89d88af4688fa57fd6496732eb48917a87175a023c8138995eb", size = 608433, upload-time = "2025-09-21T12:13:01.197Z" },
 ]
 
 [[package]]
@@ -2649,6 +2658,11 @@ factscore = [
     { name = "factscorelite" },
     { name = "rank-bm25" },
 ]
+ifbench = [
+    { name = "emoji" },
+    { name = "nltk" },
+    { name = "syllapy" },
+]
 ifeval = [
     { name = "langdetect" },
     { name = "nltk" },
@@ -2712,6 +2726,11 @@ docvqa = [{ name = "python-levenshtein", specifier = ">=0.20.0" }]
 factscore = [
     { name = "factscorelite", specifier = ">=1.3.0,<2.0.0" },
     { name = "rank-bm25", specifier = ">=0.2.2" },
+]
+ifbench = [
+    { name = "emoji", specifier = ">=2.14.0" },
+    { name = "nltk", specifier = ">=3.9.1" },
+    { name = "syllapy", specifier = ">=0.7.2" },
 ]
 ifeval = [
     { name = "langdetect", specifier = ">=1.0.9" },
@@ -4178,6 +4197,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/15/b9/cc3017f9a9c9b6e27c5106cc10cc7904653c3eec0729793aec10479dd669/starlette-0.47.3.tar.gz", hash = "sha256:6bc94f839cc176c4858894f1f8908f0ab79dfec1a6b8402f6da9be26ebea52e9", size = 2584144, upload-time = "2025-08-24T13:36:42.122Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ce/fd/901cfa59aaa5b30a99e16876f11abe38b59a1a2c51ffb3d7142bb6089069/starlette-0.47.3-py3-none-any.whl", hash = "sha256:89c0778ca62a76b826101e7c709e70680a1699ca7da6b44d38eb0a7e61fe4b51", size = 72991, upload-time = "2025-08-24T13:36:40.887Z" },
+]
+
+[[package]]
+name = "syllapy"
+version = "0.7.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/29/a1/7bc1ce4852e14ab5f3153262639742ae63fbfa626507dac4ab919a1e5232/syllapy-0.7.2.tar.gz", hash = "sha256:e55a7ad97d8b232e174b83f91b8f9be0c355d2a8e1208c7f6229055189605564", size = 25561, upload-time = "2022-08-29T01:55:03.366Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0e/cc/ffc9bddc146f14e8792a9b05b2bd1bc5f23f3b752a06e96b244780ce55b9/syllapy-0.7.2-py3-none-any.whl", hash = "sha256:198a7413033c32d7b31e21962efb3f284bcea80d3346e954b938ca1ebe6bee20", size = 24882, upload-time = "2022-08-29T01:55:01.1Z" },
 ]
 
 [[package]]

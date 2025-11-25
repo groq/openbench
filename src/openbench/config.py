@@ -432,6 +432,14 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.ifeval",
         function_name="ifeval",
     ),
+    "ifbench": BenchmarkMetadata(
+        name="IFBench",
+        description="Out-of-distribution instruction following with strict and loose scoring over challenging constraints",
+        category="core",
+        tags=["instruction-following", "constraints", "formatting", "ood"],
+        module_path="openbench.evals.ifbench",
+        function_name="ifbench",
+    ),
     "openbookqa": BenchmarkMetadata(
         name="OpenBookQA",
         description="Elementary-level science questions probing understanding of core facts",
