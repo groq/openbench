@@ -18,8 +18,7 @@ import functools
 import random
 import re
 
-import nltk
-import ast
+import nltk  # type: ignore[import-untyped]
 
 _NLTK_RESOURCES: set[str] = set()
 
@@ -34,6 +33,7 @@ def ensure_nltk_resource(resource: str) -> None:
         # Allow scoring to continue in offline environments
         pass
     _NLTK_RESOURCES.add(resource)
+
 
 WORD_LIST = [
     "western",
@@ -1563,6 +1563,7 @@ WORD_LIST = [
     "apartment",
 ]  # pylint: disable=line-too-long
 
+
 def download_nltk_resources():
     """Download 'punkt' (and metadata) if not already installed."""
     ensure_nltk_resource("punkt")
@@ -1649,11 +1650,12 @@ def _get_sentence_tokenizer():
 def count_stopwords(text):
     """Counts the number of stopwords."""
     ensure_nltk_resource("stopwords")
-    stopwords = nltk.corpus.stopwords.words('english')
+    stopwords = nltk.corpus.stopwords.words("english")
     tokenizer = nltk.tokenize.RegexpTokenizer(r"\w+")
     tokens = tokenizer.tokenize(text)
     num_stopwords = len([t for t in tokens if t.lower() in stopwords])
     return num_stopwords
+
 
 def generate_keywords(num_keywords):
     """Randomly generates a few keywords."""
