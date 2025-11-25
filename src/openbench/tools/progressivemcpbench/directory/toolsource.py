@@ -63,4 +63,4 @@ def directory_tool_source(
         env=env,
     )
 
-    return mcp_tools(server, tools=["ls", "read-tool-file", "execute-tool"])
+    return mcp_tools(server, tools=["meta__ls", "meta__read-tool-file", "meta__execute-tool"])
