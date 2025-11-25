@@ -212,20 +212,7 @@ LIVEMCPBENCH_VERDICT_PATTERN = re.compile(
     r"Thoughts:\s*(.+?)\s*Status:\s*(\w+)", re.DOTALL
 )
 
-PROGRESSIVEMCPBENCH_SYSTEM_MESSAGE = """
-You are an autonomous AI agent that solves real-world tasks using Model Context Protocol (MCP) tools.
-
-Your goals:
-1. Understand the user's task and break it into steps.
-2. Use the available MCP tools (via the Copilot server) to gather the necessary information.
-3. Reason carefully about the information you obtain.
-4. At the end, respond with a single JSON object, not natural-language prose.
-
-Tool usage:
-- You may call the MCP tools `route` and `execute-tool` as needed.
-- Do NOT call any `submit()` or similar “finalization” tools.
-- Use tools only when needed; avoid unnecessary calls.
-
+_PROGRESSIVEMCPBENCH_OUTPUT_GUIDANCE = """
 Final output format (required):
 - When you are completely done with the task, output ONLY a single JSON object, with no surrounding text and no markdown fences.
 - The JSON MUST have at least:
@@ -234,7 +221,7 @@ Final output format (required):
   - "tool_calls": a list of tool calls you made, each with:
       - "server_name" (string)
       - "tool_name" (string)
-      - "arguments" (object with the arguments you passed)
+      - "arguments": (object with the arguments you passed)
 
 Example final output:
 
@@ -257,6 +244,54 @@ Example final output:
 Do not wrap the JSON in backticks or any other formatting.
 Output only this JSON object as your final response.
 """.strip()
+
+
+PROGRESSIVEMCPBENCH_SYSTEM_MESSAGE_COPILOT = f"""
+You are an autonomous AI agent that solves real-world tasks using Model Context Protocol (MCP) tools.
+
+Your goals:
+1. Understand the user's task and break it into steps.
+2. Use the available MCP tools (via the Copilot server) to gather the necessary information.
+3. Reason carefully about the information you obtain.
+4. At the end, respond with a single JSON object, not natural-language prose.
+
+Tool usage:
+- You may call the MCP tools `route` and `execute-tool` as needed.
+- Do NOT call any `submit()` or similar “finalization” tools.
+- Use tools only when needed; avoid unnecessary calls.
+
+{_PROGRESSIVEMCPBENCH_OUTPUT_GUIDANCE}
+""".strip()
+
+
+PROGRESSIVEMCPBENCH_SYSTEM_MESSAGE_DIRECTORY = f"""
+You are an autonomous AI agent that solves real-world tasks using Model Context Protocol (MCP) tools.
+
+Your goals:
+1. Understand the user's task and break it into steps.
+2. Explore the virtual tool directory to find the right tool.
+3. Reason carefully about the information you obtain.
+4. At the end, respond with a single JSON object, not natural-language prose.
+
+Tool usage:
+- Use `ls` with no path to list available MCP servers. Use `ls <server>` to list that server's tool files.
+- Use `read-tool-file` to open one or more tool markdown files and understand their inputs before executing.
+- Use `execute-tool` with the tool file path and parameters to run the tool.
+- Do NOT call any `submit()` or similar “finalization” tools.
+- Use tools only when needed; avoid unnecessary calls.
+
+{_PROGRESSIVEMCPBENCH_OUTPUT_GUIDANCE}
+""".strip()
+
+
+def progressivemcpbench_system_message(strategy: str) -> str:
+    """Return the strategy-specific system message for ProgressiveMCPBench."""
+    normalized = (strategy or "").lower()
+    if normalized == "copilot":
+        return PROGRESSIVEMCPBENCH_SYSTEM_MESSAGE_COPILOT
+    if normalized == "directory":
+        return PROGRESSIVEMCPBENCH_SYSTEM_MESSAGE_DIRECTORY
+    raise ValueError(f"Unsupported strategy '{strategy}'")
 
 MOCK_AIME_PROMPT = """
 Please solve this AIME problem step by step. The answer is an integer ranging from 000 to 999, inclusive.

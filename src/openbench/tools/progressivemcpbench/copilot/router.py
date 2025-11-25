@@ -14,8 +14,10 @@ from pathlib import Path
 from typing import Any
 
 from .matcher import ToolMatcher
-from .schemas import Server, ServerConfig
+from .schemas import Server
 from .mcp_connection import MCPConnection
+from ..common.paths import rewrite_params_for_root
+from ..common.server_configs import load_servers_from_config
 
 
 import mcp.types as types
@@ -28,36 +30,6 @@ except Exception:  # pragma: no cover - optional dependency
 logger = logging.getLogger(__name__)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[0]
-
-
-def _root_sandbox_dir() -> Path:
-    return Path(os.path.expanduser("~/.openbench/progressivemcpbench/root")).resolve()
-
-
-def _rewrite_root_path(value: str) -> str:
-    if value.startswith("/root/"):
-        base = _root_sandbox_dir()
-        rel = value[len("/root/") :]
-        return str(base / rel)
-    return value
-
-
-def _rewrite_params_for_root(obj: Any) -> Any:
-    if isinstance(obj, dict):
-        return {k: _rewrite_params_for_root(v) for k, v in obj.items()}
-    if isinstance(obj, list):
-        return [_rewrite_params_for_root(v) for v in obj]
-    if isinstance(obj, str):
-        new_path = _rewrite_root_path(obj)
-        if new_path != obj:
-            # Ensure parent dir exists for prospective outputs
-            p = Path(new_path)
-            try:
-                p.parent.mkdir(parents=True, exist_ok=True)
-            except Exception:
-                pass
-        return new_path
-    return obj
 
 
 def dump_to_yaml(data: dict[str, Any]) -> str:
@@ -77,46 +49,7 @@ class Router:
     _default_config_path = PROJECT_ROOT / "config" / "clean_config.json"
 
     def __init__(self, config: dict[str, Any] | Path = _default_config_path):
-        self.servers: dict[str, Server] = {}
-
-        # Load config
-        if isinstance(config, dict):
-            config_obj = config
-        elif isinstance(config, Path):
-            if config.exists():
-                with config.open("r") as f:
-                    config_obj = json.load(f)
-            else:
-                logger.warning(
-                    f"Config file not found at {config}. Starting with empty server list."
-                )
-                config_obj = {"mcpServers": {}}
-        else:
-            raise ValueError("Config must be a dictionary or a Path to a JSON file.")
-
-        # Overlay paths to use root sandbox
-        sandbox = _root_sandbox_dir()
-        mcp_servers = config_obj.get("mcpServers", {})
-        for name, config_data in mcp_servers.items():
-            cfg = dict(config_data)
-            args = list(cfg.get("args", []))
-            # Redirect filesystem base path
-            if name.lower() in {
-                "filesystem",
-                "server-filesystem",
-                "@modelcontextprotocol/server-filesystem",
-            }:
-                if args and args[-1] == "/":
-                    args[-1] = str(sandbox)
-            # Replace annotated_data relative paths
-            for i, a in enumerate(args):
-                if isinstance(a, str) and "annotated_data" in a:
-                    # Map './annotated_data/...' -> sandbox/<...>
-                    parts = a.split("annotated_data/", 1)
-                    if len(parts) == 2:
-                        args[i] = str(sandbox / parts[1])
-            cfg["args"] = args
-            self.servers[name] = Server(name=name, config=ServerConfig(**cfg))
+        self.servers: dict[str, Server] = load_servers_from_config(config)
 
         # Initialize ToolMatcher
         embedding_model = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
@@ -178,7 +111,7 @@ class Router:
                 )
             async with MCPConnection(server_config) as connection:
                 try:
-                    rewritten = _rewrite_params_for_root(params or {})
+                    rewritten = rewrite_params_for_root(params or {})
                     result = await asyncio.wait_for(
                         connection.call_tool(tool_name, rewritten), timeout=timeout
                     )

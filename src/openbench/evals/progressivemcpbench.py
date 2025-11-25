@@ -9,23 +9,54 @@ import asyncio
 from openbench.datasets.progressivemcpbench import get_dataset
 from openbench.scorers.progressivemcpbench import progressivemcpbench_scorer
 from openbench.tools.progressivemcpbench.copilot.toolsource import copilot_tool_source
-from openbench.utils.text import PROGRESSIVEMCPBENCH_SYSTEM_MESSAGE
+from openbench.tools.progressivemcpbench.directory.toolsource import (
+    directory_tool_source,
+)
+from openbench.utils.text import progressivemcpbench_system_message
+
+
+SUPPORTED_STRATEGIES = {"copilot", "directory"}
+
+
+def _resolve_strategy(strategy: str | None) -> str:
+    normalized = (strategy or "").strip().lower()
+    if not normalized:
+        raise ValueError(
+            "ProgressiveMCPBench requires a strategy (-T strategy=copilot|directory)."
+        )
+    if normalized not in SUPPORTED_STRATEGIES:
+        raise ValueError(
+            f"Unsupported strategy '{strategy}'. Choose one of: {', '.join(sorted(SUPPORTED_STRATEGIES))}."
+        )
+    return normalized
+
+
+def _tool_sources_for_strategy(strategy: str):
+    if strategy == "copilot":
+        ts = copilot_tool_source()
+        return [ts]
+    if strategy == "directory":
+        ts = directory_tool_source()
+        return [ts]
+    raise ValueError(f"Unsupported strategy '{strategy}'")
 
 
 @solver
-def progressive_copilot_solver() -> Solver:
-    """Solver that uses the Copilot MCP server for ProgressiveMCPBench."""
+def progressive_solver(strategy: str) -> Solver:
+    """Solver that routes to a specific ProgressiveMCPBench strategy."""
+    resolved_strategy = _resolve_strategy(strategy)
+    instructions = progressivemcpbench_system_message(resolved_strategy)
+    tool_sources = _tool_sources_for_strategy(resolved_strategy)
 
     async def solve(state: TaskState, generate) -> TaskState:
         try:
-            tool_source = copilot_tool_source()
             react_solver = react(
                 prompt=AgentPrompt(
-                    instructions=PROGRESSIVEMCPBENCH_SYSTEM_MESSAGE,
+                    instructions=instructions,
                     assistant_prompt=None,
                     handoff_prompt=None,
                 ),
-                tools=[tool_source],
+                tools=tool_sources,
                 submit=False,
             )
             return await react_solver(state)  # type: ignore[return-value, arg-type]
@@ -54,15 +85,19 @@ def progressive_copilot_solver() -> Solver:
 
 @task
 def progressivemcpbench(
+    strategy: str,
     working_limit: int = 600,
 ) -> Task:
-    """ProgressiveMCPBench using the Copilot agent with JSON-structured output."""
+    """ProgressiveMCPBench with selectable tool discovery strategies."""
+
+    resolved_strategy = _resolve_strategy(strategy)
 
     return Task(
         dataset=get_dataset(),
-        solver=[progressive_copilot_solver()],
+        solver=[progressive_solver(resolved_strategy)],
         scorer=progressivemcpbench_scorer(),
         name="progressivemcpbench",
+        metadata={"strategy": resolved_strategy},
         config=GenerateConfig(
             temperature=0.7,
             max_tokens=2048,
