@@ -1,7 +1,8 @@
 """
 Utility functions for CLI-based solvers that run tasks inside Docker sandboxes.
 
-This module provides common functionality for different CLI code agents (aider, opencode, roo)
+This module provides common functionality for different CLI code agents
+(aider, opencode, claude_code, codex, roo)
 including repository management, environment setup, and command execution.
 """
 
@@ -392,33 +393,6 @@ opencode run -m {model} "$PROMPT" 2>&1 | tee /tmp/opencode-output.log
 """
 
 
-def get_claude_script_template() -> str:
-    """Get the Claude Code execution script template.
-
-    Returns:
-        Claude Code script template with placeholders
-    """
-    return """#!/bin/bash
-set +e
-
-cd {workdir}
-
-# Read the prompt from file
-PROMPT=$(cat /tmp/claude_code_prompt.txt)
-
-{env_setup}
-
-echo "Running Claude Code with prompt: $PROMPT"  
-echo "Model: {model}"
-echo "Working directory: $(pwd)"
-
-echo "$PROMPT" | claude -p --model "{model}" \
-    --permission-mode acceptEdits \
-    --allowedTools "Bash(*)" "Read" "Edit" \
-    2>&1 | tee /tmp/claude-code-output.log
-"""
-
-
 def get_roo_script_template() -> str:
     """Get the Roo CLI execution script template.
 
@@ -592,7 +566,8 @@ def format_solver_output(
     code_agent_section_map = {
         "aider": "AIDER_OUTPUT",
         "opencode": "OPENCODE_OUTPUT",
-        "claude": "CLAUDE_CODE_OUTPUT",
+        "claude_code": "CLAUDE_CODE_OUTPUT",
+        "codex": "CODEX_CLI_OUTPUT",
         "roo": "ROO_CLI_EXECUTION",
     }
 

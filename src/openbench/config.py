@@ -6574,17 +6574,6 @@ EVAL_GROUPS = {
             "arabic_exams_social_science_primary_school",
         ],
     ),
-    "exercism": EvalGroup(
-        name="Exercism",
-        description="Aggregate of 5 Exercism coding tasks",
-        benchmarks=[
-            "exercism_go",
-            "exercism_java",
-            "exercism_javascript",
-            "exercism_python",
-            "exercism_rust",
-        ],
-    ),
     "anli": EvalGroup(
         name="ANLI",
         description="Aggregate of 3 ANLI rounds",

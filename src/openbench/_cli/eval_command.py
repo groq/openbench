@@ -640,7 +640,7 @@ def run_eval(
         bool,
         typer.Option(
             "--alpha",
-            help="Allow running experimental/alpha benchmarks",
+            help="Allow running perimental/alpha benchmarks",
             envvar="BENCH_ALPHA",
         ),
     ] = False,
@@ -696,6 +696,13 @@ def run_eval(
                 raise typer.BadParameter(
                     "For --code-agent roo, --model must be an OpenRouter model id prefixed with 'openrouter/'. "
                     "Example: --model openrouter/anthropic/claude-sonnet-4-20250514"
+                )
+    # claude code only supports anthropic models
+    if code_agent and code_agent.lower() == "claude_code":
+        for model_name in model:
+            if not model_name.startswith("anthropic/"):
+                raise typer.BadParameter(
+                    "For claude_code, --model must be an Anthropic model id prefixed with 'anthropic/'. "
                 )
 
     # Validate model names

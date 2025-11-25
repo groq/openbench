@@ -1,5 +1,5 @@
 """
-Claude Code agent backed by inspect_swe.
+Codex CLI agent backed by inspect_swe.
 """
 
 from __future__ import annotations
@@ -12,22 +12,21 @@ from inspect_ai.model import ChatMessageUser, ModelOutput
 from openbench.utils.cli_commands import format_execution_output
 
 from .base import BaseCodeAgent
-from inspect_swe import claude_code
+from inspect_swe import codex_cli
 
 
-class ClaudeCodeAgent(BaseCodeAgent):
-    """Claude Code CLI agent via inspect_swe."""
+class CodexAgent(BaseCodeAgent):
+    """Codex CLI agent via inspect_swe."""
 
     def __init__(self) -> None:
-        super().__init__("claude_code")
+        super().__init__("codex")
 
     async def execute(self, workdir: str, prompt_text: str, model: str) -> str:
-        """Execute Claude Code."""
-
+        """Execute Codex CLI agent."""
         try:
-            claude_agent = claude_code(cwd=workdir, model=model)
+            codex_agent = codex_cli(cwd=workdir, model=model)
             state = AgentState(messages=[ChatMessageUser(content=prompt_text)])
-            completed_state = await claude_agent(state)
+            completed_state = await codex_agent(state)
             stdout_text = _format_agent_output(completed_state.output)
             result = {
                 "returncode": 0,
@@ -37,25 +36,24 @@ class ClaudeCodeAgent(BaseCodeAgent):
             }
             return format_execution_output(result)
         except Exception as exc:  # pragma: no cover - defensive
-            return f"ERROR: claude_code execution failed: {exc}"
+            return f"ERROR: codex execution failed: {exc}"
 
     def resolve_model(self, state_model: str) -> str:
-        """Resolve the appropriate model string for Claude Code."""
         stripped = (state_model or "").strip()
         return stripped if stripped else self.get_default_model()
 
     def get_default_model(self) -> str:
-        return "anthropic/claude-sonnet-4-5-20250929"
+        return "openai/gpt-5"
 
     def get_description(self) -> str:
-        return "Claude Code agent."
+        return "Codex CLI agent"
 
     def get_dockerfile_commands(self) -> List[str]:
         return []
 
 
 def _format_agent_output(output: ModelOutput) -> str:
-    """Render agent output as plain text."""
+    """Render inspect_swe agent output as plain text."""
     if not output or not output.choices:
         return "Agent completed without emitting assistant output."
 

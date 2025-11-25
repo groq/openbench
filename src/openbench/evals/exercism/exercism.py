@@ -37,8 +37,8 @@ def exercism(
         languages: List of programming languages to include (python, go, javascript, java, rust).
                   If None, includes all supported languages.
         code_agent: CLI code agent to use for code evaluation.
-                   Defaults to 'opencode'. Can also be set via --code-agent flag.
-                   Valid options: aider, opencode, claude, roo
+                   Defaults to 'codex'. Can also be set via --code-agent flag.
+                   Valid options: codex, aider, opencode, claude_code, roo
 
     Returns:
         Task configured for Exercism evaluation

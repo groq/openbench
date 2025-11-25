@@ -21,8 +21,9 @@ The benchmark places agents in realistic development environments where they mus
 - **Multiple Code Agent Harnesses**: Evaluate models across different code agent frameworks on identical tasks for fair comparison:
   - **Aider** - AI-powered pair programming tool with git integration
   - **OpenCode** - OpenAI-compatible code generation tool
-  - **Claude** - Claude-based code editor with file system access
+  - **Claude Code** - Claude-based code editor with file system access
   - **Roo** - VS Code extension with interactive development
+  - **Codex** - OpenAI Codex cli coding agent
 
 - **Realistic Development Environment**: Agents work in full file system workspaces with multiple files, build configurations, and test suites
 
@@ -32,7 +33,7 @@ The benchmark places agents in realistic development environments where they mus
 
 ## Usage
 
-Run Exercism evaluation across all languages with the default code agent (opencode):
+Run Exercism evaluation across all languages with the default code agent (codex):
 
 ```bash
 bench eval exercism
@@ -41,6 +42,7 @@ bench eval exercism
 Specify a different code agent:
 
 ```bash
+bench eval exercism --code-agent codex
 bench eval exercism --code-agent aider
 bench eval exercism --code-agent claude
 bench eval exercism --code-agent roo

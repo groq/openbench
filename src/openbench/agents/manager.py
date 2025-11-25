@@ -9,8 +9,9 @@ from typing import Callable, Dict, List, Optional
 from .base import BaseCodeAgent
 from .aider import AiderAgent
 from .opencode import OpenCodeAgent
-from .claude import ClaudeAgent
 from .roo import RooAgent
+from .claude import ClaudeCodeAgent
+from .codex import CodexAgent
 
 
 class AgentManager:
@@ -19,7 +20,8 @@ class AgentManager:
     _agents: Dict[str, Callable[[], BaseCodeAgent]] = {
         "aider": AiderAgent,
         "opencode": OpenCodeAgent,
-        "claude": ClaudeAgent,
+        "claude_code": ClaudeCodeAgent,
+        "codex": CodexAgent,
         "roo": RooAgent,
     }
 
@@ -178,7 +180,7 @@ class AgentManager:
             Formatted help text describing all available code agents
         """
         agent_names = cls.get_supported_agents()
-        default_agent = "opencode"
+        default_agent = "codex"
 
         help_text = f"CLI code agent to use for code evaluation. Options: {', '.join(agent_names)} (default: {default_agent})"
         return help_text
