@@ -23,11 +23,38 @@ def _root_sandbox_dir() -> Path:
     return Path(os.path.expanduser("~/.openbench/progressivemcpbench/root")).resolve()
 
 
-def _load_tools_data() -> tuple[dict[str, Any], list[dict[str, Any]]]:
-    """Load config and tools data from cache."""
+def _load_tools_data() -> tuple[dict[str, Any], dict[str, list[dict[str, Any]]]]:
+    """Load config and tools data from cache.
+
+    Returns:
+        Tuple of (config, tools_by_server) where tools_by_server maps
+        server_name -> list of tool info dicts with name, description, inputSchema
+    """
     config, _ = get_clean_config_cached()
-    tools_data, _ = get_tools_json_cached()
-    return config, tools_data
+    raw_tools_data, _ = get_tools_json_cached()
+
+    # Parse the nested tools.json structure into a flat mapping
+    # tools.json format: list of entries with: name, description, tools: {server_name: {tools: [...]}}
+    tools_by_server: dict[str, list[dict[str, Any]]] = {}
+    for entry in raw_tools_data:
+        tools_dict = entry.get("tools", {})
+        for server_name, server_info in tools_dict.items():
+            if not server_name:
+                continue
+            if server_name not in tools_by_server:
+                tools_by_server[server_name] = []
+            for tool in server_info.get("tools", []):
+                tool_name = tool.get("name", "")
+                if tool_name:
+                    tools_by_server[server_name].append(
+                        {
+                            "name": tool_name,
+                            "description": tool.get("description", ""),
+                            "inputSchema": tool.get("inputSchema", {}),
+                        }
+                    )
+
+    return config, tools_by_server
 
 
 def _build_server(name: str, config_data: dict[str, Any]) -> Server:
@@ -65,10 +92,10 @@ def minimal_servers_tool_source(
     Returns:
         ToolSource with all tools from the specified servers
     """
-    config, tools_data = _load_tools_data()
+    config, tools_by_server = _load_tools_data()
     mcp_servers = config.get("mcpServers", {})
 
-    # Build server index and tools index
+    # Build server index
     servers: dict[str, Server] = {}
     for name, config_data in mcp_servers.items():
         if name in required_servers:
@@ -76,24 +103,19 @@ def minimal_servers_tool_source(
 
     # Build tools list from matching servers
     tools: list[Tool] = []
-    for server_data in tools_data:
-        server_name = server_data.get("server_name", "")
-        if server_name not in required_servers:
-            continue
+    for server_name in required_servers:
         if server_name not in servers:
+            continue
+        if server_name not in tools_by_server:
             continue
 
         server = servers[server_name]
-        for tool_info in server_data.get("tools", []):
-            tool_name = tool_info.get("name", "")
-            if not tool_name:
-                continue
-
+        for tool_info in tools_by_server[server_name]:
             tool = create_mcp_tool_wrapper(
                 server=server,
-                tool_name=tool_name,
+                tool_name=tool_info["name"],
                 tool_description=tool_info.get("description", ""),
-                input_schema=tool_info.get("parameter", {}),
+                input_schema=tool_info.get("inputSchema", {}),
             )
             tools.append(tool)
 
@@ -111,29 +133,28 @@ def minimal_tools_tool_source(
     Returns:
         ToolSource with only the specified tools
     """
-    config, tools_data = _load_tools_data()
+    config, tools_by_server = _load_tools_data()
     mcp_servers = config.get("mcpServers", {})
 
     # Build set for quick lookup
     required_set = {(s, t) for s, t in required_tools}
-    required_servers = {s for s, t in required_tools}
+    required_servers_set = {s for s, t in required_tools}
 
     # Build server index
     servers: dict[str, Server] = {}
     for name, config_data in mcp_servers.items():
-        if name in required_servers:
+        if name in required_servers_set:
             servers[name] = _build_server(name, config_data)
 
     # Build tools list from matching tools
     tools: list[Tool] = []
-    for server_data in tools_data:
-        server_name = server_data.get("server_name", "")
+    for server_name, tool_list in tools_by_server.items():
         if server_name not in servers:
             continue
 
         server = servers[server_name]
-        for tool_info in server_data.get("tools", []):
-            tool_name = tool_info.get("name", "")
+        for tool_info in tool_list:
+            tool_name = tool_info["name"]
             if (server_name, tool_name) not in required_set:
                 continue
 
@@ -141,7 +162,7 @@ def minimal_tools_tool_source(
                 server=server,
                 tool_name=tool_name,
                 tool_description=tool_info.get("description", ""),
-                input_schema=tool_info.get("parameter", {}),
+                input_schema=tool_info.get("inputSchema", {}),
             )
             tools.append(tool)
 
@@ -166,7 +187,7 @@ def distraction_128_tool_source(
     Returns:
         ToolSource with required tools plus deterministic distractors
     """
-    config, tools_data = _load_tools_data()
+    config, tools_by_server = _load_tools_data()
     mcp_servers = config.get("mcpServers", {})
 
     # Build all servers
@@ -174,26 +195,19 @@ def distraction_128_tool_source(
     for name, config_data in mcp_servers.items():
         all_servers[name] = _build_server(name, config_data)
 
-    # Collect all tools grouped by server
-    all_tools_by_server: dict[str, list[dict[str, Any]]] = {}
-    for server_data in tools_data:
-        server_name = server_data.get("server_name", "")
-        if server_name in all_servers:
-            all_tools_by_server[server_name] = server_data.get("tools", [])
-
     # First, collect required tools
-    required_tools: list[tuple[str, dict[str, Any]]] = []
+    required_tools_list: list[tuple[str, dict[str, Any]]] = []
     for server_name in required_servers:
-        if server_name in all_tools_by_server:
-            for tool_info in all_tools_by_server[server_name]:
-                required_tools.append((server_name, tool_info))
+        if server_name in tools_by_server:
+            for tool_info in tools_by_server[server_name]:
+                required_tools_list.append((server_name, tool_info))
 
     # Calculate how many distractors we need
-    remaining = target_count - len(required_tools)
+    remaining = target_count - len(required_tools_list)
 
     # Collect all non-required tools as potential distractors
     distractor_pool: list[tuple[str, dict[str, Any]]] = []
-    for server_name, tool_list in all_tools_by_server.items():
+    for server_name, tool_list in tools_by_server.items():
         if server_name not in required_servers:
             for tool_info in tool_list:
                 distractor_pool.append((server_name, tool_info))
@@ -211,7 +225,7 @@ def distraction_128_tool_source(
     selected_distractors = distractor_pool[:remaining] if remaining > 0 else []
 
     # Combine required and distractor tools
-    all_selected = required_tools + selected_distractors
+    all_selected = required_tools_list + selected_distractors
 
     # Build Tool objects
     tools: list[Tool] = []
@@ -228,7 +242,7 @@ def distraction_128_tool_source(
             server=server,
             tool_name=tool_name,
             tool_description=tool_info.get("description", ""),
-            input_schema=tool_info.get("parameter", {}),
+            input_schema=tool_info.get("inputSchema", {}),
         )
         tools.append(tool)
 

@@ -102,19 +102,24 @@ class DirectoryRouter:
             cfg["args"] = args
             self.servers[name] = Server(name=name, config=ServerConfig(**cfg))
 
-        for server_data in tools_data:
-            server_name = server_data.get("server_name", "")
-            if not server_name:
-                continue
-            self.tools_index[server_name] = {}
-            for tool in server_data.get("tools", []):
-                tool_name = tool.get("name", "")
-                if tool_name:
-                    self.tools_index[server_name][tool_name] = {
-                        "name": tool_name,
-                        "description": tool.get("description", ""),
-                        "inputSchema": tool.get("parameter", {}),
-                    }
+        # tools_data format: list of server entries with nested tools structure
+        # Each entry has: name, description, tools: {server_name: {tools: [...]}}
+        for entry in tools_data:
+            tools_dict = entry.get("tools", {})
+            # tools_dict is keyed by server name
+            for server_name, server_info in tools_dict.items():
+                if not server_name:
+                    continue
+                if server_name not in self.tools_index:
+                    self.tools_index[server_name] = {}
+                for tool in server_info.get("tools", []):
+                    tool_name = tool.get("name", "")
+                    if tool_name:
+                        self.tools_index[server_name][tool_name] = {
+                            "name": tool_name,
+                            "description": tool.get("description", ""),
+                            "inputSchema": tool.get("inputSchema", {}),
+                        }
 
         self.connection_lock = asyncio.Lock()
 
