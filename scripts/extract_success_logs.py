@@ -81,8 +81,11 @@ def extract_server_and_tool_names(
 def extract_from_messages(messages: list[dict[str, Any]]) -> tuple[set[str], set[str]]:
     """Extract server and tool names from message tool calls.
 
-    Only extracts actual MCP tool calls (execute-tool), not meta-tools
-    like ls, read-tool-file, or route.
+    Only extracts actual MCP tool calls (meta__execute-tool), not meta-tools
+    like meta__ls, meta__read-tool-file, or meta__route.
+
+    Also handles minimal strategy tools which are prefixed with server names
+    (e.g., 'filesystem__read_file').
     """
     servers: set[str] = set()
     tools: set[str] = set()
@@ -95,8 +98,8 @@ def extract_from_messages(messages: list[dict[str, Any]]) -> tuple[set[str], set
             func_name = tc.get("function", "")
             args = tc.get("arguments", {})
 
-            # Handle execute-tool calls (directory strategy)
-            if func_name == "execute-tool":
+            # Handle meta__execute-tool calls (copilot and directory strategies)
+            if func_name == "meta__execute-tool":
                 tool_path = args.get("tool_path", "")
                 if tool_path.startswith("/tools/"):
                     parts = tool_path[7:].split("/")
@@ -107,11 +110,20 @@ def extract_from_messages(messages: list[dict[str, Any]]) -> tuple[set[str], set
                             tool_name = tool_name[:-3]
                         tools.add(tool_name)
 
-                # Also handle copilot-style execute-tool (with server_name, tool_name)
+                # Also handle copilot-style meta__execute-tool (with server_name, tool_name)
                 if "server_name" in args:
                     servers.add(args["server_name"])
                 if "tool_name" in args:
                     tools.add(args["tool_name"])
+
+            # Handle minimal strategy tools (prefixed with server_name__)
+            # e.g., 'filesystem__read_file' -> server='filesystem', tool='read_file'
+            elif "__" in func_name and not func_name.startswith("meta__"):
+                parts = func_name.split("__", 1)
+                if len(parts) == 2:
+                    server_name, tool_name = parts
+                    servers.add(server_name)
+                    tools.add(tool_name)
 
     return servers, tools
 
