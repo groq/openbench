@@ -740,7 +740,7 @@ def run_eval(
         if "livemcpbench" in expanded_benchmarks:
             prepare_livemcpbench_cache()
         if "progressivemcpbench" in expanded_benchmarks:
-            prepare_progressivemcpbench_cache()
+            prepare_progressivemcpbench_cache(strategy=task_args.get("strategy"))
         # auto-prepare CVEBench challenges directory
         if "cvebench" in expanded_benchmarks:
             from importlib import import_module

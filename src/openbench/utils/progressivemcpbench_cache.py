@@ -7,28 +7,42 @@ from openbench.tools.progressivemcpbench.copilot.prepare import (
     prepare_copilot_cache,
     prepare_root_data,
 )
+from openbench.tools.progressivemcpbench.copilot.upstream_cache import (
+    get_clean_config_cached,
+    get_tools_json_cached,
+)
 
 
-def prepare_progressivemcpbench_cache() -> Path:
+def prepare_progressivemcpbench_cache(strategy: str | None = None) -> Path:
     """Synchronously prepare all caches required by ProgressiveMCPBench before eval.
 
-    - Verifies OPENAI_API_KEY is present
-    - Ensures upstream JSONs and embeddings exist (blocking)
+    - When using the copilot strategy, ensures embeddings exist (requires OPENAI_API_KEY/EMBEDDING_API_KEY)
+    - For other strategies, only fetches upstream JSONs and prepares the root sandbox
     - Ensures root sandbox is staged with annotated_data
-    - Exports MCP_DATA_PATH so the server uses the same embeddings file
+    - Exports MCP_DATA_PATH so the server uses the same embeddings file (copilot)
     """
-    if not os.getenv("OPENAI_API_KEY"):
-        raise RuntimeError(
-            "OPENAI_API_KEY is required for ProgressiveMCPBench (embeddings generation)."
-        )
+    normalized = (strategy or "").lower()
+    needs_embeddings = normalized in {"", "copilot", None}
 
     typer.secho("\n🔧 Preparing ProgressiveMCPBench caches...", fg=typer.colors.CYAN)
 
-    cache_path = prepare_copilot_cache(force_refresh=False, embeddings_path=None)
-    typer.echo(f"  ✅ Embedding cache ready: {cache_path}")
-
-    # Make sure the child MCP server uses this exact path
-    os.environ["MCP_DATA_PATH"] = str(cache_path)
+    if needs_embeddings:
+        if not (
+            os.getenv("OPENAI_API_KEY")
+            or os.getenv("EMBEDDING_API_KEY")
+            or os.getenv("ABSTRACT_API_KEY")
+        ):
+            raise RuntimeError(
+                "OPENAI_API_KEY is required for the copilot strategy (embeddings generation)."
+            )
+        cache_path = prepare_copilot_cache(force_refresh=False, embeddings_path=None)
+        typer.echo(f"  ✅ Embedding cache ready: {cache_path}")
+        os.environ["MCP_DATA_PATH"] = str(cache_path)
+    else:
+        # Ensure upstream configs/tools exist even when embeddings are skipped
+        get_clean_config_cached(force_refresh=False)
+        get_tools_json_cached(force_refresh=False)
+        typer.echo("  ✅ Config + tools cache ready (embeddings not required)")
 
     root_path = prepare_root_data(force_refresh=False)
     typer.echo(f"  ✅ Root sandbox ready: {root_path}\n")

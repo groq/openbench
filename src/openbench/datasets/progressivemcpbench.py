@@ -51,6 +51,8 @@ def record_to_sample(record: dict[str, Any]) -> Optional[Sample]:
             "category": record.get("category"),
             "file_name": record.get("file_name"),
             "annotator_metadata": record.get("Annotator Metadata", {}),
+            "required_servers": record.get("required_servers"),
+            "required_tools": record.get("required_tools"),
         },
     )
 
