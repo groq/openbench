@@ -2,13 +2,28 @@
 that are incorrectly imported globally.
 """
 
+import subprocess
+import sys
 import pytest
 
 
-def test_imports_for_optional_dependencies():
+@pytest.fixture(scope="function")
+def clean_environment():
+    """Ensure only base dependencies are installed by running uv sync."""
+    # Run uv sync to reset to base dependencies only
+    result = subprocess.run(["uv", "sync"], capture_output=True, text=True)
+    if result.returncode != 0:
+        pytest.fail(f"Failed to run 'uv sync': {result.stderr}")
+    yield
+    # Note: We don't restore optional deps after the test since other tests
+    # should be able to run with base dependencies
+
+
+def test_imports_for_optional_dependencies(clean_environment):
     """Test that optional dependencies don't produce import errors from registry loading. 
     
-    To fix this, wrap optional imports in try-except blocks instead of importing globally.
+    This test runs in a clean environment with only base dependencies (uv sync)
+    to ensure optional imports are properly wrapped in try-except blocks.
     """
     try:
         # Load all evaluations through the registry
