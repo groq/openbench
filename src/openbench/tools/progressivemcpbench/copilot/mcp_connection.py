@@ -71,6 +71,16 @@ class MCPConnection:
                 }
                 for k, v in silent_defaults.items():
                     env.setdefault(k, v)
+
+                # Enforce headless mode for browser-based MCP servers to avoid
+                # Chrome windows popping up and stealing focus during evals.
+                # Puppeteer: uses PUPPETEER_LAUNCH_OPTIONS env var
+                # Playwright (@executeautomation): uses HEADLESS env var
+                env.setdefault(
+                    "PUPPETEER_LAUNCH_OPTIONS", '{"headless": true, "args": []}'
+                )
+                env.setdefault("HEADLESS", "true")
+
                 self.server.config.env = env
 
                 # STDIO connection
