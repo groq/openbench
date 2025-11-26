@@ -3,8 +3,15 @@
 import json
 import re
 import functools
-import langdetect  # type: ignore[import-untyped,import-not-found]
-import nltk  # type: ignore[import-untyped,import-not-found]
+
+try:
+    import nltk  # type: ignore[import-untyped,import-not-found]
+except ImportError:
+    nltk = None
+try:
+    import langdetect  # type: ignore[import-untyped,import-not-found]
+except ImportError:
+    langdetect = None
 
 from typing import Dict, Callable
 from inspect_ai.scorer import (
@@ -63,6 +70,10 @@ def check_english_with_case(
     """
     if not response.strip() or not case_predicate(response):
         return False
+    if langdetect is None:
+        raise RuntimeError(
+            "langdetect is required for ifeval. Install with: uv sync --group ifeval"
+        )
     try:
         return langdetect.detect(response) == "en"
     except langdetect.LangDetectException:
@@ -110,6 +121,10 @@ class NumberOfWords(InstructionChecker):
 
     def check_following(self, response: str) -> bool:
         # Use proper tokenization like original
+        if nltk is None:
+            raise RuntimeError(
+                "nltk is required for ifeval. Install with: uv sync --group ifeval"
+            )
         tokenizer = nltk.tokenize.RegexpTokenizer(r"\w+")
         tokens = tokenizer.tokenize(response)
         word_count = len(tokens)
@@ -177,6 +192,10 @@ class CapitalWordFrequencyChecker(InstructionChecker):
         self._frequency = capital_frequency or 1
 
     def check_following(self, response: str) -> bool:
+        if nltk is None:
+            raise RuntimeError(
+                "nltk is required for ifeval. Install with: uv sync --group ifeval"
+            )
         capital_words = list(filter(str.isupper, nltk.word_tokenize(response)))
         count = len(capital_words)
 
@@ -201,6 +220,10 @@ class NumberOfSentences(InstructionChecker):
     @staticmethod
     @functools.lru_cache(maxsize=None)
     def _get_sentence_tokenizer():
+        if nltk is None:
+            raise RuntimeError(
+                "nltk is required for ifeval. Install with: uv sync --group ifeval"
+            )
         return nltk.data.load("nltk:tokenizers/punkt/english.pickle")
 
     def build_description(self, *, relation=None, num_sentences=None, **kwargs):
@@ -297,6 +320,10 @@ class ResponseLanguageChecker(InstructionChecker):
         self._language = language or "en"
 
     def check_following(self, response: str) -> bool:
+        if langdetect is None:
+            raise RuntimeError(
+                "langdetect is required for ifeval. Install with: uv sync --group ifeval"
+            )
         try:
             return langdetect.detect(response) == self._language
         except langdetect.LangDetectException:
