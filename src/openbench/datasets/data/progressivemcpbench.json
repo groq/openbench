@@ -14,8 +14,8 @@
   },
   {
     "task_id": "99d7541a-73c0-4ea1-8002-a70a041f3ffc",
-    "Question": "Please perform a comprehensive analysis of the audio file located at /root/music/mixkit-retro-game-emergency-alarm-1000.wav. The analysis should include beat tracking, MFCC extraction, and chroma CQT calculation. Upon completion, please provide the resulting data along with a brief summary of the findings.",
-    "answers": null,
+    "Question": "Please perform a comprehensive analysis of the audio file located at /root/music/mixkit-retro-game-emergency-alarm-1000.wav. Then return the precise tempo of the track, to two decimal places.",
+    "answers": "60.09",
     "category": "Leisure",
     "file_name": "/root/music/mixkit-retro-game-emergency-alarm-1000.wav",
     "Annotator Metadata": {
@@ -131,8 +131,8 @@
   },
   {
     "task_id": "6b7fc66e-fe96-4403-9a52-df5afa53ab68",
-    "Question": "Generate a research summary for NCT04280705 and save it as Markdown to /root/markdown/NCT04280705.md.",
-    "answers": null,
+    "Question": "Gather information on clinical trial NCT04280705 and return its full title.",
+    "answers": "Adaptive COVID-19 Treatment Trial (ACTT)",
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -346,8 +346,8 @@
   },
   {
     "task_id": "7bda47e8-1b8b-4f1f-b67c-573a81417d36",
-    "Question": "Introduce me to the article on arxiv 2203.12277",
-    "answers": null,
+    "Question": "When was the article on arxiv 2203.12277 first submitted? Format it as YYYY-MM-DD.",
+    "answers": "2022-03-23",
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -372,8 +372,8 @@
   },
   {
     "task_id": "1a3ffa81-d1fe-4b97-9308-3d2ae2d0d9b1",
-    "Question": "Extract the key points of this TED talk in https://www.youtube.com/watch?v=arj7oStGLkU, organize them into a mind map, and tell me what the main content of the lecture is.",
-    "answers": null,
+    "Question": "Tell me the title of the lecture in https://www.youtube.com/watch?v=arj7oStGLkU, the name of the speaker, and what they described as their college major. Return only the title, the person's name, and the major, separated by commas.",
+    "answers": "Inside the Mind of a Master Procrastinator,Tim Urban,Government",
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -476,8 +476,8 @@
   },
   {
     "task_id": "00e13e2e-07fa-4d0b-9863-e966190cffd6",
-    "Question": "find the painting \"Corridor in the Asylum\" and give me some background information,",
-    "answers": null,
+    "Question": "When was \"Corridor in the Asylum\" painted, who by, and where is it now? Answer with just the year(s), the artist's last name, and the current location, separated by commas.",
+    "answers": "1889-1890, van Gogh, The Metropolitan Museum of Art",
     "category": "Leisure",
     "file_name": "",
     "Annotator Metadata": {
@@ -515,8 +515,8 @@
   },
   {
     "task_id": "4aa079dd-9d2d-440d-a654-9ba9cb3868b0",
-    "Question": "Read the paper webarena, mind2web and mind2web2, then create a Comparison Report in /root/markdown/compare_webagent.md",
-    "answers": null,
+    "Question": "Read the paper webarena, mind2web and mind2web2, then return the last names of the first listed author of each paper, sorted alphabetically and separated by commas.",
+    "answers": "Deng, Gou, Zhou",
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -554,8 +554,8 @@
   },
   {
     "task_id": "b276e772-28b5-42fd-bb85-fd73e017fe25",
-    "Question": "I have 9.5g gold, please estimate its value based on the current price of gold",
-    "answers": null,
+    "Question": "I have 9.5g gold, please estimate its value based on the price of gold at 2025-11-01. Return the amount in USD to two decimal places.",
+    "answers": "$1,396.00",
     "category": "Finance",
     "file_name": "",
     "Annotator Metadata": {
@@ -593,8 +593,8 @@
   },
   {
     "task_id": "4d7582c4-5013-4275-9621-1e7fbb5fb0c1",
-    "Question": "Download New York's Air Quality report from Government Data, saved at /root/csv/NY_AIR_QUALITY.csv",
-    "answers": null,
+    "Question": "Get New York's Air Quality report for 2024 from the official Government sources, then return the annual mean PM2.5 measurement for New York City, to one decimal place.",
+    "answers": "6.3",
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -620,7 +620,7 @@
   {
     "task_id": "9a18862e-22ce-46e7-b46a-72c6f5c79b23",
     "Question": "Get line 10 of /root/txt/Android.txt, please note that this file is very large",
-    "answers": null,
+    "answers": "03-17 16:13:38.877 2227 2227 D TextView: mVisiblity.getValue is false",
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -632,8 +632,8 @@
   },
   {
     "task_id": "de75630e-b91e-4cc7-85b1-5d02c2455392",
-    "Question": " I'm looking at a PR and need to know if these libs are outdated. com.fasterxml.jackson.core:jackson-databind:2.13.4, org.apache.poi:poi-ooxml:5.2.0, and com.google.guava:guava:30.1-jre. What are the latest versions for each?",
-    "answers": null,
+    "Question": " I'm looking at a PR and need to know if these libs are outdated. com.fasterxml.jackson.core:jackson-databind:2.13.4, org.apache.poi:poi-ooxml:5.2.0, and com.google.guava:guava:30.1-jre. Answer the number of outdated packages: 0, 1, 2 or 3.",
+    "answers": "3",
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -658,8 +658,8 @@
   },
   {
     "task_id": "1ef11556-37d6-4585-b4b2-cf2f782141e6",
-    "Question": "Read all the articles in the /root/pdf/embodied_ai_papers directory. Compare their similarities and differences, then write a report summarizing your analysis. Save the final report as a Markdown file at /root/markdown/embodied_ai_report.md.",
-    "answers": null,
+    "Question": "Read all the articles in the /root/pdf/embodied_ai_papers directory. Return the last names of the first listed author of each paper, sorted alphabetically and separated by commas.",
+    "answers": "Brohan,Driess,Wang",
     "category": "Office",
     "file_name": "/root/pdf/embodied_ai_papers",
     "Annotator Metadata": {
@@ -854,8 +854,8 @@
   },
   {
     "task_id": "b6281fad-0da4-4fd4-b669-7e4ff9083a82",
-    "Question": "I have 18.9g silver, please estimate its value based on the current price",
-    "answers": null,
+    "Question": "I have 18.9g silver, please estimate its value based on the price of silver at 2025-11-01. Return the amount in USD to two decimal places.",
+    "answers": "$29.17",
     "category": "Shopping",
     "file_name": "",
     "Annotator Metadata": {
@@ -880,8 +880,8 @@
   },
   {
     "task_id": "71a7a42a-54af-4552-ad9b-d36f4912cc1c",
-    "Question": "Convert the reference list in /root/txt/paper_list.bib into a Word document. Please use APA formatting and save the final file at /root/word/paper_list.docx.",
-    "answers": null,
+    "Question": "Read the reference list in /root/txt/paper_list.bib and return the title of the first paper cited.",
+    "answers": "WebSRC: A Dataset for Web-Based Structural Reading Comprehension",
     "category": "Office",
     "file_name": "/root/txt/paper_list.bib",
     "Annotator Metadata": {
@@ -1056,14 +1056,53 @@
   },
   {
     "task_id": "84326f9f-d4b7-4dc8-b9e0-3c8868a3f79f",
-    "Question": "Read the comments on hacker news story 44490510 and help me summarize the views in the comments.",
-    "answers": null,
+    "Question": "Read the comments on hacker news story 44490510. Return the username of the top comment.",
+    "answers": "osigurdson",
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
       "Number of steps": "2",
       "Number of tools": "1",
       "Steps": "1. get the comments in story 44490510 \n2. summarize the comments",
+      "Tools": "1. getStoryWithComments"
+    }
+  },
+  {
+    "task_id": "95369c49-8037-46f9-9099-8c336d03559f",
+    "Question": "Read the comments on hacker news story 45973709. Return the username of the top comment.",
+    "answers": "gucci-on-fleek",
+    "category": "Lifestyle",
+    "file_name": "",
+    "Annotator Metadata": {
+      "Number of steps": "2",
+      "Number of tools": "1",
+      "Steps": "1. get the comments in story 45973709 \n2. summarize the comments",
+      "Tools": "1. getStoryWithComments"
+    }
+  },
+  {
+    "task_id": "f697107c-8004-452c-9b5c-98573f95193a",
+    "Question": "Read the comments on hacker news story 44490510. Return the username of the top reply to the top comment.",
+    "answers": "cpursley",
+    "category": "Lifestyle",
+    "file_name": "",
+    "Annotator Metadata": {
+      "Number of steps": "2",
+      "Number of tools": "1",
+      "Steps": "1. get the comments in story 44490510 \n2. summarize the comments",
+      "Tools": "1. getStoryWithComments"
+    }
+  },
+  {
+    "task_id": "68407846-9583-405c-a539-6936635d236d",
+    "Question": "Read the comments on hacker news story 45973709. Return the username of the top reply to the top comment.",
+    "answers": "eastdakota",
+    "category": "Lifestyle",
+    "file_name": "",
+    "Annotator Metadata": {
+      "Number of steps": "2",
+      "Number of tools": "1",
+      "Steps": "1. get the comments in story 45973709 \n2. summarize the comments",
       "Tools": "1. getStoryWithComments"
     }
   },
@@ -1095,8 +1134,8 @@
   },
   {
     "task_id": "665e1166-1062-444f-81e3-df207d0f975b",
-    "Question": "Read the Wikipedia article on Llullaillaco, which briefly describes the content of this article, saved to /root/markdown/Llullaillaco.md",
-    "answers": null,
+    "Question": "Read the Wikipedia article on Llullaillaco, then return its height to the nearest metre (without units).",
+    "answers": "6723",
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -1179,8 +1218,8 @@
   },
   {
     "task_id": "39c4c9fc-9074-474a-850f-4b088d499d8c",
-    "Question": "Tell me the price of nvidia's stock right now.",
-    "answers": null,
+    "Question": "What was the price of Nvidia's stock as of market open, 25-11-2025? Return only the price as a two-digit floating point number.",
+    "answers": "177.82",
     "category": "Finance",
     "file_name": "",
     "Annotator Metadata": {
@@ -1205,8 +1244,8 @@
   },
   {
     "task_id": "0dafdf66-af3a-4110-ab79-d9c037f7bc62",
-    "Question": "Find the earliest available high-speed train from Beijing South to Shanghai South for tomorrow. What's the departure time and ticket price?",
-    "answers": null,
+    "Question": "Find the earliest available high-speed train from Beijing South to Shanghai South for tomorrow. Return only the departure time (HH:MM, 24 hour time) and second-class ticket price in ¥ (rounded to nearest whole number), separated by commas.",
+    "answers": "07:00,¥682",
     "category": "Travel",
     "file_name": "",
     "Annotator Metadata": {
