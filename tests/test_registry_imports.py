@@ -17,10 +17,10 @@ def test_imports_for_optional_dependencies():
     except (ImportError, ModuleNotFoundError) as e:
         error_msg = (
             f"Found unhandled optional import error: {e}\n\n"
-            "Fix: Wrap optional imports in try-except blocks instead of using type ignore\n"
+            "Fix: Wrap optional imports in try-except blocks\n"
             "Example:\n"
             "  try:\n"
-            "      import optional_package\n"
+            "      import optional_package  # type: ignore[import-untyped,import-not-found]\n"
             "  except ImportError:\n"
             "      optional_package = None"
         )
