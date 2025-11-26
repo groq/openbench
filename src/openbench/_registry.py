@@ -484,3 +484,8 @@ from .evals.rocketscience import rocketscience  # noqa: F401, E402
 
 # Vision & OCR benchmarks
 from .evals.ocrbenchv2 import ocrbenchv2  # noqa: F401, E402
+from .evals.prbench import (  # noqa: F401, E402
+    prbench,
+    prbench_finance,
+    prbench_legal,
+)
