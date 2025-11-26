@@ -265,6 +265,8 @@ from .evals.healthbench import healthbench, healthbench_hard, healthbench_consen
 from .evals.hellaswag import hellaswag  # noqa: F401, E402
 from .evals.hle import hle, hle_text  # noqa: F401, E402
 from .evals.humaneval import humaneval  # noqa: F401, E402
+from .evals.ifeval import ifeval  # noqa: F401, E402
+from .evals.ifbench import ifbench  # noqa: F401, E402
 from .evals.exercism.exercism import (  # noqa: F401, E402
     exercism,
     exercism_python,

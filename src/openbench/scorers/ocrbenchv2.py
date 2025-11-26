@@ -576,9 +576,9 @@ def ocr_evaluation(predict: str, answers: list[str]) -> float:
     """
     # Optional NLTK import for BLEU and METEOR
     try:
-        from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction  # type: ignore[import-not-found]
-        from nltk.translate.meteor_score import meteor_score  # type: ignore[import-not-found]
-        import nltk  # type: ignore[import-not-found]
+        from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction  # type: ignore[import-not-found,import-untyped]
+        from nltk.translate.meteor_score import meteor_score  # type: ignore[import-not-found,import-untyped]
+        import nltk  # type: ignore[import-not-found,import-untyped]
 
         # Ensure required NLTK data is downloaded
         try:

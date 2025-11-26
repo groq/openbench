@@ -113,6 +113,11 @@ factscore = [
     "factscorelite>=1.3.0,<2.0.0",
     "rank-bm25>=0.2.2",
 ]
+ifbench = [
+    "emoji>=2.14.0",
+    "nltk>=3.9.1",
+    "syllapy>=0.7.2",
+]
 tau_bench = [
     "tau2",
 ]
