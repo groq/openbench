@@ -4007,19 +4007,6 @@ export const benchmarksData = [
     "is_alpha": false
   },
   {
-    "name": "DocVQA",
-    "description": "Document Visual Question Answering - evaluates models on answering questions about document images (forms, reports, tables, diagrams) using ANLS scoring",
-    "category": "core",
-    "tags": [
-      "vision",
-      "multimodal",
-      "documents",
-      "ocr"
-    ],
-    "function_name": "docvqa",
-    "is_alpha": false
-  },
-  {
     "name": "ETHICS (All Dimensions)",
     "description": "Aligning AI With Shared Human Values - tests moral reasoning across 5 fundamental dimensions",
     "category": "ethics-social",
@@ -8589,6 +8576,21 @@ export const evalGroupsData = [
       "rte",
       "wic",
       "wsc"
+    ]
+  },
+  {
+    "name": "TauBench",
+    "description": "Aggregate of 3 TauBench tasks",
+    "category": "eval-group",
+    "tags": [
+      "eval-group"
+    ],
+    "id": "tau_bench",
+    "benchmark_count": 3,
+    "benchmarks": [
+      "tau_bench_retail",
+      "tau_bench_airline",
+      "tau_bench_telecom"
     ]
   },
   {
