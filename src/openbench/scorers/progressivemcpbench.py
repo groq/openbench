@@ -108,12 +108,12 @@ def progressivemcpbench_metrics() -> Metric:
     ]
 )
 def progressivemcpbench_scorer(
-    model: str = "groq/gpt-oss-120b",
+    model: str = "groq/openai/gpt-oss-120b",
 ) -> Scorer:
     """Scorer for ProgressiveMCPBench using LLM-as-a-judge.
 
     Args:
-        model: The model to use for grading (default: groq/gpt-oss-120b).
+        model: The model to use for grading (default: groq/openai/gpt-oss-120b).
     """
     grader_model: Model = get_model(model)
 
