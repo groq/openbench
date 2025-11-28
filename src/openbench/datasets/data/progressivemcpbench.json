@@ -605,7 +605,7 @@
       "Steps": "1. get the current gold price\n2. calculate the price",
       "Tools": "1. get_asset_price\n2. calculate"
     },
-    "answer": "$1,396.00",
+    "_answer": "$1,396.00",
     "scorer_instructions": null
   },
   {
@@ -927,7 +927,7 @@
       "Steps": "1. get the current silver price\n2. calculate the price",
       "Tools": "1. get_asset_price\n2. calculate"
     },
-    "answer": "$29.17",
+    "_answer": "$29.17",
     "scorer_instructions": null
   },
   {
@@ -1144,7 +1144,7 @@
       "Steps": "1. get the comments in story 44490510 \n2. summarize the comments",
       "Tools": "1. getStoryWithComments"
     },
-    "answer": "osigurdson",
+    "_answer": "osigurdson",
     "scorer_instructions": null
   },
   {
@@ -1158,7 +1158,7 @@
       "Steps": "1. get the comments in story 45973709 \n2. summarize the comments",
       "Tools": "1. getStoryWithComments"
     },
-    "answer": "gucci-on-fleek",
+    "_answer": "gucci-on-fleek",
     "scorer_instructions": null
   },
   {
@@ -1172,7 +1172,7 @@
       "Steps": "1. get the comments in story 44490510 \n2. summarize the comments",
       "Tools": "1. getStoryWithComments"
     },
-    "answer": "cpursley",
+    "_answer": "cpursley",
     "scorer_instructions": null
   },
   {
@@ -1186,7 +1186,7 @@
       "Steps": "1. get the comments in story 45973709 \n2. summarize the comments",
       "Tools": "1. getStoryWithComments"
     },
-    "answer": "eastdakota",
+    "_answer": "eastdakota",
     "scorer_instructions": null
   },
   {
@@ -1228,7 +1228,7 @@
       "Steps": "1. get the article\n2. summary the article\n3. write it to path",
       "Tools": "1. get_article\n2. write_file"
     },
-    "answer": "6723 metres",
+    "_answer": "6723 metres",
     "scorer_instructions": "Tolerate 1% error."
   },
   {
@@ -1318,7 +1318,7 @@
       "Steps": "1. Get the name of the nvidia stock\n2. Get the price of NVDA",
       "Tools": "1. get_ticker_info"
     },
-    "answer": "177.82",
+    "_answer": "177.82",
     "scorer_instructions": null
   },
   {
@@ -1346,7 +1346,7 @@
       "Steps": "1. get the station codes\n2. check available tickets",
       "Tools": "1. get-station-code-by-names\n2. get-tickets"
     },
-    "answer": "07:00,¥682",
+    "_answer": "07:00,¥682",
     "scorer_instructions": null
   },
   {
