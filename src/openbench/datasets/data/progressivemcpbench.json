@@ -2,7 +2,6 @@
   {
     "task_id": "0e3287cb-c0ff-4d2a-8c3d-d8833014a7b0",
     "Question": "Generate a well-formatted PDF report titled wechat_reading_report.pdf in /root/pdf, summarizing current WeChat Reading trends and including a word cloud.",
-    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -10,12 +9,13 @@
       "Number of tools": "6",
       "Steps": "1. Getting the current trends in WeChat Reading, focusing on popular novels, best-selling books, new releases, and various literary genres. \n2. Generate a word cloud chart to visualize the most frequently mentioned words or themes in the top-ranked books.\n3. Create a word document.\n4. Write the word document.\n5. Convert  word document to pdf.",
       "Tools": "1. get-weread-rank\n2. generate_word_cloud_chart\n3. create_document\n4. add_paragraph\n5. add_picture\n6. convert_to_pdf"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "99d7541a-73c0-4ea1-8002-a70a041f3ffc",
     "Question": "Please perform a comprehensive analysis of the audio file located at /root/music/mixkit-retro-game-emergency-alarm-1000.wav. Then return the precise tempo of the track, to two decimal places.",
-    "answers": "60.09",
     "category": "Leisure",
     "file_name": "/root/music/mixkit-retro-game-emergency-alarm-1000.wav",
     "Annotator Metadata": {
@@ -23,12 +23,13 @@
       "Number of tools": "4",
       "Steps": "1. Load the audio file\n2. Compute the beat track of the audio to understand its rhythmic structure. \n3. Extract the Mel-Frequency Cepstral Coefficients (MFCCs) from the audio to analyze its spectral content.\n4. Compute the Chroma Constant-Q Transform (CQT) to analyze the chromatic content of the audio. \n5. Write a summary document outlining the key findings and insights from the analysis.\n",
       "Tools": "1. load\n2. beat_track\n3. mfcc\n4. chroma_cqt"
-    }
+    },
+    "answer": "60.09",
+    "scorer_instructions": "Tolerate 1% error in the answer."
   },
   {
     "task_id": "dda8ea55-629c-4ae8-ab87-0c81477ae615",
     "Question": "I'm planning a trip to the Forbidden City in Beijing, show me where to park and what's interesting to do within 1km distance?",
-    "answers": null,
     "category": "Travel",
     "file_name": "",
     "Annotator Metadata": {
@@ -36,12 +37,13 @@
       "Number of tools": "4",
       "Steps": "1. convert the address of Location into precise geographic coordinates.\n2. find parking facilities within a 1-kilometer radius of Location, filtering for both surface and multi-storey parking options, and provide details such as capacity, fee structure, and access restrictions. \n3. discover nearby points of interest and amenities within the same radius, focusing on categories such as restaurants, shops, and tourist attractions.\n4. convert the coordinates of each identified parking facility and point of interest back into human-readable addresses to facilitate easy navigation and planning. ",
       "Tools": "1. geocode_address\n2. find_parking_facilities\n3. find_nearby_places\n4. reverse_geocode"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "629106a5-9508-4ac9-97c3-f22f6069ee7f",
     "Question": "My goal is to reach Radiant in Valorant, what should I focus on to improve and start climbing?",
-    "answers": null,
     "category": "Leisure",
     "file_name": "",
     "Annotator Metadata": {
@@ -49,12 +51,13 @@
       "Number of tools": "2",
       "Steps": "1. Retrieve character statistics data for Valorant\n2. Generate an enhancement program\n",
       "Tools": "1. valorant-characters-statistics"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "5a2720cd-20f1-49e7-a3fc-8e74af2217f6",
     "Question": "There are three of us. One person is in Haidian Huangzhuang, another is at Chaoyang Joy City, and the third is at Shijingshan Hospital. Could you please recommend a fair meeting point for us, and then suggest some places for entertainment nearby?",
-    "answers": null,
     "category": "Travel",
     "file_name": "",
     "Annotator Metadata": {
@@ -62,12 +65,13 @@
       "Number of tools": "4",
       "Steps": "1. Convert all address or place name to geographic coordinates\n2. Find the optimal meeting place for multiple people coming from different locations\n3. Discover place of entertainment near the optimal meeting place\n4. Convert geographic coordinates to a detailed address and location description",
       "Tools": "1. geocode_address\n2. suggest_meeting_point\n3. find_nearby_places\n4. reverse_geocode"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "0180954e-dc60-4df6-be68-63562fcafee2",
     "Question": "Show me today's trending topics in the gaming world across all platforms.",
-    "answers": null,
     "category": "Leisure",
     "file_name": "",
     "Annotator Metadata": {
@@ -75,12 +79,13 @@
       "Number of tools": "4",
       "Steps": "1. find the information in different website",
       "Tools": "1. get-bilibili-rank\n2. get-gcores-new\n3. get-weibo-trending\n4. get-douyin-trending"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "e9df60b1-37a6-4b10-aff0-d432fa79d400",
     "Question": "Please help me find the latest articles about 'MCP' on arXiv. Identify the potentially most influential papers among them and analyze the current trends in this field.",
-    "answers": null,
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -88,12 +93,13 @@
       "Number of tools": "2",
       "Steps": "1. Search for papers on arXiv and find some may important papers\n2. Get abstract of  these papers and identify the potentially most influential paper\n3. Analyze the current trends in this field",
       "Tools": "1. search_papers\n2. get_paper_data"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "2b96c022-a2db-47a5-981a-03cc6ad8f95e",
     "Question": "Run a full reconnaissance on www.baidu.com. Give me a markdown report on /root/markdown/baidu_report.md with whois information and sitemap.",
-    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -101,12 +107,13 @@
       "Number of tools": "3",
       "Steps": "1. Looksup whois information about the domain\n2. Fetch and parse the sitemap tree from the website URL\n3. Create and write a markdown report on /root/markdown/baidu_report.md",
       "Tools": "1. whois_domain\n2. get_sitemap_tree\n3. write_file"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "afd60e13-2448-4c0f-9aae-2054b91f1ac1",
     "Question": "I'm driving an EV with a 300km range from Beijing to Chengdu. Can you map out a route with all the charging stations I'll need?",
-    "answers": null,
     "category": "Travel",
     "file_name": "",
     "Annotator Metadata": {
@@ -114,12 +121,13 @@
       "Number of tools": "4",
       "Steps": "1. Convert all place names to geographic coordinates\n2. Calculate detailed route directions between two geographic points\n3. Find electric vehicle charging stations acctording to EV range \n4. Convert geographic coordinates to a detailed address and location description",
       "Tools": "1. geocode_address\n2. get_route_directions\n3. find_ev_charging_stations\n4. reverse_geocode"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "88ccea26-01f6-4db6-ba95-6b2a73c0488b",
     "Question": "Analyze Apple's stock for the past year and summarize it in a PPT in /root/ppt/apple.pptx.",
-    "answers": null,
     "category": "Finance",
     "file_name": "",
     "Annotator Metadata": {
@@ -127,12 +135,13 @@
       "Number of tools": "5",
       "Steps": "1. get information for the company\n2. create a ppt",
       "Tools": "1. get_historical_stock_prices\n2. get_news\n3. get_recommendations\n4. create_presentation\n5. save_presentation"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "6b7fc66e-fe96-4403-9a52-df5afa53ab68",
     "Question": "Gather information on clinical trial NCT04280705 and return its full title.",
-    "answers": "Adaptive COVID-19 Treatment Trial (ACTT)",
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -140,12 +149,13 @@
       "Number of tools": "2",
       "Steps": "1. Retrieves publications and other references associated with a single clinical trial identified by its NCT ID\n2. Generate a markdown report\n3. Write it to the path",
       "Tools": "1. trial_references\n2. write_file"
-    }
+    },
+    "answer": "Adaptive COVID-19 Treatment Trial (ACTT)",
+    "scorer_instructions": null
   },
   {
     "task_id": "be3f2275-15a4-4e05-b3cb-b0eeb9109d3a",
     "Question": "Help me check the high-speed train tickets from Beijing to Shanghai on next Wednesday.",
-    "answers": null,
     "category": "Travel",
     "file_name": "",
     "Annotator Metadata": {
@@ -153,12 +163,13 @@
       "Number of tools": "3",
       "Steps": "1. Get current time and calculate next Wednesday's date\n2. Query the station_code of a city by its Chinese name\n3. Check 12306 remaining ticket information.",
       "Tools": "1. get_current_time\n2. get-station-code-of-citys\n3. get-tickets"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "0b21b741-440b-460e-8bad-fa70f99dd01c",
     "Question": "What are the 八字 of a boy born on August 8, 2008 at 11:00 am?",
-    "answers": null,
     "category": "Leisure",
     "file_name": "",
     "Annotator Metadata": {
@@ -166,12 +177,13 @@
       "Number of tools": "1",
       "Steps": "1. Get information about 八字 based on time and gender.",
       "Tools": "1. getBaziDetail"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "230fb273-b316-4a8f-9297-89ce5558bc6c",
     "Question": "Find today's LeetCode Daily Challenge and generate a detailed markdown document in /root/markdown/leetcode_daily.md that provides a comprehensive walkthrough of the problem. ",
-    "answers": null,
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -179,12 +191,13 @@
       "Number of tools": "2",
       "Steps": "1. get leetcode daily challenge\n2. generate a comprehensive walkthrough of the problem\n3. write it to the path",
       "Tools": "1. get-daily-challenge\n2. write_file"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "567c79c3-3afb-4979-90cf-88ca49cb701d",
     "Question": "Help me write a quick start tutorial for Ant Design in markdown at /root/markdown/antd_tutorial.md.",
-    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -192,12 +205,13 @@
       "Number of tools": "4",
       "Steps": "1. list all the components in Ant Design.\n2. chose the proper components to introduce to the beginer.\n3. get the detailed information for these compoents.\n4. generate a quick start tutorial\n5. write it to the path",
       "Tools": "1. list-components\n2. list-component-examples\n3. get-component-docs\n4. write_file"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "4de2e9f7-f3ea-4d02-8532-0a1b0b530609",
     "Question": "Read the sales data under /root/excel/Local_Electronic_Sales.xlsx, plot it as a bar chart by month and save it in /root/figs/sale.png",
-    "answers": null,
     "category": "Office",
     "file_name": "/root/excel/Local_Electronic_Sales.xlsx",
     "Annotator Metadata": {
@@ -205,12 +219,13 @@
       "Number of tools": "2",
       "Steps": "1. read the excel file to get the data\n2. draw the bar chart",
       "Tools": "1. excel_read_sheet\n2. generate_bar_chart"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "56d7fbdb-ebd6-41fe-a5d6-cd21dbc59fd8",
     "Question": "Find the trending GitHub repositories. For the top one, read its Deepwiki. Then, draft a Markdown intro document for it in /root/markdown/github_trends.md.",
-    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -218,12 +233,13 @@
       "Number of tools": "3",
       "Steps": "1. find the trending repositories\n2. read the deepwiki of the top repository\n3. draft a Markdown intro\n4. write it to the path",
       "Tools": "1. get_github_trending_repositories\n2. deepwiki_fetch\n3. write_file"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "91cce869-ac2c-4b9c-a2ea-1d068eb5d979",
     "Question": "Draw a flowchart of a fast sorting algorithm using Mermaid.",
-    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -231,12 +247,13 @@
       "Number of tools": "1",
       "Steps": "1. write the flowchart of a fast sorting algorithm using Mermaid\n2. validates the Mermaid diagram and returns the rendered SVG if valid",
       "Tools": "1. validateMermaid"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "f2a9eb67-efec-4c86-abad-efa55a72f86d",
     "Question": "Generate a deep report of bitcoin and save it in /root/markdown/bitcoin.md",
-    "answers": null,
     "category": "Finance",
     "file_name": "",
     "Annotator Metadata": {
@@ -244,12 +261,13 @@
       "Number of tools": "2",
       "Steps": "1. deep research the bitcoin\n2. write the report to path",
       "Tools": "1. research-with-keywords\n2. write_file"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "9fc8b7f3-776c-4756-bb84-a7ae667521a9",
     "Question": "Help me find Mr. Lu Yaojie's resume in the Chinese Information Processing Laboratory of the Institute of Software and save it to /root/markdown/cv.md.",
-    "answers": null,
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -257,12 +275,13 @@
       "Number of tools": "2",
       "Steps": "1. fetch the https://www.icip.org.cn/zh/zh_team/ to get the member information\n2. fetch the resume of Lu Yaojie in https://luyaojie.github.io/\n3. save it to /root/markdown/cv.md",
       "Tools": "1. fetch\n2. write_file"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "8aaa7e7f-aff7-4735-9dc8-8bb5f474506c",
     "Question": "Find today's top LLM-related news.",
-    "answers": null,
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -270,12 +289,13 @@
       "Number of tools": "4",
       "Steps": "1. get related news related to LLM",
       "Tools": "1. getStories\n2. get-36kr-trending\n3. get-bbc-news\n4. get-theverge-news"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "08644b1a-ac5e-45a9-8ad1-3a3942e8d366",
     "Question": "Help me recommend any cheap goodies worth buying recently? Save this information to /root/excel/goods.xlsx.",
-    "answers": null,
     "category": "Shopping",
     "file_name": "",
     "Annotator Metadata": {
@@ -283,12 +303,13 @@
       "Number of tools": "2",
       "Steps": "1. get the information for cheap goodies\n2. write these information to excel in /root/excel/goods.xlsx",
       "Tools": "1. get-smzdm-rank\n2. excel_write_to_sheet"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "860f7b99-23fe-41fe-9608-59717bad2a9a",
     "Question": "Get deepwiki for vercel/ai and convert its structure to mindmap",
-    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -296,12 +317,13 @@
       "Number of tools": "2",
       "Steps": "1. get the deepwiki of vercel/ai \n2. create the mindmap of the deepwiki",
       "Tools": "1. deepwiki_fetch\n2. convert_markdown_to_mindmap"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "cda14e48-b067-48fc-94de-bb8ec090b952",
     "Question": "draw cowboy using canvas ",
-    "answers": null,
     "category": "Leisure",
     "file_name": "",
     "Annotator Metadata": {
@@ -309,12 +331,13 @@
       "Number of tools": "3",
       "Steps": "1. create the canvas\n2. drawing\n3. get picture",
       "Tools": "1. drawing_generateCanvas\n2. drawing_fillRectangle\n3. drawing_getCanvasPng"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "a984d31b-f3e9-47d4-8726-19a06e6babc5",
     "Question": "Help me make a STEINS;GATE introduction PPT and help me save it to /root/ppt/STEINS_GATE.pptx.",
-    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -322,12 +345,13 @@
       "Number of tools": "4",
       "Steps": "1. Find materials related to making PPT\n2. make a ppt and save it to the path",
       "Tools": "1. ddg-search\n2. create_presentation\n3. add_slide\n4. save_presentation"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "d116bda4-e70c-4ef1-ab1a-b68b4855e1bf",
     "Question": "Read the data under /root/excel/people_data.xlsx and tell me Sophia Moore's bmi. Format the answer as a floating point number to 2 decimal places.",
-    "answers": "20.76",
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -342,12 +366,13 @@
     "required_tools": [
       "excel_describe_sheets",
       "excel_read_sheet"
-    ]
+    ],
+    "answer": "20.76",
+    "scorer_instructions": "Must match the value exactly."
   },
   {
     "task_id": "7bda47e8-1b8b-4f1f-b67c-573a81417d36",
-    "Question": "When was the article on arxiv 2203.12277 first submitted? Format it as YYYY-MM-DD.",
-    "answers": "2022-03-23",
+    "Question": "When was the article on arxiv 2203.12277 first submitted?",
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -355,12 +380,13 @@
       "Number of tools": "2",
       "Steps": "1. get detailed information about the paper\n2. fetch the full text of the paper\n3. write a introduction",
       "Tools": "1. get_paper_data\n2. fetch"
-    }
+    },
+    "answer": "2022-03-23",
+    "scorer_instructions": "Within a few days of the ideal answer is fine"
   },
   {
     "task_id": "2bf318d4-754d-43f3-a1b5-cb2f50a7d144",
     "Question": "What are the emerging treatment strategies for head and neck cancer, write the report to /root/markdown/cancer.md?",
-    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -368,12 +394,13 @@
       "Number of tools": "4",
       "Steps": "1. gather the information\n2. generate it a report\n3. write it to path",
       "Tools": "1. article_searcher\n2. trial_searcher\n3. variant_searcher\n4. write_file"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "1a3ffa81-d1fe-4b97-9308-3d2ae2d0d9b1",
-    "Question": "Tell me the title of the lecture in https://www.youtube.com/watch?v=arj7oStGLkU, the name of the speaker, and what they described as their college major. Return only the title, the person's name, and the major, separated by commas.",
-    "answers": "Inside the Mind of a Master Procrastinator,Tim Urban,Government",
+    "Question": "Tell me the title of the lecture in https://www.youtube.com/watch?v=arj7oStGLkU, the name of the speaker, and what they described as their college major.",
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -381,12 +408,13 @@
       "Number of tools": "2",
       "Steps": "1. extract transcript from the YouTube video URL\n2. write a markdown mindmap \n3. conver markdown mindmap to real mindmap\n4. summary the main content of the lecture",
       "Tools": "1. get_transcript\n2. convert_markdown_to_mindmap"
-    }
+    },
+    "answer": "Inside the Mind of a Master Procrastinator, Tim Urban, Government",
+    "scorer_instructions": "All three parts of the answer must be present."
   },
   {
     "task_id": "7180c69a-bbf2-4912-a0ca-a6345c5fe7f1",
     "Question": "Make a web page about the history of AI based on Wikipedia saved at /root/html/ai.html.",
-    "answers": null,
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -394,12 +422,13 @@
       "Number of tools": "2",
       "Steps": "1. Summarize the history of artificial intelligence based on Wikipedia.\n2. Generate a web page about the history of artificial intelligence\n3. Save it to path",
       "Tools": "1. summarize_article_for_query\n2. write_file"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "10b5dbf7-0bac-4b25-835f-e806967ad340",
     "Question": "Help me arrange a three-day trip from Beijing to Tianjin tomorrow, round-trip by rail, give me a detailed timetable and include an approximate total budget.",
-    "answers": null,
     "category": "Travel",
     "file_name": "",
     "Annotator Metadata": {
@@ -407,12 +436,13 @@
       "Number of tools": "7",
       "Steps": "1. get current data\n2. check the 12306 ticks\n3. arrange the trip and find the nearby places\n4. generate the report with timetable and budget",
       "Tools": "1. get-current-date\n2. get-station-code-of-citys\n3. get-tickets\n4. geocode_address\n5. find_nearby_places\n6. get_route_directions\n7. reverse_geocode"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "37d72d03-29ae-48d1-9a48-66c9294d82fa",
     "Question": "Analyze the last 24h of BTC and remind me if there is anything I need to pay special attention to",
-    "answers": null,
     "category": "Finance",
     "file_name": "",
     "Annotator Metadata": {
@@ -420,12 +450,13 @@
       "Number of tools": "3",
       "Steps": "1. Get the current time\n2. Get current price and 24h stats for a cryptocurrency\n3. Get detailed market analysis including top exchanges and volume distribution\n4. Generate a report",
       "Tools": "1. get_current_time\n2. get-crypto-price\n3. get-market-analysis"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "e8f13600-c0c8-427e-98d3-0762ad510805",
     "Question": "There are three people eating in the house this week, I'm allergic to shrimp and my son doesn't eat scallions, so please help me recommend a meal plan and a rough shopping list for next week.",
-    "answers": null,
     "category": "Shopping",
     "file_name": "",
     "Annotator Metadata": {
@@ -433,12 +464,13 @@
       "Number of tools": "1",
       "Steps": "1. recommend recipes based on the user's contraindications, allergens, and number of people, create a meal plan for the week and a rough shopping list",
       "Tools": "1. mcp_howtocook_recommendMeals"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "3c65e618-2ed0-444b-b7c7-6135d3841976",
     "Question": "Recommend me a combination of dishes for a potluck dinner for three people and then tell me what ingredients I need to prepare in total and how each dish should be prepared",
-    "answers": null,
     "category": "Shopping",
     "file_name": "",
     "Annotator Metadata": {
@@ -446,12 +478,13 @@
       "Number of tools": "2",
       "Steps": "1. Recommend a combination of dishes\n2. Get the detailed information about all dishes\n3. Write a report",
       "Tools": "1. mcp_howtocook_whatToEat\n2. mcp_howtocook_getRecipeById"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "f2b074b5-860e-4ecf-afac-16874155dc59",
     "Question": "Help me find homestays in Paris, France, I want to stay tomorrow, about 3 days, one adult.",
-    "answers": null,
     "category": "Travel",
     "file_name": "",
     "Annotator Metadata": {
@@ -459,12 +492,13 @@
       "Number of tools": "2",
       "Steps": "1. get the current time\n2. find the homestays in airbnb\n3. recommendations for suitable homestays",
       "Tools": "1. get_current_time\n2. airbnb_search"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "5b2087e4-4c07-4e0d-9b2f-79514ce465f5",
     "Question": "I play mid lane in League of Legends and want to improve. Provide champion recommendations with optimal item builds, runes, and summoner spells.",
-    "answers": null,
     "category": "Leisure",
     "file_name": "",
     "Annotator Metadata": {
@@ -472,12 +506,13 @@
       "Number of tools": "2",
       "Steps": "1. get the the analytics of champions by positions and chose some\n2. retrieves very detailed information about specific champions",
       "Tools": "1. lol-champion-positions-data\n2. lol-champion-analysis"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "00e13e2e-07fa-4d0b-9863-e966190cffd6",
-    "Question": "When was \"Corridor in the Asylum\" painted, who by, and where is it now? Answer with just the year(s), the artist's last name, and the current location, separated by commas.",
-    "answers": "1889-1890, van Gogh, The Metropolitan Museum of Art",
+    "Question": "When was \"Corridor in the Asylum\" painted, who by, and where is it now?",
     "category": "Leisure",
     "file_name": "",
     "Annotator Metadata": {
@@ -485,12 +520,13 @@
       "Number of tools": "2",
       "Steps": "1. Realizes that \"Corridor in the Asylum\" is located in the Metropolitan Museum of Art Collection\n2. Search for objects in the Metropolitan Museum of Art\n3. Get the detailed information",
       "Tools": "1. search-museum-objects\n2. get-museum-object"
-    }
+    },
+    "answer": "1889-1890, van Gogh, The Metropolitan Museum of Art",
+    "scorer_instructions": "Either year is fine, but all three components of the answer must be present"
   },
   {
     "task_id": "3819a831-8e12-49e6-adb1-df40f512d774",
     "Question": "Find the latest standard iphone prices at amazon.",
-    "answers": null,
     "category": "Shopping",
     "file_name": "",
     "Annotator Metadata": {
@@ -498,12 +534,13 @@
       "Number of tools": "5",
       "Steps": "1. navigate to the website through broswer\n2. fill the search box\n3. click the search button\n4. find the price ",
       "Tools": "1. playwright_navigate\n2. playwright_screenshot\n3. playwright_get_visible_html\n4. playwright_fill\n5. playwright_click"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "fa451c3f-23c2-4b03-bcb6-60b49e3a142f",
     "Question": "Read the paper in /root/pdf/WebArena.pdf, and find the latest papers in this area",
-    "answers": null,
     "category": "Office",
     "file_name": "/root/pdf/WebArena.pdf",
     "Annotator Metadata": {
@@ -511,12 +548,13 @@
       "Number of tools": "2",
       "Steps": "1. read the paper in path and identify the field\n2. search the arxiv to find the latest papers",
       "Tools": "1. document_reader\n2. search_papers"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "4aa079dd-9d2d-440d-a654-9ba9cb3868b0",
-    "Question": "Read the paper webarena, mind2web and mind2web2, then return the last names of the first listed author of each paper, sorted alphabetically and separated by commas.",
-    "answers": "Deng, Gou, Zhou",
+    "Question": "Read the paper webarena, mind2web and mind2web2, then give me the last names of the first listed author of each paper.",
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -524,12 +562,13 @@
       "Number of tools": "3",
       "Steps": "1. get the paper id in arxiv\n2. get the detailed information for these papers\n3. write a Comparison Report in markdown\n4. save it to the path",
       "Tools": "1. search_papers\n2. get_paper_data\n3. write_file"
-    }
+    },
+    "answer": "Deng, Gou, Zhou",
+    "scorer_instructions": "All three names must be present, and no other ones should be identified as 'first authors'."
   },
   {
     "task_id": "e023dd0e-1212-47e0-a73c-97739c78b849",
     "Question": "Generate a presentation on the latest Apple product information. Save it to /root/ppt/apple_news.pptx.",
-    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -537,12 +576,13 @@
       "Number of tools": "4",
       "Steps": "1. get the latest Apple product information.\n2. create the ppt according to the informatin",
       "Tools": "1. get-9to5mac-news\n2. create_presentation\n3. add_slide\n4. save_presentation"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "ef7126b3-45ad-41ab-a191-2272c644d057",
     "Question": "I need a daily financial brief. Fetch today's economic news, cross-reference it with relevant stock movements, and then generate a report at /root/markdown/daily_fin.md.",
-    "answers": null,
     "category": "Finance",
     "file_name": "",
     "Annotator Metadata": {
@@ -550,12 +590,13 @@
       "Number of tools": "6",
       "Steps": "1. get the financial news from multiple sources\n2. check stock prices\n3. generate a daily financial brief\n4. write it to /root/markdown/daily_fin.md",
       "Tools": "1. get-36kr-trending\n2. get-netease-news-trending\n3. get-nytimes-news\n4. get_news\n5. get_current_stock_price\n6. write_file"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "b276e772-28b5-42fd-bb85-fd73e017fe25",
     "Question": "I have 9.5g gold, please estimate its value based on the price of gold at 2025-11-01. Return the amount in USD to two decimal places.",
-    "answers": "$1,396.00",
     "category": "Finance",
     "file_name": "",
     "Annotator Metadata": {
@@ -563,12 +604,13 @@
       "Number of tools": "2",
       "Steps": "1. get the current gold price\n2. calculate the price",
       "Tools": "1. get_asset_price\n2. calculate"
-    }
+    },
+    "answer": "$1,396.00",
+    "scorer_instructions": null
   },
   {
     "task_id": "fab605cf-d337-4ac1-beba-b3f563eaffff",
     "Question": "What is the current effect text of 'Sky Striker Ace = Zero', and what are its ATK and DEF? Show me the picture.",
-    "answers": null,
     "category": "Leisure",
     "file_name": "",
     "Annotator Metadata": {
@@ -576,12 +618,13 @@
       "Number of tools": "2",
       "Steps": "1. get the latest card information\n2. get the picture of the card",
       "Tools": "1. search_cards\n2. get_card_image"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "ec6f4fe5-e650-48b1-8805-285d8f52eb10",
     "Question": "Create a Next.js middleware that checks for a valid JWT in cookies and redirects unauthenticated users to `/login` in /root/code/middleware.ts. use context7",
-    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -589,12 +632,13 @@
       "Number of tools": "4",
       "Steps": "1. Resolves the package name to a Context7-compatible library ID\n2. Fetches up-to-date documentation for a library using the library ID\n3. create the middleware \n4. write it to /root/code/middleware.ts",
       "Tools": "1. resolve-library-id\n2. get-library-docs\n3. write_file"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "4d7582c4-5013-4275-9621-1e7fbb5fb0c1",
     "Question": "Get New York's Air Quality report for 2024 from the official Government sources, then return the annual mean PM2.5 measurement for New York City, to one decimal place.",
-    "answers": "6.3",
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -602,12 +646,13 @@
       "Number of tools": "3",
       "Steps": "1. Search for datasets on Data.gov\n2. Get details for the specific dataset\n3. Download the file use wget",
       "Tools": "1. package_search\n2. package_show\n3. execute_command"
-    }
+    },
+    "answer": "6.3",
+    "scorer_instructions": null
   },
   {
     "task_id": "83da9f72-640f-439d-861e-97b449e02da7",
     "Question": "Analyze the visual marketing strategy from the iPhone 16 page at https://www.apple.com/iphone-16/ and save the summary as a Markdown report to /root/markdown/iphone16_visual_strategy.md",
-    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -615,12 +660,13 @@
       "Number of tools": "3",
       "Steps": "1. Fetches the URL and get the url list in the page\n2. Extract and analyze images from web URLs. \n3. Generate a report\n4. write it to path",
       "Tools": "1. fetch\n2. extract_image_from_url\n3. write_file"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "9a18862e-22ce-46e7-b46a-72c6f5c79b23",
     "Question": "Get line 10 of /root/txt/Android.txt, please note that this file is very large",
-    "answers": "03-17 16:13:38.877 2227 2227 D TextView: mVisiblity.getValue is false",
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -628,12 +674,13 @@
       "Number of tools": "1",
       "Steps": "1. locate the 10th line in the file",
       "Tools": "1. get_text_file_contents"
-    }
+    },
+    "answer": "03-17 16:13:38.877 2227 2227 D TextView: mVisiblity.getValue is false",
+    "scorer_instructions": null
   },
   {
     "task_id": "de75630e-b91e-4cc7-85b1-5d02c2455392",
-    "Question": " I'm looking at a PR and need to know if these libs are outdated. com.fasterxml.jackson.core:jackson-databind:2.13.4, org.apache.poi:poi-ooxml:5.2.0, and com.google.guava:guava:30.1-jre. Answer the number of outdated packages: 0, 1, 2 or 3.",
-    "answers": "3",
+    "Question": " I'm looking at a PR and need to know which of these libs are outdated: com.fasterxml.jackson.core:jackson-databind:2.13.4, org.apache.poi:poi-ooxml:5.2.0, and com.google.guava:guava:30.1-jre.",
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -641,12 +688,13 @@
       "Number of tools": "1",
       "Steps": "1. check the versions",
       "Tools": "1. get_maven_latest_version"
-    }
+    },
+    "answer": "All three are outdated",
+    "scorer_instructions": "The model can express this in any way, but it must agree that all are outdate"
   },
   {
     "task_id": "cf1fca1e-8e56-4b26-ae34-dfdb1d982080",
     "Question": "Analyze and compare echarts-for-react, react-chartjs-2, and Tremor. It's for a FinTech app, so my top priorities are a deep security scan of all dependencies and performance, especially bundle size. Give me a comparison table and a final recommendation in a markdown report in /root/markdown/package_compare.md.",
-    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -654,12 +702,13 @@
       "Number of tools": "4",
       "Steps": "1. prepare all information about these package\n2. write a markdown report to compare them\n3. save it to path",
       "Tools": "1. npmDeps\n2. npmSize\n3. npmCompare\n4. write_file"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "1ef11556-37d6-4585-b4b2-cf2f782141e6",
-    "Question": "Read all the articles in the /root/pdf/embodied_ai_papers directory. Return the last names of the first listed author of each paper, sorted alphabetically and separated by commas.",
-    "answers": "Brohan,Driess,Wang",
+    "Question": "Read all the articles in the /root/pdf/embodied_ai_papers directory. Return the last names of the first listed author of each paper.",
     "category": "Office",
     "file_name": "/root/pdf/embodied_ai_papers",
     "Annotator Metadata": {
@@ -667,12 +716,13 @@
       "Number of tools": "3",
       "Steps": "1. list directory\n2. read all pdf\n3. write a summary report\n4. save it to the path",
       "Tools": "1. list_directory\n2. read_pdf\n3. write_file"
-    }
+    },
+    "answer": "Brohan, Driess, Wang",
+    "scorer_instructions": "All three names must be present, and no other ones should be identified as 'first authors'."
   },
   {
     "task_id": "fbe982c3-4142-40ec-8541-e06d7ab2e399",
     "Question": "I need a Word document summarizing NIO. Please title it 'NIO Company Overview' and include three headed sections: a brief introduction from Wikipedia, three major news updates from the last quarter as bullet points, and a list of their main vehicle models. Finally, save it in /root/word/nio.docx",
-    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -680,12 +730,13 @@
       "Number of tools": "4",
       "Steps": "1. get the wikipedia about NIO\n2. get news about NIO\n3. create a word document\n4. write the content to the word document",
       "Tools": "1. search_wikipedia\n2. get-36kr-trending\n3. create_document\n4. add_paragraph"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "470f7ac1-f573-4fec-8990-97f578749f78",
     "Question": "How are Samsung Electronics and SK Hynix doing today? I need their current stock prices, the daily percentage change for each, and can you also calculate their current market capitalization?",
-    "answers": null,
     "category": "Finance",
     "file_name": "",
     "Annotator Metadata": {
@@ -693,12 +744,13 @@
       "Number of tools": "4",
       "Steps": "1. get current time\n2. get current stock prices for both\n3. calculate the daily percentage change\n4. get market capitalization",
       "Tools": "1. get_current_time\n2. get_stock_ohlcv\n3. get_stock_market_cap\n4. calculate"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "a93169d7-af1f-43f4-b595-1b5db07aa7d5",
     "Question": "Tell me about the repository details in the /root/git directory",
-    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -706,12 +758,13 @@
       "Number of tools": "2",
       "Steps": "1. check the status of the repository\n2. check the log of git\n3. tell the information",
       "Tools": "1. git_status\n2. git_log"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "29fa007d-5caf-41a0-b107-e9388305c6c5",
     "Question": "I just pulled Jiyan and want to build a team around him as my main DPS. Can you recommend a good starter team for me? I need a sub-DPS/buffer and a healer/survivor. Also, what's his best Echo set and main Echo, and please explain why.",
-    "answers": null,
     "category": "Leisure",
     "file_name": "",
     "Annotator Metadata": {
@@ -719,12 +772,13 @@
       "Number of tools": "2",
       "Steps": "1. get the information about Jiyan \n2. get the information about Echo set\n3. write a report to explain",
       "Tools": "1. get_character_info\n2. get_artifact_info"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "90098a9c-2a37-4655-82b1-6b58c5154660",
     "Question": "I'm using shadcn/ui to build a 'create post' page. I have two input fields, one for the title and one for the content. I want the 'Publish' button at the bottom to be disabled if either the title or content is empty. It should only become clickable when both fields are filled. How can I achieve this? Please provide a complete React/TypeScript example using the Input and Button components from shadcn/ui and save the code to /root/code/shadcn_ui.ts",
-    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -732,12 +786,13 @@
       "Number of tools": "3",
       "Steps": "1. search for shadcn/ui components by keyword\n2. get detailed information about a specific shadcn/ui component\n3. write the code\n4. save it to path",
       "Tools": "1. search_components\n2. get_component_details\n3. write_file"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "17a4aef0-bb60-47b1-9b47-3686bca29db3",
     "Question": "Generate a well-formatted PDF report  in /root/pdf/douban_report.pdf, summarizing current douban trends.",
-    "answers": null,
     "category": "Leisure",
     "file_name": "",
     "Annotator Metadata": {
@@ -745,12 +800,13 @@
       "Number of tools": "4",
       "Steps": "1. Getting the current trends in douban\n2. Create a word document.\n3. Write the word document.\n4. Convert word document to pdf.",
       "Tools": "1. get-douban-rank\n2. create_document\n3. add_paragraph\n4. convert_to_pdf"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "6265fd4a-a790-4be1-9806-d27b69bc6468",
     "Question": "Help me recommend some consumer electronics that are worth buying these days.",
-    "answers": null,
     "category": "Shopping",
     "file_name": "",
     "Annotator Metadata": {
@@ -758,12 +814,13 @@
       "Number of tools": "2",
       "Steps": "1. collect the treendings in consumer electronics\n2. write a report",
       "Tools": "1. get-ifanr-news\n2. get-smzdm-rank"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "5c19a347-7423-47e1-b8e1-dba01860bc1a",
     "Question": "Find the latest research paper in the web agents. Identify the best one, read the full text, and then tell me its main motivation, the methodology it employs, and its key results.",
-    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -771,12 +828,13 @@
       "Number of tools": "3",
       "Steps": "1. Search for papers on arXiv\n2. Identify the best one\n3. Donwnload the best one\n4. Read the full content of the paper\n5. Generate a report",
       "Tools": "1. search_papers\n2. download_paper\n3. read_paper"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "2f8db365-6b8b-4188-8812-4efcf91a40bd",
     "Question": "Recommend a gaming PC build for playing the latest Call of Duty, along with an approximate budget.",
-    "answers": null,
     "category": "Shopping",
     "file_name": "",
     "Annotator Metadata": {
@@ -784,12 +842,13 @@
       "Number of tools": "5",
       "Steps": "1. Find recommended configurations for the latest COD\n2. Check the prices at shopping sites like amazon\n3. Write a report to tell user",
       "Tools": "1. search_wikipedia\n2. playwright_navigate\n3. playwright_get_visible_html\n4. playwright_fill\n5. playwright_click"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "3a5cfe49-72e3-48ec-885a-39d62f8f1904",
     "Question": "What does this base64 image mean?\n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",
-    "answers": null,
     "category": "Leisure",
     "file_name": "",
     "Annotator Metadata": {
@@ -797,12 +856,13 @@
       "Number of tools": "1",
       "Steps": "1. Decoding the base64\n2. Describe the image",
       "Tools": "1. extract_image_from_base64"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "04282571-1610-4436-9888-4cffecc6d92e",
     "Question": "Plan a bike route from UCAS Zhongguancun Campus to UCAS Yanqihu Campus, including an estimated travel time.",
-    "answers": null,
     "category": "Travel",
     "file_name": "",
     "Annotator Metadata": {
@@ -810,12 +870,13 @@
       "Number of tools": "3",
       "Steps": "1. Convert  places to geographic coordinates\n2. Calculate detailed route directions between two geographic points.\n3. Generate a report",
       "Tools": "1. geocode_address\n2. get_route_directions\n3. reverse_geocode"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "086e2393-dc1a-4c55-bf54-1e9a94951db7",
-    "Question": "Read the file /root/word/exchange.docx, tell me who did not give a gift. Format the answer as a JSON array of double-quoted strings.",
-    "answers": "[]",
+    "Question": "Read the file /root/word/exchange.docx, tell me who did not give a gift",
     "category": "Leisure",
     "file_name": "/root/word/exchange.docx",
     "Annotator Metadata": {
@@ -831,12 +892,13 @@
     "required_tools": [
       "get_document_text",
       "read_file"
-    ]
+    ],
+    "answer": "Nobody. Everyone gave a gift.",
+    "scorer_instructions": "The model can express this in any way, but if it gives a name of somebody, it failed."
   },
   {
     "task_id": "507f592a-f21f-45f6-bbde-dadb86441791",
     "Question": "Read the customer information in /root/csv/customers-100.csv and tell me Sheryl Meyers's email address. Return just the email address.",
-    "answers": "mariokhan@ryan-pope.org",
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -850,12 +912,13 @@
     ],
     "required_tools": [
       "read_file"
-    ]
+    ],
+    "answer": "mariokhan@ryan-pope.org",
+    "scorer_instructions": null
   },
   {
     "task_id": "b6281fad-0da4-4fd4-b669-7e4ff9083a82",
     "Question": "I have 18.9g silver, please estimate its value based on the price of silver at 2025-11-01. Return the amount in USD to two decimal places.",
-    "answers": "$29.17",
     "category": "Shopping",
     "file_name": "",
     "Annotator Metadata": {
@@ -863,12 +926,13 @@
       "Number of tools": "2",
       "Steps": "1. get the current silver price\n2. calculate the price",
       "Tools": "1. get_asset_price\n2. calculate"
-    }
+    },
+    "answer": "$29.17",
+    "scorer_instructions": null
   },
   {
     "task_id": "ea6e95fa-2791-4f66-b897-2244a17f9b51",
     "Question": "Help me find the top 5 best selling gpus from amazon and tell me the links directly.",
-    "answers": null,
     "category": "Shopping",
     "file_name": "",
     "Annotator Metadata": {
@@ -876,12 +940,13 @@
       "Number of tools": "4",
       "Steps": "1. navigate to the website through broswer\n2. fill the search box\n3. click the search button\n4. find the link",
       "Tools": "1. playwright_navigate\n2. playwright_screenshot\n3. playwright_get_visible_html\n4. playwright_fill\n5. playwright_click"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "71a7a42a-54af-4552-ad9b-d36f4912cc1c",
     "Question": "Read the reference list in /root/txt/paper_list.bib and return the title of the first paper cited.",
-    "answers": "WebSRC: A Dataset for Web-Based Structural Reading Comprehension",
     "category": "Office",
     "file_name": "/root/txt/paper_list.bib",
     "Annotator Metadata": {
@@ -889,12 +954,13 @@
       "Number of tools": "4",
       "Steps": "1. open the /root/txt/paper_list.bib\n2. convert them to APA format\n3. create a word document\n4. open and write to word document",
       "Tools": "1. read_file\n2. create_document\n3. open_document\n4. add_paragraph"
-    }
+    },
+    "answer": "WebSRC: A Dataset for Web-Based Structural Reading Comprehension",
+    "scorer_instructions": null
   },
   {
     "task_id": "9bc7feb8-2db9-4c5b-8ad9-44ff15748bf6",
     "Question": "Provide a foundational overview of Convolutional Neural Networks (CNNs), referencing Wikipedia. Generate a simple CNN example as a Python script and save it to /root/code/cnn_example.py.",
-    "answers": null,
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -902,12 +968,13 @@
       "Number of tools": "2",
       "Steps": "1. get the information from wiki about cnn\n2. write a code example of cnn\n3. write it to path",
       "Tools": "1. search_wikipedia\n2. write_file"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "8f26fc1a-fdaa-4e7a-ae53-7b4cacb15334",
     "Question": "My office is located at Jin Mao Tower, 88 Century Avenue, Pudong New Area, Shanghai.\nI'm looking at a potential apartment in the Nanjing West Road area, specifically let's say near 'Nanjing West Road 2-68, Huangpu District, Shanghai'.\nCould you please run a detailed commute analysis for me? I need to compare three different transportation modes: driving, walking, and biking. It's crucial to get an idea of the morning rush hour, so let's set the departure time for 8:00 AM.",
-    "answers": null,
     "category": "Travel",
     "file_name": "",
     "Annotator Metadata": {
@@ -915,12 +982,13 @@
       "Number of tools": "2",
       "Steps": "1. Convert an address or place name to geographic coordinates with detailed location information.\n2. Perform a detailed commute analysis between home and work locations.",
       "Tools": "1. geocode_address\n2. analyze_commute"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "b84fbf2e-2e19-4cc4-ab86-8a32bd0d33ed",
     "Question": "I'm considering relocating to New York City and need a comprehensive understanding of a potential neighborhood's livability. Please generate a detailed analysis for the area surrounding 72nd Street and 5th Avenue, Manhattan. Focus on a 1000-meter radius to assess the quality of life. I'm particularly interested in the availability of amenities, public transportation accessibility, green spaces and recreational areas, and proximity to education and healthcare facilities. The output should provide counts and proximity scores for these categories to help me evaluate the overall convenience and quality of the residential area.\"",
-    "answers": null,
     "category": "Travel",
     "file_name": "",
     "Annotator Metadata": {
@@ -928,12 +996,13 @@
       "Number of tools": "2",
       "Steps": "1. Convert an address or place name to geographic coordinates with detailed location information.\n2. Generate a comprehensive neighborhood analysis focused on livability factors.",
       "Tools": "1. geocode_address\n2. analyze_neighborhood"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "41899b5b-b6db-48b1-9899-334452904a12",
     "Question": " I'm considering doing some initial research on a potential investment in the Korean market. Could you help me gather comprehensive data for Hyundai Motor Company.",
-    "answers": null,
     "category": "Finance",
     "file_name": "",
     "Annotator Metadata": {
@@ -941,12 +1010,13 @@
       "Number of tools": "2",
       "Steps": "1. get  official ticker symbol and full name on KOSPI/KOSDAQ.\n2. get key fundamental ratios: P/E Ratio (PER), P/B Ratio (PBR), and Dividend Yield.\n3. write a report",
       "Tools": "1. load_all_tickers\n2. get_stock_fundamental"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "e28e8dcb-3ccb-406d-a2c7-f5670d649979",
     "Question": "Help me view recent finance-related news, categorize financial news by sentiment, and extract key entities (companies, people, products) and important financial events.",
-    "answers": null,
     "category": "Finance",
     "file_name": "",
     "Annotator Metadata": {
@@ -954,12 +1024,13 @@
       "Number of tools": "3",
       "Steps": "1. get finance-related news\n2. categorize financial news\n3. extract key entities and events",
       "Tools": "1. get-36kr-trending\n2. get-bbc-news\n3. get-nytimes-news"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "c4d6c051-e2d4-4f52-b897-e945f402b858",
     "Question": "Based on the current Fear & Greed Index and recent news, do you think it's a good time to take the plunge?",
-    "answers": null,
     "category": "Finance",
     "file_name": "",
     "Annotator Metadata": {
@@ -967,12 +1038,13 @@
       "Number of tools": "2",
       "Steps": "1. get current Fear & Greed Index\n2. get news\n3. write a answer",
       "Tools": "1. get_cnn_fear_greed_index\n2. get-bbc-news"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "ab11def3-6727-4521-ae9b-2ffc6ae5b938",
     "Question": "Any recent negative news about Bitcoin? Also, tell me how the Crypto Fear & Greed Index has changed over the past three days.",
-    "answers": null,
     "category": "Finance",
     "file_name": "",
     "Annotator Metadata": {
@@ -980,12 +1052,13 @@
       "Number of tools": "2",
       "Steps": "1. get recent news about Bitcoin\n2. get Fear & Greed Index data past three days.\n3. write a report about finds",
       "Tools": "1. get-bbc-news\n2. get_crypto_fear_greed_index"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "1f6a6db5-05b5-4a8d-a6ef-fbb5d823ad1d",
     "Question": "I plan to go to Shinjuku Gyoen from Tokyo Tower and then find a highly rated Japanese restaurant nearby for lunch. Give me restaurant recommendations and tell me how to get there.",
-    "answers": null,
     "category": "Travel",
     "file_name": "",
     "Annotator Metadata": {
@@ -993,12 +1066,13 @@
       "Number of tools": "4",
       "Steps": "1. Convert addresses to geographic coordinates.\n2. Search for restaurant within a defined geographic area.\n3. Get route directions between two geographic points.\n4. Write the report.",
       "Tools": "1. geocode_address\n2. search_category\n3. get_route_directions\n4. reverse_geocode"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "cab818f4-ee48-440b-a37e-564c4edf401a",
     "Question": "What's the weather like in Beijing in the last few days? Give me some advice on what to wear!",
-    "answers": null,
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -1006,12 +1080,13 @@
       "Number of tools": "1",
       "Steps": "1. Get current weather and forecast for Beijing\n2. write the answer",
       "Tools": "1. get_weather"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "31086c2d-e183-42c3-9ee7-7c1278c4317f",
-    "Question": "What files are in my /root/music folder? Return only the file names, separated by commas.",
-    "answers": "mixkit-retro-game-emergency-alarm-1000.wav",
+    "Question": "What files are in my /root/music folder?",
     "category": "Lifestyle",
     "file_name": "/root/music",
     "Annotator Metadata": {
@@ -1026,12 +1101,13 @@
     "required_tools": [
       "list_allowed_directories",
       "list_directory"
-    ]
+    ],
+    "answer": "mixkit-retro-game-emergency-alarm-1000.wav",
+    "scorer_instructions": "This should be the only file reported by the model"
   },
   {
     "task_id": "cf6ea2ca-5011-46ec-96a6-a15c46178de9",
     "Question": "Tell me what's the big news in AI today.",
-    "answers": null,
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -1039,12 +1115,13 @@
       "Number of tools": "3",
       "Steps": "1. get news about ai",
       "Tools": "1. get-juejin-article-rank\n2. getStories\n3. get-infoq-news"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "2293b5eb-3af1-4f5f-9eaf-138c27885544",
     "Question": "Give me a two-day tour of Beijing based on the recent weather, and my hotel is in the Haidian District",
-    "answers": null,
     "category": "Travel",
     "file_name": "",
     "Annotator Metadata": {
@@ -1052,12 +1129,13 @@
       "Number of tools": "4",
       "Steps": "1. get the weather of beijing in next two days\n2. Convert the address to geographic coordinates \n3. find points of interest and amenities near haidian.\n4. determine travel plans based on weather conditions",
       "Tools": "1. get_weather_by_city\n2. geocode_address\n3. find_nearby_places\n4. reverse_geocode"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "84326f9f-d4b7-4dc8-b9e0-3c8868a3f79f",
     "Question": "Read the comments on hacker news story 44490510. Return the username of the top comment.",
-    "answers": "osigurdson",
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -1065,12 +1143,13 @@
       "Number of tools": "1",
       "Steps": "1. get the comments in story 44490510 \n2. summarize the comments",
       "Tools": "1. getStoryWithComments"
-    }
+    },
+    "answer": "osigurdson",
+    "scorer_instructions": null
   },
   {
     "task_id": "95369c49-8037-46f9-9099-8c336d03559f",
     "Question": "Read the comments on hacker news story 45973709. Return the username of the top comment.",
-    "answers": "gucci-on-fleek",
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -1078,12 +1157,13 @@
       "Number of tools": "1",
       "Steps": "1. get the comments in story 45973709 \n2. summarize the comments",
       "Tools": "1. getStoryWithComments"
-    }
+    },
+    "answer": "gucci-on-fleek",
+    "scorer_instructions": null
   },
   {
     "task_id": "f697107c-8004-452c-9b5c-98573f95193a",
     "Question": "Read the comments on hacker news story 44490510. Return the username of the top reply to the top comment.",
-    "answers": "cpursley",
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -1091,12 +1171,13 @@
       "Number of tools": "1",
       "Steps": "1. get the comments in story 44490510 \n2. summarize the comments",
       "Tools": "1. getStoryWithComments"
-    }
+    },
+    "answer": "cpursley",
+    "scorer_instructions": null
   },
   {
     "task_id": "68407846-9583-405c-a539-6936635d236d",
     "Question": "Read the comments on hacker news story 45973709. Return the username of the top reply to the top comment.",
-    "answers": "eastdakota",
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -1104,12 +1185,13 @@
       "Number of tools": "1",
       "Steps": "1. get the comments in story 45973709 \n2. summarize the comments",
       "Tools": "1. getStoryWithComments"
-    }
+    },
+    "answer": "eastdakota",
+    "scorer_instructions": null
   },
   {
     "task_id": "d1ea5598-27d2-4a21-ae9d-be30ec099ee3",
     "Question": "Get today's bbc news, reserved for finance related content.",
-    "answers": null,
     "category": "Finance",
     "file_name": "",
     "Annotator Metadata": {
@@ -1117,12 +1199,13 @@
       "Number of tools": "1",
       "Steps": "1. get bbc news today\n2. filter the content",
       "Tools": "1. get-bbc-news"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "15aa8d9b-330c-48eb-9b2a-e732f85021aa",
     "Question": "I want to buy a 34-inch curved monitor, please help me recommend some items with prices and links to buy.",
-    "answers": null,
     "category": "Shopping",
     "file_name": "",
     "Annotator Metadata": {
@@ -1130,12 +1213,13 @@
       "Number of tools": "3",
       "Steps": "1. go to the shopping website like amazon\n2. search for the 34-inch curved monitor\n3. write a report about findings",
       "Tools": "1. playwright_navigate\n2. playwright_click\n3. playwright_fill\n4. playwright_get_visible_html"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "665e1166-1062-444f-81e3-df207d0f975b",
-    "Question": "Read the Wikipedia article on Llullaillaco, then return its height to the nearest metre (without units).",
-    "answers": "6723",
+    "Question": "Read the Wikipedia article on Llullaillaco, then return its height to the nearest metre.",
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -1143,12 +1227,13 @@
       "Number of tools": "2",
       "Steps": "1. get the article\n2. summary the article\n3. write it to path",
       "Tools": "1. get_article\n2. write_file"
-    }
+    },
+    "answer": "6723 metres",
+    "scorer_instructions": "Tolerate 1% error."
   },
   {
     "task_id": "49cdaab7-39f0-4556-a3bb-7bd523916b32",
     "Question": "We have organized an online raffle with the following list of participants: [‘Alice’, ‘Bob’, ‘Charlie’, ‘David’, ‘Eve’]. Please choose one lucky winner at random from this list.",
-    "answers": null,
     "category": "Leisure",
     "file_name": "",
     "Annotator Metadata": {
@@ -1156,12 +1241,13 @@
       "Number of tools": "1",
       "Steps": "1. must use random tool to avoid bias",
       "Tools": "1. random_sample"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "423f89ba-be77-4f93-99d7-936548513eef",
     "Question": "Help me create an example word that needs to have headings, tables, body, footnotes and insert clock.png under /root/picture and save it in /root/word/example.docx",
-    "answers": null,
     "category": "Office",
     "file_name": "/root/picture/clock.png",
     "Annotator Metadata": {
@@ -1169,12 +1255,13 @@
       "Number of tools": "6",
       "Steps": "1. create the word document\n2. Add a heading, a table, a paragraph and a footnote \n3. Insert the image",
       "Tools": "1. create_document\n2. add_heading\n3. add_table\n4. add_paragraph\n5. add_footnote_to_document\n6. add_picture"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "36d95b6f-8cc6-40d0-bb64-77d3fa162f8d",
     "Question": "I received an email from amaz0n.com asking me to click on a link to enter my account information. Is this site official for Amazon?",
-    "answers": null,
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -1182,12 +1269,13 @@
       "Number of tools": "1",
       "Steps": "1. Looksup whois information about the domain\n2. Answer this question based on information",
       "Tools": "1. whois_domain"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "2e190c2a-8aab-44e1-896d-671cb3fcc495",
-    "Question": "What are the changes in my log files /root/txt/log_today.txt and /root/txt/log_yesterday.txt, help me to find out all the different lines which contain 'ERROR' ? Answer with the exact text of the lines only, separated by commas.",
-    "answers": "[ERROR] Database connection failed.",
+    "Question": "What are the changes in my log files /root/txt/log_today.txt and /root/txt/log_yesterday.txt, help me to find out all the different lines which contain 'ERROR'?",
     "category": "Office",
     "file_name": "/root/txt/log_today.txt, /root/txt/log_yesterday.txt",
     "Annotator Metadata": {
@@ -1201,12 +1289,13 @@
     ],
     "required_tools": [
       "read_file"
-    ]
+    ],
+    "answer": "[ERROR] Database connection failed.",
+    "scorer_instructions": "Only this line should be returned."
   },
   {
     "task_id": "80bb6782-58c0-4d5e-9022-5173be685833",
     "Question": "My after-tax income last month was 15,000 CNY, and my main expenses were 3,000 CNY for rent, 2,500 CNY for meals, 500 CNY for transportation, and 1,200 CNY for shopping. Please help me calculate what my balance was last month. And visualize these data in a pie chart. Also, please take the current exchange rate of RMB to USD and calculate how much my balance is converted to USD?",
-    "answers": null,
     "category": "Finance",
     "file_name": "",
     "Annotator Metadata": {
@@ -1214,12 +1303,13 @@
       "Number of tools": "2",
       "Steps": "1. calculate balance \n2. draw the pie chart\n3. get exchange rate \n4. convert the balance in USD",
       "Tools": "1. generate_pie_chart\n2. exchange_rate"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "39c4c9fc-9074-474a-850f-4b088d499d8c",
     "Question": "What was the price of Nvidia's stock as of market open, 25-11-2025? Return only the price as a two-digit floating point number.",
-    "answers": "177.82",
     "category": "Finance",
     "file_name": "",
     "Annotator Metadata": {
@@ -1227,12 +1317,13 @@
       "Number of tools": "1",
       "Steps": "1. Get the name of the nvidia stock\n2. Get the price of NVDA",
       "Tools": "1. get_ticker_info"
-    }
+    },
+    "answer": "177.82",
+    "scorer_instructions": null
   },
   {
     "task_id": "4cbd9682-cce7-444e-a878-36283a865b2a",
     "Question": "I am writing a popular science article on ‘Causes of the Fall of the Roman Empire’. Please help me to list at least three main causes that are generally recognized by historians and find one authoritative reference for each. Finally, organize all this information into a structured document and save it to /root/markdown/Rome.md.",
-    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -1240,12 +1331,13 @@
       "Number of tools": "3",
       "Steps": "1.  List at least three main causes that are generally recognized by historians\n2. Search wiki to find references\n3. Write the article\n4. Save it to /root/markdown/Rome.md\n",
       "Tools": "1.  duckduckgo_web_search\n2. search_wikipedia\n3. get_article"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "0dafdf66-af3a-4110-ab79-d9c037f7bc62",
     "Question": "Find the earliest available high-speed train from Beijing South to Shanghai South for tomorrow. Return only the departure time (HH:MM, 24 hour time) and second-class ticket price in ¥ (rounded to nearest whole number), separated by commas.",
-    "answers": "07:00,¥682",
     "category": "Travel",
     "file_name": "",
     "Annotator Metadata": {
@@ -1253,12 +1345,13 @@
       "Number of tools": "2",
       "Steps": "1. get the station codes\n2. check available tickets",
       "Tools": "1. get-station-code-by-names\n2. get-tickets"
-    }
+    },
+    "answer": "07:00,¥682",
+    "scorer_instructions": null
   },
   {
     "task_id": "614189f6-b70d-4144-87ad-f27209f0ec14",
     "Question": "What's on the zhihu and bilibili trendings today? Help me recommend something tech related!",
-    "answers": null,
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -1266,12 +1359,13 @@
       "Number of tools": "2",
       "Steps": "1. get trendings for both sites\n2. filter the trendings",
       "Tools": "1. get-bilibili-rank\n2. get-zhihu-trending"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "ffd5f6fb-051c-4c0f-9b82-90038b4cdb84",
     "Question": "I need you to pull up the Chinese almanac and find me the best dates to get married in the near future. Give me a list of the most auspicious Gregorian dates for a wedding in the next months.",
-    "answers": null,
     "category": "Leisure",
     "file_name": "",
     "Annotator Metadata": {
@@ -1279,12 +1373,13 @@
       "Number of tools": "2",
       "Steps": "1. get current time\n2. get almanac ",
       "Tools": "1. get_current_time\n2. getChineseCalendar"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "b050f277-0a92-4cfc-933b-5f01430e77dd",
     "Question": "Convert /root/word/CV.docx and /root/word/Report_Card.docx to PDF, merge the two resulting files, and save the final combined document as /root/pdf/full_cv.pdf.",
-    "answers": null,
     "category": "Office",
     "file_name": "",
     "Annotator Metadata": {
@@ -1292,12 +1387,13 @@
       "Number of tools": "2",
       "Steps": "1. convert two documents to two separate pdf\n2. merge them into a single document",
       "Tools": "1. docx_to_pdf\n2. pdf_merger"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   },
   {
     "task_id": "38c156c5-ff2c-4cf4-9a23-984d761b8bcb",
     "Question": "Help me do a full investment analysis on Nvidia's stock",
-    "answers": null,
     "category": "Finance",
     "file_name": "",
     "Annotator Metadata": {
@@ -1305,6 +1401,8 @@
       "Number of tools": "4",
       "Steps": "1. Get the stock prices for one month\n2. Get cashflow,  income statement \n3. Get news\n4. make a report",
       "Tools": "1. get_stock_price_date_range\n2. get_income_statement\n3. get_cashflow\n4. get_news"
-    }
+    },
+    "answer": null,
+    "scorer_instructions": null
   }
 ]

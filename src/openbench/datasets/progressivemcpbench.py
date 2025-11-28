@@ -29,11 +29,11 @@ def record_to_sample(record: dict[str, Any]) -> Optional[Sample]:
         Sample: Converted sample for evaluation.
         None: If the record should be skipped (e.g. answers is None).
     """
-    # specific user request: if answers is explicitly null, skip the task
-    if record.get("answers") is None:
+    # specific user request: if answer is explicitly null, skip the task
+    if record.get("answer") is None:
         return None
 
-    answers = record.get("answers") or []
+    answers = record.get("answer") or []
     if isinstance(answers, str):
         answers_list: List[str] = [answers.strip()] if answers.strip() else []
     else:
