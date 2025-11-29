@@ -126,9 +126,6 @@ ifbench = [
 tau_bench = [
     "tau2",
 ]
-docvqa = [
-    "python-levenshtein>=0.20.0",
-]
 ocrbenchv2 = [
     "apted>=1.0.3",
     "lxml>=5.0.0",
