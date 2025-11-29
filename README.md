@@ -217,6 +217,7 @@ All cache data is stored under `~/.openbench`. The cache command helps you monit
 | `--hub-repo`         | `BENCH_HUB_REPO`          | `None`                    | Push results to a Hugging Face Hub dataset                       |
 | `--keep-livemcp-root` | `BENCH_KEEP_LIVEMCP_ROOT` | `False`                   | Allow preservation of root data after livemcpbench eval runs     |
 | `--code-agent`       | `BENCH_CODE_AGENT`        | `codex`                   | Select code agent for Exercism tasks (codex/aider/opencode/claude_code/roo) |
+| `--hidden-tests`     | `BENCH_HIDDEN_TESTS`      | `False`                   | Run Exercism agents with hidden tests |
 
 ## Grader Information
 

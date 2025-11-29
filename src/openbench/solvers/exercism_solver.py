@@ -22,6 +22,7 @@ Usage:
 
 from __future__ import annotations
 
+from typing import Any, Dict
 
 from inspect_ai.solver import Solver, TaskState, solver
 from openbench.utils.cli_commands import (
@@ -29,6 +30,8 @@ from openbench.utils.cli_commands import (
     run_setup_commands,
     run_final_test,
     format_solver_output,
+    prepare_hidden_workspace,
+    sync_agent_workspace,
 )
 from openbench.agents import AgentManager
 
@@ -91,19 +94,49 @@ def exercism_solver() -> Solver:
                 )
                 return state
 
-            workdir = f"/workspace/{language}/{task_name}"
+            full_workdir = f"/workspace/{language}/{task_name}"
+            agent_workdir = full_workdir
+            hide_tests = bool(state.metadata.get("hide_tests"))
+            sync_context: Dict[str, Any] | None = None
+
+            if hide_tests:
+                prep_result = await prepare_hidden_workspace(language, task_name)
+                if not prep_result.get("success"):
+                    stderr = prep_result.get("stderr") or "unknown error"
+                    state.output.completion = (
+                        f"ERROR: Failed to prepare hidden workspace: {stderr}"
+                    )
+                    return state
+                agent_workdir = str(prep_result.get("agent_dir", full_workdir))
+                sync_context = {
+                    "hidden_paths": prep_result.get("hidden_paths", {}),
+                }
+
             prompt_text = state.input_text
 
             # Run any language-specific setup commands inside the task directory
-            setup_out = await run_setup_commands(setup_commands, workdir)
+            setup_out = await run_setup_commands(setup_commands, agent_workdir)
 
             agent = AgentManager.get_agent(code_agent)
 
             model = agent.resolve_model_with_fallback(str(state.model))
 
-            code_agent_out = await agent.execute(workdir, prompt_text, model)
+            code_agent_out = await agent.execute(agent_workdir, prompt_text, model)
 
-            test_out = await run_final_test(test_command, workdir)
+            if hide_tests and sync_context is not None:
+                sync_result = await sync_agent_workspace(
+                    agent_workdir,
+                    full_workdir,
+                    dict(sync_context.get("hidden_paths", {})),
+                )
+                if not sync_result.get("success"):
+                    stderr = sync_result.get("stderr") or "unknown error"
+                    state.output.completion = (
+                        f"ERROR: Failed to sync hidden workspace: {stderr}"
+                    )
+                    return state
+
+            test_out = await run_final_test(test_command, full_workdir)
 
             state.output.completion = format_solver_output(
                 code_agent, setup_out, code_agent_out, test_out

@@ -9,6 +9,7 @@ from typing import Callable, Dict, List, Optional
 from .base import BaseCodeAgent
 from .aider import AiderAgent
 from .opencode import OpenCodeAgent
+from .gemini import GeminiAgent
 from .roo import RooAgent
 from .claude import ClaudeCodeAgent
 from .codex import CodexAgent
@@ -20,6 +21,7 @@ class AgentManager:
     _agents: Dict[str, Callable[[], BaseCodeAgent]] = {
         "aider": AiderAgent,
         "opencode": OpenCodeAgent,
+        "gemini": GeminiAgent,
         "claude_code": ClaudeCodeAgent,
         "codex": CodexAgent,
         "roo": RooAgent,

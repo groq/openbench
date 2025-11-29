@@ -54,6 +54,14 @@ Evaluate with a specific model:
 bench eval exercism --code-agent opencode --model groq/gpt-oss-120b
 ```
 
+Hide the Exercism test suites from the agent (tests still run after the edit loop):
+
+```bash
+bench eval exercism --hidden-tests
+```
+
+With `--hidden-tests`, the agent works inside a sanitized copy of the repo with the language-specific tests excluded, while the final verification still runs against the full workspace to ensure correctness.
+
 Run evaluation for a single language:
 
 ```bash
@@ -114,4 +122,3 @@ The multi-agent design allows for unique comparative analysis:
 - Compare how different models perform on identical tasks
 - Evaluate which code agent harness works best for different languages and models
 - Identify model strengths and weaknesses across programming paradigms
-
