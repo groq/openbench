@@ -61,6 +61,7 @@ COMMON_BASE_PACKAGES = [
     "jq",
     "xz-utils",
     "bash",
+    "rsync",
 ]
 
 # Language runtime packages for exercism support
@@ -101,6 +102,14 @@ class OpenCodeCommands:
     """Docker commands for OpenCode agent installation."""
 
     DOCKERFILE_COMMANDS = ["RUN npm install -g opencode-ai"]
+
+    BASE_PACKAGES = ["curl", "gnupg", "ca-certificates"]
+
+
+class GeminiCommands:
+    """Docker commands for Gemini CLI agent installation."""
+
+    DOCKERFILE_COMMANDS = ["RUN npm install -g @google/gemini-cli@latest"]
 
     BASE_PACKAGES = ["curl", "gnupg", "ca-certificates"]
 
@@ -242,6 +251,7 @@ def get_agent_docker_commands(agent_name: str) -> List[str]:
     commands_map = {
         "aider": AiderCommands.DOCKERFILE_COMMANDS,
         "opencode": OpenCodeCommands.DOCKERFILE_COMMANDS,
+        "gemini": GeminiCommands.DOCKERFILE_COMMANDS,
         "claude_code": [],
         "codex": [],
         "roo": RooCommands.get_dockerfile_commands(),
@@ -268,6 +278,7 @@ def get_agent_base_packages(agent_name: str) -> List[str]:
     packages_map = {
         "aider": AiderCommands.BASE_PACKAGES,
         "opencode": OpenCodeCommands.BASE_PACKAGES,
+        "gemini": GeminiCommands.BASE_PACKAGES,
         "claude_code": [],
         "codex": [],
         "roo": RooCommands.BASE_PACKAGES,

@@ -24,7 +24,7 @@ class CodexAgent(BaseCodeAgent):
     async def execute(self, workdir: str, prompt_text: str, model: str) -> str:
         """Execute Codex CLI agent."""
         try:
-            codex_agent = codex_cli(cwd=workdir, model=model)
+            codex_agent = codex_cli(cwd=workdir, model=model, model_config=model)
             state = AgentState(messages=[ChatMessageUser(content=prompt_text)])
             completed_state = await codex_agent(state)
             stdout_text = _format_agent_output(completed_state.output)
