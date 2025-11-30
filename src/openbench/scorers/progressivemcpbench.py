@@ -66,7 +66,11 @@ def progressivemcpbench_metrics() -> Metric:
     """Custom metrics including category breakdown."""
 
     def metric_calculator(scores: list[SampleScore]) -> Value:
-        total_score = sum(float(s.score.value) for s in scores if isinstance(s.score.value, (int, float)))
+        total_score = sum(
+            float(s.score.value)
+            for s in scores
+            if isinstance(s.score.value, (int, float))
+        )
         total_count = len(scores)
 
         category_stats: dict[str, dict[str, float]] = {}
@@ -146,16 +150,27 @@ def progressivemcpbench_scorer(
                 },
             )
 
+        # Get scorer instructions from metadata if present
+        scorer_instructions = (
+            state.metadata.get("scorer_instructions") if state.metadata else None
+        )
+        scorer_instructions_section = (
+            f"\nAdditional Scoring Guidance (from the benchmark author):\n{scorer_instructions}\n"
+            if scorer_instructions
+            else ""
+        )
+
         # Construct prompt for the LLM judge
         prompt = PROGRESSIVEMCPBENCH_GRADER_TEMPLATE.format(
             model_answer=model_answer,
             expected_answers="\n".join(f"- {a}" for a in expected_list),
+            scorer_instructions_section=scorer_instructions_section,
         )
 
         try:
             response = await grader_model.generate([ChatMessageUser(content=prompt)])
             grade_text = response.completion.strip().upper()
-            
+
             # Look for CORRECT or INCORRECT in the response
             if "CORRECT" in grade_text and "INCORRECT" not in grade_text:
                 value = 1.0

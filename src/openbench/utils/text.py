@@ -345,7 +345,7 @@ Model Answer:
 
 Expected Answer(s):
 {expected_answers}
-
+{scorer_instructions_section}
 Instructions:
 1. Compare the Model Answer to the Expected Answer(s).
 2. Ignore differences in whitespace, capitalization, and punctuation.

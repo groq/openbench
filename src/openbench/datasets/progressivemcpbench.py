@@ -55,6 +55,10 @@ def record_to_sample(record: dict[str, Any]) -> Optional[Sample]:
     if "required_tools" in record:
         metadata["required_tools"] = record["required_tools"]
 
+    # Add scorer instructions if present
+    if record.get("scorer_instructions"):
+        metadata["scorer_instructions"] = record["scorer_instructions"]
+
     return Sample(
         id=record["task_id"],
         input=record["Question"],
