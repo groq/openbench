@@ -25,7 +25,14 @@
       "Tools": "1. load\n2. beat_track\n3. mfcc\n4. chroma_cqt"
     },
     "answer": "60.09",
-    "scorer_instructions": "Tolerate 1% error in the answer."
+    "scorer_instructions": "Tolerate 1% error in the answer.",
+    "required_servers": [
+      "music-analysis"
+    ],
+    "required_tools": [
+      "load",
+      "tempo"
+    ]
   },
   {
     "task_id": "dda8ea55-629c-4ae8-ab87-0c81477ae615",
@@ -150,8 +157,9 @@
       "Steps": "1. Retrieves publications and other references associated with a single clinical trial identified by its NCT ID\n2. Generate a markdown report\n3. Write it to the path",
       "Tools": "1. trial_references\n2. write_file"
     },
-    "answer": "Adaptive COVID-19 Treatment Trial (ACTT)",
-    "scorer_instructions": null
+    "answer": "Brief Title: Adaptive COVID-19 Treatment Trial (ACTT)\nOfficial Title: A Multicenter, Adaptive, Randomized Blinded Controlled Trial of the Safety and Efficacy of Investigational Therapeutics for the Treatment of COVID-19 in Hospitalized Adults",
+    "_comment": "",
+    "scorer_instructions": "Either title is OK"
   },
   {
     "task_id": "be3f2275-15a4-4e05-b3cb-b0eeb9109d3a",
@@ -351,7 +359,7 @@
   },
   {
     "task_id": "d116bda4-e70c-4ef1-ab1a-b68b4855e1bf",
-    "Question": "Read the data under /root/excel/people_data.xlsx and tell me Sophia Moore's bmi. Format the answer as a floating point number to 2 decimal places.",
+    "Question": "Read the data under /root/excel/people_data.xlsx and tell me Sophia Moore's bmi.",
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
@@ -382,7 +390,13 @@
       "Tools": "1. get_paper_data\n2. fetch"
     },
     "answer": "2022-03-23",
-    "scorer_instructions": "Within a few days of the ideal answer is fine"
+    "scorer_instructions": "Within a few days of the ideal answer is fine",
+    "required_servers": [
+      "arxiv-mcp-server"
+    ],
+    "required_tools": [
+      "search_papers"
+    ]
   },
   {
     "task_id": "2bf318d4-754d-43f3-a1b5-cb2f50a7d144",
@@ -409,7 +423,8 @@
       "Steps": "1. extract transcript from the YouTube video URL\n2. write a markdown mindmap \n3. conver markdown mindmap to real mindmap\n4. summary the main content of the lecture",
       "Tools": "1. get_transcript\n2. convert_markdown_to_mindmap"
     },
-    "answer": "Inside the Mind of a Master Procrastinator, Tim Urban, Government",
+    "_answer": "Inside the Mind of a Master Procrastinator, Tim Urban, Government",
+    "_comment": "Something wrong with the YouTube transcript tool?",
     "scorer_instructions": "All three parts of the answer must be present."
   },
   {
@@ -521,7 +536,8 @@
       "Steps": "1. Realizes that \"Corridor in the Asylum\" is located in the Metropolitan Museum of Art Collection\n2. Search for objects in the Metropolitan Museum of Art\n3. Get the detailed information",
       "Tools": "1. search-museum-objects\n2. get-museum-object"
     },
-    "answer": "1889-1890, van Gogh, The Metropolitan Museum of Art",
+    "_answer": "1889-1890, van Gogh, The Metropolitan Museum of Art",
+    "_comment": "For something that seems so easily Googleable, this is a super flaky task.",
     "scorer_instructions": "Either year is fine, but all three components of the answer must be present"
   },
   {
@@ -564,7 +580,13 @@
       "Tools": "1. search_papers\n2. get_paper_data\n3. write_file"
     },
     "answer": "Deng, Gou, Zhou",
-    "scorer_instructions": "All three names must be present, and no other ones should be identified as 'first authors'."
+    "scorer_instructions": "All three names must be present, and no other ones should be identified as 'first authors'.",
+    "required_servers": [
+      "arxiv-mcp-server"
+    ],
+    "required_tools": [
+      "search_papers"
+    ]
   },
   {
     "task_id": "e023dd0e-1212-47e0-a73c-97739c78b849",
@@ -647,7 +669,8 @@
       "Steps": "1. Search for datasets on Data.gov\n2. Get details for the specific dataset\n3. Download the file use wget",
       "Tools": "1. package_search\n2. package_show\n3. execute_command"
     },
-    "answer": "6.3",
+    "_answer": "6.3",
+    "_comment": "Nobody seems to be able to actually get this data.",
     "scorer_instructions": null
   },
   {
@@ -676,7 +699,13 @@
       "Tools": "1. get_text_file_contents"
     },
     "answer": "03-17 16:13:38.877 2227 2227 D TextView: mVisiblity.getValue is false",
-    "scorer_instructions": null
+    "scorer_instructions": null,
+    "required_servers": [
+      "filesystem"
+    ],
+    "required_tools": [
+      "read_file"
+    ]
   },
   {
     "task_id": "de75630e-b91e-4cc7-85b1-5d02c2455392",
@@ -690,7 +719,13 @@
       "Tools": "1. get_maven_latest_version"
     },
     "answer": "All three are outdated",
-    "scorer_instructions": "The model can express this in any way, but it must agree that all are outdate"
+    "scorer_instructions": "The model can express this in any way, but it must agree that all are outdate",
+    "required_servers": [
+      "maven-deps-server"
+    ],
+    "required_tools": [
+      "get_latest_release"
+    ]
   },
   {
     "task_id": "cf1fca1e-8e56-4b26-ae34-dfdb1d982080",
@@ -718,7 +753,16 @@
       "Tools": "1. list_directory\n2. read_pdf\n3. write_file"
     },
     "answer": "Brohan, Driess, Wang",
-    "scorer_instructions": "All three names must be present, and no other ones should be identified as 'first authors'."
+    "scorer_instructions": "All three names must be present, and no other ones should be identified as 'first authors'.",
+    "required_servers": [
+      "filesystem",
+      "pdf-reader-mcp"
+    ],
+    "required_tools": [
+      "list_allowed_directories",
+      "list_directory",
+      "read_pdf"
+    ]
   },
   {
     "task_id": "fbe982c3-4142-40ec-8541-e06d7ab2e399",
@@ -886,12 +930,10 @@
       "Tools": "1. get_document_text"
     },
     "required_servers": [
-      "filesystem",
       "word-document-server"
     ],
     "required_tools": [
-      "get_document_text",
-      "read_file"
+      "get_document_text"
     ],
     "answer": "Nobody. Everyone gave a gift.",
     "scorer_instructions": "The model can express this in any way, but if it gives a name of somebody, it failed."
@@ -956,7 +998,13 @@
       "Tools": "1. read_file\n2. create_document\n3. open_document\n4. add_paragraph"
     },
     "answer": "WebSRC: A Dataset for Web-Based Structural Reading Comprehension",
-    "scorer_instructions": null
+    "scorer_instructions": null,
+    "required_servers": [
+      "filesystem"
+    ],
+    "required_tools": [
+      "read_file"
+    ]
   },
   {
     "task_id": "9bc7feb8-2db9-4c5b-8ad9-44ff15748bf6",
@@ -1288,7 +1336,8 @@
       "filesystem"
     ],
     "required_tools": [
-      "read_file"
+      "read_file",
+      "read_multiple_files"
     ],
     "answer": "[ERROR] Database connection failed.",
     "scorer_instructions": "Only this line should be returned."
