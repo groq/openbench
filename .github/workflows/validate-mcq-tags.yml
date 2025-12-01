@@ -1,0 +1,92 @@
+name: Validate MCQ Tags
+
+on:
+  pull_request:
+    paths:
+      - 'src/openbench/config.py'
+      - 'src/openbench/evals/**'
+      - 'src/openbench/utils/mcq.py'
+      - 'src/openbench/scorers/mcq.py'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  validate-and-fix:
+    name: Validate and Fix MCQ Tags
+    runs-on: ubuntu-latest
+    # Only run on PRs from the same repository (not forks)
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          enable-cache: true
+          cache-dependency-glob: |
+            **/pyproject.toml
+            **/uv.lock
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Validate and auto-fix MCQ tags
+        id: validate
+        run: |
+          echo "Running MCQ tag validation with auto-fix..."
+          uv run python3 scripts/validate_mcq_tags.py --fix
+          echo "result=completed" >> "$GITHUB_OUTPUT"
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet src/openbench/config.py; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No changes needed"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Changes applied to config.py"
+          fi
+
+      - name: Commit and push changes
+        if: steps.check_changes.outputs.changed == 'true'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/openbench/config.py
+          git commit -m "fix: auto-update MCQ 'mcq' tags [skip ci]"
+          git push
+
+      - name: Comment on PR with success
+        if: steps.check_changes.outputs.changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ **MCQ Tags Auto-Fixed**\n\nThe `mcq` tags have been automatically updated in `config.py` to match the actual MCQ benchmark implementations detected by `is_mcq_task()`.\n\nThe changes have been committed to this PR.'
+            })
+
+      - name: Comment on PR with validation
+        if: steps.check_changes.outputs.changed == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ **MCQ Tags Validated**\n\nAll MCQ benchmarks have correct `mcq` tags. No changes needed.'
+            })
