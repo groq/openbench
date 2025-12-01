@@ -9,7 +9,8 @@ Strategies:
 - directory: Presents tools as a filesystem with ls/read-tool-file/execute-tool
 - minimal-servers: Provides only the tools from the required server(s) for each task
 - minimal-tools: Provides only the exact tools needed for each task
-- distraction-128: Provides required tools plus distraction tools to total 128 tools
+- distraction-64: Minimal tools plus distraction tools to total 64 tools
+- distraction-128: Minimal tools plus distraction tools to total 128 tools
 """
 
 from inspect_ai import task, Task
@@ -30,6 +31,7 @@ from openbench.tools.progressivemcpbench.directory.toolsource import (
 from openbench.tools.progressivemcpbench.minimal.toolsource import (
     minimal_servers_tool_source,
     minimal_tools_tool_source,
+    distraction_64_tool_source,
     distraction_128_tool_source,
 )
 from openbench.utils.text import (
@@ -44,6 +46,7 @@ VALID_STRATEGIES = {
     "directory",
     "minimal-servers",
     "minimal-tools",
+    "distraction-64",
     "distraction-128",
 }
 
@@ -181,6 +184,45 @@ def progressive_minimal_tools_solver() -> Solver:
     return solve
 
 
+def _build_required_tools(
+    required_servers: list[str], required_tools_list: list[str]
+) -> list[tuple[str, str]]:
+    """Build list of (server, tool) tuples from annotations."""
+    required_tools: list[tuple[str, str]] = []
+    for server in required_servers:
+        for tool in required_tools_list:
+            required_tools.append((server, tool))
+    return required_tools
+
+
+@solver
+def progressive_distraction_64_solver() -> Solver:
+    """Solver that provides required tools plus distractors to total 64 tools."""
+
+    async def solve(state: TaskState, generate: Any) -> TaskState:
+        metadata = state.metadata or {}
+        required_servers = metadata.get("required_servers", [])
+        required_tools_list = metadata.get("required_tools", [])
+        task_id = str(state.sample_id or "")
+
+        if not required_servers or not required_tools_list:
+            state.metadata = state.metadata or {}
+            state.metadata["execution_error"] = "missing_annotation"
+            state.metadata["error_message"] = (
+                "Task is missing 'required_servers' or 'required_tools' annotation. "
+                "Run with strategy=copilot first and annotate the dataset."
+            )
+            return state
+
+        required_tools = _build_required_tools(required_servers, required_tools_list)
+        tool_source = distraction_64_tool_source(required_tools, task_id)
+        return await _run_react_with_tools(
+            state, PROGRESSIVEMCPBENCH_MINIMAL_SYSTEM_MESSAGE, tool_source
+        )
+
+    return solve
+
+
 @solver
 def progressive_distraction_128_solver() -> Solver:
     """Solver that provides required tools plus distractors to total 128 tools."""
@@ -188,18 +230,20 @@ def progressive_distraction_128_solver() -> Solver:
     async def solve(state: TaskState, generate: Any) -> TaskState:
         metadata = state.metadata or {}
         required_servers = metadata.get("required_servers", [])
+        required_tools_list = metadata.get("required_tools", [])
         task_id = str(state.sample_id or "")
 
-        if not required_servers:
+        if not required_servers or not required_tools_list:
             state.metadata = state.metadata or {}
             state.metadata["execution_error"] = "missing_annotation"
             state.metadata["error_message"] = (
-                "Task is missing 'required_servers' annotation. "
+                "Task is missing 'required_servers' or 'required_tools' annotation. "
                 "Run with strategy=copilot first and annotate the dataset."
             )
             return state
 
-        tool_source = distraction_128_tool_source(required_servers, task_id)
+        required_tools = _build_required_tools(required_servers, required_tools_list)
+        tool_source = distraction_128_tool_source(required_tools, task_id)
         return await _run_react_with_tools(
             state, PROGRESSIVEMCPBENCH_MINIMAL_SYSTEM_MESSAGE, tool_source
         )
@@ -217,6 +261,8 @@ def _get_solver_for_strategy(strategy: str) -> Solver:
         return progressive_minimal_servers_solver()
     elif strategy == "minimal-tools":
         return progressive_minimal_tools_solver()
+    elif strategy == "distraction-64":
+        return progressive_distraction_64_solver()
     elif strategy == "distraction-128":
         return progressive_distraction_128_solver()
     else:
@@ -239,7 +285,8 @@ def progressivemcpbench(
             - "directory": Filesystem-like exploration (ls/read-tool-file/execute-tool)
             - "minimal-servers": Direct access to required server tools (requires annotations)
             - "minimal-tools": Direct access to exact required tools (requires annotations)
-            - "distraction-128": Required tools + distractors to 128 total (requires annotations)
+            - "distraction-64": Minimal tools + distractors to 64 total (requires annotations)
+            - "distraction-128": Minimal tools + distractors to 128 total (requires annotations)
     """
     if strategy is None:
         raise ValueError(

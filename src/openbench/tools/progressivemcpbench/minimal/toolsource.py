@@ -169,20 +169,24 @@ def minimal_tools_tool_source(
     return _StaticToolSource(tools)
 
 
-def distraction_128_tool_source(
-    required_servers: list[str],
+def _distraction_tool_source(
+    required_tools: list[tuple[str, str]],
     task_id: str,
-    target_count: int = 128,
+    target_count: int,
 ) -> ToolSource:
     """Create a ToolSource with required tools plus distractors to reach target count.
+
+    This starts with the minimal required tools and adds random irrelevant tools
+    to reach the target count. This ensures a consistent baseline regardless of
+    how many tools any individual server might have.
 
     The distraction tools are selected deterministically based on the task_id,
     ensuring reproducibility across runs.
 
     Args:
-        required_servers: List of server names that must be included
+        required_tools: List of (server_name, tool_name) tuples for required tools
         task_id: Task identifier used for deterministic distractor selection
-        target_count: Total number of tools to include (default 128)
+        target_count: Total number of tools to include
 
     Returns:
         ToolSource with required tools plus deterministic distractors
@@ -195,11 +199,15 @@ def distraction_128_tool_source(
     for name, config_data in mcp_servers.items():
         all_servers[name] = _build_server(name, config_data)
 
-    # First, collect required tools
+    # Build set for quick lookup of required tools
+    required_set = {(s, t) for s, t in required_tools}
+
+    # First, collect required tools (minimal tools)
     required_tools_list: list[tuple[str, dict[str, Any]]] = []
-    for server_name in required_servers:
-        if server_name in tools_by_server:
-            for tool_info in tools_by_server[server_name]:
+    for server_name, tool_list in tools_by_server.items():
+        for tool_info in tool_list:
+            tool_name = tool_info.get("name", "")
+            if (server_name, tool_name) in required_set:
                 required_tools_list.append((server_name, tool_info))
 
     # Calculate how many distractors we need
@@ -208,8 +216,9 @@ def distraction_128_tool_source(
     # Collect all non-required tools as potential distractors
     distractor_pool: list[tuple[str, dict[str, Any]]] = []
     for server_name, tool_list in tools_by_server.items():
-        if server_name not in required_servers:
-            for tool_info in tool_list:
+        for tool_info in tool_list:
+            tool_name = tool_info.get("name", "")
+            if (server_name, tool_name) not in required_set:
                 distractor_pool.append((server_name, tool_info))
 
     # Sort distractors deterministically based on task_id hash
@@ -247,6 +256,38 @@ def distraction_128_tool_source(
         tools.append(tool)
 
     return _StaticToolSource(tools)
+
+
+def distraction_64_tool_source(
+    required_tools: list[tuple[str, str]],
+    task_id: str,
+) -> ToolSource:
+    """Create a ToolSource with required tools plus distractors to reach 64 tools.
+
+    Args:
+        required_tools: List of (server_name, tool_name) tuples for required tools
+        task_id: Task identifier used for deterministic distractor selection
+
+    Returns:
+        ToolSource with required tools plus deterministic distractors (64 total)
+    """
+    return _distraction_tool_source(required_tools, task_id, target_count=64)
+
+
+def distraction_128_tool_source(
+    required_tools: list[tuple[str, str]],
+    task_id: str,
+) -> ToolSource:
+    """Create a ToolSource with required tools plus distractors to reach 128 tools.
+
+    Args:
+        required_tools: List of (server_name, tool_name) tuples for required tools
+        task_id: Task identifier used for deterministic distractor selection
+
+    Returns:
+        ToolSource with required tools plus deterministic distractors (128 total)
+    """
+    return _distraction_tool_source(required_tools, task_id, target_count=128)
 
 
 class _StaticToolSource(ToolSource):
