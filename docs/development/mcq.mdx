@@ -106,3 +106,21 @@ return Task(
     epochs=epochs,
 )
 ```
+
+## Model-Graded Scoring
+
+By default, MCQEval uses regex-based answer extraction that looks for the answer at the beginning of the model response (e.g., `"A"`, `"The answer is B"`, etc.). For custom prompt implementations yielding verbose reasoning or custom response formats, users can opt to enable a more robust LLL-based scoring method.
+
+The `--model-graded` flag enables LLM-based answer extraction using `groq/openai/gpt-oss-20b` as the grading model. This flag should be used as a troubleshooting method when unexpectedly low results are observed with an MCQ benchmark.
+
+### Usage Example
+
+```bash
+# Standard MCQ evaluation (regex-based)
+bench eval mmlu --model openai/gpt-4o
+
+# Model-graded MCQ evaluation (LLM-based)
+bench eval mmlu --model openai/gpt-4o --model-graded
+```
+
+**Note:** Model-graded scoring requires the `GROQ_API_KEY` environment variable to be set. It is slower and more expensive than regex-based scoring, so it should be used when regex extraction proves insufficient.
