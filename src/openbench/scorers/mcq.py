@@ -11,6 +11,7 @@ from inspect_ai.scorer import (
     accuracy,
     stderr,
     std,
+    model_graded_fact,
     CORRECT,
     INCORRECT,
 )
@@ -155,15 +156,26 @@ def extract_mcq_answer(text: str) -> Optional[str]:
 def create_mcq_scorer(
     group_keys: Optional[List[str]] = None,
     additional_metrics: Optional[List[Any]] = None,
+    use_model_grading: bool = False,
+    grading_model: Optional[str] = "groq/openai/gpt-oss-20b",
 ) -> Callable:
     """
     Create a generic multiple-choice question scorer.
 
     This is a factory function that creates scorers for MCQ benchmarks like MMLU, MMMU, GPQA, etc.
 
+    NOTE: When using MCQEval infrastructure, scoring configuration is controlled by global settings
+    in `openbench.utils.mcq` (USE_MODEL_GRADING and MCQ_GRADING_MODEL). Direct calls to this
+    function can override those defaults.
+
     Args:
         group_keys: Optional list of metadata keys to group metrics by (e.g., ["category", "subject"])
         additional_metrics: Optional list of additional metrics to include beyond accuracy/stderr
+        use_model_grading: Whether to use model-graded scoring (default: False).
+            When False (default), uses regex-based parsing (fast but may have accuracy issues).
+            When True, uses an LLM to grade the answer, which is more reliable for verbose reasoning.
+        grading_model: Model to use for grading (default: "groq/openai/gpt-oss-20b").
+            Set to None to use the model being evaluated. Only applicable when use_model_grading=True.
 
     Returns:
         A scorer function that can be used with Inspect AI tasks
@@ -185,6 +197,36 @@ def create_mcq_scorer(
     if additional_metrics:
         metrics.extend(additional_metrics)
 
+    # Note: No warning for regex-based parsing since it's the default
+    # Users can opt-in to model grading with --model-graded flag if needed
+
+    # Use model-graded scoring (more reliable)
+    if use_model_grading:
+        # Custom prompt for MCQ grading
+        mcq_grading_instructions = """You are grading a multiple-choice question answer.
+
+The model was asked to choose between options A, B, C, D, etc.
+
+Please carefully read the model's response and determine which letter (A, B, C, D, etc.) the model chose as their final answer. Look for explicit statements like "Answer: B" or a standalone letter at the end.
+
+If the model clearly stated a final answer, respond with:
+GRADE: C (if the model's answer matches the target)
+GRADE: I (if the model's answer does not match the target, or if no clear answer was provided)
+
+Focus on what the model stated as their FINAL answer, not intermediate reasoning."""
+
+        # model_graded_fact returns a Scorer object, but we need to return
+        # a factory function to match the pattern expected by MCQEval
+        # We'll return a lambda that returns the scorer
+        graded_scorer = model_graded_fact(
+            instructions=mcq_grading_instructions,
+            model=grading_model,
+        )
+
+        # Return a factory function that matches the regex path pattern
+        return lambda: graded_scorer
+
+    # Fall back to regex-based parsing
     @scorer(metrics=metrics)
     def mcq_scorer() -> Callable:
         async def score(state: TaskState, target: Target) -> Score:

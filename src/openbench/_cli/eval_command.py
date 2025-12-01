@@ -130,6 +130,47 @@ def validate_model_role(model_role: Optional[str]) -> Dict[str, str | Model]:
         raise typer.BadParameter(str(e))
 
 
+def validate_mcq_flag(benchmarks: List[str]) -> None:
+    """Validate that --model-graded is only used with MCQ benchmarks.
+
+    Uses get_mcq_benchmarks() to detect MCQ benchmarks by inspecting their
+    implementations (via static analysis). This is the same detection method
+    used by CI/CD to keep tags in sync.
+
+    Args:
+        benchmarks: List of benchmark names to validate
+
+    Raises:
+        typer.BadParameter: If any non-MCQ benchmarks are detected
+    """
+    from openbench.utils.mcq import get_mcq_benchmarks
+
+    # Get all MCQ benchmarks using static analysis (fast: ~1-2 seconds)
+    mcq_benchmarks = set(get_mcq_benchmarks(include_alpha=True))
+
+    # Find non-MCQ benchmarks in the provided list
+    non_mcq_benchmarks = [b for b in benchmarks if b not in mcq_benchmarks]
+
+    if non_mcq_benchmarks:
+        error_msg = (
+            "The --model-graded flag only works with MCQ benchmarks. "
+            "The following benchmarks are not MCQ-based:\n\n"
+        )
+        for bench in non_mcq_benchmarks[:5]:  # Show max 5 to avoid overwhelming output
+            error_msg += f"  • {bench}\n"
+
+        if len(non_mcq_benchmarks) > 5:
+            error_msg += f"  ... and {len(non_mcq_benchmarks) - 5} more\n"
+
+        error_msg += (
+            "\nThe --model-graded flag enables model-graded scoring for MCQ benchmarks "
+            "(MMLU, GPQA, rootly_gmcq, etc.) where regex answer extraction may fail with "
+            "verbose reasoning. It does not apply to other benchmark types.\n\n"
+            "To run these benchmarks, remove the --model-graded flag."
+        )
+        raise typer.BadParameter(error_msg)
+
+
 def expand_eval_groups(
     benchmarks: List[str],
 ) -> Tuple[List[str], dict[str, List[str]]]:
@@ -652,10 +693,49 @@ def run_eval(
             envvar="BENCH_CODE_AGENT",
         ),
     ] = None,
+    model_graded: Annotated[
+        bool,
+        typer.Option(
+            "--model-graded",
+            help=(
+                "Use model-graded MCQ scoring instead of regex parsing. "
+                "More reliable for models with verbose reasoning, but slower/more expensive. "
+                "Uses groq/openai/gpt-oss-20b as grader by default. "
+                "Only applies to MCQ benchmarks (MMLU, GPQA, rootly_gmcq, etc.)."
+            ),
+            envvar="BENCH_MODEL_GRADED",
+        ),
+    ] = False,
 ) -> List[EvalLog] | None:
     """
     Run a benchmark on a model.
     """
+    # Expand eval groups into individual benchmarks (do this first)
+    expanded_benchmarks, groups = expand_eval_groups(benchmarks)
+
+    # Validate --model-graded flag before configuring MCQ scoring
+    # This ensures we only use it with MCQ benchmarks
+    if model_graded:
+        validate_mcq_flag(expanded_benchmarks)
+
+    # Configure MCQ scoring mode globally (before loading tasks)
+    # This affects all MCQ benchmarks created via MCQEval infrastructure
+    if model_graded:
+        import openbench.utils.mcq as mcq_utils
+
+        mcq_utils.USE_MODEL_GRADING = True
+        typer.echo(
+            "ℹ️  Using model-graded MCQ scoring with groq/openai/gpt-oss-20b. Required GROQ_API_KEY environment variable to be set."
+        )
+
+        # Warn if GROQ_API_KEY is not set
+        if not os.getenv("GROQ_API_KEY"):
+            typer.secho(
+                "⚠️  WARNING: GROQ_API_KEY environment variable is not set. "
+                "Model-graded scoring requires a Groq API key to use the grading model (groq/openai/gpt-oss-20b).",
+                fg=typer.colors.YELLOW,
+            )
+
     # Parse model and task arguments
     model_args = parse_cli_args(m) if m else {}
     task_args = parse_cli_args(t) if t else {}
@@ -701,9 +781,6 @@ def run_eval(
     # Validate model names
     for model_name in model:
         validate_model_name(model_name)
-
-    # Expand eval groups into individual benchmarks
-    expanded_benchmarks, groups = expand_eval_groups(benchmarks)
 
     # Load tasks from registry
     tasks = []
