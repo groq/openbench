@@ -30,6 +30,8 @@
       "music-analysis"
     ],
     "required_tools": [
+      "beat_track",
+      "get_duration",
       "load",
       "tempo"
     ]
@@ -159,7 +161,13 @@
     },
     "answer": "Brief Title: Adaptive COVID-19 Treatment Trial (ACTT)\nOfficial Title: A Multicenter, Adaptive, Randomized Blinded Controlled Trial of the Safety and Efficacy of Investigational Therapeutics for the Treatment of COVID-19 in Hospitalized Adults",
     "_comment": "",
-    "scorer_instructions": "Either title is OK"
+    "scorer_instructions": "Either title is OK",
+    "required_servers": [
+      "biomcp"
+    ],
+    "required_tools": [
+      "trial_protocol_getter"
+    ]
   },
   {
     "task_id": "be3f2275-15a4-4e05-b3cb-b0eeb9109d3a",
@@ -369,10 +377,13 @@
       "Tools": "1. excel_read_sheet\n2. calculate"
     },
     "required_servers": [
-      "excel"
+      "excel",
+      "searxng"
     ],
     "required_tools": [
+      "document_reader",
       "excel_describe_sheets",
+      "excel_read",
       "excel_read_sheet"
     ],
     "answer": "20.76",
@@ -392,10 +403,10 @@
     "answer": "2022-03-23",
     "scorer_instructions": "Within a few days of the ideal answer is fine",
     "required_servers": [
-      "arxiv-mcp-server"
+      "mcp-simple-arxiv"
     ],
     "required_tools": [
-      "search_papers"
+      "get_paper_data"
     ]
   },
   {
@@ -582,7 +593,8 @@
     "answer": "Deng, Gou, Zhou",
     "scorer_instructions": "All three names must be present, and no other ones should be identified as 'first authors'.",
     "required_servers": [
-      "arxiv-mcp-server"
+      "arxiv-mcp-server",
+      "mcp-simple-arxiv"
     ],
     "required_tools": [
       "search_papers"
@@ -761,6 +773,7 @@
     "required_tools": [
       "list_allowed_directories",
       "list_directory",
+      "read_file",
       "read_pdf"
     ]
   },
@@ -930,10 +943,14 @@
       "Tools": "1. get_document_text"
     },
     "required_servers": [
+      "filesystem",
+      "searxng",
       "word-document-server"
     ],
     "required_tools": [
-      "get_document_text"
+      "docx_to_html",
+      "get_document_text",
+      "read_file"
     ],
     "answer": "Nobody. Everyone gave a gift.",
     "scorer_instructions": "The model can express this in any way, but if it gives a name of somebody, it failed."
@@ -1147,7 +1164,6 @@
       "filesystem"
     ],
     "required_tools": [
-      "list_allowed_directories",
       "list_directory"
     ],
     "answer": "mixkit-retro-game-emergency-alarm-1000.wav",
