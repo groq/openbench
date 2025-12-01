@@ -128,23 +128,20 @@ class EvalStats:
 
         # LLM timing - collect all individual call times for averaging
         all_http_times = []
-        all_queue_times = []
-        all_prompt_times = []
-        all_completion_times = []
-        all_provider_times = []
+        total_queue_time_sum = 0.0
+        total_prompt_time_sum = 0.0
+        total_completion_time_sum = 0.0
+        total_provider_time_sum = 0.0
+        total_provider_time_calls = 0
 
         for s in self.sample_stats:
             all_http_times.extend(s.llm_http_times)
-            # Provider timing is summed per sample, so we need per-call averages
             if s.n_model_calls > 0:
-                all_queue_times.append(s.llm_queue_time_total / s.n_model_calls)
-                all_prompt_times.append(s.llm_prompt_time_total / s.n_model_calls)
-                all_completion_times.append(
-                    s.llm_completion_time_total / s.n_model_calls
-                )
-                all_provider_times.append(
-                    s.llm_provider_time_total / s.n_model_calls
-                )
+                total_queue_time_sum += s.llm_queue_time_total
+                total_prompt_time_sum += s.llm_prompt_time_total
+                total_completion_time_sum += s.llm_completion_time_total
+                total_provider_time_sum += s.llm_provider_time_total
+                total_provider_time_calls += s.n_model_calls
 
         # Token sums and rates
         input_tokens_sum = sum(s.input_tokens_total for s in self.sample_stats)
@@ -216,16 +213,24 @@ class EvalStats:
                 statistics.mean(all_http_times) if all_http_times else None
             ),
             "llm_queue_time_mean": (
-                statistics.mean(all_queue_times) if all_queue_times else None
+                total_queue_time_sum / total_provider_time_calls
+                if total_provider_time_calls > 0
+                else None
             ),
             "llm_prompt_time_mean": (
-                statistics.mean(all_prompt_times) if all_prompt_times else None
+                total_prompt_time_sum / total_provider_time_calls
+                if total_provider_time_calls > 0
+                else None
             ),
             "llm_completion_time_mean": (
-                statistics.mean(all_completion_times) if all_completion_times else None
+                total_completion_time_sum / total_provider_time_calls
+                if total_provider_time_calls > 0
+                else None
             ),
             "llm_provider_time_mean": (
-                statistics.mean(all_provider_times) if all_provider_times else None
+                total_provider_time_sum / total_provider_time_calls
+                if total_provider_time_calls > 0
+                else None
             ),
             # Time breakdown (for understanding where time goes)
             "llm_http_time_sum": llm_http_time_sum,
