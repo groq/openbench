@@ -184,6 +184,18 @@ class EvalStats:
             sum(working_times) - llm_http_time_sum if working_times else None
         )
 
+        total_time_p95 = None
+        if len(total_times) >= 20:
+            sorted_times = sorted(total_times)
+            percentile_position = 0.95 * (len(sorted_times) - 1)
+            lower_index = int(percentile_position)
+            upper_index = min(lower_index + 1, len(sorted_times) - 1)
+            fraction = percentile_position - lower_index
+            total_time_p95 = (
+                sorted_times[lower_index] * (1 - fraction)
+                + sorted_times[upper_index] * fraction
+            )
+
         return {
             "log_path": self.log_path,
             "model": self.model,
@@ -199,11 +211,7 @@ class EvalStats:
             "total_time_p50": (
                 statistics.median(total_times) if total_times else None
             ),
-            "total_time_p95": (
-                sorted(total_times)[int(len(total_times) * 0.95)]
-                if len(total_times) >= 20
-                else None
-            ),
+            "total_time_p95": total_time_p95,
             "working_time_sum": sum(working_times) if working_times else None,
             "working_time_mean": (
                 statistics.mean(working_times) if working_times else None
