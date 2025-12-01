@@ -144,7 +144,10 @@ def create_mcp_tool_wrapper(
 
     # Prefix tool name with server name to avoid collisions
     # e.g., "filesystem__read_file" instead of just "read_file"
-    prefixed_name = f"{server_name}__{tool_name}"
+    # Replace whitespace with underscores to avoid API errors
+    safe_server_name = server_name.replace(" ", "_")
+    safe_tool_name = tool_name.replace(" ", "_")
+    prefixed_name = f"{safe_server_name}__{safe_tool_name}"
 
     # Create ToolDef and convert to Tool
     tool_def = ToolDef(
