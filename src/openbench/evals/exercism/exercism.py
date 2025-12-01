@@ -26,7 +26,7 @@ COMPOSE_PATH = (TASK_DIR / "compose.yaml").resolve()
 @task
 def exercism(
     languages: Optional[List[str]] = None,
-    code_agent: str = "opencode",
+    code_agent: str = "codex",
     hide_tests: bool = False,
 ) -> Task:
     """

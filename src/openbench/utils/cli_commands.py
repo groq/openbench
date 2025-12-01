@@ -559,7 +559,7 @@ echo "Running Gemini CLI with prompt: $PROMPT"
 echo "Working directory: $(pwd)"
 
 # Run Gemini with --yolo flag to enable automatic file editing
-gemini -p "$PROMPT" --yolo 2>&1 | tee /tmp/gemini-output.log
+gemini --model {model} -p "$PROMPT" --yolo 2>&1 | tee /tmp/gemini-output.log
 """
 
 
