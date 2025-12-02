@@ -24,3 +24,10 @@ repos:
         args: [src]
         pass_filenames: false
         files: ^src/
+      - id: test-registry-imports
+        name: test registry imports
+        entry: .venv/bin/pytest
+        language: system
+        args: [tests/test_registry_imports.py, -v]
+        pass_filenames: false
+        files: ^(src/openbench/_registry\.py|pyproject\.toml)
