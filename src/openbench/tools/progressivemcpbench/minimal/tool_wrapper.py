@@ -73,22 +73,78 @@ def _format_result(result: types.CallToolResult) -> str:
     return "\n".join(text_parts) if text_parts else "(no output)"
 
 
+def _convert_json_schema(prop: dict[str, Any], name: str | None = None) -> JSONSchema:
+    """Recursively convert a JSON schema dict to a JSONSchema object.
+
+    Handles nested schemas (items, properties) and union types (anyOf).
+    """
+    kwargs: dict[str, Any] = {}
+
+    # Handle union types like ["integer", "null"]
+    prop_type = prop.get("type")
+    if isinstance(prop_type, list):
+        # Convert to anyOf format
+        kwargs["anyOf"] = [
+            JSONSchema(type=t)  # type: ignore[arg-type]
+            for t in prop_type
+        ]
+    elif prop_type:
+        kwargs["type"] = prop_type
+
+    # Description (provide default if at top level with a name)
+    if "description" in prop:
+        kwargs["description"] = prop["description"]
+    elif name:
+        kwargs["description"] = f"The {name} parameter"
+
+    # Simple scalar fields
+    for field in ["format", "default", "enum"]:
+        if field in prop:
+            kwargs[field] = prop[field]
+
+    # Nested items schema (for arrays)
+    if "items" in prop:
+        items_schema = prop["items"]
+        if isinstance(items_schema, dict):
+            kwargs["items"] = _convert_json_schema(items_schema)
+
+    # Nested properties (for objects)
+    if "properties" in prop:
+        kwargs["properties"] = {
+            k: _convert_json_schema(v, k) for k, v in prop["properties"].items()
+        }
+
+    # Required fields for object types
+    if "required" in prop:
+        kwargs["required"] = list(prop["required"])
+
+    # Additional properties
+    if "additionalProperties" in prop:
+        ap = prop["additionalProperties"]
+        if isinstance(ap, bool):
+            kwargs["additionalProperties"] = ap
+        elif isinstance(ap, dict):
+            kwargs["additionalProperties"] = _convert_json_schema(ap)
+
+    # anyOf (if already present in source)
+    if "anyOf" in prop and "anyOf" not in kwargs:
+        kwargs["anyOf"] = [_convert_json_schema(s) for s in prop["anyOf"]]
+
+    return JSONSchema(**kwargs)  # type: ignore[arg-type]
+
+
 def _json_schema_to_tool_params(schema: dict[str, Any]) -> ToolParams:
-    """Convert a JSON schema to ToolParams."""
+    """Convert a JSON schema to ToolParams.
+
+    Recursively converts nested schemas to ensure compatibility with
+    strict API validators like OpenAI.
+    """
     properties_dict: dict[str, JSONSchema] = {}
     properties = schema.get("properties", {})
     required = list(schema.get("required", []))
 
     for name, prop in properties.items():
-        # Map JSON schema type to the expected literal type
-        prop_type = prop.get("type", "string")
-        # Inspect AI requires descriptions - provide a default if missing
-        description = prop.get("description") or f"The {name} parameter"
-        json_schema = JSONSchema(
-            type=prop_type,  # type: ignore[arg-type]
-            description=description,
-        )
-        properties_dict[name] = json_schema
+        properties_dict[name] = _convert_json_schema(prop, name)
 
     return ToolParams(
         type="object",
