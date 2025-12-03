@@ -173,6 +173,7 @@ def _distraction_tool_source(
     required_tools: list[tuple[str, str]],
     task_id: str,
     target_count: int,
+    base_distractor_count: int | None = None,
 ) -> ToolSource:
     """Create a ToolSource with required tools plus distractors to reach target count.
 
@@ -183,10 +184,17 @@ def _distraction_tool_source(
     The distraction tools are selected deterministically based on the task_id,
     ensuring reproducibility across runs.
 
+    When base_distractor_count is provided, the first base_distractor_count distractors
+    are selected using the task_id-based hash, and additional distractors are selected
+    using a different hash to ensure the base set is a strict subset. This allows
+    distraction-128 to be a strict superset of distraction-64.
+
     Args:
         required_tools: List of (server_name, tool_name) tuples for required tools
         task_id: Task identifier used for deterministic distractor selection
         target_count: Total number of tools to include
+        base_distractor_count: If provided, the first N distractors use the base hash,
+            remaining distractors use an extended hash for superset consistency
 
     Returns:
         ToolSource with required tools plus deterministic distractors
@@ -211,7 +219,7 @@ def _distraction_tool_source(
                 required_tools_list.append((server_name, tool_info))
 
     # Calculate how many distractors we need
-    remaining = target_count - len(required_tools_list)
+    total_distractors_needed = target_count - len(required_tools_list)
 
     # Collect all non-required tools as potential distractors
     distractor_pool: list[tuple[str, dict[str, Any]]] = []
@@ -222,16 +230,36 @@ def _distraction_tool_source(
                 distractor_pool.append((server_name, tool_info))
 
     # Sort distractors deterministically based on task_id hash
-    def sort_key(item: tuple[str, dict[str, Any]]) -> str:
+    def base_sort_key(item: tuple[str, dict[str, Any]]) -> str:
         server_name, tool_info = item
         tool_name = tool_info.get("name", "")
         combined = f"{task_id}:{server_name}:{tool_name}"
         return hashlib.sha256(combined.encode()).hexdigest()
 
-    distractor_pool.sort(key=sort_key)
+    distractor_pool.sort(key=base_sort_key)
 
-    # Select distractors
-    selected_distractors = distractor_pool[:remaining] if remaining > 0 else []
+    # Select distractors with superset consistency
+    if base_distractor_count is not None and total_distractors_needed > base_distractor_count:
+        # Take the first base_distractor_count using the base hash (same as distraction-64)
+        base_distractors = distractor_pool[:base_distractor_count]
+
+        # For additional distractors, use a different hash to select from remaining pool
+        remaining_pool = distractor_pool[base_distractor_count:]
+        additional_needed = total_distractors_needed - base_distractor_count
+
+        def extended_sort_key(item: tuple[str, dict[str, Any]]) -> str:
+            server_name, tool_info = item
+            tool_name = tool_info.get("name", "")
+            combined = f"{task_id}:extended:{server_name}:{tool_name}"
+            return hashlib.sha256(combined.encode()).hexdigest()
+
+        remaining_pool.sort(key=extended_sort_key)
+        additional_distractors = remaining_pool[:additional_needed]
+
+        selected_distractors = base_distractors + additional_distractors
+    else:
+        # Simple case: just take from the sorted pool
+        selected_distractors = distractor_pool[:total_distractors_needed] if total_distractors_needed > 0 else []
 
     # Combine required and distractor tools
     all_selected = required_tools_list + selected_distractors
@@ -258,6 +286,10 @@ def _distraction_tool_source(
     return _StaticToolSource(tools)
 
 
+# Base distractor count for distraction-64 (used for superset consistency)
+_DISTRACTION_64_BASE = 64
+
+
 def distraction_64_tool_source(
     required_tools: list[tuple[str, str]],
     task_id: str,
@@ -280,6 +312,9 @@ def distraction_128_tool_source(
 ) -> ToolSource:
     """Create a ToolSource with required tools plus distractors to reach 128 tools.
 
+    This is a strict superset of distraction-64: it contains all 64 tools from
+    distraction-64 plus an additional 64 deterministically selected tools.
+
     Args:
         required_tools: List of (server_name, tool_name) tuples for required tools
         task_id: Task identifier used for deterministic distractor selection
@@ -287,7 +322,12 @@ def distraction_128_tool_source(
     Returns:
         ToolSource with required tools plus deterministic distractors (128 total)
     """
-    return _distraction_tool_source(required_tools, task_id, target_count=128)
+    # Calculate how many distractors distraction-64 would use for this task
+    # We need to match its base selection, then add more
+    base_distractors = _DISTRACTION_64_BASE - len(required_tools)
+    return _distraction_tool_source(
+        required_tools, task_id, target_count=128, base_distractor_count=max(0, base_distractors)
+    )
 
 
 class _StaticToolSource(ToolSource):
