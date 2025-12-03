@@ -273,7 +273,7 @@ def _get_solver_for_strategy(strategy: str) -> Solver:
 
 @task
 def progressivemcpbench(
-    working_limit: int = 600,
+    working_limit: int = 60,
     strategy: str | None = None,
 ) -> Task:
     """ProgressiveMCPBench using configurable tool discovery strategies.
