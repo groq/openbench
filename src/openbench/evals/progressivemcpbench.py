@@ -33,6 +33,9 @@ from openbench.tools.progressivemcpbench.synthetic.toolsource import (
     synthetic_distraction_64_tool_source,
     synthetic_distraction_128_tool_source,
 )
+from openbench.tools.progressivemcpbench.copilot.synthetic_toolsource import (
+    synthetic_copilot_tool_source,
+)
 from openbench.utils.text import (
     PROGRESSIVEMCPBENCH_SYSTEM_MESSAGE,
     PROGRESSIVEMCPBENCH_DIRECTORY_SYSTEM_MESSAGE,
@@ -41,7 +44,7 @@ from openbench.utils.text import (
 
 
 VALID_STRATEGIES = {
-    # "copilot",  # Disabled - requires live embeddings infrastructure
+    "copilot",
     "directory",
     "minimal-servers",
     "minimal-tools",
@@ -96,6 +99,23 @@ async def _run_react_with_tools(
         if state.output and not state.output.completion:
             state.output.completion = f"Task failed due to runtime error: {str(e)}"
         return state
+
+
+@solver
+def progressive_copilot_solver() -> Solver:
+    """Solver that uses the synthetic Copilot MCP server for ProgressiveMCPBench.
+
+    This strategy uses semantic search with embeddings to discover tools,
+    then executes them via the synthetic HTTP MCP backend.
+    """
+
+    async def solve(state: TaskState, generate: Any) -> TaskState:
+        tool_source = synthetic_copilot_tool_source()
+        return await _run_react_with_tools(
+            state, PROGRESSIVEMCPBENCH_SYSTEM_MESSAGE, tool_source
+        )
+
+    return solve
 
 
 @solver
@@ -228,7 +248,9 @@ def progressive_distraction_128_solver() -> Solver:
 
 def _get_solver_for_strategy(strategy: str) -> Solver:
     """Get the appropriate solver for the given strategy."""
-    if strategy == "directory":
+    if strategy == "copilot":
+        return progressive_copilot_solver()
+    elif strategy == "directory":
         return progressive_directory_solver()
     elif strategy == "minimal-servers":
         return progressive_minimal_servers_solver()
@@ -256,7 +278,7 @@ def progressivemcpbench(
     Args:
         working_limit: Maximum number of API calls per task.
         strategy: Tool discovery strategy. Required. One of:
-            - "copilot": Semantic search with embeddings (route/execute-tool) [DISABLED]
+            - "copilot": Semantic search with embeddings (route/execute-tool)
             - "directory": Filesystem-like exploration (ls/read-tool-file/execute-tool)
             - "minimal-servers": Direct access to required server tools (requires annotations)
             - "minimal-tools": Direct access to exact required tools (requires annotations)
