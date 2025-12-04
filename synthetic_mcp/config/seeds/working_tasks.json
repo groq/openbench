@@ -1,0 +1,279 @@
+[
+  {
+    "task_id": "99d7541a-73c0-4ea1-8002-a70a041f3ffc",
+    "Question": "Please perform a comprehensive analysis of the audio file located at /root/music/mixkit-retro-game-emergency-alarm-1000.wav. Then return the precise tempo of the track, to two decimal places.",
+    "category": "Leisure",
+    "file_name": "/root/music/mixkit-retro-game-emergency-alarm-1000.wav",
+    "answer": "60.09",
+    "scorer_instructions": "Tolerate 1% error in the answer.",
+    "required_servers": [
+      "music-analysis"
+    ],
+    "required_tools": [
+      "beat_track",
+      "get_duration",
+      "load",
+      "tempo"
+    ],
+    "annotator_metadata": {
+      "Number of steps": "5",
+      "Number of tools": "4",
+      "Steps": "1. Load the audio file\n2. Compute the beat track of the audio to understand its rhythmic structure. \n3. Extract the Mel-Frequency Cepstral Coefficients (MFCCs) from the audio to analyze its spectral content.\n4. Compute the Chroma Constant-Q Transform (CQT) to analyze the chromatic content of the audio. \n5. Write a summary document outlining the key findings and insights from the analysis.\n",
+      "Tools": "1. load\n2. beat_track\n3. mfcc\n4. chroma_cqt"
+    }
+  },
+  {
+    "task_id": "6b7fc66e-fe96-4403-9a52-df5afa53ab68",
+    "Question": "Gather information on clinical trial NCT04280705 and return its full title.",
+    "category": "Office",
+    "file_name": "",
+    "answer": "Brief Title: Adaptive COVID-19 Treatment Trial (ACTT)\nOfficial Title: A Multicenter, Adaptive, Randomized Blinded Controlled Trial of the Safety and Efficacy of Investigational Therapeutics for the Treatment of COVID-19 in Hospitalized Adults",
+    "scorer_instructions": "Either title is OK",
+    "required_servers": [
+      "biomcp"
+    ],
+    "required_tools": [
+      "trial_protocol_getter"
+    ],
+    "annotator_metadata": {
+      "Number of steps": "3",
+      "Number of tools": "2",
+      "Steps": "1. Retrieves publications and other references associated with a single clinical trial identified by its NCT ID\n2. Generate a markdown report\n3. Write it to the path",
+      "Tools": "1. trial_references\n2. write_file"
+    }
+  },
+  {
+    "task_id": "d116bda4-e70c-4ef1-ab1a-b68b4855e1bf",
+    "Question": "Read the data under /root/excel/people_data.xlsx and tell me Sophia Moore's bmi.",
+    "category": "Lifestyle",
+    "file_name": "",
+    "answer": "20.76",
+    "scorer_instructions": "Must match the value exactly.",
+    "required_servers": [
+      "excel",
+      "searxng"
+    ],
+    "required_tools": [
+      "document_reader",
+      "excel_describe_sheets",
+      "excel_read",
+      "excel_read_sheet"
+    ],
+    "annotator_metadata": {
+      "Number of steps": "2",
+      "Number of tools": "2",
+      "Steps": "1. read the excel\n2. caculate the bmi",
+      "Tools": "1. excel_read_sheet\n2. calculate"
+    }
+  },
+  {
+    "task_id": "7bda47e8-1b8b-4f1f-b67c-573a81417d36",
+    "Question": "When was the article on arxiv 2203.12277 first submitted?",
+    "category": "Office",
+    "file_name": "",
+    "answer": "2022-03-23",
+    "scorer_instructions": "Within a few days of the ideal answer is fine",
+    "required_servers": [
+      "mcp-simple-arxiv"
+    ],
+    "required_tools": [
+      "get_paper_data"
+    ],
+    "annotator_metadata": {
+      "Number of steps": "3",
+      "Number of tools": "2",
+      "Steps": "1. get detailed information about the paper\n2. fetch the full text of the paper\n3. write a introduction",
+      "Tools": "1. get_paper_data\n2. fetch"
+    }
+  },
+  {
+    "task_id": "4aa079dd-9d2d-440d-a654-9ba9cb3868b0",
+    "Question": "Read the paper webarena, mind2web and mind2web2, then give me the last names of the first listed author of each paper.",
+    "category": "Office",
+    "file_name": "",
+    "answer": "Deng, Gou, Zhou",
+    "scorer_instructions": "All three names must be present, and no other ones should be identified as 'first authors'.",
+    "required_servers": [
+      "arxiv-mcp-server",
+      "mcp-simple-arxiv"
+    ],
+    "required_tools": [
+      "search_papers"
+    ],
+    "annotator_metadata": {
+      "Number of steps": "4",
+      "Number of tools": "3",
+      "Steps": "1. get the paper id in arxiv\n2. get the detailed information for these papers\n3. write a Comparison Report in markdown\n4. save it to the path",
+      "Tools": "1. search_papers\n2. get_paper_data\n3. write_file"
+    }
+  },
+  {
+    "task_id": "9a18862e-22ce-46e7-b46a-72c6f5c79b23",
+    "Question": "Get line 10 of /root/txt/Android.txt, please note that this file is very large",
+    "category": "Office",
+    "file_name": "",
+    "answer": "03-17 16:13:38.877 2227 2227 D TextView: mVisiblity.getValue is false",
+    "scorer_instructions": null,
+    "required_servers": [
+      "filesystem"
+    ],
+    "required_tools": [
+      "read_file"
+    ],
+    "annotator_metadata": {
+      "Number of steps": "1",
+      "Number of tools": "1",
+      "Steps": "1. locate the 10th line in the file",
+      "Tools": "1. get_text_file_contents"
+    }
+  },
+  {
+    "task_id": "de75630e-b91e-4cc7-85b1-5d02c2455392",
+    "Question": " I'm looking at a PR and need to know which of these libs are outdated: com.fasterxml.jackson.core:jackson-databind:2.13.4, org.apache.poi:poi-ooxml:5.2.0, and com.google.guava:guava:30.1-jre.",
+    "category": "Office",
+    "file_name": "",
+    "answer": "All three are outdated",
+    "scorer_instructions": "The model can express this in any way, but it must agree that all are outdate",
+    "required_servers": [
+      "maven-deps-server"
+    ],
+    "required_tools": [
+      "get_latest_release"
+    ],
+    "annotator_metadata": {
+      "Number of steps": "1",
+      "Number of tools": "1",
+      "Steps": "1. check the versions",
+      "Tools": "1. get_maven_latest_version"
+    }
+  },
+  {
+    "task_id": "1ef11556-37d6-4585-b4b2-cf2f782141e6",
+    "Question": "Read all the articles in the /root/pdf/embodied_ai_papers directory. Return the last names of the first listed author of each paper.",
+    "category": "Office",
+    "file_name": "/root/pdf/embodied_ai_papers",
+    "answer": "Brohan, Driess, Wang",
+    "scorer_instructions": "All three names must be present, and no other ones should be identified as 'first authors'.",
+    "required_servers": [
+      "filesystem",
+      "pdf-reader-mcp"
+    ],
+    "required_tools": [
+      "list_allowed_directories",
+      "list_directory",
+      "read_file",
+      "read_pdf"
+    ],
+    "annotator_metadata": {
+      "Number of steps": "4",
+      "Number of tools": "3",
+      "Steps": "1. list directory\n2. read all pdf\n3. write a summary report\n4. save it to the path",
+      "Tools": "1. list_directory\n2. read_pdf\n3. write_file"
+    }
+  },
+  {
+    "task_id": "086e2393-dc1a-4c55-bf54-1e9a94951db7",
+    "Question": "Read the file /root/word/exchange.docx, tell me who did not give a gift",
+    "category": "Leisure",
+    "file_name": "/root/word/exchange.docx",
+    "answer": "Nobody. Everyone gave a gift.",
+    "scorer_instructions": "The model can express this in any way, but if it gives a name of somebody, it failed.",
+    "required_servers": [
+      "filesystem",
+      "searxng",
+      "word-document-server"
+    ],
+    "required_tools": [
+      "docx_to_html",
+      "get_document_text",
+      "read_file"
+    ],
+    "annotator_metadata": {
+      "Number of steps": "2",
+      "Number of tools": "1",
+      "Steps": "1. open the word document\n2. answer the question",
+      "Tools": "1. get_document_text"
+    }
+  },
+  {
+    "task_id": "507f592a-f21f-45f6-bbde-dadb86441791",
+    "Question": "Read the customer information in /root/csv/customers-100.csv and tell me Sheryl Meyers's email address. Return just the email address.",
+    "category": "Office",
+    "file_name": "",
+    "answer": "mariokhan@ryan-pope.org",
+    "scorer_instructions": null,
+    "required_servers": [
+      "filesystem"
+    ],
+    "required_tools": [
+      "read_file"
+    ],
+    "annotator_metadata": {
+      "Number of steps": "2",
+      "Number of tools": "1",
+      "Steps": "1. read the file\n2. find the information about Sheryl Meyers",
+      "Tools": "1. document_reader"
+    }
+  },
+  {
+    "task_id": "71a7a42a-54af-4552-ad9b-d36f4912cc1c",
+    "Question": "Read the reference list in /root/txt/paper_list.bib and return the title of the first paper cited.",
+    "category": "Office",
+    "file_name": "/root/txt/paper_list.bib",
+    "answer": "WebSRC: A Dataset for Web-Based Structural Reading Comprehension",
+    "scorer_instructions": null,
+    "required_servers": [
+      "filesystem"
+    ],
+    "required_tools": [
+      "read_file"
+    ],
+    "annotator_metadata": {
+      "Number of steps": "4",
+      "Number of tools": "4",
+      "Steps": "1. open the /root/txt/paper_list.bib\n2. convert them to APA format\n3. create a word document\n4. open and write to word document",
+      "Tools": "1. read_file\n2. create_document\n3. open_document\n4. add_paragraph"
+    }
+  },
+  {
+    "task_id": "31086c2d-e183-42c3-9ee7-7c1278c4317f",
+    "Question": "What files are in my /root/music folder?",
+    "category": "Lifestyle",
+    "file_name": "/root/music",
+    "answer": "mixkit-retro-game-emergency-alarm-1000.wav",
+    "scorer_instructions": "This should be the only file reported by the model",
+    "required_servers": [
+      "filesystem"
+    ],
+    "required_tools": [
+      "list_directory"
+    ],
+    "annotator_metadata": {
+      "Number of steps": "1",
+      "Number of tools": "1",
+      "Steps": "1. list the dir",
+      "Tools": "1. list_directory"
+    }
+  },
+  {
+    "task_id": "2e190c2a-8aab-44e1-896d-671cb3fcc495",
+    "Question": "What are the changes in my log files /root/txt/log_today.txt and /root/txt/log_yesterday.txt, help me to find out all the different lines which contain 'ERROR'?",
+    "category": "Office",
+    "file_name": "/root/txt/log_today.txt, /root/txt/log_yesterday.txt",
+    "answer": "[ERROR] Database connection failed.",
+    "scorer_instructions": "Only this line should be returned.",
+    "required_servers": [
+      "filesystem"
+    ],
+    "required_tools": [
+      "read_file",
+      "read_multiple_files"
+    ],
+    "annotator_metadata": {
+      "Number of steps": "2",
+      "Number of tools": "1",
+      "Steps": "1. Compare two text files and show differences\n2. Find different lines which contain 'ERROR'",
+      "Tools": "1. text_diff"
+    }
+  }
+]

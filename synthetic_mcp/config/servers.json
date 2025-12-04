@@ -1,0 +1,565 @@
+{
+  "filesystem": {
+    "server_name": "filesystem",
+    "description": "Node.js server implementing Model Context Protocol (MCP) for filesystem operations.",
+    "category": "File Access",
+    "tools": [
+      {
+        "name": "read_file",
+        "description": "Read the complete contents of a file from the file system. Handles various text encodings and provides detailed error messages if the file cannot be read. Use this tool when you need to examine the contents of a single file. Only works within allowed directories.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Path to the file to read"
+            }
+          },
+          "required": ["path"]
+        },
+        "handler": {
+          "type": "filesystem",
+          "root": "data/files/root"
+        }
+      },
+      {
+        "name": "read_multiple_files",
+        "description": "Read the contents of multiple files simultaneously. This is more efficient than reading files one by one when you need to analyze or compare multiple files. Each file's content is returned with its path as a reference.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "paths": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Array of file paths to read"
+            }
+          },
+          "required": ["paths"]
+        },
+        "handler": {
+          "type": "filesystem",
+          "root": "data/files/root"
+        }
+      },
+      {
+        "name": "list_directory",
+        "description": "Get a detailed listing of all files and directories in a specified path. Results clearly distinguish between files and directories with [FILE] and [DIR] prefixes.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Path to the directory to list"
+            }
+          },
+          "required": ["path"]
+        },
+        "handler": {
+          "type": "filesystem",
+          "root": "data/files/root"
+        }
+      },
+      {
+        "name": "list_allowed_directories",
+        "description": "Returns the list of directories that this server is allowed to access. Use this to understand which directories are available before trying to access files.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "handler": {
+          "type": "static_json",
+          "response": ["/root"]
+        }
+      }
+    ]
+  },
+  "excel": {
+    "server_name": "excel",
+    "description": "A Model Context Protocol (MCP) server that reads and writes MS Excel data.",
+    "category": "File Access",
+    "tools": [
+      {
+        "name": "excel_describe_sheets",
+        "description": "List all sheet information of specified Excel file including sheet names and dimensions.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "fileAbsolutePath": {
+              "type": "string",
+              "description": "Absolute path to the Excel file"
+            }
+          },
+          "required": ["fileAbsolutePath"]
+        },
+        "handler": {
+          "type": "excel_reader",
+          "operation": "describe_sheets",
+          "root": "data/files/root"
+        }
+      },
+      {
+        "name": "excel_read_sheet",
+        "description": "Read values from Excel sheet. Returns cell values as a structured table.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "fileAbsolutePath": {
+              "type": "string",
+              "description": "Absolute path to the Excel file"
+            },
+            "sheetName": {
+              "type": "string",
+              "description": "Sheet name in the Excel file"
+            },
+            "range": {
+              "type": "string",
+              "description": "Range of cells to read (e.g., 'A1:C10')"
+            }
+          },
+          "required": ["fileAbsolutePath", "sheetName"]
+        },
+        "handler": {
+          "type": "excel_reader",
+          "operation": "read_sheet",
+          "root": "data/files/root"
+        }
+      }
+    ]
+  },
+  "music-analysis": {
+    "server_name": "music-analysis",
+    "description": "Model Context Provider (MCP) that uses librosa for audio analysis on local audio files.",
+    "category": "Miscellaneous",
+    "tools": [
+      {
+        "name": "load",
+        "description": "Loads an audio file and returns a reference to the audio time series for further analysis.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "file_path": {
+              "type": "string",
+              "description": "Path to the audio file"
+            },
+            "offset": {
+              "type": "number",
+              "description": "Start reading after this time (in seconds)",
+              "default": 0.0
+            },
+            "duration": {
+              "type": "number",
+              "description": "Only load this much audio (in seconds)"
+            }
+          },
+          "required": ["file_path"]
+        },
+        "handler": {
+          "type": "table_lookup",
+          "dataset": "data/api/audio_files.json",
+          "key_field": "file_path",
+          "response_field": "load_result"
+        }
+      },
+      {
+        "name": "get_duration",
+        "description": "Returns the total duration (in seconds) of the given audio time series.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "path_audio_time_series_y": {
+              "type": "string",
+              "description": "Reference to a loaded audio time series"
+            }
+          },
+          "required": ["path_audio_time_series_y"]
+        },
+        "handler": {
+          "type": "table_lookup",
+          "dataset": "data/api/audio_files.json",
+          "key_field": "audio_ref",
+          "response_field": "duration"
+        }
+      },
+      {
+        "name": "tempo",
+        "description": "Estimates the tempo (in BPM) of the given audio time series using librosa.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "path_audio_time_series_y": {
+              "type": "string",
+              "description": "Reference to a loaded audio time series"
+            },
+            "hop_length": {
+              "type": "integer",
+              "default": 512
+            },
+            "start_bpm": {
+              "type": "number",
+              "default": 120
+            }
+          },
+          "required": ["path_audio_time_series_y"]
+        },
+        "handler": {
+          "type": "table_lookup",
+          "dataset": "data/api/audio_files.json",
+          "key_field": "audio_ref",
+          "response_field": "tempo"
+        }
+      },
+      {
+        "name": "beat_track",
+        "description": "Computes the beat track of the given audio time series. Returns beat frames and tempo.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "path_audio_time_series_y": {
+              "type": "string",
+              "description": "Reference to a loaded audio time series"
+            },
+            "hop_length": {
+              "type": "integer",
+              "default": 512
+            }
+          },
+          "required": ["path_audio_time_series_y"]
+        },
+        "handler": {
+          "type": "table_lookup",
+          "dataset": "data/api/audio_files.json",
+          "key_field": "audio_ref",
+          "response_field": "beat_track"
+        }
+      }
+    ]
+  },
+  "biomcp": {
+    "server_name": "biomcp",
+    "description": "BioMCP is a toolkit that empowers AI assistants with specialized biomedical knowledge. It connects AI systems to authoritative biomedical data sources for clinical trials, scientific literature, and genomic variants.",
+    "category": "Discovery",
+    "tools": [
+      {
+        "name": "trial_protocol_getter",
+        "description": "Fetch core protocol information for a clinical trial. Retrieves official title, brief summary, study status, sponsor information, study design, eligibility criteria, and primary completion date.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "nct_id": {
+              "type": "string",
+              "description": "NCT ID (e.g., 'NCT04280705')"
+            }
+          },
+          "required": ["nct_id"]
+        },
+        "handler": {
+          "type": "table_lookup",
+          "dataset": "data/api/clinical_trials.json",
+          "key_field": "nct_id"
+        }
+      }
+    ]
+  },
+  "mcp-simple-arxiv": {
+    "server_name": "mcp-simple-arxiv",
+    "description": "An MCP server that provides access to arXiv papers through their API.",
+    "category": "Discovery",
+    "tools": [
+      {
+        "name": "get_paper_data",
+        "description": "Get detailed information about a specific paper including title, authors, abstract, submission date, and available formats.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "paper_id": {
+              "type": "string",
+              "description": "arXiv paper ID (e.g., '2203.12277')"
+            }
+          },
+          "required": ["paper_id"]
+        },
+        "handler": {
+          "type": "table_lookup",
+          "dataset": "data/api/arxiv_papers.json",
+          "key_field": "paper_id"
+        }
+      },
+      {
+        "name": "search_papers",
+        "description": "Search for papers on arXiv by title and abstract content. Supports advanced search syntax.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Search query to match against paper titles and abstracts"
+            },
+            "max_results": {
+              "type": "number",
+              "description": "Maximum number of results to return (default: 10)"
+            }
+          },
+          "required": ["query"]
+        },
+        "handler": {
+          "type": "table_lookup",
+          "dataset": "data/api/arxiv_papers.json",
+          "key_field": "search_query",
+          "operation": "search"
+        }
+      }
+    ]
+  },
+  "arxiv-mcp-server": {
+    "server_name": "arxiv-mcp-server",
+    "description": "The ArXiv MCP Server provides a bridge between AI assistants and arXiv's research repository. It allows AI models to search for papers and access their content.",
+    "category": "Discovery",
+    "tools": [
+      {
+        "name": "search_papers",
+        "description": "Search for papers on arXiv with advanced filtering by date, category, and keywords.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Search query"
+            },
+            "max_results": {
+              "type": "integer",
+              "description": "Maximum number of results"
+            },
+            "date_from": {
+              "type": "string",
+              "description": "Filter papers from this date"
+            },
+            "date_to": {
+              "type": "string",
+              "description": "Filter papers until this date"
+            },
+            "categories": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Filter by arXiv categories"
+            }
+          },
+          "required": ["query"]
+        },
+        "handler": {
+          "type": "table_lookup",
+          "dataset": "data/api/arxiv_papers.json",
+          "key_field": "search_query",
+          "operation": "search"
+        }
+      }
+    ]
+  },
+  "maven-deps-server": {
+    "server_name": "maven-deps-server",
+    "description": "An MCP server that provides tools for checking Maven dependency versions. Enables verification of Maven dependencies and retrieval of their latest versions from Maven Central Repository.",
+    "category": "Code",
+    "tools": [
+      {
+        "name": "get_latest_release",
+        "description": "Get the latest release version of a Maven dependency (excludes pre-releases by default).",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "dependency": {
+              "type": "string",
+              "description": "Maven coordinate in format 'groupId:artifactId' (e.g., 'org.springframework:spring-core')"
+            },
+            "excludePreReleases": {
+              "type": "boolean",
+              "description": "Whether to exclude pre-release versions",
+              "default": true
+            }
+          },
+          "required": ["dependency"]
+        },
+        "handler": {
+          "type": "table_lookup",
+          "dataset": "data/api/maven_versions.json",
+          "key_field": "artifact"
+        }
+      }
+    ]
+  },
+  "pdf-reader-mcp": {
+    "server_name": "pdf-reader-mcp",
+    "description": "MCP server for reading and extracting information from PDF files including text, metadata, and page count.",
+    "category": "File Access",
+    "tools": [
+      {
+        "name": "read_pdf",
+        "description": "Reads content and metadata from one or more PDF files. Can extract text from specific pages.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "sources": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "description": "Path to the PDF file"
+                  },
+                  "pages": {
+                    "type": "array",
+                    "items": {"type": "integer"},
+                    "description": "Specific pages to extract (1-based)"
+                  }
+                }
+              },
+              "description": "Array of PDF sources to process"
+            },
+            "include_full_text": {
+              "type": "boolean",
+              "default": true,
+              "description": "Include the full text content"
+            },
+            "include_metadata": {
+              "type": "boolean",
+              "default": true,
+              "description": "Include metadata"
+            }
+          },
+          "required": ["sources"]
+        },
+        "handler": {
+          "type": "pdf_reader",
+          "root": "data/files/root"
+        }
+      },
+      {
+        "name": "list_directory",
+        "description": "List PDF files in a directory.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Directory path"
+            }
+          },
+          "required": ["path"]
+        },
+        "handler": {
+          "type": "filesystem",
+          "root": "data/files/root"
+        }
+      },
+      {
+        "name": "list_allowed_directories",
+        "description": "Returns the list of directories that this server is allowed to access.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "handler": {
+          "type": "static_json",
+          "response": ["/root"]
+        }
+      }
+    ]
+  },
+  "word-document-server": {
+    "server_name": "word-document-server",
+    "description": "MCP server for creating, reading, and manipulating Microsoft Word documents. Enables AI assistants to work with Word documents through a standardized interface.",
+    "category": "File Access",
+    "tools": [
+      {
+        "name": "get_document_text",
+        "description": "Extract all text from a Word document.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "filename": {
+              "type": "string",
+              "description": "Path to the Word document"
+            }
+          },
+          "required": ["filename"]
+        },
+        "handler": {
+          "type": "docx_reader",
+          "root": "data/files/root"
+        }
+      }
+    ]
+  },
+  "searxng": {
+    "server_name": "searxng",
+    "description": "A powerful MCP server providing comprehensive document processing capabilities including reading, converting, and transforming various document formats.",
+    "category": "File Access",
+    "tools": [
+      {
+        "name": "document_reader",
+        "description": "Read content from document files at specified paths, supporting formats: .pdf, .docx, .txt, .html, .csv, .xlsx",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "filePath": {
+              "type": "string",
+              "description": "Path to the file to be read"
+            }
+          },
+          "required": ["filePath"]
+        },
+        "handler": {
+          "type": "document_reader",
+          "root": "data/files/root"
+        }
+      },
+      {
+        "name": "excel_read",
+        "description": "Read Excel file and convert to JSON format while preserving structure.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "inputPath": {
+              "type": "string",
+              "description": "Path to the Excel file"
+            },
+            "includeHeaders": {
+              "type": "boolean",
+              "default": true
+            }
+          },
+          "required": ["inputPath"]
+        },
+        "handler": {
+          "type": "excel_reader",
+          "operation": "read_all",
+          "root": "data/files/root"
+        }
+      },
+      {
+        "name": "docx_to_html",
+        "description": "Convert DOCX to HTML while preserving formatting.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "inputPath": {
+              "type": "string",
+              "description": "Path to the DOCX file"
+            },
+            "outputDir": {
+              "type": "string",
+              "description": "Directory for output"
+            }
+          },
+          "required": ["inputPath", "outputDir"]
+        },
+        "handler": {
+          "type": "docx_reader",
+          "operation": "to_html",
+          "root": "data/files/root"
+        }
+      }
+    ]
+  }
+}

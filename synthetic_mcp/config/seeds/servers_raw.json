@@ -1,0 +1,3480 @@
+{
+  "word-document-server": {
+    "name": "Office-Word-MCP-Server",
+    "description": "A Model Context Protocol (MCP) server for creating, reading, and manipulating Microsoft Word documents. This server enables AI assistants to work with Word documents through a standardized interface, providing rich document editing capabilities.",
+    "category": "File Access",
+    "web": "https://github.com/gongrzhe/office-word-mcp-server",
+    "in_clean_config": true,
+    "tools": [
+      {
+        "name": "create_document",
+        "description": "Create a new Word document with optional metadata.",
+        "inputSchema": {
+          "properties": {
+            "filename": {
+              "title": "Filename",
+              "type": "string"
+            },
+            "title": {
+              "default": null,
+              "title": "Title",
+              "type": "string"
+            },
+            "author": {
+              "default": null,
+              "title": "Author",
+              "type": "string"
+            }
+          },
+          "required": [
+            "filename"
+          ],
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "copy_document",
+        "description": "Create a copy of a Word document.",
+        "inputSchema": {
+          "properties": {
+            "source_filename": {
+              "title": "Source Filename",
+              "type": "string"
+            },
+            "destination_filename": {
+              "default": null,
+              "title": "Destination Filename",
+              "type": "string"
+            }
+          },
+          "required": [
+            "source_filename"
+          ],
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "get_document_info",
+        "description": "Get information about a Word document.",
+        "inputSchema": {
+          "properties": {
+            "filename": {
+              "title": "Filename",
+              "type": "string"
+            }
+          },
+          "required": [
+            "filename"
+          ],
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "get_document_text",
+        "description": "Extract all text from a Word document.",
+        "inputSchema": {
+          "properties": {
+            "filename": {
+              "title": "Filename",
+              "type": "string"
+            }
+          },
+          "required": [
+            "filename"
+          ],
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "get_document_outline",
+        "description": "Get the structure of a Word document.",
+        "inputSchema": {
+          "properties": {
+            "filename": {
+              "title": "Filename",
+              "type": "string"
+            }
+          },
+          "required": [
+            "filename"
+          ],
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "list_available_documents",
+        "description": "List all .docx files in the specified directory.",
+        "inputSchema": {
+          "properties": {
+            "directory": {
+              "default": ".",
+              "title": "Directory",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "add_paragraph",
+        "description": "Add a paragraph to a Word document.",
+        "inputSchema": {
+          "properties": {
+            "filename": {
+              "title": "Filename",
+              "type": "string"
+            },
+            "text": {
+              "title": "Text",
+              "type": "string"
+            },
+            "style": {
+              "default": null,
+              "title": "Style",
+              "type": "string"
+            }
+          },
+          "required": [
+            "filename",
+            "text"
+          ],
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "add_heading",
+        "description": "Add a heading to a Word document.",
+        "inputSchema": {
+          "properties": {
+            "filename": {
+              "title": "Filename",
+              "type": "string"
+            },
+            "text": {
+              "title": "Text",
+              "type": "string"
+            },
+            "level": {
+              "default": 1,
+              "title": "Level",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "filename",
+            "text"
+          ],
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "add_picture",
+        "description": "Add an image to a Word document.",
+        "inputSchema": {
+          "properties": {
+            "filename": {
+              "title": "Filename",
+              "type": "string"
+            },
+            "image_path": {
+              "title": "Image Path",
+              "type": "string"
+            },
+            "width": {
+              "default": null,
+              "title": "Width",
+              "type": "number"
+            }
+          },
+          "required": [
+            "filename",
+            "image_path"
+          ],
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "add_table",
+        "description": "Add a table to a Word document.",
+        "inputSchema": {
+          "properties": {
+            "filename": {
+              "title": "Filename",
+              "type": "string"
+            },
+            "rows": {
+              "title": "Rows",
+              "type": "integer"
+            },
+            "cols": {
+              "title": "Cols",
+              "type": "integer"
+            },
+            "data": {
+              "default": null,
+              "items": {},
+              "title": "Data",
+              "type": "array"
+            }
+          },
+          "required": [
+            "filename",
+            "rows",
+            "cols"
+          ],
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "add_page_break",
+        "description": "Add a page break to the document.",
+        "inputSchema": {
+          "properties": {
+            "filename": {
+              "title": "Filename",
+              "type": "string"
+            }
+          },
+          "required": [
+            "filename"
+          ],
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "delete_paragraph",
+        "description": "Delete a paragraph from a document.",
+        "inputSchema": {
+          "properties": {
+            "filename": {
+              "title": "Filename",
+              "type": "string"
+            },
+            "paragraph_index": {
+              "title": "Paragraph Index",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "filename",
+            "paragraph_index"
+          ],
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "search_and_replace",
+        "description": "Search for text and replace all occurrences.",
+        "inputSchema": {
+          "properties": {
+            "filename": {
+              "title": "Filename",
+              "type": "string"
+            },
+            "find_text": {
+              "title": "Find Text",
+              "type": "string"
+            },
+            "replace_text": {
+              "title": "Replace Text",
+              "type": "string"
+            }
+          },
+          "required": [
+            "filename",
+            "find_text",
+            "replace_text"
+          ],
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "create_custom_style",
+        "description": "Create a custom style in the document.",
+        "inputSchema": {
+          "properties": {
+            "filename": {
+              "title": "Filename",
+              "type": "string"
+            },
+            "style_name": {
+              "title": "Style Name",
+              "type": "string"
+            },
+            "bold": {
+              "default": null,
+              "title": "Bold",
+              "type": "boolean"
+            },
+            "italic": {
+              "default": null,
+              "title": "Italic",
+              "type": "boolean"
+            },
+            "font_size": {
+              "default": null,
+              "title": "Font Size",
+              "type": "integer"
+            },
+            "font_name": {
+              "default": null,
+              "title": "Font Name",
+              "type": "string"
+            },
+            "color": {
+              "default": null,
+              "title": "Color",
+              "type": "string"
+            },
+            "base_style": {
+              "default": null,
+              "title": "Base Style",
+              "type": "string"
+            }
+          },
+          "required": [
+            "filename",
+            "style_name"
+          ],
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "format_text",
+        "description": "Format a specific range of text within a paragraph.",
+        "inputSchema": {
+          "properties": {
+            "filename": {
+              "title": "Filename",
+              "type": "string"
+            },
+            "paragraph_index": {
+              "title": "Paragraph Index",
+              "type": "integer"
+            },
+            "start_pos": {
+              "title": "Start Pos",
+              "type": "integer"
+            },
+            "end_pos": {
+              "title": "End Pos",
+              "type": "integer"
+            },
+            "bold": {
+              "default": null,
+              "title": "Bold",
+              "type": "boolean"
+            },
+            "italic": {
+              "default": null,
+              "title": "Italic",
+              "type": "boolean"
+            },
+            "underline": {
+              "default": null,
+              "title": "Underline",
+              "type": "boolean"
+            },
+            "color": {
+              "default": null,
+              "title": "Color",
+              "type": "string"
+            },
+            "font_size": {
+              "default": null,
+              "title": "Font Size",
+              "type": "integer"
+            },
+            "font_name": {
+              "default": null,
+              "title": "Font Name",
+              "type": "string"
+            }
+          },
+          "required": [
+            "filename",
+            "paragraph_index",
+            "start_pos",
+            "end_pos"
+          ],
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "format_table",
+        "description": "Format a table with borders, shading, and structure.",
+        "inputSchema": {
+          "properties": {
+            "filename": {
+              "title": "Filename",
+              "type": "string"
+            },
+            "table_index": {
+              "title": "Table Index",
+              "type": "integer"
+            },
+            "has_header_row": {
+              "default": null,
+              "title": "Has Header Row",
+              "type": "boolean"
+            },
+            "border_style": {
+              "default": null,
+              "title": "Border Style",
+              "type": "string"
+            },
+            "shading": {
+              "default": null,
+              "items": {},
+              "title": "Shading",
+              "type": "array"
+            }
+          },
+          "required": [
+            "filename",
+            "table_index"
+          ],
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "protect_document",
+        "description": "Add password protection to a Word document.",
+        "inputSchema": {
+          "properties": {
+            "filename": {
+              "title": "Filename",
+              "type": "string"
+            },
+            "password": {
+              "title": "Password",
+              "type": "string"
+            }
+          },
+          "required": [
+            "filename",
+            "password"
+          ],
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "unprotect_document",
+        "description": "Remove password protection from a Word document.",
+        "inputSchema": {
+          "properties": {
+            "filename": {
+              "title": "Filename",
+              "type": "string"
+            },
+            "password": {
+              "title": "Password",
+              "type": "string"
+            }
+          },
+          "required": [
+            "filename",
+            "password"
+          ],
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "add_footnote_to_document",
+        "description": "Add a footnote to a specific paragraph in a Word document.",
+        "inputSchema": {
+          "properties": {
+            "filename": {
+              "title": "Filename",
+              "type": "string"
+            },
+            "paragraph_index": {
+              "title": "Paragraph Index",
+              "type": "integer"
+            },
+            "footnote_text": {
+              "title": "Footnote Text",
+              "type": "string"
+            }
+          },
+          "required": [
+            "filename",
+            "paragraph_index",
+            "footnote_text"
+          ],
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "add_endnote_to_document",
+        "description": "Add an endnote to a specific paragraph in a Word document.",
+        "inputSchema": {
+          "properties": {
+            "filename": {
+              "title": "Filename",
+              "type": "string"
+            },
+            "paragraph_index": {
+              "title": "Paragraph Index",
+              "type": "integer"
+            },
+            "endnote_text": {
+              "title": "Endnote Text",
+              "type": "string"
+            }
+          },
+          "required": [
+            "filename",
+            "paragraph_index",
+            "endnote_text"
+          ],
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "customize_footnote_style",
+        "description": "Customize footnote numbering and formatting in a Word document.",
+        "inputSchema": {
+          "properties": {
+            "filename": {
+              "title": "Filename",
+              "type": "string"
+            },
+            "numbering_format": {
+              "default": "1, 2, 3",
+              "title": "Numbering Format",
+              "type": "string"
+            },
+            "start_number": {
+              "default": 1,
+              "title": "Start Number",
+              "type": "integer"
+            },
+            "font_name": {
+              "default": null,
+              "title": "Font Name",
+              "type": "string"
+            },
+            "font_size": {
+              "default": null,
+              "title": "Font Size",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "filename"
+          ],
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "get_paragraph_text_from_document",
+        "description": "Get text from a specific paragraph in a Word document.",
+        "inputSchema": {
+          "properties": {
+            "filename": {
+              "title": "Filename",
+              "type": "string"
+            },
+            "paragraph_index": {
+              "title": "Paragraph Index",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "filename",
+            "paragraph_index"
+          ],
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "find_text_in_document",
+        "description": "Find occurrences of specific text in a Word document.",
+        "inputSchema": {
+          "properties": {
+            "filename": {
+              "title": "Filename",
+              "type": "string"
+            },
+            "text_to_find": {
+              "title": "Text To Find",
+              "type": "string"
+            },
+            "match_case": {
+              "default": true,
+              "title": "Match Case",
+              "type": "boolean"
+            },
+            "whole_word": {
+              "default": false,
+              "title": "Whole Word",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "filename",
+            "text_to_find"
+          ],
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "convert_to_pdf",
+        "description": "Convert a Word document to PDF format.",
+        "inputSchema": {
+          "properties": {
+            "filename": {
+              "title": "Filename",
+              "type": "string"
+            },
+            "output_filename": {
+              "default": null,
+              "title": "Output Filename",
+              "type": "string"
+            }
+          },
+          "required": [
+            "filename"
+          ],
+          "type": "object"
+        },
+        "annotations": null
+      }
+    ]
+  },
+  "excel": {
+    "name": "Excel MCP Server",
+    "description": "A Model Context Protocol (MCP) server that reads and writes MS Excel data.",
+    "category": "File Access",
+    "web": "https://github.com/negokaz/excel-mcp-server",
+    "in_clean_config": true,
+    "tools": [
+      {
+        "name": "excel_copy_sheet",
+        "description": "Copy existing sheet to a new sheet",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "dstSheetName": {
+              "description": "Sheet name to be copied",
+              "type": "string"
+            },
+            "fileAbsolutePath": {
+              "description": "Absolute path to the Excel file",
+              "type": "string"
+            },
+            "srcSheetName": {
+              "description": "Source sheet name in the Excel file",
+              "type": "string"
+            }
+          },
+          "required": [
+            "fileAbsolutePath",
+            "srcSheetName",
+            "dstSheetName"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "excel_create_table",
+        "description": "Create a table in the Excel sheet",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "fileAbsolutePath": {
+              "description": "Absolute path to the Excel file",
+              "type": "string"
+            },
+            "range": {
+              "description": "Range to be a table (e.g., \"A1:C10\")",
+              "type": "string"
+            },
+            "sheetName": {
+              "description": "Sheet name where the table is created",
+              "type": "string"
+            },
+            "tableName": {
+              "description": "Table name to be created",
+              "type": "string"
+            }
+          },
+          "required": [
+            "fileAbsolutePath",
+            "sheetName",
+            "tableName"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "excel_describe_sheets",
+        "description": "List all sheet information of specified Excel file",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "fileAbsolutePath": {
+              "description": "Absolute path to the Excel file",
+              "type": "string"
+            }
+          },
+          "required": [
+            "fileAbsolutePath"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "excel_read_sheet",
+        "description": "Read values from Excel sheet with pagination.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "fileAbsolutePath": {
+              "description": "Absolute path to the Excel file",
+              "type": "string"
+            },
+            "range": {
+              "description": "Range of cells to read in the Excel sheet (e.g., \"A1:C10\"). [default: first paging range]",
+              "type": "string"
+            },
+            "sheetName": {
+              "description": "Sheet name in the Excel file",
+              "type": "string"
+            },
+            "showFormula": {
+              "description": "Show formula instead of value",
+              "type": "boolean"
+            },
+            "showStyle": {
+              "description": "Show style information for cells",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "fileAbsolutePath",
+            "sheetName"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "excel_write_to_sheet",
+        "description": "Write values to the Excel sheet",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "fileAbsolutePath": {
+              "description": "Absolute path to the Excel file",
+              "type": "string"
+            },
+            "newSheet": {
+              "description": "Create a new sheet if true, otherwise write to the existing sheet",
+              "type": "boolean"
+            },
+            "range": {
+              "description": "Range of cells in the Excel sheet (e.g., \"A1:C10\")",
+              "type": "string"
+            },
+            "sheetName": {
+              "description": "Sheet name in the Excel file",
+              "type": "string"
+            },
+            "values": {
+              "description": "Values to write to the Excel sheet. If the value is a formula, it should start with \"=\"",
+              "items": {
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "type": "array"
+              },
+              "type": "array"
+            }
+          },
+          "required": [
+            "fileAbsolutePath",
+            "sheetName",
+            "newSheet",
+            "range",
+            "values"
+          ]
+        },
+        "annotations": null
+      }
+    ]
+  },
+  "music-analysis": {
+    "name": "MCP Music Analysis",
+    "description": "This repository contains a Model Context Provider (MCP) that uses MCP and librosa for audio analysis on audio in local, youtube link, or audio link.",
+    "category": "Miscellaneous",
+    "web": "https://github.com/hugohow/mcp-music-analysis",
+    "in_clean_config": true,
+    "tools": [
+      {
+        "name": "load",
+        "description": "\nLoads an audio file and returns the path to the audio time series\nOffset and duration are optional, in seconds.\nBe careful, you will never know the name of the song.\n",
+        "inputSchema": {
+          "properties": {
+            "file_path": {
+              "title": "File Path",
+              "type": "string"
+            },
+            "offset": {
+              "default": 0.0,
+              "title": "Offset",
+              "type": "number"
+            },
+            "duration": {
+              "default": null,
+              "title": "Duration",
+              "type": "number"
+            }
+          },
+          "required": [
+            "file_path"
+          ],
+          "title": "loadArguments",
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "get_duration",
+        "description": "\nReturns the total duration (in seconds) of the given audio time series.\n",
+        "inputSchema": {
+          "properties": {
+            "path_audio_time_series_y": {
+              "title": "Path Audio Time Series Y",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path_audio_time_series_y"
+          ],
+          "title": "get_durationArguments",
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "tempo",
+        "description": "\nEstimates the tempo (in BPM) of the given audio time series using librosa.\nOffset and duration are optional, in seconds.\n",
+        "inputSchema": {
+          "properties": {
+            "path_audio_time_series_y": {
+              "title": "Path Audio Time Series Y",
+              "type": "string"
+            },
+            "hop_length": {
+              "default": 512,
+              "title": "Hop Length",
+              "type": "integer"
+            },
+            "start_bpm": {
+              "default": 120,
+              "title": "Start Bpm",
+              "type": "number"
+            },
+            "std_bpm": {
+              "default": 1.0,
+              "title": "Std Bpm",
+              "type": "number"
+            },
+            "ac_size": {
+              "default": 8.0,
+              "title": "Ac Size",
+              "type": "number"
+            },
+            "max_tempo": {
+              "default": 320.0,
+              "title": "Max Tempo",
+              "type": "number"
+            }
+          },
+          "required": [
+            "path_audio_time_series_y"
+          ],
+          "title": "tempoArguments",
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "chroma_cqt",
+        "description": "\nComputes the chroma CQT of the given audio time series using librosa.\nThe chroma CQT is a representation of the audio signal in terms of its\nchromatic content, which is useful for music analysis.\nThe chroma CQT is computed using the following parameters:\n- path_audio_time_series_y: The path to the audio time series (CSV file).\n    It's sometimes better to take harmonics only\n- hop_length: The number of samples between frames.\n- fmin: The minimum frequency of the chroma feature.\n- n_chroma: The number of chroma bins (default is 12).\n- n_octaves: The number of octaves to include in the chroma feature.\nThe chroma CQT is saved to a CSV file with the following columns:\n- note: The note name (C, C#, D, etc.).\n- time: The time position of the note in seconds.\n- amplitude: The amplitude of the note at that time.\nThe path to the CSV file is returned.\n",
+        "inputSchema": {
+          "properties": {
+            "path_audio_time_series_y": {
+              "title": "Path Audio Time Series Y",
+              "type": "string"
+            },
+            "hop_length": {
+              "default": 512,
+              "title": "Hop Length",
+              "type": "integer"
+            },
+            "fmin": {
+              "default": null,
+              "title": "Fmin",
+              "type": "number"
+            },
+            "n_chroma": {
+              "default": 12,
+              "title": "N Chroma",
+              "type": "integer"
+            },
+            "n_octaves": {
+              "default": 7,
+              "title": "N Octaves",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "path_audio_time_series_y"
+          ],
+          "title": "chroma_cqtArguments",
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "mfcc",
+        "description": "\nComputes the MFCC of the given audio time series using librosa.\nThe MFCC is a representation of the audio signal in terms of its\nspectral content, which is useful for music analysis.\nThe MFCC is computed using the following parameters:\n- path_audio_time_series_y: The path to the audio time series (CSV file).\n    It's sometimes better to take harmonics only\n",
+        "inputSchema": {
+          "properties": {
+            "path_audio_time_series_y": {
+              "title": "Path Audio Time Series Y",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path_audio_time_series_y"
+          ],
+          "title": "mfccArguments",
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "beat_track",
+        "description": "\nComputes the beat track of the given audio time series using librosa.\nThe beat track is a representation of the audio signal in terms of its\nrhythmic content, which is useful for music analysis.\nThe beat track is computed using the following parameters:\n- hop_length: The number of samples between frames.\n- start_bpm: The initial estimate of the tempo (in BPM).\n- tightness: The tightness of the beat tracking (default is 100).\n- units: The units of the beat track (default is \"frames\"). It can be frames, samples, time.\n",
+        "inputSchema": {
+          "properties": {
+            "path_audio_time_series_y": {
+              "title": "Path Audio Time Series Y",
+              "type": "string"
+            },
+            "hop_length": {
+              "default": 512,
+              "title": "Hop Length",
+              "type": "integer"
+            },
+            "start_bpm": {
+              "default": 120,
+              "title": "Start Bpm",
+              "type": "number"
+            },
+            "tightness": {
+              "default": 100,
+              "title": "Tightness",
+              "type": "integer"
+            },
+            "units": {
+              "default": "frames",
+              "title": "Units",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path_audio_time_series_y"
+          ],
+          "title": "beat_trackArguments",
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "download_from_url",
+        "description": "\nDownloads a file from a given URL and returns the path to the downloaded file.\nBe careful, you will never know the name of the song.\n",
+        "inputSchema": {
+          "properties": {
+            "url": {
+              "title": "Url",
+              "type": "string"
+            }
+          },
+          "required": [
+            "url"
+          ],
+          "title": "download_from_urlArguments",
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "download_from_youtube",
+        "description": "\nDownloads a file from a given youtube URL and returns the path to the downloaded file.\nBe careful, you will never know the name of the song.\n",
+        "inputSchema": {
+          "properties": {
+            "youtube_url": {
+              "title": "Youtube Url",
+              "type": "string"
+            }
+          },
+          "required": [
+            "youtube_url"
+          ],
+          "title": "download_from_youtubeArguments",
+          "type": "object"
+        },
+        "annotations": null
+      }
+    ]
+  },
+  "filesystem": {
+    "name": "Filesystem MCP Server",
+    "description": "Node.js server implementing Model Context Protocol (MCP) for filesystem operations.",
+    "category": "File Access",
+    "web": "https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem",
+    "in_clean_config": true,
+    "tools": [
+      {
+        "name": "read_file",
+        "description": "Read the complete contents of a file from the file system. Handles various text encodings and provides detailed error messages if the file cannot be read. Use this tool when you need to examine the contents of a single file. Use the 'head' parameter to read only the first N lines of a file, or the 'tail' parameter to read only the last N lines of a file. Only works within allowed directories.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "tail": {
+              "type": "number",
+              "description": "If provided, returns only the last N lines of the file"
+            },
+            "head": {
+              "type": "number",
+              "description": "If provided, returns only the first N lines of the file"
+            }
+          },
+          "required": [
+            "path"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": null
+      },
+      {
+        "name": "read_multiple_files",
+        "description": "Read the contents of multiple files simultaneously. This is more efficient than reading files one by one when you need to analyze or compare multiple files. Each file's content is returned with its path as a reference. Failed reads for individual files won't stop the entire operation. Only works within allowed directories.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "paths": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "paths"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": null
+      },
+      {
+        "name": "write_file",
+        "description": "Create a new file or completely overwrite an existing file with new content. Use with caution as it will overwrite existing files without warning. Handles text content with proper encoding. Only works within allowed directories.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "content": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "content"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": null
+      },
+      {
+        "name": "edit_file",
+        "description": "Make line-based edits to a text file. Each edit replaces exact line sequences with new content. Returns a git-style diff showing the changes made. Only works within allowed directories.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "edits": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "oldText": {
+                    "type": "string",
+                    "description": "Text to search for - must match exactly"
+                  },
+                  "newText": {
+                    "type": "string",
+                    "description": "Text to replace with"
+                  }
+                },
+                "required": [
+                  "oldText",
+                  "newText"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "dryRun": {
+              "type": "boolean",
+              "default": false,
+              "description": "Preview changes using git-style diff format"
+            }
+          },
+          "required": [
+            "path",
+            "edits"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": null
+      },
+      {
+        "name": "create_directory",
+        "description": "Create a new directory or ensure a directory exists. Can create multiple nested directories in one operation. If the directory already exists, this operation will succeed silently. Perfect for setting up directory structures for projects or ensuring required paths exist. Only works within allowed directories.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "path"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": null
+      },
+      {
+        "name": "list_directory",
+        "description": "Get a detailed listing of all files and directories in a specified path. Results clearly distinguish between files and directories with [FILE] and [DIR] prefixes. This tool is essential for understanding directory structure and finding specific files within a directory. Only works within allowed directories.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "path"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": null
+      },
+      {
+        "name": "list_directory_with_sizes",
+        "description": "Get a detailed listing of all files and directories in a specified path, including sizes. Results clearly distinguish between files and directories with [FILE] and [DIR] prefixes. This tool is useful for understanding directory structure and finding specific files within a directory. Only works within allowed directories.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sortBy": {
+              "type": "string",
+              "enum": [
+                "name",
+                "size"
+              ],
+              "default": "name",
+              "description": "Sort entries by name or size"
+            }
+          },
+          "required": [
+            "path"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": null
+      },
+      {
+        "name": "directory_tree",
+        "description": "Get a recursive tree view of files and directories as a JSON structure. Each entry includes 'name', 'type' (file/directory), and 'children' for directories. Files have no children array, while directories always have a children array (which may be empty). The output is formatted with 2-space indentation for readability. Only works within allowed directories.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "path"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": null
+      },
+      {
+        "name": "move_file",
+        "description": "Move or rename files and directories. Can move files between directories and rename them in a single operation. If the destination exists, the operation will fail. Works across different directories and can be used for simple renaming within the same directory. Both source and destination must be within allowed directories.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string"
+            },
+            "destination": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "source",
+            "destination"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": null
+      },
+      {
+        "name": "search_files",
+        "description": "Recursively search for files and directories matching a pattern. Searches through all subdirectories from the starting path. The search is case-insensitive and matches partial names. Returns full paths to all matching items. Great for finding files when you don't know their exact location. Only searches within allowed directories.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "pattern": {
+              "type": "string"
+            },
+            "excludePatterns": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": []
+            }
+          },
+          "required": [
+            "path",
+            "pattern"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": null
+      },
+      {
+        "name": "get_file_info",
+        "description": "Retrieve detailed metadata about a file or directory. Returns comprehensive information including size, creation time, last modified time, permissions, and type. This tool is perfect for understanding file characteristics without reading the actual content. Only works within allowed directories.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "path"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "annotations": null
+      },
+      {
+        "name": "list_allowed_directories",
+        "description": "Returns the list of directories that this server is allowed to access. Use this to understand which directories are available before trying to access files.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "annotations": null
+      }
+    ]
+  },
+  "mcp-simple-arxiv": {
+    "name": "mcp-simple-arxiv",
+    "description": "An MCP server that provides access to arXiv papers through their API.",
+    "category": "Discovery",
+    "web": "https://github.com/andybrandt/mcp-simple-arxiv",
+    "in_clean_config": true,
+    "tools": [
+      {
+        "name": "search_papers",
+        "description": "Search for papers on arXiv by title and abstract content.\n            \nYou can use advanced search syntax:\n- Search in title: ti:\"search terms\"\n- Search in abstract: abs:\"search terms\"\n- Search by author: au:\"author name\"\n- Combine terms with: AND, OR, ANDNOT\n- Filter by category: cat:cs.AI (use list_categories tool to see available categories)\n\nExamples:\n- \"machine learning\"  (searches all fields)\n- ti:\"neural networks\" AND cat:cs.AI  (title with category)\n- au:bengio AND ti:\"deep learning\"  (author and title)",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Search query to match against paper titles and abstracts"
+            },
+            "max_results": {
+              "type": "number",
+              "description": "Maximum number of results to return (default: 10)",
+              "minimum": 1,
+              "maximum": 50
+            }
+          },
+          "required": [
+            "query"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "get_paper_data",
+        "description": "Get detailed information about a specific paper including abstract and available formats",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "paper_id": {
+              "type": "string",
+              "description": "arXiv paper ID (e.g., '2103.08220')"
+            }
+          },
+          "required": [
+            "paper_id"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "list_categories",
+        "description": "List all available arXiv categories and how to use them in search",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "primary_category": {
+              "type": "string",
+              "description": "Optional: filter by primary category (e.g., 'cs' for Computer Science)"
+            }
+          }
+        },
+        "annotations": null
+      },
+      {
+        "name": "update_categories",
+        "description": "Update the stored category taxonomy by fetching the latest version from arxiv.org",
+        "inputSchema": {
+          "type": "object",
+          "properties": {}
+        },
+        "annotations": null
+      }
+    ]
+  },
+  "maven-deps-server": {
+    "name": "Maven Dependencies MCP Server",
+    "description": "An MCP (Model Context Protocol) server that provides tools for checking Maven dependency versions. This server enables LLMs to verify Maven dependencies and retrieve their latest versions from Maven Central Repository.",
+    "category": "Code",
+    "web": "https://github.com/Bigsy/maven-mcp-server",
+    "in_clean_config": true,
+    "tools": [
+      {
+        "name": "get_latest_release",
+        "description": "Get the latest release version of a Maven dependency (excludes pre-releases by default)",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "dependency": {
+              "type": "string",
+              "description": "Maven coordinate in format \"groupId:artifactId[:version][:packaging][:classifier]\" (e.g. \"org.springframework:spring-core\" or \"org.springframework:spring-core:5.3.20:jar\")"
+            },
+            "excludePreReleases": {
+              "type": "boolean",
+              "description": "Whether to exclude pre-release versions (alpha, beta, milestone, RC, snapshot). Default: true",
+              "default": true
+            }
+          },
+          "required": [
+            "dependency"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "check_maven_version_exists",
+        "description": "Check if a specific version of a Maven dependency exists",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "dependency": {
+              "type": "string",
+              "description": "Maven coordinate in format \"groupId:artifactId[:version][:packaging][:classifier]\" (e.g. \"org.springframework:spring-core\" or \"org.springframework:spring-core:5.3.20:jar\")"
+            },
+            "version": {
+              "type": "string",
+              "description": "Version to check if not included in dependency string"
+            }
+          },
+          "required": [
+            "dependency"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "list_maven_versions",
+        "description": "List Maven dependency versions sorted by last updated date (most recent first)",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "dependency": {
+              "type": "string",
+              "description": "Maven coordinate in format \"groupId:artifactId[:packaging][:classifier]\" (e.g. \"org.springframework:spring-core\" or \"org.springframework:spring-core:jar\")"
+            },
+            "depth": {
+              "type": "number",
+              "description": "Number of versions to return (default: 15)",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "excludePreReleases": {
+              "type": "boolean",
+              "description": "Whether to exclude pre-release versions (alpha, beta, milestone, RC, snapshot). Default: true",
+              "default": true
+            }
+          },
+          "required": [
+            "dependency"
+          ]
+        },
+        "annotations": null
+      }
+    ]
+  },
+  "pdf-reader-mcp": {
+    "name": "PDF Reader MCP Server",
+    "description": "Empower your AI agents (like Cline) with the ability to securely read and extract information (text, metadata, page count) from PDF files within your project context using a single, flexible tool.",
+    "category": "File Access",
+    "web": "https://github.com/sylphxltd/pdf-reader-mcp",
+    "in_clean_config": true,
+    "tools": [
+      {
+        "name": "read_pdf",
+        "description": "Reads content/metadata from one or more PDFs (local/URL). Each source can specify pages to extract.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "sources": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Relative path to the local PDF file."
+                  },
+                  "url": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "URL of the PDF file."
+                  },
+                  "pages": {
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "integer",
+                          "exclusiveMinimum": true,
+                          "minimum": 0
+                        },
+                        "minItems": 1
+                      },
+                      {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    ],
+                    "description": "Extract text only from specific pages (1-based) or ranges for *this specific source*. If provided, 'include_full_text' for the entire request is ignored for this source."
+                  }
+                },
+                "additionalProperties": false
+              },
+              "minItems": 1,
+              "description": "An array of PDF sources to process, each can optionally specify pages."
+            },
+            "include_full_text": {
+              "type": "boolean",
+              "default": false,
+              "description": "Include the full text content of each PDF (only if 'pages' is not specified for that source)."
+            },
+            "include_metadata": {
+              "type": "boolean",
+              "default": true,
+              "description": "Include metadata and info objects for each PDF."
+            },
+            "include_page_count": {
+              "type": "boolean",
+              "default": true,
+              "description": "Include the total number of pages for each PDF."
+            }
+          },
+          "required": [
+            "sources"
+          ],
+          "additionalProperties": false
+        },
+        "annotations": null
+      }
+    ]
+  },
+  "biomcp": {
+    "name": "BioMCP: Biomedical Model Context Protocol",
+    "description": "BioMCP is an open source (MIT License) toolkit that empowers AI assistants and agents with specialized biomedical knowledge. Built following the Model Context Protocol (MCP), it connects AI systems to authoritative biomedical data sources, enabling them to answer questions about clinical trials, scientific literature, and genomic variants with precision and depth.",
+    "category": "Discovery",
+    "web": "https://github.com/genomoncology/biomcp",
+    "in_clean_config": true,
+    "tools": [
+      {
+        "name": "search",
+        "description": "Search biomedical literature, clinical trials, and genetic variants.\n\n    ⚠️ IMPORTANT: Have you used the 'think' tool first? If not, STOP and use it NOW!\n    The 'think' tool is REQUIRED for proper research planning and should be your FIRST step.\n\n    This tool provides access to biomedical data from PubMed/PubTator3, ClinicalTrials.gov,\n    and MyVariant.info. It supports two search modes:\n\n    ## 1. UNIFIED QUERY LANGUAGE\n    Use the 'query' parameter with field-based syntax for precise cross-domain searches.\n\n    Syntax:\n    - Basic: \"gene:BRAF\"\n    - AND logic: \"gene:BRAF AND disease:melanoma\"\n    - OR logic: \"gene:PTEN AND (R173 OR Arg173 OR 'position 173')\"\n    - Domain-specific: \"trials.condition:melanoma AND trials.phase:3\"\n\n    Common fields:\n    - Cross-domain: gene, disease, variant, chemical/drug\n    - Articles: pmid, title, abstract, journal, author\n    - Trials: trials.condition, trials.intervention, trials.phase, trials.status\n    - Variants: variants.hgvs, variants.rsid, variants.significance\n\n    Example:\n    ```\n    await search(\n        query=\"gene:BRAF AND disease:melanoma AND trials.phase:3\",\n        max_results_per_domain=20\n    )\n    ```\n\n    ## 2. DOMAIN-SPECIFIC SEARCH\n    Use the 'domain' parameter with specific filters for targeted searches.\n\n    Domains:\n    - \"article\": Search PubMed/PubTator3 for research articles and preprints ABOUT genes, variants, diseases, or chemicals\n    - \"trial\": Search ClinicalTrials.gov for clinical studies\n    - \"variant\": Search MyVariant.info for genetic variant DATABASE RECORDS (population frequency, clinical significance, etc.) - NOT for articles about variants!\n\n    Example:\n    ```\n    await search(\n        domain=\"article\",\n        genes=[\"BRAF\", \"NRAS\"],\n        diseases=[\"melanoma\"],\n        page_size=50\n    )\n    ```\n\n    ## DOMAIN SELECTION EXAMPLES:\n    - To find ARTICLES about BRAF V600E mutation: domain=\"article\", genes=[\"BRAF\"], variants=[\"V600E\"]\n    - To find VARIANT DATA for BRAF mutations: domain=\"variant\", gene=\"BRAF\"\n    - To find articles about ERBB2 p.D277Y: domain=\"article\", genes=[\"ERBB2\"], variants=[\"p.D277Y\"]\n    - Common mistake: Using domain=\"variant\" when you want articles about a variant\n\n    ## IMPORTANT NOTES:\n    - For complex research questions, use the separate 'think' tool for systematic analysis\n    - The tool returns results in OpenAI MCP format: {\"results\": [{\"id\", \"title\", \"text\", \"url\"}, ...]}\n    - Search results do NOT include metadata (per OpenAI MCP specification)\n    - Use the fetch tool to get detailed metadata for specific records\n    - Use get_schema=True to explore available search fields\n    - Use explain_query=True to understand query parsing (unified mode)\n    - Domain-specific searches use AND logic for multiple values\n    - For OR logic, use the unified query language\n    - NEW: Article search keywords support OR with pipe separator: \"R173|Arg173|p.R173\"\n    - Remember: domain=\"article\" finds LITERATURE, domain=\"variant\" finds DATABASE RECORDS\n\n    ## RETURN FORMAT:\n    All search modes return results in this format:\n    ```json\n    {\n        \"results\": [\n            {\n                \"id\": \"unique_identifier\",\n                \"title\": \"Human-readable title\",\n                \"text\": \"Summary or snippet of content\",\n                \"url\": \"Link to full resource\"\n            }\n        ]\n    }\n    ```\n    ",
+        "inputSchema": {
+          "properties": {
+            "query": {
+              "title": "Query",
+              "type": "string"
+            },
+            "call_benefit": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Brief explanation of why this search is being performed and expected benefit. Helps improve search accuracy and provides context for analytics. Highly recommended for better results.",
+              "title": "Call Benefit"
+            },
+            "domain": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "article",
+                    "trial",
+                    "variant"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Domain to search: 'article' for papers/literature ABOUT genes/variants/diseases, 'trial' for clinical studies, 'variant' for genetic variant DATABASE RECORDS (NOT articles about variants)",
+              "title": "Domain"
+            },
+            "genes": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Genes"
+            },
+            "diseases": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Diseases"
+            },
+            "variants": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Variants"
+            },
+            "chemicals": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Chemicals"
+            },
+            "keywords": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Keywords"
+            },
+            "conditions": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Conditions"
+            },
+            "interventions": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Interventions"
+            },
+            "recruiting_status": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Recruiting Status"
+            },
+            "phase": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Phase"
+            },
+            "significance": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Significance"
+            },
+            "lat": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Lat"
+            },
+            "long": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Long"
+            },
+            "distance": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Distance"
+            },
+            "page": {
+              "default": 1,
+              "title": "Page",
+              "type": "integer"
+            },
+            "page_size": {
+              "default": 10,
+              "title": "Page Size",
+              "type": "integer"
+            },
+            "max_results_per_domain": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Max Results Per Domain"
+            },
+            "explain_query": {
+              "default": false,
+              "title": "Explain Query",
+              "type": "boolean"
+            },
+            "get_schema": {
+              "default": false,
+              "title": "Get Schema",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "query"
+          ],
+          "title": "searchArguments",
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "fetch",
+        "description": "Fetch comprehensive details for a specific biomedical record.\n\n    This tool retrieves full information for articles, clinical trials, or genetic variants\n    using their unique identifiers. It returns data in a standardized format suitable for\n    detailed analysis and research.\n\n    ## IDENTIFIER FORMATS:\n    - Articles: PMID (PubMed ID) - e.g., \"35271234\" OR DOI - e.g., \"10.1101/2024.01.20.23288905\"\n    - Trials: NCT ID (ClinicalTrials.gov ID) - e.g., \"NCT04280705\"\n    - Variants: HGVS notation or dbSNP ID - e.g., \"chr7:g.140453136A>T\" or \"rs121913254\"\n\n    The domain is automatically detected from the ID format if not provided:\n    - NCT* → trial\n    - Contains \"/\" with numeric prefix (DOI) → article\n    - Pure numeric → article (PMID)\n    - rs* or contains ':' or 'g.' → variant\n\n    ## DOMAIN-SPECIFIC OPTIONS:\n\n    ### Articles (domain=\"article\"):\n    - Returns full article metadata, abstract, and full text when available\n    - Supports both PubMed articles (via PMID) and Europe PMC preprints (via DOI)\n    - Includes annotations for genes, diseases, chemicals, and variants (PubMed only)\n    - detail=\"full\" attempts to retrieve full text content (PubMed only)\n\n    ### Clinical Trials (domain=\"trial\"):\n    - detail=None or \"protocol\": Core study information\n    - detail=\"locations\": Study sites and contact information\n    - detail=\"outcomes\": Primary/secondary outcomes and results\n    - detail=\"references\": Related publications and citations\n    - detail=\"all\": Complete trial record with all sections\n\n    ### Variants (domain=\"variant\"):\n    - Returns comprehensive variant information including:\n      - Clinical significance and interpretations\n      - Population frequencies\n      - Gene/protein effects\n      - External database links\n    - detail parameter is ignored (always returns full data)\n\n    ## RETURN FORMAT:\n    All fetch operations return a standardized format:\n    ```json\n    {\n        \"id\": \"unique_identifier\",\n        \"title\": \"Record title or name\",\n        \"text\": \"Full content or comprehensive description\",\n        \"url\": \"Link to original source\",\n        \"metadata\": {\n            // Domain-specific additional fields\n        }\n    }\n    ```\n\n    ## EXAMPLES:\n\n    Fetch article by PMID (domain auto-detected):\n    ```\n    await fetch(id=\"35271234\")\n    ```\n\n    Fetch article by DOI (domain auto-detected):\n    ```\n    await fetch(id=\"10.1101/2024.01.20.23288905\")\n    ```\n\n    Fetch complete trial information (domain auto-detected):\n    ```\n    await fetch(\n        id=\"NCT04280705\",\n        detail=\"all\"\n    )\n    ```\n\n    Fetch variant with clinical interpretations:\n    ```\n    await fetch(id=\"rs121913254\")\n    ```\n\n    Explicitly specify domain (optional):\n    ```\n    await fetch(\n        domain=\"variant\",\n        id=\"chr7:g.140453136A>T\"\n    )\n    ```\n    ",
+        "inputSchema": {
+          "properties": {
+            "id": {
+              "title": "Id",
+              "type": "string"
+            },
+            "domain": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "article",
+                    "trial",
+                    "variant"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Domain of the record (auto-detected if not provided)",
+              "title": "Domain"
+            },
+            "call_benefit": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Brief explanation of why this fetch is being performed and expected benefit. Helps provide context for analytics and improves result relevance.",
+              "title": "Call Benefit"
+            },
+            "detail": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "protocol",
+                    "locations",
+                    "outcomes",
+                    "references",
+                    "all",
+                    "full"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Detail"
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "title": "fetchArguments",
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "think",
+        "description": "REQUIRED FIRST STEP: Perform structured sequential thinking for ANY biomedical research task.\n\n    🚨 IMPORTANT: You MUST use this tool BEFORE any search or fetch operations when:\n    - Researching ANY biomedical topic (genes, diseases, variants, trials)\n    - Planning to use multiple BioMCP tools\n    - Answering questions that require analysis or synthesis\n    - Comparing information from different sources\n    - Making recommendations or drawing conclusions\n\n    ⚠️ FAILURE TO USE THIS TOOL FIRST will result in:\n    - Incomplete or poorly structured analysis\n    - Missing important connections between data\n    - Suboptimal search strategies\n    - Overlooked critical information\n\n    Sequential thinking ensures you:\n    1. Fully understand the research question\n    2. Plan an optimal search strategy\n    3. Identify all relevant data sources\n    4. Structure your analysis properly\n    5. Deliver comprehensive, well-reasoned results\n\n    ## Usage Pattern:\n    1. Start with thoughtNumber=1 to initiate analysis\n    2. Progress through numbered thoughts sequentially\n    3. Adjust totalThoughts estimate as understanding develops\n    4. Set nextThoughtNeeded=False only when analysis is complete\n\n    ## Example:\n    ```python\n    # Initial analysis\n    await think(\n        thought=\"Breaking down the relationship between BRAF mutations and melanoma treatment resistance...\",\n        thoughtNumber=1,\n        totalThoughts=5,\n        nextThoughtNeeded=True\n    )\n\n    # Continue analysis\n    await think(\n        thought=\"Examining specific BRAF V600E mutation mechanisms...\",\n        thoughtNumber=2,\n        totalThoughts=5,\n        nextThoughtNeeded=True\n    )\n\n    # Final thought\n    await think(\n        thought=\"Synthesizing findings and proposing research directions...\",\n        thoughtNumber=5,\n        totalThoughts=5,\n        nextThoughtNeeded=False\n    )\n    ```\n\n    ## Important Notes:\n    - Each thought builds on previous ones within a session\n    - State is maintained throughout the MCP session\n    - Use thoughtful, detailed analysis in each step\n    - Revisions and branching are supported through the underlying implementation\n    ",
+        "inputSchema": {
+          "properties": {
+            "thought": {
+              "description": "Current thinking step for analysis",
+              "title": "Thought",
+              "type": "string"
+            },
+            "thoughtNumber": {
+              "description": "Current thought number, starting at 1",
+              "minimum": 1,
+              "title": "Thoughtnumber",
+              "type": "integer"
+            },
+            "totalThoughts": {
+              "description": "Estimated total thoughts needed for complete analysis",
+              "minimum": 1,
+              "title": "Totalthoughts",
+              "type": "integer"
+            },
+            "nextThoughtNeeded": {
+              "default": true,
+              "description": "Whether more thinking steps are needed after this one",
+              "title": "Nextthoughtneeded",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "thought",
+            "thoughtNumber",
+            "totalThoughts"
+          ],
+          "title": "thinkArguments",
+          "type": "object"
+        },
+        "annotations": null
+      },
+      {
+        "name": "article_searcher",
+        "description": "Search PubMed/PubTator3 for research articles and preprints.\n\n    ⚠️ PREREQUISITE: Use the 'think' tool FIRST to plan your research strategy!\n\n    Use this tool to find scientific literature ABOUT genes, variants, diseases, or chemicals.\n    Results include articles from PubMed and optionally preprints from bioRxiv/medRxiv.\n\n    Important: This searches for ARTICLES ABOUT these topics, not database records.\n    For genetic variant database records, use variant_searcher instead.\n\n    Example usage:\n    - Find articles about BRAF mutations in melanoma\n    - Search for papers on a specific drug's effects\n    - Locate research on gene-disease associations\n    ",
+        "inputSchema": {
+          "properties": {
+            "chemicals": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Chemical/drug names to search for",
+              "title": "Chemicals"
+            },
+            "diseases": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Disease names to search for",
+              "title": "Diseases"
+            },
+            "genes": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Gene symbols to search for",
+              "title": "Genes"
+            },
+            "keywords": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Free-text keywords to search for",
+              "title": "Keywords"
+            },
+            "variants": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Variant strings to search for (e.g., 'V600E', 'p.D277Y')",
+              "title": "Variants"
+            },
+            "include_preprints": {
+              "default": true,
+              "description": "Include preprints from bioRxiv/medRxiv",
+              "title": "Include Preprints",
+              "type": "boolean"
+            },
+            "include_cbioportal": {
+              "default": true,
+              "description": "Include cBioPortal cancer genomics summary when searching by gene",
+              "title": "Include Cbioportal",
+              "type": "boolean"
+            },
+            "page": {
+              "default": 1,
+              "description": "Page number (1-based)",
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            },
+            "page_size": {
+              "default": 10,
+              "description": "Results per page",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          },
+          "title": "article_searcherArguments",
+          "type": "object"
+        },
+        "annotations": null,
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "article_searcherOutput",
+          "type": "object"
+        }
+      },
+      {
+        "name": "article_getter",
+        "description": "Fetch detailed information for a specific article.\n\n    Retrieves the full abstract and available text for an article by its identifier.\n    Supports:\n    - PubMed IDs (PMID) for published articles\n    - PMC IDs for articles in PubMed Central\n    - DOIs for preprints from Europe PMC\n\n    Returns formatted text including:\n    - Title\n    - Abstract\n    - Full text (when available from PMC for published articles)\n    - Source information (PubMed or Europe PMC)\n    ",
+        "inputSchema": {
+          "properties": {
+            "pmid": {
+              "description": "Article identifier - either a PubMed ID (e.g., '38768446' or 'PMC11193658') or DOI (e.g., '10.1101/2024.01.20.23288905')",
+              "title": "Pmid",
+              "type": "string"
+            }
+          },
+          "required": [
+            "pmid"
+          ],
+          "title": "article_getterArguments",
+          "type": "object"
+        },
+        "annotations": null,
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "article_getterOutput",
+          "type": "object"
+        }
+      },
+      {
+        "name": "trial_searcher",
+        "description": "Search ClinicalTrials.gov for clinical studies.\n\n    ⚠️ PREREQUISITE: Use the 'think' tool FIRST to plan your research strategy!\n\n    Comprehensive search tool for finding clinical trials based on multiple criteria.\n    Supports filtering by conditions, interventions, location, phase, and eligibility.\n\n    Location search notes:\n    - Use either location term OR lat/long coordinates, not both\n    - For city-based searches, AI agents should geocode to lat/long first\n    - Distance parameter only works with lat/long coordinates\n\n    Returns a formatted list of matching trials with key details.\n    ",
+        "inputSchema": {
+          "properties": {
+            "conditions": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Medical conditions to search for",
+              "title": "Conditions"
+            },
+            "interventions": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Treatment interventions to search for",
+              "title": "Interventions"
+            },
+            "other_terms": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Additional search terms",
+              "title": "Other Terms"
+            },
+            "recruiting_status": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "OPEN",
+                    "CLOSED",
+                    "ANY"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Filter by recruiting status",
+              "title": "Recruiting Status"
+            },
+            "phase": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "EARLY_PHASE1",
+                    "PHASE1",
+                    "PHASE2",
+                    "PHASE3",
+                    "PHASE4",
+                    "NOT_APPLICABLE"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Filter by clinical trial phase",
+              "title": "Phase"
+            },
+            "location": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Location term for geographic filtering",
+              "title": "Location"
+            },
+            "lat": {
+              "anyOf": [
+                {
+                  "maximum": 90,
+                  "minimum": -90,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Latitude for location-based search. AI agents should geocode city names before using.",
+              "title": "Lat"
+            },
+            "long": {
+              "anyOf": [
+                {
+                  "maximum": 180,
+                  "minimum": -180,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Longitude for location-based search. AI agents should geocode city names before using.",
+              "title": "Long"
+            },
+            "distance": {
+              "anyOf": [
+                {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Distance in miles from lat/long coordinates",
+              "title": "Distance"
+            },
+            "age_group": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "CHILD",
+                    "ADULT",
+                    "OLDER_ADULT"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Filter by age group",
+              "title": "Age Group"
+            },
+            "sex": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "FEMALE",
+                    "MALE",
+                    "ALL"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Filter by biological sex",
+              "title": "Sex"
+            },
+            "healthy_volunteers": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "YES",
+                    "NO"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Filter by healthy volunteer eligibility",
+              "title": "Healthy Volunteers"
+            },
+            "study_type": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "INTERVENTIONAL",
+                    "OBSERVATIONAL",
+                    "EXPANDED_ACCESS"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Filter by study type",
+              "title": "Study Type"
+            },
+            "funder_type": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "NIH",
+                    "OTHER_GOV",
+                    "INDUSTRY",
+                    "OTHER"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Filter by funding source",
+              "title": "Funder Type"
+            },
+            "page": {
+              "default": 1,
+              "description": "Page number (1-based)",
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            },
+            "page_size": {
+              "default": 10,
+              "description": "Results per page",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          },
+          "title": "trial_searcherArguments",
+          "type": "object"
+        },
+        "annotations": null,
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "trial_searcherOutput",
+          "type": "object"
+        }
+      },
+      {
+        "name": "trial_getter",
+        "description": "Fetch comprehensive details for a specific clinical trial.\n\n    Retrieves all available information for a clinical trial by its NCT ID.\n    This includes protocol details, locations, outcomes, and references.\n\n    For specific sections only, use the specialized getter tools:\n    - trial_protocol_getter: Core protocol information\n    - trial_locations_getter: Site locations and contacts\n    - trial_outcomes_getter: Primary/secondary outcomes and results\n    - trial_references_getter: Publications and references\n    ",
+        "inputSchema": {
+          "properties": {
+            "nct_id": {
+              "description": "NCT ID (e.g., 'NCT06524388')",
+              "title": "Nct Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "nct_id"
+          ],
+          "title": "trial_getterArguments",
+          "type": "object"
+        },
+        "annotations": null,
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "trial_getterOutput",
+          "type": "object"
+        }
+      },
+      {
+        "name": "trial_protocol_getter",
+        "description": "Fetch core protocol information for a clinical trial.\n\n    Retrieves essential protocol details including:\n    - Official title and brief summary\n    - Study status and sponsor information\n    - Study design (type, phase, allocation, masking)\n    - Eligibility criteria\n    - Primary completion date\n    ",
+        "inputSchema": {
+          "properties": {
+            "nct_id": {
+              "description": "NCT ID (e.g., 'NCT06524388')",
+              "title": "Nct Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "nct_id"
+          ],
+          "title": "trial_protocol_getterArguments",
+          "type": "object"
+        },
+        "annotations": null,
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "trial_protocol_getterOutput",
+          "type": "object"
+        }
+      },
+      {
+        "name": "trial_references_getter",
+        "description": "Fetch publications and references for a clinical trial.\n\n    Retrieves all linked publications including:\n    - Published results papers\n    - Background literature\n    - Protocol publications\n    - Related analyses\n\n    Includes PubMed IDs when available for easy cross-referencing.\n    ",
+        "inputSchema": {
+          "properties": {
+            "nct_id": {
+              "description": "NCT ID (e.g., 'NCT06524388')",
+              "title": "Nct Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "nct_id"
+          ],
+          "title": "trial_references_getterArguments",
+          "type": "object"
+        },
+        "annotations": null,
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "trial_references_getterOutput",
+          "type": "object"
+        }
+      },
+      {
+        "name": "trial_outcomes_getter",
+        "description": "Fetch outcome measures and results for a clinical trial.\n\n    Retrieves detailed outcome information including:\n    - Primary outcome measures\n    - Secondary outcome measures\n    - Results data (if available)\n    - Adverse events (if reported)\n\n    Note: Results are only available for completed trials that have posted data.\n    ",
+        "inputSchema": {
+          "properties": {
+            "nct_id": {
+              "description": "NCT ID (e.g., 'NCT06524388')",
+              "title": "Nct Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "nct_id"
+          ],
+          "title": "trial_outcomes_getterArguments",
+          "type": "object"
+        },
+        "annotations": null,
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "trial_outcomes_getterOutput",
+          "type": "object"
+        }
+      },
+      {
+        "name": "trial_locations_getter",
+        "description": "Fetch contact and location details for a clinical trial.\n\n    Retrieves all study locations including:\n    - Facility names and addresses\n    - Principal investigator information\n    - Contact details (when recruiting)\n    - Recruitment status by site\n\n    Useful for finding trials near specific locations or contacting study teams.\n    ",
+        "inputSchema": {
+          "properties": {
+            "nct_id": {
+              "description": "NCT ID (e.g., 'NCT06524388')",
+              "title": "Nct Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "nct_id"
+          ],
+          "title": "trial_locations_getterArguments",
+          "type": "object"
+        },
+        "annotations": null,
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "trial_locations_getterOutput",
+          "type": "object"
+        }
+      },
+      {
+        "name": "variant_searcher",
+        "description": "Search MyVariant.info for genetic variant DATABASE RECORDS.\n\n    ⚠️ PREREQUISITE: Use the 'think' tool FIRST to plan your research strategy!\n\n    Important: This searches for variant DATABASE RECORDS (frequency, significance, etc.),\n    NOT articles about variants. For articles about variants, use article_searcher.\n\n    Searches the comprehensive variant database including:\n    - Population frequencies (gnomAD, 1000 Genomes, etc.)\n    - Clinical significance (ClinVar)\n    - Functional predictions (SIFT, PolyPhen, CADD)\n    - Gene and protein consequences\n\n    Search by various identifiers or filter by clinical/functional criteria.\n    ",
+        "inputSchema": {
+          "properties": {
+            "gene": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Gene symbol (e.g., 'BRAF', 'TP53')",
+              "title": "Gene"
+            },
+            "hgvs": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "HGVS notation (genomic, coding, or protein)",
+              "title": "Hgvs"
+            },
+            "hgvsp": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Protein change in HGVS format (e.g., 'p.V600E')",
+              "title": "Hgvsp"
+            },
+            "hgvsc": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Coding sequence change (e.g., 'c.1799T>A')",
+              "title": "Hgvsc"
+            },
+            "rsid": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "dbSNP rsID (e.g., 'rs113488022')",
+              "title": "Rsid"
+            },
+            "region": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Genomic region (e.g., 'chr7:140753336-140753337')",
+              "title": "Region"
+            },
+            "significance": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "pathogenic",
+                    "likely_pathogenic",
+                    "uncertain_significance",
+                    "likely_benign",
+                    "benign",
+                    "conflicting"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Clinical significance filter",
+              "title": "Significance"
+            },
+            "frequency_min": {
+              "anyOf": [
+                {
+                  "maximum": 1,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Minimum allele frequency",
+              "title": "Frequency Min"
+            },
+            "frequency_max": {
+              "anyOf": [
+                {
+                  "maximum": 1,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Maximum allele frequency",
+              "title": "Frequency Max"
+            },
+            "consequence": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Variant consequence (e.g., 'missense_variant')",
+              "title": "Consequence"
+            },
+            "cadd_score_min": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Minimum CADD score for pathogenicity",
+              "title": "Cadd Score Min"
+            },
+            "sift_prediction": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "deleterious",
+                    "tolerated"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "SIFT functional prediction",
+              "title": "Sift Prediction"
+            },
+            "polyphen_prediction": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "probably_damaging",
+                    "possibly_damaging",
+                    "benign"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "PolyPhen-2 functional prediction",
+              "title": "Polyphen Prediction"
+            },
+            "include_cbioportal": {
+              "default": true,
+              "description": "Include cBioPortal cancer genomics summary when searching by gene",
+              "title": "Include Cbioportal",
+              "type": "boolean"
+            },
+            "page": {
+              "default": 1,
+              "description": "Page number (1-based)",
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            },
+            "page_size": {
+              "default": 10,
+              "description": "Results per page",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          },
+          "title": "variant_searcherArguments",
+          "type": "object"
+        },
+        "annotations": null,
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "variant_searcherOutput",
+          "type": "object"
+        }
+      },
+      {
+        "name": "variant_getter",
+        "description": "Fetch comprehensive details for a specific genetic variant.\n\n    Retrieves all available information for a variant including:\n    - Gene location and consequences\n    - Population frequencies across databases\n    - Clinical significance from ClinVar\n    - Functional predictions\n    - External annotations (TCGA cancer data, conservation scores)\n\n    Accepts various ID formats:\n    - HGVS: NM_004333.4:c.1799T>A\n    - rsID: rs113488022\n    - MyVariant ID: chr7:g.140753336A>T\n    ",
+        "inputSchema": {
+          "properties": {
+            "variant_id": {
+              "description": "Variant ID (HGVS, rsID, or MyVariant ID like 'chr7:g.140753336A>T')",
+              "title": "Variant Id",
+              "type": "string"
+            },
+            "include_external": {
+              "default": true,
+              "description": "Include external annotations (TCGA, 1000 Genomes, functional predictions)",
+              "title": "Include External",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "variant_id"
+          ],
+          "title": "variant_getterArguments",
+          "type": "object"
+        },
+        "annotations": null,
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "variant_getterOutput",
+          "type": "object"
+        }
+      },
+      {
+        "name": "alphagenome_predictor",
+        "description": "Predict variant effects on gene regulation using Google DeepMind's AlphaGenome.\n\n    ⚠️ PREREQUISITE: Use the 'think' tool FIRST to plan your analysis strategy!\n\n    AlphaGenome provides state-of-the-art predictions for how genetic variants\n    affect gene regulation, including:\n    - Gene expression changes (RNA-seq)\n    - Chromatin accessibility impacts (ATAC-seq, DNase-seq)\n    - Splicing alterations\n    - Promoter activity changes (CAGE)\n\n    This tool requires:\n    1. AlphaGenome to be installed (see error message for instructions)\n    2. An API key from https://deepmind.google.com/science/alphagenome\n\n    API Key Options:\n    - Provide directly via the api_key parameter\n    - Or set ALPHAGENOME_API_KEY environment variable\n\n    Example usage:\n    - Predict regulatory effects of BRAF V600E mutation: chr7:140753336 A>T\n    - Assess non-coding variant impact on gene expression\n    - Evaluate promoter variants in specific tissues\n\n    Note: This is an optional tool that enhances variant interpretation\n    with AI predictions. Standard annotations remain available via variant_getter.\n    ",
+        "inputSchema": {
+          "properties": {
+            "chromosome": {
+              "description": "Chromosome (e.g., 'chr7', 'chrX')",
+              "title": "Chromosome",
+              "type": "string"
+            },
+            "position": {
+              "description": "1-based genomic position of the variant",
+              "title": "Position",
+              "type": "integer"
+            },
+            "reference": {
+              "description": "Reference allele(s) (e.g., 'A', 'ATG')",
+              "title": "Reference",
+              "type": "string"
+            },
+            "alternate": {
+              "description": "Alternate allele(s) (e.g., 'T', 'A')",
+              "title": "Alternate",
+              "type": "string"
+            },
+            "interval_size": {
+              "default": 131072,
+              "description": "Size of genomic interval to analyze in bp (max 1,000,000)",
+              "maximum": 1000000,
+              "minimum": 2000,
+              "title": "Interval Size",
+              "type": "integer"
+            },
+            "tissue_types": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "UBERON ontology terms for tissue-specific predictions (e.g., 'UBERON:0002367' for external ear)",
+              "title": "Tissue Types"
+            },
+            "significance_threshold": {
+              "default": 0.5,
+              "description": "Threshold for significant log2 fold changes (default: 0.5)",
+              "maximum": 5.0,
+              "minimum": 0.0,
+              "title": "Significance Threshold",
+              "type": "number"
+            },
+            "api_key": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "AlphaGenome API key. Check if user mentioned 'my AlphaGenome API key is...' in their message. If not provided here and no env var is set, user will be prompted to provide one.",
+              "title": "Api Key"
+            }
+          },
+          "required": [
+            "chromosome",
+            "position",
+            "reference",
+            "alternate"
+          ],
+          "title": "alphagenome_predictorArguments",
+          "type": "object"
+        },
+        "annotations": null,
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "alphagenome_predictorOutput",
+          "type": "object"
+        }
+      }
+    ]
+  },
+  "arxiv-mcp-server": {
+    "name": "ArXiv MCP Server",
+    "description": "The ArXiv MCP Server provides a bridge between AI assistants and arXiv's research repository through the Model Context Protocol (MCP). It allows AI models to search for papers and access their content in a programmatic way.",
+    "category": "Discovery",
+    "web": "https://github.com/blazickjp/arxiv-mcp-server",
+    "in_clean_config": true,
+    "tools": [
+      {
+        "name": "search_papers",
+        "description": "Search for papers on arXiv with advanced filtering",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string"
+            },
+            "max_results": {
+              "type": "integer"
+            },
+            "date_from": {
+              "type": "string"
+            },
+            "date_to": {
+              "type": "string"
+            },
+            "categories": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "query"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "download_paper",
+        "description": "Download a paper and create a resource for it",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "paper_id": {
+              "type": "string",
+              "description": "The arXiv ID of the paper to download"
+            },
+            "check_status": {
+              "type": "boolean",
+              "description": "If true, only check conversion status without downloading",
+              "default": false
+            }
+          },
+          "required": [
+            "paper_id"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "list_papers",
+        "description": "List all existing papers available as resources",
+        "inputSchema": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "annotations": null
+      },
+      {
+        "name": "read_paper",
+        "description": "Read the full content of a stored paper in markdown format",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "paper_id": {
+              "type": "string",
+              "description": "The arXiv ID of the paper to read"
+            }
+          },
+          "required": [
+            "paper_id"
+          ]
+        },
+        "annotations": null
+      }
+    ]
+  },
+  "searxng": {
+    "name": "Simple Document Processing MCP Server",
+    "description": "A powerful Model Context Protocol (MCP) server providing comprehensive document processing capabilities.",
+    "category": "File Access",
+    "web": "https://github.com/cablate/mcp-doc-forge",
+    "in_clean_config": true,
+    "tools": [
+      {
+        "name": "document_reader",
+        "description": "Read content from non-image document-files at specified paths, supporting various file formats: .pdf, .docx, .txt, .html, .csv",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "filePath": {
+              "type": "string",
+              "description": "Path to the file to be read"
+            }
+          },
+          "required": [
+            "filePath"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "pdf_merger",
+        "description": "Merge multiple PDF files into one",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "inputPaths": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Paths to the input PDF files"
+            },
+            "outputDir": {
+              "type": "string",
+              "description": "Directory where merged PDFs should be saved"
+            }
+          },
+          "required": [
+            "inputPaths",
+            "outputDir"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "pdf_splitter",
+        "description": "Split a PDF file into multiple files",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "inputPath": {
+              "type": "string",
+              "description": "Path to the input PDF file"
+            },
+            "outputDir": {
+              "type": "string",
+              "description": "Directory where split PDFs should be saved"
+            },
+            "pageRanges": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "start": {
+                    "type": "number"
+                  },
+                  "end": {
+                    "type": "number"
+                  }
+                }
+              },
+              "description": "Array of page ranges to split"
+            }
+          },
+          "required": [
+            "inputPath",
+            "outputDir",
+            "pageRanges"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "docx_to_pdf",
+        "description": "Convert DOCX files to PDF format",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "inputPath": {
+              "type": "string",
+              "description": "Path to the input DOCX file"
+            },
+            "outputPath": {
+              "type": "string",
+              "description": "Path where the output PDF file should be saved"
+            }
+          },
+          "required": [
+            "inputPath",
+            "outputPath"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "docx_to_html",
+        "description": "Convert DOCX to HTML while preserving formatting",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "inputPath": {
+              "type": "string",
+              "description": "Path to the input DOCX file"
+            },
+            "outputDir": {
+              "type": "string",
+              "description": "Directory where HTML should be saved"
+            }
+          },
+          "required": [
+            "inputPath",
+            "outputDir"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "html_cleaner",
+        "description": "Clean HTML by removing unnecessary tags and attributes",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "inputPath": {
+              "type": "string",
+              "description": "Path to the input HTML file"
+            },
+            "outputDir": {
+              "type": "string",
+              "description": "Directory where cleaned HTML should be saved"
+            }
+          },
+          "required": [
+            "inputPath",
+            "outputDir"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "html_to_text",
+        "description": "Convert HTML to plain text while preserving structure",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "inputPath": {
+              "type": "string",
+              "description": "Path to the input HTML file"
+            },
+            "outputDir": {
+              "type": "string",
+              "description": "Directory where text file should be saved"
+            }
+          },
+          "required": [
+            "inputPath",
+            "outputDir"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "html_to_markdown",
+        "description": "Convert HTML to Markdown format",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "inputPath": {
+              "type": "string",
+              "description": "Path to the input HTML file"
+            },
+            "outputDir": {
+              "type": "string",
+              "description": "Directory where Markdown file should be saved"
+            }
+          },
+          "required": [
+            "inputPath",
+            "outputDir"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "html_extract_resources",
+        "description": "Extract all resources (images, videos, links) from HTML",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "inputPath": {
+              "type": "string",
+              "description": "Path to the input HTML file"
+            },
+            "outputDir": {
+              "type": "string",
+              "description": "Directory where resources should be saved"
+            }
+          },
+          "required": [
+            "inputPath",
+            "outputDir"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "html_formatter",
+        "description": "Format and beautify HTML code",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "inputPath": {
+              "type": "string",
+              "description": "Path to the input HTML file"
+            },
+            "outputDir": {
+              "type": "string",
+              "description": "Directory where formatted HTML should be saved"
+            }
+          },
+          "required": [
+            "inputPath",
+            "outputDir"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "text_diff",
+        "description": "Compare two text files and show differences",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "file1Path": {
+              "type": "string",
+              "description": "Path to the first text file"
+            },
+            "file2Path": {
+              "type": "string",
+              "description": "Path to the second text file"
+            },
+            "outputDir": {
+              "type": "string",
+              "description": "Directory where diff result should be saved"
+            }
+          },
+          "required": [
+            "file1Path",
+            "file2Path",
+            "outputDir"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "text_splitter",
+        "description": "Split text file by specified delimiter or line count",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "inputPath": {
+              "type": "string",
+              "description": "Path to the input text file"
+            },
+            "outputDir": {
+              "type": "string",
+              "description": "Directory where split files should be saved"
+            },
+            "splitBy": {
+              "type": "string",
+              "enum": [
+                "lines",
+                "delimiter"
+              ],
+              "description": "Split method: by line count or delimiter"
+            },
+            "value": {
+              "type": "string",
+              "description": "Line count (number) or delimiter string"
+            }
+          },
+          "required": [
+            "inputPath",
+            "outputDir",
+            "splitBy",
+            "value"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "text_formatter",
+        "description": "Format text with proper indentation and line spacing",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "inputPath": {
+              "type": "string",
+              "description": "Path to the input text file"
+            },
+            "outputDir": {
+              "type": "string",
+              "description": "Directory where formatted file should be saved"
+            }
+          },
+          "required": [
+            "inputPath",
+            "outputDir"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "text_encoding_converter",
+        "description": "Convert text between different encodings",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "inputPath": {
+              "type": "string",
+              "description": "Path to the input text file"
+            },
+            "outputDir": {
+              "type": "string",
+              "description": "Directory where converted file should be saved"
+            },
+            "fromEncoding": {
+              "type": "string",
+              "description": "Source encoding (e.g., 'big5', 'gbk', 'utf8')"
+            },
+            "toEncoding": {
+              "type": "string",
+              "description": "Target encoding (e.g., 'utf8', 'big5', 'gbk')"
+            }
+          },
+          "required": [
+            "inputPath",
+            "outputDir",
+            "fromEncoding",
+            "toEncoding"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "excel_read",
+        "description": "Read Excel file and convert to JSON format while preserving structure",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "inputPath": {
+              "type": "string",
+              "description": "Path to the input Excel file"
+            },
+            "includeHeaders": {
+              "type": "boolean",
+              "description": "Whether to include headers in the output",
+              "default": true
+            }
+          },
+          "required": [
+            "inputPath"
+          ]
+        },
+        "annotations": null
+      },
+      {
+        "name": "format_convert",
+        "description": "Convert between different document formats (Markdown, HTML, XML, JSON)",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "input": {
+              "type": "string",
+              "description": "Input content to convert"
+            },
+            "fromFormat": {
+              "type": "string",
+              "enum": [
+                "markdown",
+                "html",
+                "xml",
+                "json"
+              ],
+              "description": "Source format"
+            },
+            "toFormat": {
+              "type": "string",
+              "enum": [
+                "markdown",
+                "html",
+                "xml",
+                "json"
+              ],
+              "description": "Target format"
+            }
+          },
+          "required": [
+            "input",
+            "fromFormat",
+            "toFormat"
+          ]
+        },
+        "annotations": null
+      }
+    ]
+  }
+}
