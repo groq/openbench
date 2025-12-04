@@ -20,8 +20,12 @@ DATA_FILE = DATA_DIR / "progressivemcpbench.json"
 
 # Synthetic MCP data directory (in repo root)
 # Path: src/openbench/datasets/ -> repo root is 3 parents up
-SYNTHETIC_MCP_DIR = Path(__file__).resolve().parent.parent.parent.parent / "synthetic_mcp"
-SYNTHETIC_TASKS_FILE = SYNTHETIC_MCP_DIR / "tasks" / "progressivemcpbench_synthetic.json"
+SYNTHETIC_MCP_DIR = (
+    Path(__file__).resolve().parent.parent.parent.parent / "synthetic_mcp"
+)
+SYNTHETIC_TASKS_FILE = (
+    SYNTHETIC_MCP_DIR / "tasks" / "progressivemcpbench_synthetic.json"
+)
 
 
 def record_to_sample(record: dict[str, Any]) -> Optional[Sample]:
@@ -103,7 +107,9 @@ def get_synthetic_dataset() -> Dataset:
         with SYNTHETIC_TASKS_FILE.open("r", encoding="utf-8") as f:
             raw_records: list[dict[str, Any]] = json.load(f)
     except (json.JSONDecodeError, FileNotFoundError) as e:
-        logger.error(f"Failed to read synthetic dataset file {SYNTHETIC_TASKS_FILE}: {e}")
+        logger.error(
+            f"Failed to read synthetic dataset file {SYNTHETIC_TASKS_FILE}: {e}"
+        )
         raise FileNotFoundError(
             f"Synthetic dataset file not found at {SYNTHETIC_TASKS_FILE}. "
             "Run the synthetic generation pipeline first (see docs/evals/progressivemcpbench.mdx)."

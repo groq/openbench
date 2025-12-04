@@ -2,7 +2,9 @@
 ToolSource factory for the ProgressiveMCPBench Directory MCP server.
 
 This creates an InspectAI ToolSource using mcp_server_stdio to run the
-ProgressiveMCPBench Directory server module and exposes its tools (ls, read-tool-file, execute-tool).
+Synthetic Directory server module and exposes its tools (ls, read-tool-file, execute-tool).
+
+The synthetic version routes tool execution to the HTTP MCP server instead of real MCP.
 """
 
 from __future__ import annotations
@@ -17,7 +19,10 @@ def directory_tool_source(
     python_executable: Optional[str] = None,
     extra_env: Optional[dict[str, str]] = None,
 ) -> ToolSource:
-    """Create a ToolSource for the Directory MCP server.
+    """Create a ToolSource for the Synthetic Directory MCP server.
+
+    This uses the synthetic directory server which routes tool execution
+    to the HTTP MCP server instead of real MCP servers.
 
     Args:
         python_executable: Optional path to Python to run the module
@@ -32,9 +37,6 @@ def directory_tool_source(
         else os.environ.get("PYTHON", "python")
     )
     passthrough_keys = {
-        "OPENAI_API_KEY",
-        "MCP_DATA_PATH",
-        "OPENBENCH_PROGRESSIVEMCPBENCH_REFRESH",
         "OPENBENCH_COPILOT_SILENT",
         "LOG_LEVEL",
         "RUST_LOG",
@@ -45,7 +47,6 @@ def directory_tool_source(
         "http_proxy",
         "https_proxy",
         "no_proxy",
-        "PLAYWRIGHT_BROWSERS_PATH",
     }
     env = {k: v for k, v in os.environ.items() if k in passthrough_keys}
     env.setdefault("OPENBENCH_COPILOT_SILENT", "1")
@@ -57,9 +58,10 @@ def directory_tool_source(
     if extra_env:
         env.update(extra_env)
 
+    # Use the synthetic directory server
     server = mcp_server_stdio(
         command=py,
-        args=["-m", "openbench.tools.progressivemcpbench.directory.server"],
+        args=["-m", "openbench.tools.progressivemcpbench.synthetic.directory_server"],
         env=env,
     )
 
