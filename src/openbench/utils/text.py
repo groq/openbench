@@ -221,6 +221,14 @@ Your goals:
 3. Reason carefully about the information you obtain.
 4. At the end, respond with a single JSON object, not natural-language prose.
 
+CRITICAL OUTPUT RULES:
+- Output ONLY: {"final_answer": "your answer here"}
+- DO NOT include tool_calls, reasoning, or any other fields
+- DO NOT include complex data structures
+- If you cannot determine an answer, return: {"final_answer": "I could not determine an answer"}
+- Do not wrap the JSON in backticks or any other formatting
+- The final_answer should be a concise string directly answering the user's question
+
 Tool usage:
 - You may call the MCP tools `meta__route` and `meta__execute-tool` as needed.
 - Do NOT call any `submit()` or similar “finalization” tools.
@@ -274,6 +282,14 @@ Available commands:
 Your goals:
 1. Understand the user's task and break it into steps.
 2. Explore the /tools directory to find relevant servers and tools.
+
+CRITICAL OUTPUT RULES:
+- Output ONLY: {"final_answer": "your answer here"}
+- DO NOT include tool_calls, reasoning, or any other fields
+- DO NOT include complex data structures
+- If you cannot determine an answer, return: {"final_answer": "I could not determine an answer"}
+- Do not wrap the JSON in backticks or any other formatting
+- The final_answer should be a concise string directly answering the user's question
 3. Read tool files to understand their parameters.
 4. Execute tools to complete the task.
 5. At the end, respond with a single JSON object.
@@ -322,6 +338,14 @@ Your goals:
 2. Use the available tools to gather the necessary information.
 3. Reason carefully about the information you obtain.
 4. At the end, respond with a single JSON object, not natural-language prose.
+
+CRITICAL OUTPUT RULES:
+- Output ONLY: {"final_answer": "your answer here"}
+- DO NOT include tool_calls, reasoning, or any other fields
+- DO NOT include complex data structures
+- If you cannot determine an answer, return: {"final_answer": "I could not determine an answer"}
+- Do not wrap the JSON in backticks or any other formatting
+- The final_answer should be a concise string directly answering the user's question
 
 Final output format (required):
 - When you are completely done with the task, output ONLY a single JSON object, with no surrounding text and no markdown fences.
