@@ -9,13 +9,13 @@ and returns deterministic responses.
 from __future__ import annotations
 
 import json
-from http.client import HTTPConnection
 from typing import Any
 
 from inspect_ai.tool import Tool
 from inspect_ai.tool._tool_def import ToolDef
 from inspect_ai.tool._tool_params import ToolParams
 from inspect_ai.util._json import JSONSchema
+import aiohttp
 
 
 DEFAULT_HTTP_HOST = "localhost"
@@ -83,7 +83,7 @@ def _json_schema_to_tool_params(schema: dict[str, Any]) -> ToolParams:
     )
 
 
-def _call_http_tool(
+async def _call_http_tool(
     server_name: str,
     tool_name: str,
     params: dict[str, Any],
@@ -104,23 +104,18 @@ def _call_http_tool(
     Returns:
         Response dictionary with 'result' or 'error' key
     """
-    conn = HTTPConnection(host, port, timeout=timeout)
-    body = json.dumps(params)
-
-    try:
-        conn.request(
-            "POST",
-            f"/mcp/{server_name}/tools/{tool_name}",
-            body,
-            {"Content-Type": "application/json"},
-        )
-        response = conn.getresponse()
-        data = json.loads(response.read().decode("utf-8"))
-        return data
-    except Exception as e:
-        return {"error": str(e)}
-    finally:
-        conn.close()
+    async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=timeout)) as session:
+        try:
+            url = f"http://{host}:{port}/mcp/{server_name}/tools/{tool_name}"
+            async with session.post(
+                url,
+                json=params,
+                headers={"Content-Type": "application/json"},
+            ) as response:
+                data = await response.json()
+                return data
+        except Exception as e:
+            return {"error": str(e)}
 
 
 def create_synthetic_tool_wrapper(
@@ -149,7 +144,7 @@ def create_synthetic_tool_wrapper(
 
     async def execute(**kwargs: Any) -> str:
         """Execute the tool via HTTP MCP server."""
-        response = _call_http_tool(
+        response = await _call_http_tool(
             server_name=server_name,
             tool_name=tool_name,
             params=kwargs,
