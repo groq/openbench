@@ -172,11 +172,12 @@ def main():
     print("\n🌱 Extracting server seeds...")
     server_seeds = extract_server_seeds(working_tasks, server_index, clean_config)
     
-    # Save outputs
+    # Save outputs (sorted for reproducibility)
     print("\n💾 Saving outputs...")
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     
-    save_json(OUTPUT_DIR / "servers_raw.json", server_seeds)
+    sorted_server_seeds = dict(sorted(server_seeds.items()))
+    save_json(OUTPUT_DIR / "servers_raw.json", sorted_server_seeds)
     save_json(OUTPUT_DIR / "working_tasks.json", working_tasks)
     
     # Print summary
@@ -184,8 +185,8 @@ def main():
     print("Summary")
     print("=" * 60)
     print(f"  Working tasks: {len(working_tasks)}")
-    print(f"  Required servers: {len(server_seeds)}")
-    for name, info in server_seeds.items():
+    print(f"  Required servers: {len(sorted_server_seeds)}")
+    for name, info in sorted_server_seeds.items():
         tool_count = len(info.get("tools", []))
         status = "✓" if info.get("in_clean_config") else "✗"
         print(f"    [{status}] {name}: {tool_count} tools - {info.get('description', '')[:50]}...")
