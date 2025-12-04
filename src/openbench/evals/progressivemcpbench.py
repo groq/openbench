@@ -311,7 +311,7 @@ def progressivemcpbench(
         config=GenerateConfig(
             temperature=0.7,
             max_tokens=2048,
-            extra_body={"response_format": {"type": "json_object"}},
+            # extra_body={"response_format": {"type": "json_object"}}, # removed due to JSON parsing issues
         ),
         working_limit=working_limit,
     )

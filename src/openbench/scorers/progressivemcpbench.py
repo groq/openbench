@@ -33,46 +33,31 @@ from openbench.scorers.simpleqa import GRADER_TEMPLATE
 def _extract_final_answer(state: TaskState) -> str | None:
     """Extract the 'final_answer' field from the JSON output."""
     if not state.output or not state.output.completion:
-        print(f"DEBUG: No output or completion in state")
         return None
 
     raw = state.output.completion.strip()
-    print(f"DEBUG: Raw completion length: {len(raw)}")
-    print(f"DEBUG: Raw completion preview: {repr(raw[:100])}")
 
     # Try direct JSON parse
     try:
         obj = json.loads(raw)
-        print(f"DEBUG: Direct JSON parse succeeded, keys: {list(obj.keys()) if isinstance(obj, dict) else 'not dict'}")
-    except json.JSONDecodeError as e:
-        print(f"DEBUG: Direct JSON parse failed: {e}")
+    except json.JSONDecodeError:
         # Fallback: try to find the first {...} block
         m = re.search(r"\{.*\}", raw, flags=re.DOTALL)
         if not m:
-            print(f"DEBUG: No JSON block found")
             return None
         try:
             obj = json.loads(m.group(0))
-            print(f"DEBUG: Fallback JSON parse succeeded")
-        except json.JSONDecodeError as e2:
-            print(f"DEBUG: Fallback JSON parse failed: {e2}")
+        except json.JSONDecodeError:
             return None
-    except Exception as e:
-        print(f"DEBUG: Unexpected error in JSON parsing: {e}")
-        return None
 
     if not isinstance(obj, dict):
-        print(f"DEBUG: Parsed object is not a dict: {type(obj)}")
         return None
 
     value = obj.get("final_answer")
     if value is None:
-        print(f"DEBUG: No 'final_answer' key in parsed object")
         return None
 
-    result = str(value).strip() or None
-    print(f"DEBUG: Extracted final_answer: {repr(result)}")
-    return result
+    return str(value).strip() or None
 
 
 @metric
