@@ -18,6 +18,10 @@ logger = logging.getLogger(__name__)
 DATA_DIR = Path(__file__).resolve().parent / "data"
 DATA_FILE = DATA_DIR / "progressivemcpbench.json"
 
+# Synthetic MCP data directory (in repo root)
+SYNTHETIC_MCP_DIR = Path(__file__).resolve().parent.parent.parent.parent.parent / "synthetic_mcp"
+SYNTHETIC_TASKS_FILE = SYNTHETIC_MCP_DIR / "tasks" / "progressivemcpbench_synthetic.json"
+
 
 def record_to_sample(record: dict[str, Any]) -> Optional[Sample]:
     """Convert a ProgressiveMCPBench record to an Inspect Sample.
@@ -86,3 +90,28 @@ def get_dataset() -> Dataset:
             samples.append(sample)
 
     return MemoryDataset(samples=samples, name="progressivemcpbench")
+
+
+def get_synthetic_dataset() -> Dataset:
+    """Load the synthetic ProgressiveMCPBench dataset.
+
+    This dataset uses the synthetic MCP server for deterministic evaluation.
+    It loads from synthetic_mcp/tasks/progressivemcpbench_synthetic.json.
+    """
+    try:
+        with SYNTHETIC_TASKS_FILE.open("r", encoding="utf-8") as f:
+            raw_records: list[dict[str, Any]] = json.load(f)
+    except (json.JSONDecodeError, FileNotFoundError) as e:
+        logger.error(f"Failed to read synthetic dataset file {SYNTHETIC_TASKS_FILE}: {e}")
+        raise FileNotFoundError(
+            f"Synthetic dataset file not found at {SYNTHETIC_TASKS_FILE}. "
+            "Run the synthetic generation pipeline first (see docs/evals/progressivemcpbench.mdx)."
+        ) from e
+
+    samples: list[Sample] = []
+    for record in raw_records:
+        sample = record_to_sample(record)
+        if sample:
+            samples.append(sample)
+
+    return MemoryDataset(samples=samples, name="progressivemcpbench-synthetic")

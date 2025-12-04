@@ -22,7 +22,7 @@ from inspect_ai.tool import ToolError, ToolSource
 import asyncio
 from typing import Any
 
-from openbench.datasets.progressivemcpbench import get_dataset
+from openbench.datasets.progressivemcpbench import get_dataset, get_synthetic_dataset
 from openbench.scorers.progressivemcpbench import progressivemcpbench_scorer
 from openbench.tools.progressivemcpbench.copilot.toolsource import copilot_tool_source
 from openbench.tools.progressivemcpbench.directory.toolsource import (
@@ -33,6 +33,11 @@ from openbench.tools.progressivemcpbench.minimal.toolsource import (
     minimal_tools_tool_source,
     distraction_64_tool_source,
     distraction_128_tool_source,
+)
+from openbench.tools.progressivemcpbench.synthetic.toolsource import (
+    synthetic_minimal_servers_tool_source,
+    synthetic_minimal_tools_tool_source,
+    synthetic_all_tools_tool_source,
 )
 from openbench.utils.text import (
     PROGRESSIVEMCPBENCH_SYSTEM_MESSAGE,
@@ -48,6 +53,10 @@ VALID_STRATEGIES = {
     "minimal-tools",
     "distraction-64",
     "distraction-128",
+    # Synthetic strategies (use HTTP MCP server instead of real MCP)
+    "synthetic",
+    "synthetic-minimal-servers",
+    "synthetic-minimal-tools",
 }
 
 
@@ -251,6 +260,72 @@ def progressive_distraction_128_solver() -> Solver:
     return solve
 
 
+# --- Synthetic Solvers (use HTTP MCP server) ---
+
+
+@solver
+def synthetic_solver() -> Solver:
+    """Solver that provides all synthetic tools via HTTP MCP server."""
+
+    async def solve(state: TaskState, generate: Any) -> TaskState:
+        tool_source = synthetic_all_tools_tool_source()
+        return await _run_react_with_tools(
+            state, PROGRESSIVEMCPBENCH_MINIMAL_SYSTEM_MESSAGE, tool_source
+        )
+
+    return solve
+
+
+@solver
+def synthetic_minimal_servers_solver() -> Solver:
+    """Solver that provides tools from required servers via HTTP MCP server."""
+
+    async def solve(state: TaskState, generate: Any) -> TaskState:
+        metadata = state.metadata or {}
+        required_servers = metadata.get("required_servers", [])
+
+        if not required_servers:
+            state.metadata = state.metadata or {}
+            state.metadata["execution_error"] = "missing_annotation"
+            state.metadata["error_message"] = (
+                "Task is missing 'required_servers' annotation."
+            )
+            return state
+
+        tool_source = synthetic_minimal_servers_tool_source(required_servers)
+        return await _run_react_with_tools(
+            state, PROGRESSIVEMCPBENCH_MINIMAL_SYSTEM_MESSAGE, tool_source
+        )
+
+    return solve
+
+
+@solver
+def synthetic_minimal_tools_solver() -> Solver:
+    """Solver that provides only the exact required tools via HTTP MCP server."""
+
+    async def solve(state: TaskState, generate: Any) -> TaskState:
+        metadata = state.metadata or {}
+        required_servers = metadata.get("required_servers", [])
+        required_tools_list = metadata.get("required_tools", [])
+
+        if not required_servers or not required_tools_list:
+            state.metadata = state.metadata or {}
+            state.metadata["execution_error"] = "missing_annotation"
+            state.metadata["error_message"] = (
+                "Task is missing 'required_servers' or 'required_tools' annotation."
+            )
+            return state
+
+        required_tools = _build_required_tools(required_servers, required_tools_list)
+        tool_source = synthetic_minimal_tools_tool_source(required_tools)
+        return await _run_react_with_tools(
+            state, PROGRESSIVEMCPBENCH_MINIMAL_SYSTEM_MESSAGE, tool_source
+        )
+
+    return solve
+
+
 def _get_solver_for_strategy(strategy: str) -> Solver:
     """Get the appropriate solver for the given strategy."""
     if strategy == "copilot":
@@ -265,10 +340,22 @@ def _get_solver_for_strategy(strategy: str) -> Solver:
         return progressive_distraction_64_solver()
     elif strategy == "distraction-128":
         return progressive_distraction_128_solver()
+    # Synthetic strategies
+    elif strategy == "synthetic":
+        return synthetic_solver()
+    elif strategy == "synthetic-minimal-servers":
+        return synthetic_minimal_servers_solver()
+    elif strategy == "synthetic-minimal-tools":
+        return synthetic_minimal_tools_solver()
     else:
         raise ValueError(
             f"Unknown strategy: {strategy}. Valid strategies: {VALID_STRATEGIES}"
         )
+
+
+def _is_synthetic_strategy(strategy: str) -> bool:
+    """Check if a strategy uses the synthetic MCP server."""
+    return strategy.startswith("synthetic")
 
 
 @task
@@ -287,6 +374,9 @@ def progressivemcpbench(
             - "minimal-tools": Direct access to exact required tools (requires annotations)
             - "distraction-64": Minimal tools + distractors to 64 total (requires annotations)
             - "distraction-128": Minimal tools + distractors to 128 total (requires annotations)
+            - "synthetic": All synthetic tools via HTTP MCP server
+            - "synthetic-minimal-servers": Required server tools via HTTP MCP server
+            - "synthetic-minimal-tools": Exact required tools via HTTP MCP server
     """
     if strategy is None:
         raise ValueError(
@@ -303,8 +393,14 @@ def progressivemcpbench(
 
     solver = _get_solver_for_strategy(strategy)
 
+    # Use synthetic dataset for synthetic strategies
+    if _is_synthetic_strategy(strategy):
+        dataset = get_synthetic_dataset()
+    else:
+        dataset = get_dataset()
+
     return Task(
-        dataset=get_dataset(),
+        dataset=dataset,
         solver=[solver],
         scorer=progressivemcpbench_scorer(),
         name=f"progressivemcpbench-{strategy}",
