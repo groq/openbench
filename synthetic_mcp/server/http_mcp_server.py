@@ -258,14 +258,21 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
 
                 if path in pdf_metadata:
                     meta = pdf_metadata[path]
-                    results.append(
-                        {
+                    # Check if metadata is empty or invalid
+                    if not meta or not isinstance(meta, dict) or not meta.get('title'):
+                        results.append({
                             "path": path,
-                            "metadata": meta,
-                            "page_count": meta.get("page_count", 0),
-                            "text": f"[PDF Content] Title: {meta.get('title', 'Unknown')}\nAuthors: {', '.join(meta.get('authors', []))}",
-                        }
-                    )
+                            "error": "PDF not found in metadata"
+                        })
+                    else:
+                        results.append(
+                            {
+                                "path": path,
+                                "metadata": meta,
+                                "page_count": meta.get("page_count", 0),
+                                "text": f"[PDF Content] Title: {meta.get('title', 'Unknown')}\nAuthors: {', '.join(meta.get('authors', []))}",
+                            }
+                        )
                 else:
                     # Generic response for unknown PDFs
                     results.append({"path": path, "error": "PDF not found in metadata"})
