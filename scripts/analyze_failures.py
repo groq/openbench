@@ -12,6 +12,9 @@ Usage:
     # Analyze all progressivemcpbench logs
     python scripts/analyze_failures.py
 
+    # Analyze a specific log file
+    python scripts/analyze_failures.py --log-file logs/my-evaluation.eval
+
     # Limit to specific number of failures per run
     python scripts/analyze_failures.py --max-per-run 5
 
@@ -482,6 +485,11 @@ async def main() -> None:
         help="Directory containing .eval files (default: logs)",
     )
     parser.add_argument(
+        "--log-file",
+        type=Path,
+        help="Analyze a specific .eval file instead of all files in logs directory",
+    )
+    parser.add_argument(
         "-o",
         "--output",
         type=Path,
@@ -514,9 +522,18 @@ async def main() -> None:
 
     args = parser.parse_args()
 
-    # Find eval files
-    eval_files = find_progressivemcpbench_logs(args.logs_dir)
-    print(f"Found {len(eval_files)} progressivemcpbench eval files")
+    # Determine which eval files to analyze
+    if args.log_file:
+        # Analyze only the specified file
+        if not args.log_file.exists():
+            print(f"Error: Log file not found: {args.log_file}", file=sys.stderr)
+            sys.exit(1)
+        eval_files = [args.log_file]
+        print(f"Analyzing specific log file: {args.log_file.name}")
+    else:
+        # Find all eval files in logs directory
+        eval_files = find_progressivemcpbench_logs(args.logs_dir)
+        print(f"Found {len(eval_files)} progressivemcpbench eval files")
 
     # Extract failures from all files
     all_failures: list[FailedSample] = []
