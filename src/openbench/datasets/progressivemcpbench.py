@@ -8,7 +8,7 @@ but uses a local JSON dataset and exact/fuzzy answer matching.
 import json
 import logging
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 from inspect_ai.dataset import Dataset, MemoryDataset, Sample
 
@@ -36,21 +36,23 @@ def record_to_sample(record: dict[str, Any]) -> Optional[Sample]:
 
     Returns:
         Sample: Converted sample for evaluation.
-        None: If the record should be skipped (e.g. answers is None).
+        None: If the record should be skipped (e.g. answer is None or empty).
     """
     # specific user request: if answer is explicitly null, skip the task
     if record.get("answer") is None:
         return None
 
-    answers = record.get("answer") or []
-    if isinstance(answers, str):
-        answers_list: List[str] = [answers.strip()] if answers.strip() else []
+    # Handle answer as a single string
+    raw_answer = record.get("answer")
+    if isinstance(raw_answer, list):
+        # If it's a list, take the first non-empty answer
+        answer = next((str(a).strip() for a in raw_answer if str(a).strip()), "")
     else:
-        answers_list = [str(a).strip() for a in answers if str(a).strip()]
+        answer = str(raw_answer).strip() if raw_answer else ""
 
-    # Skip records with no usable answers (requirement 3: skip empty answers)
-    # if not answers_list:
-    #    raise ValueError("Empty answers list; record should be filtered before Sample creation")
+    # Skip records with no usable answer
+    if not answer:
+        return None
 
     metadata = {
         "category": record.get("category"),
@@ -71,7 +73,7 @@ def record_to_sample(record: dict[str, Any]) -> Optional[Sample]:
     return Sample(
         id=record["task_id"],
         input=record["Question"],
-        target=answers_list,  # list of acceptable answers
+        target=answer,  # single answer string
         metadata=metadata,
     )
 

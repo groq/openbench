@@ -336,28 +336,6 @@ Do not wrap the JSON in backticks or any other formatting.
 Output only this JSON object as your final response.
 """.strip()
 
-PROGRESSIVEMCPBENCH_GRADER_TEMPLATE = """
-You are an expert judge evaluating the performance of an AI agent.
-Your task is to determine if the agent's answer matches the expected answer.
-
-Model Answer:
-{model_answer}
-
-Expected Answer(s):
-{expected_answers}
-{scorer_instructions_section}
-Instructions:
-1. Compare the Model Answer to the Expected Answer(s).
-2. Ignore differences in whitespace, capitalization, and punctuation.
-3. Ignore the order of items in lists or sets.
-4. Allow for small differences in floating point numbers (e.g. 1.00 vs 1.0, or 0.333 vs 0.33).
-5. If the Model Answer is a valid match for any of the Expected Answers based on these criteria, consider it CORRECT.
-6. If the Model Answer is effectively the same fact but expressed differently, consider it CORRECT.
-7. Otherwise, consider it INCORRECT.
-
-Reply with a single word: CORRECT or INCORRECT.
-""".strip()
-
 MOCK_AIME_PROMPT = """
 Please solve this AIME problem step by step. The answer is an integer ranging from 000 to 999, inclusive.
 

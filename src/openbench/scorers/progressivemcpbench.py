@@ -2,12 +2,11 @@
 ProgressiveMCPBench scorer (LLM-as-Judge).
 
 Implements an LLM-based scorer for ProgressiveMCPBench that checks the 'final_answer'
-against the 'answers' list from the dataset, tolerating formatting/ordering differences.
+against the expected answer from the dataset, using the SimpleQA grading template.
 """
 
 import json
 import re
-from typing import List
 
 from inspect_ai.scorer import (
     accuracy,
@@ -28,7 +27,7 @@ from inspect_ai.model import (
     Model,
 )
 from openbench.metrics.grouped import grouped
-from openbench.utils.text import PROGRESSIVEMCPBENCH_GRADER_TEMPLATE
+from openbench.scorers.simpleqa import GRADER_TEMPLATE
 
 
 def _extract_final_answer(state: TaskState) -> str | None:
@@ -114,7 +113,7 @@ def progressivemcpbench_metrics() -> Metric:
 def progressivemcpbench_scorer(
     model: str = "groq/openai/gpt-oss-120b",
 ) -> Scorer:
-    """Scorer for ProgressiveMCPBench using LLM-as-a-judge.
+    """Scorer for ProgressiveMCPBench using LLM-as-a-judge with SimpleQA grading.
 
     Args:
         model: The model to use for grading (default: groq/openai/gpt-oss-120b).
@@ -122,18 +121,10 @@ def progressivemcpbench_scorer(
     grader_model: Model = get_model(model)
 
     async def score(state: TaskState, target: Target) -> Score:
-        # Expected answers from target.text, which we set to a list in the dataset
-        expected_raw = target.target if target is not None else []
-        if isinstance(expected_raw, str):
-            expected_list: List[str] = [expected_raw]
-        else:
-            expected_list = list(expected_raw or [])
+        # Get the expected answer (now a single string)
+        expected_answer = target.text if target else ""
 
-        expected_list = [e for e in (str(x).strip() for x in expected_list) if e]
-
-        # Safety: we should have already filtered empty answers at dataset time
-        if not expected_list:
-            # Treat as ungraded / auto-skip
+        if not expected_answer:
             return Score(
                 value=0.0, answer="", metadata={"skipped_no_expected_answer": True}
             )
@@ -144,71 +135,73 @@ def progressivemcpbench_scorer(
                 value=0.0,
                 answer="",
                 metadata={
-                    "match_type": "no_answer",
+                    "grade": "not_attempted",
+                    "grade_letter": "C",
                     "reason": "Failed to extract final_answer from output",
-                    "expected_answers": expected_list,
+                    "expected_answer": expected_answer,
                 },
             )
+
+        # Get the question from state input
+        question = state.input_text
 
         # Get scorer instructions from metadata if present
         scorer_instructions = (
             state.metadata.get("scorer_instructions") if state.metadata else None
         )
-        scorer_instructions_section = (
-            f"\nAdditional Scoring Guidance (from the benchmark author):\n{scorer_instructions}\n"
-            if scorer_instructions
-            else ""
-        )
 
-        # Construct prompt for the LLM judge
-        prompt = PROGRESSIVEMCPBENCH_GRADER_TEMPLATE.format(
-            model_answer=model_answer,
-            expected_answers="\n".join(f"- {a}" for a in expected_list),
-            scorer_instructions_section=scorer_instructions_section,
+        # Build the gold target, optionally including scorer instructions
+        gold_target = expected_answer
+        if scorer_instructions:
+            gold_target = f"{expected_answer}\n\nNote: {scorer_instructions}"
+
+        # Use SimpleQA's grading template
+        grader_prompt = GRADER_TEMPLATE.format(
+            question=question,
+            target=gold_target,
+            predicted_answer=model_answer,
         )
 
         try:
-            response = await grader_model.generate([ChatMessageUser(content=prompt)])
-            grade_text = response.completion.strip().upper()
+            response = await grader_model.generate(
+                [ChatMessageUser(content=grader_prompt)]
+            )
+            grading_text = response.completion.strip()
 
-            # Look for CORRECT or INCORRECT in the response
-            if "CORRECT" in grade_text and "INCORRECT" not in grade_text:
-                value = 1.0
-                match_type = "correct"
-            elif "INCORRECT" in grade_text:
-                value = 0.0
-                match_type = "incorrect"
-            else:
-                # Fallback if model output is ambiguous, treat as incorrect but log it
-                value = 0.0
-                match_type = "ambiguous_grade"
+            # Extract the grade letter (A, B, or C)
+            match = re.search(r"(A|B|C)", grading_text)
+            grade_letter = match.group(0) if match else "C"
+
+            # Map letter to grade and score
+            grade_map = {
+                "A": ("correct", 1.0),
+                "B": ("incorrect", 0.0),
+                "C": ("not_attempted", 0.0),
+            }
+
+            grade_name, score_value = grade_map.get(
+                grade_letter, ("not_attempted", 0.0)
+            )
 
         except Exception as e:
-            value = 0.0
-            match_type = "grading_error"
-            grade_text = str(e)
+            score_value = 0.0
+            grade_name = "grading_error"
+            grade_letter = "C"
+            grading_text = str(e)
 
         category = (
             state.metadata.get("category", "unknown") if state.metadata else "unknown"
         )
 
-        # Set grade letter for display
-        if value >= 1.0:
-            grade_letter = "A"
-        elif value >= 0.5:
-            grade_letter = "C"
-        else:
-            grade_letter = "F"
-
         return Score(
-            value=value,
+            value=score_value,
             answer=model_answer or "",
             metadata={
-                "expected_answers": expected_list,
-                "match_type": match_type,
-                "grading_response": grade_text,
-                "category": category,
+                "expected_answer": expected_answer,
+                "grade": grade_name,
                 "grade_letter": grade_letter,
+                "grading_response": grading_text,
+                "category": category,
             },
         )
 

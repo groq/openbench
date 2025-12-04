@@ -271,9 +271,7 @@ class SyntheticDirectoryRouter:
         else:
             text = json.dumps(result, indent=2)
 
-        return types.CallToolResult(
-            content=[types.TextContent(type="text", text=text)]
-        )
+        return types.CallToolResult(content=[types.TextContent(type="text", text=text)])
 
     async def aclose(self) -> None:
         pass
@@ -281,7 +279,5 @@ class SyntheticDirectoryRouter:
     async def __aenter__(self) -> "SyntheticDirectoryRouter":
         return self
 
-    async def __aexit__(
-        self, exc_type: Any, exc: Any, tb: Any
-    ) -> None:
+    async def __aexit__(self, exc_type: Any, exc: Any, tb: Any) -> None:
         await self.aclose()
