@@ -5,6 +5,74 @@ description: Evaluating LLM agents with progressive tool discovery strategies us
 
 # ProgressiveMCPBench
 
+<Callout type="warning">
+**Work in Progress**: This benchmark is being migrated to a fully synthetic MCP layer. The documentation below describes the current (live MCP) implementation. See the [Synthetic MCP Pipeline](#synthetic-mcp-pipeline) section for regeneration instructions.
+</Callout>
+
+## Synthetic MCP Pipeline
+
+We are developing a synthetic version of ProgressiveMCPBench that replaces live MCP servers with a single HTTP server serving deterministic responses. This eliminates infrastructure failures and enables faster, more reliable evaluation.
+
+### Regenerating the Synthetic Data
+
+The generation pipeline lives in `synthetic_mcp/generation/`. Run these steps in order:
+
+```bash
+# Ensure you're in the repo root with venv activated
+cd /path/to/openbench
+source .venv/bin/activate
+
+# Stage 0: Extract seeds from working tasks
+# - Reads progressivemcpbench.json and LiveMCPBench tools.json
+# - Outputs: synthetic_mcp/config/seeds/servers_raw.json, working_tasks.json
+python synthetic_mcp/generation/step0_extract_seeds.py
+
+# Stage 1: Generate tool schemas with handlers
+# - Uses gpt-oss-120b to generate handler specifications
+# - Outputs: synthetic_mcp/config/servers.json
+# - REVIEW THIS FILE before proceeding - manual refinement may be needed
+python synthetic_mcp/generation/step1_generate_schemas.py
+
+# Stage 2: Generate test data (TODO)
+# - Creates data/files/, data/api/, data/excel/ contents
+# - Outputs: Excel files, JSON lookup tables, text files
+python synthetic_mcp/generation/step2_generate_data.py
+
+# Stage 3: Generate tasks with expected answers (TODO)
+# - Creates tasks tied to specific tools with verifiable answers
+# - Outputs: synthetic_mcp/tasks/progressivemcpbench_synthetic.json
+python synthetic_mcp/generation/step3_generate_tasks.py
+
+# Stage 4: Validate and build HTTP server (TODO)
+# - Runs integration tests
+# - Builds the HTTP MCP server
+python synthetic_mcp/generation/step4_validate_all.py
+```
+
+### Environment Requirements
+
+```bash
+export GROQ_API_KEY=...  # Required for LLM generation steps
+```
+
+### Directory Structure
+
+```
+synthetic_mcp/
+├── config/
+│   ├── seeds/           # Stage 0 outputs (server/task extraction)
+│   └── servers.json     # Stage 1 output (tool schemas + handlers)
+├── data/
+│   ├── files/root/      # Synthetic filesystem (txt, csv, pdf, docx)
+│   ├── api/             # JSON lookup tables (trials, papers, etc.)
+│   └── excel/           # Excel test files
+├── tasks/               # Generated task datasets
+├── server/              # HTTP MCP server implementation
+└── generation/          # Pipeline scripts
+```
+
+---
+
 ProgressiveMCPBench is a benchmark for evaluating how effectively language models can discover and use Model Context Protocol (MCP) tools. It extends LiveMCPBench by supporting multiple **strategies** for presenting tools to the model, allowing researchers to measure the impact of different tool discovery mechanisms on agent performance.
 
 ## Overview
