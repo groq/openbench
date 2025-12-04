@@ -19,7 +19,8 @@ DATA_DIR = Path(__file__).resolve().parent / "data"
 DATA_FILE = DATA_DIR / "progressivemcpbench.json"
 
 # Synthetic MCP data directory (in repo root)
-SYNTHETIC_MCP_DIR = Path(__file__).resolve().parent.parent.parent.parent.parent / "synthetic_mcp"
+# Path: src/openbench/datasets/ -> repo root is 3 parents up
+SYNTHETIC_MCP_DIR = Path(__file__).resolve().parent.parent.parent.parent / "synthetic_mcp"
 SYNTHETIC_TASKS_FILE = SYNTHETIC_MCP_DIR / "tasks" / "progressivemcpbench_synthetic.json"
 
 

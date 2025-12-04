@@ -22,10 +22,10 @@ from .tool_wrapper import (
 
 def _synthetic_mcp_dir() -> Path:
     """Get the synthetic_mcp directory path."""
-    # Navigate from src/openbench/tools/progressivemcpbench/synthetic/
-    # to repo root, then to synthetic_mcp/
+    # Navigate from src/openbench/tools/progressivemcpbench/synthetic/toolsource.py
+    # to repo root (5 parents), then to synthetic_mcp/
     current = Path(__file__).resolve()
-    # Go up: synthetic -> minimal -> progressivemcpbench -> tools -> openbench -> src -> repo_root
+    # Go up: synthetic -> progressivemcpbench -> tools -> openbench -> src -> repo_root
     repo_root = current.parent.parent.parent.parent.parent.parent
     return repo_root / "synthetic_mcp"
 
