@@ -43,9 +43,9 @@ To access any major model, set the appropriate API key environment variable:
 
 ## Using Unsupported Providers
 
-openbench works with any OpenAI-compatible API endpoint, even if the provider isn't listed above. This allows you to benchmark models from new or specialized providers that support the OpenAI Chat Completions API format.
+openbench works with any OpenAI-compatible API endpoint, even if the provider isn't listed above. This allows you to benchmark models from new or specialized providers that support the OpenAI Chat Completions or Responses API format.
 
-1. Use the model string format: `openai-api/<provider>/<model-name>`
+1. Use the model string format: `chat-completions/<provider>/<model-name>` or `responses/<provider>/<model-name>`
 2. Set environment variables: `<PROVIDER>_API_KEY` and `<PROVIDER>_BASE_URL`
 
 ```bash
@@ -53,7 +53,7 @@ openbench works with any OpenAI-compatible API endpoint, even if the provider is
 export GROQ_API_KEY="gsk_..."
 export GROQ_BASE_URL=https://api.groq.com/openai/v1
 
-bench eval mmlu --model openai-api/groq/openai/gpt-oss-120b
+bench eval mmlu --model chat-completions/groq/openai/gpt-oss-120b
 ```
 
 ## General Model Configuration

@@ -195,6 +195,22 @@ def siliconflow() -> Type[ModelAPI]:
     return SiliconFlowAPI
 
 
+@modelapi(name="responses")
+def responses() -> Type[ModelAPI]:
+    """Register generic responses/ format provider."""
+    from .model._providers.responses import ResponsesFormatAPI
+
+    return ResponsesFormatAPI
+
+
+@modelapi(name="chat-completions")
+def chat_completions() -> Type[ModelAPI]:
+    """Register generic chat-completions/ format provider."""
+    from .model._providers.chat_completions import ChatCompletionsFormatAPI
+
+    return ChatCompletionsFormatAPI
+
+
 def _override_builtin_groq_provider():
     """Replace Inspect AI's built-in groq provider with enhanced openbench version."""
     from inspect_ai._util.registry import _registry
