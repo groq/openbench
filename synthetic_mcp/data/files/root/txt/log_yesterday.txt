@@ -1,0 +1,4 @@
+[INFO] Service started.
+[WARN] Disk space low.
+[ERROR] Database connection failed.
+[INFO] User logged in.

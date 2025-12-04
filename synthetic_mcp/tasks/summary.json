@@ -1,0 +1,46 @@
+{
+  "total_tasks": 13,
+  "servers_used": [
+    "word-document-server",
+    "searxng",
+    "mcp-simple-arxiv",
+    "music-analysis",
+    "excel",
+    "filesystem",
+    "pdf-reader-mcp",
+    "biomcp",
+    "arxiv-mcp-server",
+    "maven-deps-server"
+  ],
+  "tools_used": [
+    "document_reader",
+    "read_file",
+    "get_paper_data",
+    "beat_track",
+    "excel_read",
+    "read_pdf",
+    "tempo",
+    "load",
+    "list_allowed_directories",
+    "get_document_text",
+    "excel_read_sheet",
+    "trial_protocol_getter",
+    "docx_to_html",
+    "search_papers",
+    "get_latest_release",
+    "read_multiple_files",
+    "excel_describe_sheets",
+    "list_directory",
+    "get_duration"
+  ],
+  "categories": [
+    "Leisure",
+    "Office",
+    "Lifestyle"
+  ],
+  "tasks_by_category": {
+    "Leisure": 2,
+    "Office": 9,
+    "Lifestyle": 2
+  }
+}

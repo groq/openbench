@@ -1,0 +1,44 @@
+{
+  "com.fasterxml.jackson.core:jackson-databind": {
+    "dependency": "com.fasterxml.jackson.core:jackson-databind",
+    "latest_version": "2.17.0",
+    "release_date": "2024-03-15",
+    "description": "General data-binding functionality for Jackson"
+  },
+  "org.apache.poi:poi-ooxml": {
+    "dependency": "org.apache.poi:poi-ooxml",
+    "latest_version": "5.2.5",
+    "release_date": "2024-01-20",
+    "description": "Apache POI - Java API for Microsoft Documents"
+  },
+  "com.google.guava:guava": {
+    "dependency": "com.google.guava:guava",
+    "latest_version": "33.0.0-jre",
+    "release_date": "2024-02-01",
+    "description": "Google Core Libraries for Java"
+  },
+  "com.fasterxml.jackson.core:jackson-databind:2.13.4": {
+    "dependency": "com.fasterxml.jackson.core:jackson-databind:2.13.4",
+    "latest_version": "2.17.0",
+    "release_date": "2024-03-15",
+    "description": "General data-binding functionality for Jackson",
+    "queried_version": "2.13.4",
+    "is_outdated": true
+  },
+  "org.apache.poi:poi-ooxml:5.2.0": {
+    "dependency": "org.apache.poi:poi-ooxml:5.2.0",
+    "latest_version": "5.2.5",
+    "release_date": "2024-01-20",
+    "description": "Apache POI - Java API for Microsoft Documents",
+    "queried_version": "5.2.0",
+    "is_outdated": true
+  },
+  "com.google.guava:guava:30.1-jre": {
+    "dependency": "com.google.guava:guava:30.1-jre",
+    "latest_version": "33.0.0-jre",
+    "release_date": "2024-02-01",
+    "description": "Google Core Libraries for Java",
+    "queried_version": "30.1-jre",
+    "is_outdated": true
+  }
+}

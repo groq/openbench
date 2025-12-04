@@ -33,19 +33,22 @@ python synthetic_mcp/generation/step0_extract_seeds.py
 # - REVIEW THIS FILE before proceeding - manual refinement may be needed
 python synthetic_mcp/generation/step1_generate_schemas.py
 
-# Stage 2: Generate test data (TODO)
-# - Creates data/files/, data/api/, data/excel/ contents
-# - Outputs: Excel files, JSON lookup tables, text files
+# Stage 2: Generate test data
+# - Copies files from LiveMCPBench annotated_data
+# - Generates JSON lookup tables for API-style tools
+# - Outputs: synthetic_mcp/data/files/root/, synthetic_mcp/data/api/
 python synthetic_mcp/generation/step2_generate_data.py
 
-# Stage 3: Generate tasks with expected answers (TODO)
-# - Creates tasks tied to specific tools with verifiable answers
+# Stage 3: Validate tasks from working_tasks.json
+# - Uses the 13 working tasks from LiveMCPBench directly
+# - Validates all required servers/tools exist in servers.json
 # - Outputs: synthetic_mcp/tasks/progressivemcpbench_synthetic.json
 python synthetic_mcp/generation/step3_generate_tasks.py
 
-# Stage 4: Validate and build HTTP server (TODO)
-# - Runs integration tests
-# - Builds the HTTP MCP server
+# Stage 4: Integration tests
+# - Starts the HTTP MCP server
+# - Runs tests against each tool handler
+# - Validates expected answers match tool outputs
 python synthetic_mcp/generation/step4_validate_all.py
 ```
 
@@ -61,14 +64,28 @@ export GROQ_API_KEY=...  # Required for LLM generation steps
 synthetic_mcp/
 ├── config/
 │   ├── seeds/           # Stage 0 outputs (server/task extraction)
+│   │   ├── servers_raw.json
+│   │   └── working_tasks.json
 │   └── servers.json     # Stage 1 output (tool schemas + handlers)
 ├── data/
-│   ├── files/root/      # Synthetic filesystem (txt, csv, pdf, docx)
-│   ├── api/             # JSON lookup tables (trials, papers, etc.)
-│   └── excel/           # Excel test files
-├── tasks/               # Generated task datasets
-├── server/              # HTTP MCP server implementation
-└── generation/          # Pipeline scripts
+│   ├── files/root/      # Synthetic filesystem (txt, csv, pdf, docx, music, excel)
+│   │   ├── txt/         # Android.txt, log files, paper_list.bib
+│   │   ├── csv/         # customers-100.csv
+│   │   ├── excel/       # people_data.xlsx
+│   │   ├── word/        # exchange.docx
+│   │   ├── pdf/         # WebArena.pdf, embodied_ai_papers/
+│   │   └── music/       # mixkit-retro-game-emergency-alarm-1000.wav
+│   └── api/             # JSON lookup tables
+│       ├── trials.json           # Clinical trials (biomcp)
+│       ├── arxiv_papers.json     # arXiv papers (mcp-simple-arxiv)
+│       ├── maven_versions.json   # Maven versions (maven-deps-server)
+│       └── audio_files.json      # Audio metadata (music-analysis)
+├── tasks/
+│   ├── progressivemcpbench_synthetic.json  # The 13 working tasks
+│   └── summary.json                        # Task statistics
+├── server/
+│   └── http_mcp_server.py  # HTTP server masquerading as multiple MCP servers
+└── generation/             # Pipeline scripts (step0-4)
 ```
 
 ---

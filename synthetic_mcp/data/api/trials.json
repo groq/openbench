@@ -1,0 +1,50 @@
+{
+  "NCT04280705": {
+    "nct_id": "NCT04280705",
+    "brief_title": "Adaptive COVID-19 Treatment Trial (ACTT)",
+    "official_title": "A Multicenter, Adaptive, Randomized Blinded Controlled Trial of the Safety and Efficacy of Investigational Therapeutics for the Treatment of COVID-19 in Hospitalized Adults",
+    "status": "COMPLETED",
+    "phase": "PHASE3",
+    "sponsor": "National Institute of Allergy and Infectious Diseases (NIAID)",
+    "conditions": [
+      "COVID-19"
+    ],
+    "interventions": [
+      "Remdesivir",
+      "Placebo"
+    ],
+    "enrollment": 1062,
+    "start_date": "2020-02-21",
+    "completion_date": "2020-04-19",
+    "eligibility": {
+      "minimum_age": "18 Years",
+      "sex": "ALL",
+      "healthy_volunteers": "No"
+    }
+  },
+  "NCT06524388": {
+    "nct_id": "NCT06524388",
+    "brief_title": "Study of Novel Cancer Immunotherapy",
+    "official_title": "A Phase 2 Randomized Study of Novel Checkpoint Inhibitor Combination in Advanced Solid Tumors",
+    "status": "RECRUITING",
+    "phase": "PHASE2",
+    "sponsor": "Example Pharmaceuticals",
+    "conditions": [
+      "Solid Tumors",
+      "Advanced Cancer"
+    ],
+    "interventions": [
+      "Drug A",
+      "Drug B",
+      "Placebo"
+    ],
+    "enrollment": 450,
+    "start_date": "2024-01-15",
+    "eligibility": {
+      "minimum_age": "18 Years",
+      "maximum_age": "75 Years",
+      "sex": "ALL",
+      "healthy_volunteers": "No"
+    }
+  }
+}

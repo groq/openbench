@@ -239,7 +239,10 @@ def _distraction_tool_source(
     distractor_pool.sort(key=base_sort_key)
 
     # Select distractors with superset consistency
-    if base_distractor_count is not None and total_distractors_needed > base_distractor_count:
+    if (
+        base_distractor_count is not None
+        and total_distractors_needed > base_distractor_count
+    ):
         # Take the first base_distractor_count using the base hash (same as distraction-64)
         base_distractors = distractor_pool[:base_distractor_count]
 
@@ -259,7 +262,11 @@ def _distraction_tool_source(
         selected_distractors = base_distractors + additional_distractors
     else:
         # Simple case: just take from the sorted pool
-        selected_distractors = distractor_pool[:total_distractors_needed] if total_distractors_needed > 0 else []
+        selected_distractors = (
+            distractor_pool[:total_distractors_needed]
+            if total_distractors_needed > 0
+            else []
+        )
 
     # Combine required and distractor tools
     all_selected = required_tools_list + selected_distractors
@@ -326,7 +333,10 @@ def distraction_128_tool_source(
     # We need to match its base selection, then add more
     base_distractors = _DISTRACTION_64_BASE - len(required_tools)
     return _distraction_tool_source(
-        required_tools, task_id, target_count=128, base_distractor_count=max(0, base_distractors)
+        required_tools,
+        task_id,
+        target_count=128,
+        base_distractor_count=max(0, base_distractors),
     )
 
 

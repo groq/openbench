@@ -1,0 +1,35 @@
+{
+  "/root/pdf/embodied_ai_papers/RT-2, Vision-Language-Action Models Transfer Web Knowledge to Robotic Control, Anthony Brohan et al., 2023, v1_compressed.pdf": {
+    "title": "RT-2: Vision-Language-Action Models Transfer Web Knowledge to Robotic Control",
+    "authors": [
+      "Anthony Brohan",
+      "Noah Brown",
+      "Justice Carbajal"
+    ],
+    "first_author_last_name": "Brohan",
+    "year": "2023",
+    "page_count": 22
+  },
+  "/root/pdf/embodied_ai_papers/PaLM-E, An Embodied Multimodal Language Model, Danny Driess et al., 2023, v1_compressed.pdf": {
+    "title": "PaLM-E: An Embodied Multimodal Language Model",
+    "authors": [
+      "Danny Driess",
+      "Fei Xia",
+      "Mehdi S. M. Sajjadi"
+    ],
+    "first_author_last_name": "Driess",
+    "year": "2023",
+    "page_count": 27
+  },
+  "/root/pdf/embodied_ai_papers/Voyager, An Open-Ended Embodied Agent with Large Language Models, Guanzhi Wang et al., 2023, v2_compressed.pdf": {
+    "title": "Voyager: An Open-Ended Embodied Agent with Large Language Models",
+    "authors": [
+      "Guanzhi Wang",
+      "Yuqi Xie",
+      "Yunfan Jiang"
+    ],
+    "first_author_last_name": "Wang",
+    "year": "2023",
+    "page_count": 18
+  }
+}

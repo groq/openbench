@@ -1,0 +1,70 @@
+{
+  "2203.12277": {
+    "paper_id": "2203.12277",
+    "title": "Example Paper on Machine Learning",
+    "authors": [
+      "John Smith",
+      "Jane Doe"
+    ],
+    "abstract": "This paper presents a novel approach to machine learning...",
+    "published": "2022-03-23",
+    "updated": "2022-03-25",
+    "categories": [
+      "cs.LG",
+      "cs.AI"
+    ],
+    "pdf_url": "https://arxiv.org/pdf/2203.12277"
+  },
+  "2301.00001": {
+    "paper_id": "2301.00001",
+    "title": "WebArena: A Realistic Web Environment for Building Autonomous Agents",
+    "authors": [
+      "Xiang Deng",
+      "Yu Gu",
+      "Boyuan Zheng",
+      "Shijie Chen"
+    ],
+    "abstract": "WebArena is a realistic web environment for building autonomous agents...",
+    "published": "2023-01-15",
+    "updated": "2023-01-20",
+    "categories": [
+      "cs.CL",
+      "cs.AI"
+    ],
+    "pdf_url": "https://arxiv.org/pdf/2301.00001"
+  },
+  "2305.00002": {
+    "paper_id": "2305.00002",
+    "title": "Mind2Web: Towards a Generalist Agent for the Web",
+    "authors": [
+      "Yuan Gou",
+      "Boyuan Zheng",
+      "Zhuosheng Zhang"
+    ],
+    "abstract": "Mind2Web is a dataset for developing generalist web agents...",
+    "published": "2023-05-20",
+    "updated": "2023-05-25",
+    "categories": [
+      "cs.CL",
+      "cs.AI"
+    ],
+    "pdf_url": "https://arxiv.org/pdf/2305.00002"
+  },
+  "2402.00003": {
+    "paper_id": "2402.00003",
+    "title": "Mind2Web2: Scaling Web Agent Development",
+    "authors": [
+      "Wei Zhou",
+      "Alice Wang",
+      "Bob Chen"
+    ],
+    "abstract": "Mind2Web2 extends the original Mind2Web dataset...",
+    "published": "2024-02-10",
+    "updated": "2024-02-15",
+    "categories": [
+      "cs.CL",
+      "cs.AI"
+    ],
+    "pdf_url": "https://arxiv.org/pdf/2402.00003"
+  }
+}
