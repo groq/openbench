@@ -251,19 +251,20 @@ def main():
             synthetic_servers[server_name] = result
             print(f"     ✓ Created fallback with {len(result.get('tools', []))} tools")
     
-    # Save output
+    # Save output (sorted for reproducibility)
     print("\n💾 Saving output...")
-    save_json(OUTPUT_FILE, synthetic_servers)
+    sorted_synthetic_servers = dict(sorted(synthetic_servers.items()))
+    save_json(OUTPUT_FILE, sorted_synthetic_servers)
     
     # Print summary
     print("\n" + "=" * 60)
     print("Summary")
     print("=" * 60)
-    total_tools = sum(len(s.get("tools", [])) for s in synthetic_servers.values())
-    print(f"  Servers generated: {len(synthetic_servers)}")
+    total_tools = sum(len(s.get("tools", [])) for s in sorted_synthetic_servers.values())
+    print(f"  Servers generated: {len(sorted_synthetic_servers)}")
     print(f"  Total tools: {total_tools}")
     
-    for name, info in synthetic_servers.items():
+    for name, info in sorted_synthetic_servers.items():
         tools = info.get("tools", [])
         handler_types = set(t.get("handler", {}).get("type", "unknown") for t in tools)
         print(f"    {name}: {len(tools)} tools ({', '.join(handler_types)})")
