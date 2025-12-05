@@ -715,5 +715,95 @@
         }
       }
     ]
+  },
+  "playwright": {
+    "server_name": "playwright",
+    "description": "Synthetic Playwright-like web client backed by static HTML snapshots. Provides browser automation capabilities for navigating to URLs and extracting page content.",
+    "category": "Web",
+    "tools": [
+      {
+        "name": "playwright_navigate",
+        "description": "Navigate to a URL and return a page handle. Returns page metadata if the URL exists in the corpus, or an error if not found.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "url": {
+              "type": "string",
+              "description": "The URL to navigate to"
+            }
+          },
+          "required": ["url"]
+        },
+        "handler": {
+          "type": "web_corpus",
+          "operation": "navigate"
+        }
+      },
+      {
+        "name": "playwright_get_visible_html",
+        "description": "Return the visible HTML content for a given URL. This fetches the full HTML of the page.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "url": {
+              "type": "string",
+              "description": "The URL to fetch HTML from"
+            }
+          },
+          "required": ["url"]
+        },
+        "handler": {
+          "type": "web_corpus",
+          "operation": "get_visible_html"
+        }
+      },
+      {
+        "name": "playwright_screenshot",
+        "description": "Take a screenshot of a web page. Returns metadata about the captured page.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "url": {
+              "type": "string",
+              "description": "The URL to screenshot"
+            }
+          },
+          "required": ["url"]
+        },
+        "handler": {
+          "type": "web_corpus",
+          "operation": "screenshot"
+        }
+      }
+    ]
+  },
+  "url-search": {
+    "server_name": "url-search",
+    "description": "Search service for discovering URLs in the synthetic web corpus. Use this to find relevant web pages before fetching them with the playwright server.",
+    "category": "Discovery",
+    "tools": [
+      {
+        "name": "search_urls",
+        "description": "Search for relevant URLs in the synthetic web corpus. Returns a list of matching URLs with their titles and descriptions.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Search query to find relevant URLs"
+            },
+            "max_results": {
+              "type": "integer",
+              "description": "Maximum number of results to return (default: 5)",
+              "default": 5
+            }
+          },
+          "required": ["query"]
+        },
+        "handler": {
+          "type": "url_search"
+        }
+      }
+    ]
   }
 }
