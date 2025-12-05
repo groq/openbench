@@ -31,6 +31,7 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
     servers_config: dict = {}
     data_path: Path = DEFAULT_DATA_PATH
     web_corpus_metadata: dict = {}  # Cached web corpus metadata
+    decoy_urls: list = []  # Cached decoy URLs for search results
 
     def log_message(self, format: str, *args: Any) -> None:
         """Override to reduce logging noise."""
@@ -65,7 +66,10 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
                 return
 
             server = self.servers_config[server_name]
-            tools = [{"name": t["name"], "description": t.get("description", "")} for t in server.get("tools", [])]
+            tools = [
+                {"name": t["name"], "description": t.get("description", "")}
+                for t in server.get("tools", [])
+            ]
             self.send_json_response({"server": server_name, "tools": tools})
 
         else:
@@ -78,7 +82,9 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
 
         # Expected: /mcp/{server_name}/tools/{tool_name}
         if len(path_parts) != 4 or path_parts[0] != "mcp" or path_parts[2] != "tools":
-            self.send_error_response("Invalid path. Expected: /mcp/{server}/tools/{tool}", 400)
+            self.send_error_response(
+                "Invalid path. Expected: /mcp/{server}/tools/{tool}", 400
+            )
             return
 
         server_name = path_parts[1]
@@ -97,12 +103,18 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
                 break
 
         if not tool:
-            self.send_error_response(f"Unknown tool: {tool_name} in server {server_name}", 404)
+            self.send_error_response(
+                f"Unknown tool: {tool_name} in server {server_name}", 404
+            )
             return
 
         # Parse request body
         content_length = int(self.headers.get("Content-Length", 0))
-        body = self.rfile.read(content_length).decode("utf-8") if content_length > 0 else "{}"
+        body = (
+            self.rfile.read(content_length).decode("utf-8")
+            if content_length > 0
+            else "{}"
+        )
 
         try:
             params = json.loads(body) if body else {}
@@ -120,7 +132,9 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
         except Exception as e:
             self.send_error_response(f"Handler error: {e!s}", 500)
 
-    def execute_handler(self, handler_type: str, handler: dict, params: dict, tool: dict) -> Any:
+    def execute_handler(
+        self, handler_type: str, handler: dict, params: dict, tool: dict
+    ) -> Any:
         """Execute a handler based on its type."""
         if handler_type == "static_json":
             return handler.get("response", {})
@@ -164,7 +178,11 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
 
         if tool_name in ("read_file", "document_reader", "get_document_text"):
             # Get the path parameter (different tools use different param names)
-            file_path = params.get("path") or params.get("filePath") or params.get("filename", "")
+            file_path = (
+                params.get("path")
+                or params.get("filePath")
+                or params.get("filename", "")
+            )
 
             # Handle head/tail parameters for read_file
             head = params.get("head")
@@ -217,7 +235,9 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
             results = {}
             for file_path in paths:
                 try:
-                    result = self.handle_filesystem(handler, {"path": file_path}, {"name": "read_file"})
+                    result = self.handle_filesystem(
+                        handler, {"path": file_path}, {"name": "read_file"}
+                    )
                     results[file_path] = {"content": result, "error": None}
                 except Exception as e:
                     results[file_path] = {"content": None, "error": str(e)}
@@ -264,11 +284,10 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
                 if path in pdf_metadata:
                     meta = pdf_metadata[path]
                     # Check if metadata is empty or invalid
-                    if not meta or not isinstance(meta, dict) or not meta.get('title'):
-                        results.append({
-                            "path": path,
-                            "error": "PDF not found in metadata"
-                        })
+                    if not meta or not isinstance(meta, dict) or not meta.get("title"):
+                        results.append(
+                            {"path": path, "error": "PDF not found in metadata"}
+                        )
                     else:
                         results.append(
                             {
@@ -366,7 +385,9 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
             sheets = []
             for sheet_name in wb.sheetnames:
                 ws = wb[sheet_name]
-                sheets.append({"name": sheet_name, "rows": ws.max_row, "columns": ws.max_column})
+                sheets.append(
+                    {"name": sheet_name, "rows": ws.max_row, "columns": ws.max_column}
+                )
             return {"sheets": sheets}
 
         elif tool_name in ("excel_read_sheet", "excel_read"):
@@ -416,6 +437,58 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
                 return data.get("entries", [])
         return []
 
+    def get_decoy_urls(self) -> list:
+        """Load and cache decoy URLs for search results."""
+        if not self.decoy_urls:
+            decoy_path = self.data_path / "web" / "decoy_urls.json"
+            if decoy_path.exists():
+                with open(decoy_path, encoding="utf-8") as f:
+                    data = json.load(f)
+                    self.decoy_urls = data.get("decoys", [])
+        return self.decoy_urls
+
+    def get_decoy_error(self, decoy: dict) -> dict:
+        """Generate a realistic error response for a decoy URL."""
+        error_type = decoy.get("error_type", "connection_timeout")
+        url = decoy.get("url", "")
+
+        error_messages = {
+            "connection_timeout": {
+                "error": "Connection timed out while trying to reach the server",
+                "status": 504,
+                "error_code": "ETIMEDOUT",
+            },
+            "connection_reset": {
+                "error": "Connection was reset by the remote server",
+                "status": 502,
+                "error_code": "ECONNRESET",
+            },
+            "503_service_unavailable": {
+                "error": "Service temporarily unavailable. Please try again later.",
+                "status": 503,
+                "error_code": "SERVICE_UNAVAILABLE",
+            },
+            "404_not_found": {
+                "error": "The requested page could not be found",
+                "status": 404,
+                "error_code": "NOT_FOUND",
+            },
+            "ssl_error": {
+                "error": "SSL certificate verification failed",
+                "status": 495,
+                "error_code": "SSL_ERROR",
+            },
+        }
+
+        error_info = error_messages.get(
+            error_type, error_messages["connection_timeout"]
+        )
+        return {
+            "url": url,
+            "success": False,
+            **error_info,
+        }
+
     def handle_web_corpus(self, handler: dict, params: dict, tool: dict) -> Any:
         """Handle web corpus operations (Playwright-like fetch)."""
         operation = handler.get("operation", "get_visible_html")
@@ -426,6 +499,12 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
 
         # Load corpus metadata
         metadata = self.get_web_corpus_metadata()
+
+        # Check if this is a decoy URL - return realistic error
+        decoys = self.get_decoy_urls()
+        for decoy in decoys:
+            if decoy.get("url") == url:
+                return self.get_decoy_error(decoy)
 
         if operation == "navigate":
             # Check if URL exists in corpus
@@ -455,7 +534,11 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
             entry = metadata[url]
             html_path = entry.get("html_path", "")
             if not html_path:
-                return {"error": "No HTML path configured for URL", "status": 500, "url": url}
+                return {
+                    "error": "No HTML path configured for URL",
+                    "status": 500,
+                    "url": url,
+                }
 
             # Load HTML content
             full_html_path = self.data_path / html_path
@@ -487,13 +570,17 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
             }
 
         else:
-            return {"error": f"Unknown web_corpus operation: {operation}", "status": 400}
+            return {
+                "error": f"Unknown web_corpus operation: {operation}",
+                "status": 400,
+            }
 
     def handle_url_search(self, handler: dict, params: dict, tool: dict) -> Any:
         """Handle URL search operations.
 
-        This performs a simple keyword-based search over the web corpus.
-        For more sophisticated search, an external LLM can be integrated.
+        This performs a simple keyword-based search over the web corpus,
+        including both real URLs and decoy URLs. Decoys have a relevance
+        penalty applied to make them rank lower than matching real URLs.
         """
         query = params.get("query", "")
         max_results = params.get("max_results", 5)
@@ -501,16 +588,17 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
         if not query:
             return {"error": "Query parameter is required", "results": []}
 
-        # Load search index
+        # Load search index and decoys
         search_index = self.get_web_search_index()
+        decoy_urls = self.get_decoy_urls()
 
         # Simple keyword matching
         query_lower = query.lower()
         query_terms = query_lower.split()
 
-        scored_results = []
-        for entry in search_index:
-            score = 0
+        def score_entry(entry: dict, is_decoy: bool = False) -> float:
+            """Score an entry based on keyword matches."""
+            score = 0.0
             searchable_text = " ".join(
                 [
                     entry.get("title", ""),
@@ -528,15 +616,33 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
                 if query_lower in searchable_text:
                     score += 2
 
+            # Apply relevance penalty for decoys
+            if is_decoy and score > 0:
+                penalty = entry.get("relevance_penalty", 0.3)
+                score *= 1 - penalty
+
+            return score
+
+        scored_results = []
+
+        # Score real entries
+        for entry in search_index:
+            score = score_entry(entry, is_decoy=False)
             if score > 0:
-                scored_results.append((score, entry))
+                scored_results.append((score, entry, False))
+
+        # Score decoy entries
+        for decoy in decoy_urls:
+            score = score_entry(decoy, is_decoy=True)
+            if score > 0:
+                scored_results.append((score, decoy, True))
 
         # Sort by score descending
         scored_results.sort(key=lambda x: x[0], reverse=True)
 
         # Build results
         results = []
-        for score, entry in scored_results[:max_results]:
+        for score, entry, is_decoy in scored_results[:max_results]:
             url = entry.get("url", "")
             results.append(
                 {
@@ -597,8 +703,12 @@ def main():
 
     parser = argparse.ArgumentParser(description="Synthetic HTTP MCP Server")
     parser.add_argument("--port", type=int, default=8765, help="Port to listen on")
-    parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG_PATH, help="Path to servers.json")
-    parser.add_argument("--data", type=Path, default=DEFAULT_DATA_PATH, help="Path to data directory")
+    parser.add_argument(
+        "--config", type=Path, default=DEFAULT_CONFIG_PATH, help="Path to servers.json"
+    )
+    parser.add_argument(
+        "--data", type=Path, default=DEFAULT_DATA_PATH, help="Path to data directory"
+    )
     args = parser.parse_args()
 
     server = create_server(config_path=args.config, data_path=args.data, port=args.port)

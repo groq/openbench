@@ -1,0 +1,106 @@
+{
+  "_comment": "Decoy URLs that appear in search results but return errors when fetched. These make the benchmark more realistic by requiring models to handle failed requests and find authoritative sources.",
+  "_schema_version": "1.0",
+  "decoys": [
+    {
+      "id": "decoy_llullaillaco_summitpost",
+      "url": "https://www.summitpost.org/llullaillaco/150892",
+      "title": "Llullaillaco - SummitPost",
+      "short_description": "Mountain climbing page for Llullaillaco with route information and trip reports.",
+      "tags": ["llullaillaco", "mountain", "climbing", "andes", "summitpost"],
+      "related_to": ["wikipedia_llullaillaco"],
+      "relevance_penalty": 0.3,
+      "error_type": "connection_timeout"
+    },
+    {
+      "id": "decoy_llullaillaco_peakbagger",
+      "url": "https://www.peakbagger.com/peak.aspx?pid=8562",
+      "title": "Llullaillaco, Chile/Argentina - Peakbagger.com",
+      "short_description": "Peak information and ascent logs for Llullaillaco volcano.",
+      "tags": ["llullaillaco", "peak", "volcano", "chile", "argentina", "peakbagger"],
+      "related_to": ["wikipedia_llullaillaco"],
+      "relevance_penalty": 0.3,
+      "error_type": "503_service_unavailable"
+    },
+    {
+      "id": "decoy_llullaillaco_forum",
+      "url": "https://www.mountainproject.com/forum/topic/llullaillaco-expedition-2023",
+      "title": "Llullaillaco Expedition 2023 - Mountain Project Forum",
+      "short_description": "Discussion thread about climbing Llullaillaco with user trip reports.",
+      "tags": ["llullaillaco", "expedition", "forum", "climbing", "trip report"],
+      "related_to": ["wikipedia_llullaillaco"],
+      "relevance_penalty": 0.5,
+      "error_type": "404_not_found"
+    },
+    {
+      "id": "decoy_ojos_del_salado_wiki",
+      "url": "https://en.wikipedia.org/wiki/Ojos_del_Salado",
+      "title": "Ojos del Salado - Wikipedia",
+      "short_description": "Wikipedia article about Ojos del Salado, the highest volcano in the world at 6,893 metres.",
+      "tags": ["wikipedia", "ojos del salado", "volcano", "andes", "mountain", "chile", "argentina", "elevation", "height"],
+      "related_to": ["wikipedia_llullaillaco"],
+      "relevance_penalty": 0.2,
+      "error_type": "connection_reset"
+    },
+    {
+      "id": "decoy_aconcagua_wiki",
+      "url": "https://en.wikipedia.org/wiki/Aconcagua",
+      "title": "Aconcagua - Wikipedia",
+      "short_description": "Wikipedia article about Aconcagua, the highest peak in the Americas at 6,961 metres.",
+      "tags": ["wikipedia", "aconcagua", "mountain", "andes", "argentina", "elevation", "height"],
+      "related_to": ["wikipedia_llullaillaco"],
+      "relevance_penalty": 0.2,
+      "error_type": "connection_timeout"
+    },
+    {
+      "id": "decoy_hn_44490510_reddit",
+      "url": "https://www.reddit.com/r/programming/comments/1abc123/postgresql_is_better_than_your_favorite_database/",
+      "title": "PostgreSQL is Better Than Your Favorite Database : programming",
+      "short_description": "Reddit discussion about the PostgreSQL article that was also discussed on Hacker News.",
+      "tags": ["reddit", "programming", "postgresql", "database", "discussion"],
+      "related_to": ["hn_story_44490510"],
+      "relevance_penalty": 0.4,
+      "error_type": "503_service_unavailable"
+    },
+    {
+      "id": "decoy_hn_44490510_lobsters",
+      "url": "https://lobste.rs/s/abc123/why_postgresql_is_better",
+      "title": "Why PostgreSQL is Better Than Your Favorite Database | Lobsters",
+      "short_description": "Lobsters discussion thread about PostgreSQL advantages.",
+      "tags": ["lobsters", "postgresql", "database", "discussion", "comments"],
+      "related_to": ["hn_story_44490510"],
+      "relevance_penalty": 0.4,
+      "error_type": "connection_timeout"
+    },
+    {
+      "id": "decoy_hn_45973709_reddit",
+      "url": "https://www.reddit.com/r/cloudflare/comments/1xyz789/new_ai_gateway_feature/",
+      "title": "New AI Gateway Feature : cloudflare",
+      "short_description": "Reddit discussion about Cloudflare's AI Gateway announcement.",
+      "tags": ["reddit", "cloudflare", "ai", "gateway", "discussion"],
+      "related_to": ["hn_story_45973709"],
+      "relevance_penalty": 0.4,
+      "error_type": "404_not_found"
+    },
+    {
+      "id": "decoy_hn_45973709_twitter",
+      "url": "https://twitter.com/CloudflareDev/status/1234567890",
+      "title": "Cloudflare Developers on Twitter: AI Gateway Launch",
+      "short_description": "Official Cloudflare tweet thread about the AI Gateway feature launch.",
+      "tags": ["twitter", "cloudflare", "ai", "gateway", "announcement"],
+      "related_to": ["hn_story_45973709"],
+      "relevance_penalty": 0.3,
+      "error_type": "connection_reset"
+    },
+    {
+      "id": "decoy_hn_generic_old",
+      "url": "https://news.ycombinator.com/item?id=12345678",
+      "title": "Hacker News: Story 12345678 - Database Performance Tips",
+      "short_description": "Older Hacker News discussion about database optimization techniques.",
+      "tags": ["hacker news", "hn", "database", "performance", "discussion"],
+      "related_to": ["hn_story_44490510"],
+      "relevance_penalty": 0.5,
+      "error_type": "404_not_found"
+    }
+  ]
+}
