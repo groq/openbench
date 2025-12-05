@@ -13,14 +13,14 @@ ProgressiveMCPBench is a benchmark for evaluating how effectively language model
 # Start the HTTP MCP server (in a separate terminal)
 python synthetic_mcp/server/http_mcp_server.py
 
-# Run with all synthetic tools
-bench eval progressivemcpbench --model openai/gpt-4o -T strategy=synthetic
+# Run with directory-style tool discovery
+bench eval progressivemcpbench --model openai/gpt-4o -T strategy=directory
 
 # Run with only required servers per task
-bench eval progressivemcpbench --model openai/gpt-4o -T strategy=synthetic-minimal-servers
+bench eval progressivemcpbench --model openai/gpt-4o -T strategy=minimal-servers
 
 # Run with only exact required tools per task
-bench eval progressivemcpbench --model openai/gpt-4o -T strategy=synthetic-minimal-tools
+bench eval progressivemcpbench --model openai/gpt-4o -T strategy=minimal-tools
 ```
 
 ## Architecture Overview
@@ -36,9 +36,12 @@ The benchmark uses a **synthetic MCP layer** that provides:
 │                     Inspect AI Eval                         │
 ├─────────────────────────────────────────────────────────────┤
 │  Strategy Layer                                             │
-│  ├─ synthetic ──────────► All synthetic tools               │
-│  ├─ synthetic-minimal-servers ► Server-level filtering      │
-│  └─ synthetic-minimal-tools ──► Exact tools only            │
+│  ├─ copilot ────────────► Semantic search discovery         │
+│  ├─ directory ──────────► Filesystem-like exploration       │
+│  ├─ minimal-servers ────► Server-level filtering            │
+│  ├─ minimal-tools ──────► Exact tools only                  │
+│  ├─ distraction-64 ─────► Required + distractors (64)       │
+│  └─ distraction-128 ────► Required + distractors (128)      │
 ├─────────────────────────────────────────────────────────────┤
 │  Synthetic HTTP MCP Server (localhost:8765)                 │
 │  ├─ filesystem handler ──► data/files/root/                 │
@@ -53,26 +56,31 @@ The benchmark uses a **synthetic MCP layer** that provides:
 
 ## Strategies
 
-### Synthetic Strategies (Recommended)
+All strategies use the synthetic MCP layer with deterministic responses.
 
 | Strategy | Description | Use Case |
 |----------|-------------|----------|
-| `synthetic` | All synthetic tools available | Baseline with full tool set |
-| `synthetic-minimal-servers` | Only required servers per task | Tests with server-level filtering |
-| `synthetic-minimal-tools` | Only exact tools needed | Upper bound on performance |
+| `copilot` | Semantic search via `route()` + `execute-tool()` | Tests RAG-style tool discovery |
+| `directory` | Filesystem-like exploration via `ls()` + `read-tool-file()` | Tests explicit tool browsing |
+| `minimal-servers` | Direct access to required servers only | Tests with server-level filtering |
+| `minimal-tools` | Direct access to exact tools needed | Upper bound on performance |
+| `distraction-64` | Required tools + distractors (64 total) | Tests distraction resistance |
+| `distraction-128` | Required tools + distractors (128 total) | Tests distraction resistance |
 
-### Live MCP Strategies
+### Strategy Details
 
-These strategies use real MCP servers (requires Node.js and network access):
+**Copilot** - The model uses two meta-tools:
+- `route(query)` - Semantic search across all available tools using embeddings
+- `execute-tool(server, tool, params)` - Execute a discovered tool
 
-| Strategy | Description |
-|----------|-------------|
-| `copilot` | Semantic search via `route()` + `execute-tool()` |
-| `directory` | Filesystem-like exploration via `ls()` + `read-tool-file()` |
-| `minimal-servers` | Direct access to required servers only |
-| `minimal-tools` | Direct access to exact tools needed |
-| `distraction-64` | Required tools + distractors (64 total) |
-| `distraction-128` | Required tools + distractors (128 total) |
+**Directory** - Tools are presented as a filesystem:
+- `ls(path)` - List available servers or tools within a server
+- `read-tool-file(paths)` - Read tool descriptions (can batch multiple)
+- `execute-tool(tool_path, params)` - Execute a tool by its path
+
+**Minimal strategies** - No discovery needed; tools are provided directly based on task annotations. Requires `required_servers` and `required_tools` fields in tasks.
+
+**Distraction strategies** - Required tools plus additional "distractor" tools, padded to exactly 64 or 128 tools total. Distractors are selected deterministically based on task ID.
 
 ---
 
@@ -360,9 +368,12 @@ The model must output a JSON object with a `final_answer` field containing the a
 bench eval progressivemcpbench --model <model> -T strategy=<strategy> [options]
 
 # Strategy options:
--T strategy=synthetic                  # All synthetic tools
--T strategy=synthetic-minimal-servers  # Only required servers
--T strategy=synthetic-minimal-tools    # Only exact tools
+-T strategy=copilot           # Semantic search discovery
+-T strategy=directory         # Filesystem-like exploration
+-T strategy=minimal-servers   # Only required servers
+-T strategy=minimal-tools     # Only exact tools
+-T strategy=distraction-64    # Required + distractors (64 total)
+-T strategy=distraction-128   # Required + distractors (128 total)
 
 # Common options:
 --limit N          # Run only N tasks
@@ -375,14 +386,9 @@ bench eval progressivemcpbench --model <model> -T strategy=<strategy> [options]
 
 ## Requirements
 
-**For synthetic strategies:**
 - Python 3.10+
 - The HTTP MCP server running (`python synthetic_mcp/server/http_mcp_server.py`)
-
-**For live MCP strategies:**
 - OPENAI_API_KEY (for embeddings in copilot strategy)
-- Node.js (for running MCP servers)
-- Various MCP server dependencies (automatically managed)
 
 ---
 
