@@ -235,14 +235,8 @@ Tool usage:
 - Use tools only when needed; avoid unnecessary calls.
 
 Final output format (required):
-- When you are completely done with the task, output ONLY a single JSON object, with no surrounding text and no markdown fences.
-- The JSON MUST have at least:
-  - "final_answer": a concise natural language answer to the task (string)
-  - "reasoning": a brief description of how you arrived at the answer (string)
-  - "tool_calls": a list of tool calls you made, each with:
-      - "server_name" (string)
-      - "tool_name" (string)
-      - "arguments" (object with the arguments you passed)
+- When you are completely done with the task, output ONLY: {"final_answer": "your answer here"}
+- Do not wrap the JSON in backticks or any other formatting.
 
 Example final output:
 
@@ -301,13 +295,8 @@ Strategy:
 - Use meta__read-tool-file with multiple paths to reduce round trips
 
 Final output format (required):
-- When you are completely done with the task, output ONLY a single JSON object, with no surrounding text and no markdown fences.
-- The JSON MUST have at least:
-  - "final_answer": a concise natural language answer to the task (string)
-  - "reasoning": a brief description of how you arrived at the answer (string)
-  - "tool_calls": a list of tool calls you made, each with:
-      - "tool_path" (string, e.g., "/tools/filesystem/read_file.md")
-      - "arguments" (object with the arguments you passed)
+- When you are completely done with the task, output ONLY: {"final_answer": "your answer here"}
+- Do not wrap the JSON in backticks or any other formatting.
 
 Example final output:
 
@@ -346,18 +335,6 @@ CRITICAL OUTPUT RULES:
 - If you cannot determine an answer, return: {"final_answer": "I could not determine an answer"}
 - Do not wrap the JSON in backticks or any other formatting
 - The final_answer should be a concise string directly answering the user's question
-
-Final output format (required):
-- When you are completely done with the task, output ONLY a single JSON object, with no surrounding text and no markdown fences.
-- The JSON MUST have at least:
-  - "final_answer": a concise natural language answer to the task (string)
-  - "reasoning": a brief description of how you arrived at the answer (string)
-  - "tool_calls": a list of tool calls you made, each with:
-      - "tool_name" (string)
-      - "arguments" (object with the arguments you passed)
-
-Do not wrap the JSON in backticks or any other formatting.
-Output only this JSON object as your final response.
 """.strip()
 
 MOCK_AIME_PROMPT = """
