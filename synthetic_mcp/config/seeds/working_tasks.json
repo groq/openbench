@@ -44,7 +44,7 @@
   },
   {
     "task_id": "d116bda4-e70c-4ef1-ab1a-b68b4855e1bf",
-    "Question": "Read the data under /root/excel/people_data.xlsx and tell me Sophia Moore's bmi.",
+    "Question": "Read the data under /root/excel/people_data.xlsx and tell me Sophia Moore's bmi to two decimal places.",
     "category": "Lifestyle",
     "file_name": "",
     "answer": "20.76",
