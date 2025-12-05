@@ -2236,7 +2236,7 @@
         },
         "handler": {
           "type": "table_lookup",
-          "dataset": "data/api/audio_analysis.json",
+          "dataset": "data/api/audio_files.json",
           "key_field": "file_path"
         }
       },
@@ -2258,7 +2258,7 @@
         },
         "handler": {
           "type": "table_lookup",
-          "dataset": "data/api/audio_analysis.json",
+          "dataset": "data/api/audio_files.json",
           "key_field": "file_path"
         }
       },
@@ -2305,7 +2305,7 @@
         },
         "handler": {
           "type": "table_lookup",
-          "dataset": "data/api/audio_analysis.json",
+          "dataset": "data/api/audio_files.json",
           "key_field": "file_path"
         }
       },
@@ -2415,7 +2415,7 @@
         },
         "handler": {
           "type": "table_lookup",
-          "dataset": "data/api/audio_analysis.json",
+          "dataset": "data/api/audio_files.json",
           "key_field": "file_path"
         }
       },
