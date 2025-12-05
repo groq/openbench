@@ -1,0 +1,4 @@
+{
+  "_comment": "Master index of web corpus URLs, keyed by URL. Each entry contains metadata and path to HTML snapshot.",
+  "_schema_version": "1.0"
+}
