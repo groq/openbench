@@ -280,6 +280,9 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
         elif handler_type == "url_search":
             return self.handle_url_search(handler, params, tool)
 
+        elif handler_type == "table_search":
+            return self.handle_table_search(handler, params, tool)
+
         else:
             raise ValueError(f"Unknown handler type: {handler_type}")
 
@@ -477,6 +480,65 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
             return result
 
         return {"error": f"Key not found: {lookup_key}"}
+
+    def handle_table_search(self, handler: dict, params: dict, tool: dict) -> Any:
+        """Handle search over JSON table data.
+        
+        Returns matching entries plus some synthetic decoy results.
+        Used for trial_searcher, search, list_maven_versions, etc.
+        """
+        dataset_path = handler.get("dataset", "")
+        search_fields = handler.get("search_fields", [])
+        result_format = handler.get("result_format", "list")
+        include_decoys = handler.get("include_decoys", True)
+        max_results = params.get("max_results", params.get("page_size", 10))
+        
+        # Load the dataset
+        data = self.load_api_data(dataset_path)
+        
+        # Get search query from various possible parameter names
+        query = None
+        for param_name in ["query", "conditions", "nct_id", "id", "dependency"]:
+            if param_name in params:
+                query = str(params[param_name])
+                break
+        
+        results = []
+        
+        # Search for matching entries
+        if isinstance(data, dict):
+            for key, entry in data.items():
+                if query:
+                    # Check if query matches key or any searchable field
+                    searchable = str(key).lower()
+                    if search_fields:
+                        for field in search_fields:
+                            if field in entry:
+                                searchable += " " + str(entry[field]).lower()
+                    
+                    if query.lower() in searchable:
+                        results.append(entry)
+                else:
+                    results.append(entry)
+        elif isinstance(data, list):
+            for entry in data:
+                if query:
+                    searchable = json.dumps(entry).lower()
+                    if query.lower() in searchable:
+                        results.append(entry)
+                else:
+                    results.append(entry)
+        
+        # Add decoy results if configured
+        if include_decoys and len(results) > 0:
+            decoys = handler.get("decoys", [])
+            results.extend(decoys[:max(0, max_results - len(results))])
+        
+        # Format results
+        if result_format == "list":
+            return {"results": results[:max_results], "total": len(results)}
+        else:
+            return results[:max_results]
 
     def handle_excel_reader(self, handler: dict, params: dict, tool: dict) -> Any:
         """Handle Excel reading operations."""

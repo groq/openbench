@@ -391,11 +391,26 @@
           "type": "object"
         },
         "handler": {
-          "type": "static_json",
-          "response": {
-            "success": true,
-            "message": "Operation 'search' completed successfully (synthetic stub)"
-          }
+          "type": "table_search",
+          "dataset": "data/api/trials.json",
+          "search_fields": [
+            "nct_id",
+            "brief_title",
+            "conditions"
+          ],
+          "include_decoys": true,
+          "decoys": [
+            {
+              "nct_id": "NCT99999999",
+              "brief_title": "Unrelated Study of Sleep Patterns",
+              "status": "COMPLETED"
+            },
+            {
+              "nct_id": "NCT88888888",
+              "brief_title": "Phase 1 Dietary Supplement Trial",
+              "status": "RECRUITING"
+            }
+          ]
         }
       },
       {
@@ -466,11 +481,9 @@
           "type": "object"
         },
         "handler": {
-          "type": "static_json",
-          "response": {
-            "success": true,
-            "message": "Operation 'fetch' completed successfully (synthetic stub)"
-          }
+          "type": "table_lookup",
+          "dataset": "data/api/trials.json",
+          "key_field": "nct_id"
         }
       },
       {
@@ -950,11 +963,26 @@
           "type": "object"
         },
         "handler": {
-          "type": "static_json",
-          "response": {
-            "success": true,
-            "message": "Operation 'trial_searcher' completed successfully (synthetic stub)"
-          }
+          "type": "table_search",
+          "dataset": "data/api/trials.json",
+          "search_fields": [
+            "nct_id",
+            "brief_title",
+            "conditions"
+          ],
+          "include_decoys": true,
+          "decoys": [
+            {
+              "nct_id": "NCT99999999",
+              "brief_title": "Unrelated Study of Sleep Patterns",
+              "status": "COMPLETED"
+            },
+            {
+              "nct_id": "NCT88888888",
+              "brief_title": "Phase 1 Dietary Supplement Trial",
+              "status": "RECRUITING"
+            }
+          ]
         }
       },
       {
@@ -975,11 +1003,9 @@
           "type": "object"
         },
         "handler": {
-          "type": "static_json",
-          "response": {
-            "success": true,
-            "message": "Operation 'trial_getter' completed successfully (synthetic stub)"
-          }
+          "type": "table_lookup",
+          "dataset": "data/api/trials.json",
+          "key_field": "nct_id"
         }
       },
       {
@@ -1001,7 +1027,7 @@
         },
         "handler": {
           "type": "table_lookup",
-          "dataset": "data/api/clinical_trials.json",
+          "dataset": "data/api/trials.json",
           "key_field": "nct_id"
         }
       },
@@ -2054,11 +2080,35 @@
           ]
         },
         "handler": {
-          "type": "static_json",
-          "response": {
-            "success": true,
-            "message": "Operation 'list_maven_versions' completed successfully (synthetic stub)"
-          }
+          "type": "table_search",
+          "dataset": "data/api/maven_versions.json",
+          "search_fields": [
+            "dependency"
+          ],
+          "include_decoys": true,
+          "result_format": "versions",
+          "decoys": [
+            {
+              "version": "2.16.0",
+              "release_date": "2023-11-01"
+            },
+            {
+              "version": "2.15.3",
+              "release_date": "2023-08-15"
+            },
+            {
+              "version": "2.14.2",
+              "release_date": "2023-03-01"
+            },
+            {
+              "version": "2.13.4",
+              "release_date": "2022-10-01"
+            },
+            {
+              "version": "2.12.7",
+              "release_date": "2022-05-15"
+            }
+          ]
         }
       }
     ]
