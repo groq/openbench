@@ -10,9 +10,6 @@ ProgressiveMCPBench is a benchmark for evaluating how effectively language model
 ## Quick Start
 
 ```bash
-# Start the HTTP MCP server (in a separate terminal)
-python synthetic_mcp/server/http_mcp_server.py
-
 # Run with directory-style tool discovery
 bench eval progressivemcpbench --model openai/gpt-4o -T strategy=directory
 
@@ -22,6 +19,8 @@ bench eval progressivemcpbench --model openai/gpt-4o -T strategy=minimal-servers
 # Run with only exact required tools per task
 bench eval progressivemcpbench --model openai/gpt-4o -T strategy=minimal-tools
 ```
+
+The synthetic MCP HTTP server is started automatically when you run the eval.
 
 ## Architecture Overview
 
@@ -58,14 +57,14 @@ The benchmark uses a **synthetic MCP layer** that provides:
 
 All strategies use the synthetic MCP layer with deterministic responses.
 
-| Strategy | Description | Use Case |
-|----------|-------------|----------|
-| `copilot` | Semantic search via `route()` + `execute-tool()` | Tests RAG-style tool discovery |
-| `directory` | Filesystem-like exploration via `ls()` + `read-tool-file()` | Tests explicit tool browsing |
-| `minimal-servers` | Direct access to required servers only | Tests with server-level filtering |
-| `minimal-tools` | Direct access to exact tools needed | Upper bound on performance |
-| `distraction-64` | Required tools + distractors (64 total) | Tests distraction resistance |
-| `distraction-128` | Required tools + distractors (128 total) | Tests distraction resistance |
+| Strategy          | Description                                                 | Use Case                          |
+|-------------------|-------------------------------------------------------------|-----------------------------------|
+| `copilot`         | Semantic search via `route()` + `execute-tool()`            | Tests RAG-style tool discovery    |
+| `directory`       | Filesystem-like exploration via `ls()` + `read-tool-file()` | Tests explicit tool browsing      |
+| `minimal-servers` | Direct access to required servers only                      | Tests with server-level filtering |
+| `minimal-tools`   | Direct access to exact tools needed                         | Upper bound on performance        |
+| `distraction-64`  | Required tools + distractors (64 total)                     | Tests distraction resistance      |
+| `distraction-128` | Required tools + distractors (128 total)                    | Tests distraction resistance      |
 
 ### Strategy Details
 
@@ -110,12 +109,12 @@ The original `progressivemcpbench.json` contains many tasks that can be converte
 
 Tasks fall into categories:
 
-| Category | Characteristics | Action |
-|----------|-----------------|--------|
-| **A: Ready to use** | Has `answer`, has `required_servers`, not time-dependent | Add directly |
-| **B: Has `_answer`** | Flagged as flaky but has known answer | May need data freeze |
-| **C: No answer, but deterministic** | E.g., stock analysis, paper lookup | Create synthetic data |
-| **D: Inherently dynamic** | "today's trending", live web automation | Convert to scalar Q&A or skip |
+| Category                            | Characteristics                                          | Action                        |
+|-------------------------------------|----------------------------------------------------------|-------------------------------|
+| **A: Ready to use**                 | Has `answer`, has `required_servers`, not time-dependent | Add directly                  |
+| **B: Has `_answer`**                | Flagged as flaky but has known answer                    | May need data freeze          |
+| **C: No answer, but deterministic** | E.g., stock analysis, paper lookup                       | Create synthetic data         |
+| **D: Inherently dynamic**           | "today's trending", live web automation                  | Convert to scalar Q&A or skip |
 
 #### Step 2: Add Tasks to Seeds
 
@@ -276,13 +275,13 @@ python synthetic_mcp/generation/step4_validate_all.py
 
 ### Handler Types Reference
 
-| Handler | Purpose | Data Location |
-|---------|---------|---------------|
-| `filesystem` | Read files from synthetic filesystem | `data/files/root/` |
-| `table_lookup` | Query JSON tables | `data/api/` |
-| `excel_reader` | Read Excel files | `data/files/root/**/*.xlsx` |
-| `static_json` | Return fixed JSON responses | Inline in handler |
-| `compute` | Evaluate formulas | Expression in handler |
+| Handler        | Purpose                              | Data Location               |
+|----------------|--------------------------------------|-----------------------------|
+| `filesystem`   | Read files from synthetic filesystem | `data/files/root/`          |
+| `table_lookup` | Query JSON tables                    | `data/api/`                 |
+| `excel_reader` | Read Excel files                     | `data/files/root/**/*.xlsx` |
+| `static_json`  | Return fixed JSON responses          | Inline in handler           |
+| `compute`      | Evaluate formulas                    | Expression in handler       |
 
 ---
 
@@ -290,11 +289,11 @@ python synthetic_mcp/generation/step4_validate_all.py
 
 When configuring evaluations, consider the trade-off between task count and epochs:
 
-| Configuration | Tasks | Epochs | Total Runs | Use Case |
-|---------------|-------|--------|------------|----------|
-| Quick smoke test | 20 | 2 | 40 | Development iteration |
-| Standard eval | 50-80 | 3-5 | 150-400 | Regular benchmarking |
-| Full eval | 100+ | 3 | 300+ | Publication-quality |
+| Configuration    | Tasks | Epochs | Total Runs | Use Case              |
+|------------------|-------|--------|------------|-----------------------|
+| Quick smoke test | 20    | 2      | 40         | Development iteration |
+| Standard eval    | 50-80 | 3-5    | 150-400    | Regular benchmarking  |
+| Full eval        | 100+  | 3      | 300+       | Publication-quality   |
 
 **Recommendation:** Favor more unique tasks with 3-5 epochs over fewer tasks with many epochs. Diversity of tools and reasoning patterns is more valuable than reducing variance on a small set.
 
@@ -352,11 +351,11 @@ synthetic_mcp/
 
 Tasks are scored using LLM-as-a-judge with the SimpleQA grader template:
 
-| Score | Meaning |
-|-------|---------|
-| 1.0 | Correct answer |
-| 0.5 | Partially correct (fuzzy match) |
-| 0.0 | Incorrect or no answer |
+| Score | Meaning                         |
+|-------|---------------------------------|
+| 1.0   | Correct answer                  |
+| 0.5   | Partially correct (fuzzy match) |
+| 0.0   | Incorrect or no answer          |
 
 The model must output a JSON object with a `final_answer` field containing the answer.
 
@@ -387,7 +386,6 @@ bench eval progressivemcpbench --model <model> -T strategy=<strategy> [options]
 ## Requirements
 
 - Python 3.10+
-- The HTTP MCP server running (`python synthetic_mcp/server/http_mcp_server.py`)
 - OPENAI_API_KEY (for embeddings in copilot strategy)
 
 ---

@@ -41,6 +41,7 @@ from openbench.utils.text import (
     PROGRESSIVEMCPBENCH_DIRECTORY_SYSTEM_MESSAGE,
     PROGRESSIVEMCPBENCH_MINIMAL_SYSTEM_MESSAGE,
 )
+from openbench.utils.mcp_server_manager import ensure_mcp_server_running
 
 
 VALID_STRATEGIES = {
@@ -297,6 +298,8 @@ def progressivemcpbench(
             f"Invalid strategy '{strategy}'.\n"
             f"Valid strategies: {', '.join(sorted(VALID_STRATEGIES))}"
         )
+
+    ensure_mcp_server_running()
 
     solver = _get_solver_for_strategy(strategy)
 

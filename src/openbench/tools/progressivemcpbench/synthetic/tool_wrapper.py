@@ -104,7 +104,9 @@ async def _call_http_tool(
     Returns:
         Response dictionary with 'result' or 'error' key
     """
-    async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=timeout)) as session:
+    async with aiohttp.ClientSession(
+        timeout=aiohttp.ClientTimeout(total=timeout)
+    ) as session:
         try:
             url = f"http://{host}:{port}/mcp/{server_name}/tools/{tool_name}"
             async with session.post(
