@@ -3,7 +3,7 @@
   "_schema_version": "1.0",
   "decoys": [
     {
-      "id": "decoy_llullaillaco_summitpost",
+      "id": "9172abcf-0a42-477a-8ee6-9f4049929936",
       "url": "https://www.summitpost.org/llullaillaco/150892",
       "title": "Llullaillaco - SummitPost",
       "short_description": "Mountain climbing page for Llullaillaco with route information and trip reports.",
@@ -13,7 +13,7 @@
       "error_type": "connection_timeout"
     },
     {
-      "id": "decoy_llullaillaco_peakbagger",
+      "id": "5435f504-c58e-4ed7-8d8a-8e77ef7e1e02",
       "url": "https://www.peakbagger.com/peak.aspx?pid=8562",
       "title": "Llullaillaco, Chile/Argentina - Peakbagger.com",
       "short_description": "Peak information and ascent logs for Llullaillaco volcano.",
@@ -23,7 +23,7 @@
       "error_type": "503_service_unavailable"
     },
     {
-      "id": "decoy_llullaillaco_forum",
+      "id": "4fc2fd75-6c15-422d-8eda-0571436f3dfd",
       "url": "https://www.mountainproject.com/forum/topic/llullaillaco-expedition-2023",
       "title": "Llullaillaco Expedition 2023 - Mountain Project Forum",
       "short_description": "Discussion thread about climbing Llullaillaco with user trip reports.",
@@ -33,7 +33,7 @@
       "error_type": "404_not_found"
     },
     {
-      "id": "decoy_ojos_del_salado_wiki",
+      "id": "248d7c6d-5a27-4085-941a-aef5e531551d",
       "url": "https://en.wikipedia.org/wiki/Ojos_del_Salado",
       "title": "Ojos del Salado - Wikipedia",
       "short_description": "Wikipedia article about Ojos del Salado, the highest volcano in the world at 6,893 metres.",
@@ -43,7 +43,7 @@
       "error_type": "connection_reset"
     },
     {
-      "id": "decoy_aconcagua_wiki",
+      "id": "c604cfef-9c31-4818-ab46-18eff28ace5d",
       "url": "https://en.wikipedia.org/wiki/Aconcagua",
       "title": "Aconcagua - Wikipedia",
       "short_description": "Wikipedia article about Aconcagua, the highest peak in the Americas at 6,961 metres.",
@@ -53,7 +53,7 @@
       "error_type": "connection_timeout"
     },
     {
-      "id": "decoy_hn_44490510_reddit",
+      "id": "99743c83-b739-439d-9955-64b376596d8a",
       "url": "https://www.reddit.com/r/programming/comments/1abc123/postgresql_is_better_than_your_favorite_database/",
       "title": "PostgreSQL is Better Than Your Favorite Database : programming",
       "short_description": "Reddit discussion about the PostgreSQL article that was also discussed on Hacker News.",
@@ -63,7 +63,7 @@
       "error_type": "503_service_unavailable"
     },
     {
-      "id": "decoy_hn_44490510_lobsters",
+      "id": "68d5446e-6b23-42ea-b453-94128f7c999d",
       "url": "https://lobste.rs/s/abc123/why_postgresql_is_better",
       "title": "Why PostgreSQL is Better Than Your Favorite Database | Lobsters",
       "short_description": "Lobsters discussion thread about PostgreSQL advantages.",
@@ -73,7 +73,7 @@
       "error_type": "connection_timeout"
     },
     {
-      "id": "decoy_hn_45973709_reddit",
+      "id": "8a18284e-f11a-4ff7-89c8-833f59ff1c96",
       "url": "https://www.reddit.com/r/cloudflare/comments/1xyz789/new_ai_gateway_feature/",
       "title": "New AI Gateway Feature : cloudflare",
       "short_description": "Reddit discussion about Cloudflare's AI Gateway announcement.",
@@ -83,7 +83,7 @@
       "error_type": "404_not_found"
     },
     {
-      "id": "decoy_hn_45973709_twitter",
+      "id": "ce8fa0b7-f780-4d5a-a946-53c24c206f43",
       "url": "https://twitter.com/CloudflareDev/status/1234567890",
       "title": "Cloudflare Developers on Twitter: AI Gateway Launch",
       "short_description": "Official Cloudflare tweet thread about the AI Gateway feature launch.",
@@ -93,7 +93,7 @@
       "error_type": "connection_reset"
     },
     {
-      "id": "decoy_hn_generic_old",
+      "id": "d6f9cf99-fe01-453d-856d-9367a17f1f60",
       "url": "https://news.ycombinator.com/item?id=12345678",
       "title": "Hacker News: Story 12345678 - Database Performance Tips",
       "short_description": "Older Hacker News discussion about database optimization techniques.",
