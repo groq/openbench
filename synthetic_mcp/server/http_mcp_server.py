@@ -280,6 +280,12 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
         elif handler_type == "url_search":
             return self.handle_url_search(handler, params, tool)
 
+        elif handler_type == "hackernews_story":
+            return self.handle_hackernews_story(handler, params, tool)
+
+        elif handler_type == "wikipedia_search":
+            return self.handle_wikipedia_search(handler, params, tool)
+
         elif handler_type == "table_search":
             return self.handle_table_search(handler, params, tool)
 
@@ -892,6 +898,78 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
             "results": results,
             "total_found": len(scored_results),
         }
+
+    def handle_hackernews_story(self, handler: dict, params: dict, tool: dict) -> Any:
+        """Handle HackerNews story lookup by ID."""
+        story_id = params.get("id", "")
+
+        if not story_id:
+            return {"error": "Story ID is required"}
+
+        stories_path = self.data_path / "api" / "hackernews_stories.json"
+        if not stories_path.exists():
+            return {"error": "HackerNews data not available"}
+
+        with open(stories_path, encoding="utf-8") as f:
+            data = json.load(f)
+
+        stories = data.get("stories", {})
+        story = stories.get(story_id)
+
+        if not story:
+            return {"error": f"Story {story_id} not found"}
+
+        return {
+            "id": story["id"],
+            "title": story["title"],
+            "url": story["url"],
+            "author": story["author"],
+            "points": story["points"],
+            "num_comments": story["num_comments"],
+            "age": story["age"],
+            "discussion_url": story["discussion_url"],
+        }
+
+    def handle_wikipedia_search(self, handler: dict, params: dict, tool: dict) -> Any:
+        """Handle Wikipedia article search."""
+        query = params.get("query", "")
+
+        if not query:
+            return {"error": "Search query is required", "results": []}
+
+        articles_path = self.data_path / "api" / "wikipedia_articles.json"
+        if not articles_path.exists():
+            return {"error": "Wikipedia data not available", "results": []}
+
+        with open(articles_path, encoding="utf-8") as f:
+            data = json.load(f)
+
+        query_lower = query.lower()
+        query_terms = query_lower.split()
+
+        results = []
+        for article in data.get("articles", []):
+            searchable = " ".join(
+                [article.get("title", ""), article.get("summary", "")]
+                + article.get("keywords", [])
+            ).lower()
+
+            if any(term in searchable for term in query_terms):
+                results.append(
+                    {
+                        "title": article["title"],
+                        "url": article["url"],
+                        "summary": article["summary"],
+                    }
+                )
+
+        if not results:
+            return {
+                "error": "Wikipedia search is temporarily unavailable. Please try again later.",
+                "query": query,
+            }
+
+        return {"query": query, "results": results}
 
     def load_api_data(self, dataset_path: str) -> dict:
         """Load a JSON dataset from the API data directory."""

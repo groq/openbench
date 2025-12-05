@@ -6,7 +6,8 @@
     "music-analysis",
     "playwright",
     "mcp-simple-arxiv",
-    "url-search",
+    "hackernews",
+    "wikipedia",
     "word-document-server",
     "arxiv-mcp-server",
     "filesystem",
@@ -35,7 +36,8 @@
     "trial_protocol_getter",
     "read_multiple_files",
     "list_allowed_directories",
-    "search_urls"
+    "get_story",
+    "search"
   ],
   "categories": [
     "Office",

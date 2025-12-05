@@ -3120,33 +3120,50 @@
       }
     ]
   },
-  "url-search": {
-    "server_name": "url-search",
-    "description": "Search service for discovering URLs in the synthetic web corpus. Use this to find relevant web pages before fetching them with the playwright server.",
+  "hackernews": {
+    "server_name": "hackernews",
+    "description": "HackerNews API server for looking up story metadata. Use this to get information about HN stories, then use playwright to fetch full discussion pages.",
     "category": "Discovery",
     "tools": [
       {
-        "name": "search_urls",
-        "description": "Search for relevant URLs in the synthetic web corpus. Returns a list of matching URLs with their titles and descriptions.",
+        "name": "get_story",
+        "description": "Get metadata about a HackerNews story by ID. Returns title, author, points, comment count, and the discussion URL. To read comments, use the discussion_url with playwright.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "description": "The HackerNews story ID (numeric string)"
+            }
+          },
+          "required": ["id"]
+        },
+        "handler": {
+          "type": "hackernews_story"
+        }
+      }
+    ]
+  },
+  "wikipedia": {
+    "server_name": "wikipedia",
+    "description": "Wikipedia search server for finding article URLs. Use this to discover Wikipedia pages, then use playwright to fetch the full content.",
+    "category": "Discovery",
+    "tools": [
+      {
+        "name": "search",
+        "description": "Search for Wikipedia articles matching a query. Returns article titles and URLs. To read the full article content, use the URL with playwright.",
         "inputSchema": {
           "type": "object",
           "properties": {
             "query": {
               "type": "string",
-              "description": "Search query to find relevant URLs"
-            },
-            "max_results": {
-              "type": "integer",
-              "description": "Maximum number of results to return (default: 5)",
-              "default": 5
+              "description": "Search query to find Wikipedia articles"
             }
           },
-          "required": [
-            "query"
-          ]
+          "required": ["query"]
         },
         "handler": {
-          "type": "url_search"
+          "type": "wikipedia_search"
         }
       }
     ]

@@ -284,18 +284,18 @@
     "answer": "osigurdson",
     "scorer_instructions": null,
     "required_servers": [
-      "url-search",
+      "hackernews",
       "playwright"
     ],
     "required_tools": [
-      "search_urls",
+      "get_story",
       "playwright_get_visible_html"
     ],
     "annotator_metadata": {
       "Number of steps": "2",
       "Number of tools": "2",
-      "Steps": "1. Search for the HN story URL\n2. Fetch the page and find the top comment username",
-      "Tools": "1. search_urls\n2. playwright_get_visible_html"
+      "Steps": "1. Get the HN story info to find the discussion URL\n2. Fetch the page and find the top comment username",
+      "Tools": "1. get_story\n2. playwright_get_visible_html"
     }
   },
   {
@@ -306,18 +306,18 @@
     "answer": "gucci-on-fleek",
     "scorer_instructions": null,
     "required_servers": [
-      "url-search",
+      "hackernews",
       "playwright"
     ],
     "required_tools": [
-      "search_urls",
+      "get_story",
       "playwright_get_visible_html"
     ],
     "annotator_metadata": {
       "Number of steps": "2",
       "Number of tools": "2",
-      "Steps": "1. Search for the HN story URL\n2. Fetch the page and find the top comment username",
-      "Tools": "1. search_urls\n2. playwright_get_visible_html"
+      "Steps": "1. Get the HN story info to find the discussion URL\n2. Fetch the page and find the top comment username",
+      "Tools": "1. get_story\n2. playwright_get_visible_html"
     }
   },
   {
@@ -328,18 +328,18 @@
     "answer": "cpursley",
     "scorer_instructions": null,
     "required_servers": [
-      "url-search",
+      "hackernews",
       "playwright"
     ],
     "required_tools": [
-      "search_urls",
+      "get_story",
       "playwright_get_visible_html"
     ],
     "annotator_metadata": {
       "Number of steps": "2",
       "Number of tools": "2",
-      "Steps": "1. Search for the HN story URL\n2. Fetch the page and find the top reply to the top comment",
-      "Tools": "1. search_urls\n2. playwright_get_visible_html"
+      "Steps": "1. Get the HN story info to find the discussion URL\n2. Fetch the page and find the top reply to the top comment",
+      "Tools": "1. get_story\n2. playwright_get_visible_html"
     }
   },
   {
@@ -350,18 +350,18 @@
     "answer": "eastdakota",
     "scorer_instructions": null,
     "required_servers": [
-      "url-search",
+      "hackernews",
       "playwright"
     ],
     "required_tools": [
-      "search_urls",
+      "get_story",
       "playwright_get_visible_html"
     ],
     "annotator_metadata": {
       "Number of steps": "2",
       "Number of tools": "2",
-      "Steps": "1. Search for the HN story URL\n2. Fetch the page and find the top reply to the top comment",
-      "Tools": "1. search_urls\n2. playwright_get_visible_html"
+      "Steps": "1. Get the HN story info to find the discussion URL\n2. Fetch the page and find the top reply to the top comment",
+      "Tools": "1. get_story\n2. playwright_get_visible_html"
     }
   },
   {
@@ -372,18 +372,18 @@
     "answer": "6723 metres",
     "scorer_instructions": "Tolerate 1% error.",
     "required_servers": [
-      "url-search",
+      "wikipedia",
       "playwright"
     ],
     "required_tools": [
-      "search_urls",
+      "search",
       "playwright_get_visible_html"
     ],
     "annotator_metadata": {
       "Number of steps": "2",
       "Number of tools": "2",
-      "Steps": "1. Search for the Wikipedia article URL\n2. Fetch the page and extract the height",
-      "Tools": "1. search_urls\n2. playwright_get_visible_html"
+      "Steps": "1. Search Wikipedia for the article URL\n2. Fetch the page and extract the height",
+      "Tools": "1. search\n2. playwright_get_visible_html"
     }
   }
 ]

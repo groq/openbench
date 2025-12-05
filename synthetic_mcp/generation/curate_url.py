@@ -254,17 +254,15 @@ def update_task_answer(task_id: str, answer: str) -> bool:
                 task["answer"] = answer
                 print(f"  ✓ Set answer for task {task_id}")
 
-            # Add required_servers if not present
-            if "required_servers" not in task:
-                task["required_servers"] = ["url-search", "playwright"]
-            elif "url-search" not in task["required_servers"]:
-                task["required_servers"].append("url-search")
+            # Ensure playwright is in required_servers
             if "playwright" not in task.get("required_servers", []):
                 task.setdefault("required_servers", []).append("playwright")
 
-            # Add required_tools if not present
-            if "required_tools" not in task:
-                task["required_tools"] = ["search_urls", "playwright_get_visible_html"]
+            # Ensure playwright tool is in required_tools
+            if "playwright_get_visible_html" not in task.get("required_tools", []):
+                task.setdefault("required_tools", []).append(
+                    "playwright_get_visible_html"
+                )
 
             break
 
@@ -295,13 +293,13 @@ def create_new_task(
         "Annotator Metadata": {
             "Number of steps": "2",
             "Number of tools": "2",
-            "Steps": "1. Search for the relevant URL\n2. Fetch the page and extract the answer",
-            "Tools": "search_urls, playwright_get_visible_html",
+            "Steps": "1. Look up the relevant URL\n2. Fetch the page and extract the answer",
+            "Tools": "domain-specific lookup, playwright_get_visible_html",
         },
         "answer": answer,
         "scorer_instructions": None,
-        "required_servers": ["url-search", "playwright"],
-        "required_tools": ["search_urls", "playwright_get_visible_html"],
+        "required_servers": ["playwright"],
+        "required_tools": ["playwright_get_visible_html"],
     }
 
     tasks = load_json(BENCHMARK_DATA_PATH)

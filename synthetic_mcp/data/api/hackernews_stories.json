@@ -1,0 +1,25 @@
+{
+  "_comment": "HackerNews story metadata extracted from HTML snapshots",
+  "stories": {
+    "44490510": {
+      "id": "44490510",
+      "title": "Why PostgreSQL is Better Than Your Favorite Database",
+      "url": "https://example.com/article",
+      "author": "techwriter",
+      "points": 487,
+      "num_comments": 342,
+      "age": "5 hours ago",
+      "discussion_url": "https://news.ycombinator.com/item?id=44490510"
+    },
+    "45973709": {
+      "id": "45973709",
+      "title": "Cloudflare's New AI Gateway Feature",
+      "url": "https://example.com/cloudflare-article",
+      "author": "clouddev",
+      "points": 623,
+      "num_comments": 512,
+      "age": "8 hours ago",
+      "discussion_url": "https://news.ycombinator.com/item?id=45973709"
+    }
+  }
+}
