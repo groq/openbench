@@ -1,4 +1,28 @@
 {
   "_comment": "Master index of web corpus URLs, keyed by URL. Each entry contains metadata and path to HTML snapshot.",
-  "_schema_version": "1.0"
+  "_schema_version": "1.0",
+  "https://news.ycombinator.com/item?id=44490510": {
+    "id": "hn_story_44490510",
+    "html_path": "web/html/news_ycombinator_com_item_id_44490510.html",
+    "title": "Hacker News: Story 44490510 - Why PostgreSQL is Better Than Your Favorite Database",
+    "domain": "news.ycombinator.com",
+    "tags": ["hacker news", "hn", "postgresql", "database", "comments", "discussion"],
+    "task_ids": ["84326f9f-d4b7-4dc8-b9e0-3c8868a3f79f", "f697107c-8004-452c-9b5c-98573f95193a"]
+  },
+  "https://news.ycombinator.com/item?id=45973709": {
+    "id": "hn_story_45973709",
+    "html_path": "web/html/news_ycombinator_com_item_id_45973709.html",
+    "title": "Hacker News: Story 45973709 - Cloudflare's New AI Gateway Feature",
+    "domain": "news.ycombinator.com",
+    "tags": ["hacker news", "hn", "cloudflare", "ai", "gateway", "comments", "discussion"],
+    "task_ids": ["95369c49-8037-46f9-9099-8c336d03559f", "68407846-9583-405c-a539-6936635d236d"]
+  },
+  "https://en.wikipedia.org/wiki/Llullaillaco": {
+    "id": "wikipedia_llullaillaco",
+    "html_path": "web/html/en_wikipedia_org_wiki_Llullaillaco.html",
+    "title": "Llullaillaco - Wikipedia",
+    "domain": "en.wikipedia.org",
+    "tags": ["wikipedia", "llullaillaco", "volcano", "andes", "mountain", "argentina", "chile", "elevation", "height"],
+    "task_ids": ["665e1166-1062-444f-81e3-df207d0f975b"]
+  }
 }

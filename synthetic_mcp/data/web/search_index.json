@@ -1,5 +1,45 @@
 {
   "_comment": "Lightweight search index for URL discovery. Contains metadata optimized for search queries.",
   "_schema_version": "1.0",
-  "entries": []
+  "entries": [
+    {
+      "id": "hn_story_44490510",
+      "url": "https://news.ycombinator.com/item?id=44490510",
+      "title": "Hacker News: Story 44490510 - Why PostgreSQL is Better Than Your Favorite Database",
+      "short_description": "Hacker News discussion with comments about PostgreSQL. Top comment by osigurdson, with reply from cpursley.",
+      "tags": ["hacker news", "hn", "postgresql", "database", "comments", "discussion", "osigurdson", "cpursley"],
+      "example_queries": [
+        "hacker news story 44490510",
+        "hn item 44490510",
+        "read the comments on hacker news story 44490510",
+        "44490510 comments"
+      ]
+    },
+    {
+      "id": "hn_story_45973709",
+      "url": "https://news.ycombinator.com/item?id=45973709",
+      "title": "Hacker News: Story 45973709 - Cloudflare's New AI Gateway Feature",
+      "short_description": "Hacker News discussion about Cloudflare AI Gateway. Top comment by gucci-on-fleek, with reply from eastdakota.",
+      "tags": ["hacker news", "hn", "cloudflare", "ai", "gateway", "comments", "discussion", "gucci-on-fleek", "eastdakota"],
+      "example_queries": [
+        "hacker news story 45973709",
+        "hn item 45973709",
+        "read the comments on hacker news story 45973709",
+        "45973709 comments"
+      ]
+    },
+    {
+      "id": "wikipedia_llullaillaco",
+      "url": "https://en.wikipedia.org/wiki/Llullaillaco",
+      "title": "Llullaillaco - Wikipedia",
+      "short_description": "Wikipedia article about Llullaillaco, a stratovolcano at 6,723 metres on the Argentina-Chile border.",
+      "tags": ["wikipedia", "llullaillaco", "volcano", "andes", "mountain", "argentina", "chile", "elevation", "height", "6723"],
+      "example_queries": [
+        "llullaillaco wikipedia",
+        "llullaillaco height",
+        "llullaillaco volcano",
+        "wikipedia article on llullaillaco"
+      ]
+    }
+  ]
 }
