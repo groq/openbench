@@ -85,7 +85,8 @@ Use this to explore available MCP servers and their tools.
 - ls("/tools/<server>") - lists all tool files for a specific server
 
 Each server is a directory containing markdown files that describe individual tools.
-To see a tool's description and parameters, use read-tool-file.
+
+IMPORTANT: You MUST call meta__read-tool-file to read a tool's full description and parameters BEFORE calling meta__execute-tool for that tool. Never execute a tool without first reading its specification.
 """
         ),
     )
