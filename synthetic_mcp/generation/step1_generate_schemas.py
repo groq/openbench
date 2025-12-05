@@ -3,33 +3,26 @@
 Step 1: Generate Synthetic Tool Schemas
 
 This script takes the server seeds from step0 and generates synthetic tool schemas
-that will be used by the mock HTTP MCP server. For the MVP, we focus on the tools
-actually used by the 13 working tasks.
+that will be used by the mock HTTP MCP server.
 
 Key decisions:
 - Preserve real server names and descriptions for realism
 - Generate simplified tool schemas with handler specifications
 - Each handler specifies how the mock server will respond (table_lookup, filesystem, etc.)
-- Include the exact tools needed for working tasks + a few extras for distraction strategies
-
-Uses: gpt-oss-120b via Groq API
+- Include ALL tools from each required server (for minimal-servers strategy)
+- Tools that are explicitly required get proper handler implementations
+- Other tools get stub handlers that return placeholder responses
 """
 
 import json
-import os
 from pathlib import Path
 from typing import Any
-
-from groq import Groq
 
 # Paths
 SCRIPT_DIR = Path(__file__).resolve().parent
 CONFIG_DIR = SCRIPT_DIR.parent / "config"
 SEEDS_DIR = CONFIG_DIR / "seeds"
 OUTPUT_FILE = CONFIG_DIR / "servers.json"
-
-# Model configuration
-MODEL = "openai/gpt-oss-120b"
 
 
 def load_json(path: Path) -> Any:
@@ -60,132 +53,90 @@ def get_tools_needed(working_tasks: list[dict]) -> dict[str, set[str]]:
     return tools_by_server
 
 
-def generate_handler_spec(
-    client: Groq,
-    server_name: str,
-    server_info: dict,
-    needed_tools: set[str],
-    working_tasks: list[dict],
-) -> dict:
-    """Use LLM to generate handler specifications for a server's tools."""
+def get_required_servers(working_tasks: list[dict]) -> set[str]:
+    """Get the set of all servers that are required by any task."""
+    servers: set[str] = set()
+    for task in working_tasks:
+        for server in task.get("required_servers", []):
+            servers.add(server)
+    return servers
+
+
+def create_stub_handler(tool_name: str, tool_info: dict) -> dict:
+    """Create a stub handler for tools that are not explicitly required.
     
-    # Get the original tools that are needed
-    original_tools = server_info.get("tools", [])
-    needed_tool_list = [t for t in original_tools if t.get("name") in needed_tools]
+    Mutation tools return success messages.
+    Query tools return empty/placeholder responses.
+    """
+    description = tool_info.get("description", "").lower()
+    name_lower = tool_name.lower()
     
-    # Find relevant tasks for context
-    relevant_tasks = [
-        t for t in working_tasks
-        if server_name in t.get("required_servers", [])
+    # Detect mutation verbs in name or description
+    mutation_verbs = [
+        "create", "add", "delete", "remove", "update", "modify", "set",
+        "write", "save", "copy", "move", "rename", "format", "protect",
+        "unprotect", "replace", "convert", "customize"
     ]
     
-    # Build task examples for context
-    task_examples = [
-        {"Question": t["Question"], "answer": t["answer"], "required_tools": t["required_tools"]}
-        for t in relevant_tasks
-    ]
+    is_mutation = any(verb in name_lower or verb in description for verb in mutation_verbs)
     
-    # Build the prompt
-    prompt = f"""You are designing a synthetic MCP server that will be used for benchmarking LLM agents.
-
-## Server: {server_name}
-Description: {server_info.get('description', 'No description')}
-Category: {server_info.get('category', 'Unknown')}
-
-## Tools needed for benchmark tasks:
-{json.dumps(needed_tool_list, indent=2)}
-
-## Example tasks that will use these tools:
-{json.dumps(task_examples, indent=2)}
-
-## Your task:
-Generate a synthetic tool specification for each tool. For each tool, provide:
-1. Keep the original name, description, and inputSchema exactly as-is
-2. Add a "handler" object that specifies how a mock HTTP server should respond
-
-Handler types available:
-- "filesystem": For tools that read/list files. Specify "root" (the base directory).
-- "table_lookup": For tools that look up data by key. Specify "dataset" (JSON file path) and "key_field".
-- "static_json": For tools returning fixed data. Specify the "response" directly.
-- "excel_reader": For Excel file operations. Specify "root" directory.
-- "compute": For calculations. Specify "operation" type.
-
-Important: The handler must be able to produce the expected answers shown in the tasks.
-
-Return ONLY a valid JSON object with this structure:
-{{
-  "server_name": "{server_name}",
-  "description": "<original description>",
-  "category": "<original category>",
-  "tools": [
-    {{
-      "name": "<tool name>",
-      "description": "<original description>",
-      "inputSchema": <original schema>,
-      "handler": {{
-        "type": "<handler type>",
-        // handler-specific fields
-      }}
-    }}
-  ]
-}}
-
-Return ONLY the JSON, no markdown code blocks or explanations."""
-
-    response = client.chat.completions.create(
-        model=MODEL,
-        messages=[
-            {"role": "system", "content": "You are a technical architect designing mock MCP servers for AI benchmarking. Return only valid JSON."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.3,
-        max_tokens=4000,
-    )
-    
-    content = response.choices[0].message.content.strip()
-    
-    # Try to parse the JSON response
-    try:
-        # Remove markdown code blocks if present
-        if content.startswith("```"):
-            lines = content.split("\n")
-            content = "\n".join(lines[1:-1] if lines[-1] == "```" else lines[1:])
-        
-        return json.loads(content)
-    except json.JSONDecodeError as e:
-        print(f"  ⚠ Failed to parse LLM response for {server_name}: {e}")
-        print(f"  Response: {content[:500]}...")
-        return None
+    if is_mutation:
+        return {
+            "type": "static_json",
+            "response": {
+                "success": True,
+                "message": f"Operation '{tool_name}' completed successfully (synthetic stub)"
+            }
+        }
+    else:
+        # Query tools - return placeholder based on what they might return
+        if "list" in name_lower:
+            return {"type": "static_json", "response": {"items": [], "message": "No items found (synthetic stub)"}}
+        elif "get" in name_lower or "find" in name_lower or "search" in name_lower:
+            return {"type": "static_json", "response": {"results": [], "message": "No results found (synthetic stub)"}}
+        else:
+            return {"type": "static_json", "response": {"data": None, "message": "No data available (synthetic stub)"}}
 
 
 def create_fallback_handler(server_name: str, server_info: dict, needed_tools: set[str]) -> dict:
-    """Create a fallback handler specification when LLM fails."""
+    """Create a fallback handler specification when LLM fails.
+    
+    Includes ALL tools from the server, with proper handlers for needed tools
+    and stub handlers for non-needed tools.
+    """
     original_tools = server_info.get("tools", [])
-    needed_tool_list = [t for t in original_tools if t.get("name") in needed_tools]
     
     # Default handler mappings based on server type
     handler_defaults = {
-        "filesystem": {"type": "filesystem", "root": "data/files/root"},
-        "excel": {"type": "excel_reader", "root": "data/excel"},
+        "filesystem": {"type": "filesystem", "root": "/root"},
+        "excel": {"type": "excel_reader", "root": "/root/excel"},
         "mcp-simple-arxiv": {"type": "table_lookup", "dataset": "data/api/arxiv_papers.json", "key_field": "paper_id"},
         "arxiv-mcp-server": {"type": "table_lookup", "dataset": "data/api/arxiv_papers.json", "key_field": "paper_id"},
         "biomcp": {"type": "table_lookup", "dataset": "data/api/clinical_trials.json", "key_field": "nct_id"},
         "music-analysis": {"type": "table_lookup", "dataset": "data/api/audio_analysis.json", "key_field": "file_path"},
         "maven-deps-server": {"type": "table_lookup", "dataset": "data/api/maven_releases.json", "key_field": "artifact"},
-        "pdf-reader-mcp": {"type": "filesystem", "root": "data/files/root"},
-        "word-document-server": {"type": "filesystem", "root": "data/files/root"},
-        "searxng": {"type": "filesystem", "root": "data/files/root"},
+        "pdf-reader-mcp": {"type": "filesystem", "root": "/root"},
+        "word-document-server": {"type": "filesystem", "root": "/root/word"},
+        "searxng": {"type": "filesystem", "root": "/root"},
     }
     
     default_handler = handler_defaults.get(server_name, {"type": "static_json", "response": {}})
     
     tools_with_handlers = []
-    for tool in needed_tool_list:
+    for tool in original_tools:
+        tool_name = tool.get("name", "")
+        if tool_name in needed_tools:
+            # Use the server's default handler for needed tools
+            handler = default_handler.copy()
+        else:
+            # Use a stub handler for non-needed tools
+            handler = create_stub_handler(tool_name, tool)
+        
         tools_with_handlers.append({
-            "name": tool.get("name"),
+            "name": tool_name,
             "description": tool.get("description", ""),
             "inputSchema": tool.get("inputSchema", {}),
-            "handler": default_handler.copy(),
+            "handler": handler,
         })
     
     return {
@@ -201,55 +152,61 @@ def main():
     print("Step 1: Generate Synthetic Tool Schemas")
     print("=" * 60)
     
-    # Check for API key
-    api_key = os.getenv("GROQ_API_KEY")
-    if not api_key:
-        raise RuntimeError("GROQ_API_KEY environment variable is required")
-    
-    client = Groq(api_key=api_key)
-    
     # Load seeds
     print("\n📂 Loading seeds...")
     servers_raw = load_json(SEEDS_DIR / "servers_raw.json")
     working_tasks = load_json(SEEDS_DIR / "working_tasks.json")
-    print(f"  ✓ Loaded {len(servers_raw)} servers")
+    print(f"  ✓ Loaded {len(servers_raw)} servers from seeds")
     print(f"  ✓ Loaded {len(working_tasks)} working tasks")
     
-    # Get tools needed per server
-    tools_needed = get_tools_needed(working_tasks)
-    print("\n🔍 Tools needed per server:")
-    for server, tools in sorted(tools_needed.items()):
-        print(f"  {server}: {sorted(tools)}")
+    # Load existing servers.json to preserve manually-defined servers
+    existing_servers: dict = {}
+    if OUTPUT_FILE.exists():
+        existing_servers = load_json(OUTPUT_FILE)
+        print(f"  ✓ Loaded {len(existing_servers)} servers from existing servers.json")
     
-    # Generate schemas for each server
-    print("\n🤖 Generating synthetic schemas with gpt-oss-120b...")
+    # Get tools needed per server and required servers
+    tools_needed = get_tools_needed(working_tasks)
+    required_servers = get_required_servers(working_tasks)
+    
+    print("\n🔍 Required servers and tools needed:")
+    for server in sorted(required_servers):
+        tools = tools_needed.get(server, set())
+        all_tools = len(servers_raw.get(server, {}).get("tools", []))
+        source = "seeds" if server in servers_raw else ("existing" if server in existing_servers else "MISSING")
+        print(f"  {server}: {len(tools)} needed / {all_tools} total tools [{source}]")
+    
+    # Generate schemas for each required server
+    # We use fallback handler for all to include ALL tools from each server
+    print("\n🔧 Generating tool schemas (including ALL tools from required servers)...")
     synthetic_servers = {}
     
-    for server_name, server_info in servers_raw.items():
-        needed = tools_needed.get(server_name, set())
-        if not needed:
-            print(f"  ⏭ Skipping {server_name} (no tools needed)")
-            continue
-        
-        print(f"\n  📝 Processing {server_name}...")
-        print(f"     Tools needed: {sorted(needed)}")
-        
-        result = generate_handler_spec(
-            client,
-            server_name,
-            server_info,
-            needed,
-            working_tasks,
-        )
-        
-        if result:
-            synthetic_servers[server_name] = result
-            print(f"     ✓ Generated {len(result.get('tools', []))} tools with handlers")
-        else:
-            print(f"     ⚠ LLM generation failed, using fallback")
+    for server_name in sorted(required_servers):
+        if server_name in servers_raw:
+            # Generate from seeds with all tools
+            server_info = servers_raw[server_name]
+            needed = tools_needed.get(server_name, set())
+            all_tools_count = len(server_info.get("tools", []))
+            
+            print(f"\n  📝 Processing {server_name}...")
+            print(f"     Needed tools: {sorted(needed)}")
+            print(f"     Total tools in server: {all_tools_count}")
+            
+            # Use fallback handler to include ALL tools
             result = create_fallback_handler(server_name, server_info, needed)
             synthetic_servers[server_name] = result
-            print(f"     ✓ Created fallback with {len(result.get('tools', []))} tools")
+            
+            needed_count = sum(1 for t in result.get("tools", []) if t.get("name") in needed)
+            stub_count = len(result.get("tools", [])) - needed_count
+            print(f"     ✓ Generated {needed_count} tools with handlers, {stub_count} with stubs")
+        elif server_name in existing_servers:
+            # Preserve manually-defined server from existing servers.json
+            print(f"\n  📝 Preserving {server_name} from existing servers.json...")
+            synthetic_servers[server_name] = existing_servers[server_name]
+            tools_count = len(existing_servers[server_name].get("tools", []))
+            print(f"     ✓ Preserved {tools_count} tools")
+        else:
+            print(f"\n  ⚠ Server '{server_name}' not found in seeds or existing servers.json, skipping")
     
     # Save output (sorted for reproducibility)
     print("\n💾 Saving output...")
@@ -261,13 +218,15 @@ def main():
     print("Summary")
     print("=" * 60)
     total_tools = sum(len(s.get("tools", [])) for s in sorted_synthetic_servers.values())
+    total_needed = sum(len(tools_needed.get(s, set())) for s in sorted_synthetic_servers.keys())
     print(f"  Servers generated: {len(sorted_synthetic_servers)}")
-    print(f"  Total tools: {total_tools}")
+    print(f"  Total tools: {total_tools} ({total_needed} needed, {total_tools - total_needed} stubs)")
     
     for name, info in sorted_synthetic_servers.items():
         tools = info.get("tools", [])
+        needed = tools_needed.get(name, set())
         handler_types = set(t.get("handler", {}).get("type", "unknown") for t in tools)
-        print(f"    {name}: {len(tools)} tools ({', '.join(handler_types)})")
+        print(f"    {name}: {len(tools)} tools, {len(needed)} needed ({', '.join(handler_types)})")
     
     print("\n✅ Step 1 complete!")
     print(f"   Output: {OUTPUT_FILE}")
