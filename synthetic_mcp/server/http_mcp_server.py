@@ -15,11 +15,10 @@ Handler types:
 
 import csv
 import json
-import re
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from typing import Any
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import urlparse
 
 # Default paths - can be overridden
 DEFAULT_CONFIG_PATH = Path(__file__).parent.parent / "config" / "servers.json"
@@ -158,7 +157,6 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
 
     def handle_filesystem(self, handler: dict, params: dict, tool: dict) -> Any:
         """Handle filesystem operations (read_file, list_directory, etc.)."""
-        root = handler.get("root", "/root")
         tool_name = tool.get("name", "")
 
         # Map /root paths to our synthetic data directory
@@ -341,7 +339,6 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
     def handle_excel_reader(self, handler: dict, params: dict, tool: dict) -> Any:
         """Handle Excel reading operations."""
         tool_name = tool.get("name", "")
-        root = handler.get("root", "/root")
 
         # Get file path
         file_path = params.get("fileAbsolutePath") or params.get("inputPath", "")
@@ -380,7 +377,6 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
                 ws = wb.active
 
             # Read the data
-            cell_range = params.get("range", "")
             include_headers = params.get("includeHeaders", True)
 
             rows = []
@@ -507,7 +503,6 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
 
         # Load search index
         search_index = self.get_web_search_index()
-        metadata = self.get_web_corpus_metadata()
 
         # Simple keyword matching
         query_lower = query.lower()
