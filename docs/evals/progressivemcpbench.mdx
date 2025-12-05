@@ -5,15 +5,9 @@ description: Evaluating LLM agents with progressive tool discovery strategies us
 
 # ProgressiveMCPBench
 
-## Synthetic Strategies (Recommended)
+ProgressiveMCPBench is a benchmark for evaluating how effectively language models can discover and use Model Context Protocol (MCP) tools. It tests agents on tasks that require using MCP tools - from file operations to API calls - while controlling *how* tools are presented to the model.
 
-The synthetic strategies use a local HTTP server instead of live MCP servers, providing:
-- **Deterministic responses** - Same inputs always produce same outputs
-- **Fast execution** - No network latency or server startup time
-- **No dependencies** - No Node.js, npm packages, or external services required
-- **Reliable evaluation** - No infrastructure failures or timeouts
-
-### Running Synthetic Evaluations
+## Quick Start
 
 ```bash
 # Start the HTTP MCP server (in a separate terminal)
@@ -22,63 +16,300 @@ python synthetic_mcp/server/http_mcp_server.py
 # Run with all synthetic tools
 bench eval progressivemcpbench --model openai/gpt-4o -T strategy=synthetic
 
-# Run with only required servers
+# Run with only required servers per task
 bench eval progressivemcpbench --model openai/gpt-4o -T strategy=synthetic-minimal-servers
 
-# Run with only exact required tools
+# Run with only exact required tools per task
 bench eval progressivemcpbench --model openai/gpt-4o -T strategy=synthetic-minimal-tools
 ```
 
-The synthetic strategies automatically load tasks from `synthetic_mcp/tasks/progressivemcpbench_synthetic.json`.
+## Architecture Overview
 
-### Synthetic HTTP Server
-
-The server runs on `localhost:8765` and masquerades as multiple MCP servers:
+The benchmark uses a **synthetic MCP layer** that provides:
+- **Deterministic responses** - Same inputs always produce same outputs
+- **Fast execution** - No network latency or server startup time  
+- **No dependencies** - No Node.js, npm packages, or external services required
+- **Reliable evaluation** - No infrastructure failures or timeouts
 
 ```
-POST /mcp/{server_name}/tools/{tool_name}
-Content-Type: application/json
-
-{"param1": "value1", "param2": "value2"}
-
-Response: {"result": ...}
+┌─────────────────────────────────────────────────────────────┐
+│                     Inspect AI Eval                         │
+├─────────────────────────────────────────────────────────────┤
+│  Strategy Layer                                             │
+│  ├─ synthetic ──────────► All synthetic tools               │
+│  ├─ synthetic-minimal-servers ► Server-level filtering      │
+│  └─ synthetic-minimal-tools ──► Exact tools only            │
+├─────────────────────────────────────────────────────────────┤
+│  Synthetic HTTP MCP Server (localhost:8765)                 │
+│  ├─ filesystem handler ──► data/files/root/                 │
+│  ├─ table_lookup handler ► data/api/*.json                  │
+│  ├─ excel_reader handler ► data/files/root/**/*.xlsx        │
+│  ├─ static_json handler ─► Fixed responses                  │
+│  └─ compute handler ─────► Formula evaluation               │
+└─────────────────────────────────────────────────────────────┘
 ```
-
-Handler types:
-- `filesystem` - Read files from `synthetic_mcp/data/files/root/`
-- `table_lookup` - Query JSON datasets in `synthetic_mcp/data/api/`
-- `excel_reader` - Read Excel files with openpyxl
-- `static_json` - Return fixed responses
-- `compute` - Return computed values
 
 ---
 
-## Regenerating Synthetic Data
+## Strategies
 
-<Callout type="info">
-The synthetic data is pre-generated and committed to the repository. You only need to regenerate if you're adding new tasks or modifying tool handlers.
-</Callout>
+### Synthetic Strategies (Recommended)
 
-The generation pipeline lives in `synthetic_mcp/generation/`. Run these steps in order:
+| Strategy | Description | Use Case |
+|----------|-------------|----------|
+| `synthetic` | All synthetic tools available | Baseline with full tool set |
+| `synthetic-minimal-servers` | Only required servers per task | Tests with server-level filtering |
+| `synthetic-minimal-tools` | Only exact tools needed | Upper bound on performance |
+
+### Live MCP Strategies
+
+These strategies use real MCP servers (requires Node.js and network access):
+
+| Strategy | Description |
+|----------|-------------|
+| `copilot` | Semantic search via `route()` + `execute-tool()` |
+| `directory` | Filesystem-like exploration via `ls()` + `read-tool-file()` |
+| `minimal-servers` | Direct access to required servers only |
+| `minimal-tools` | Direct access to exact tools needed |
+| `distraction-64` | Required tools + distractors (64 total) |
+| `distraction-128` | Required tools + distractors (128 total) |
+
+---
+
+## Expanding the Task Set
+
+The benchmark currently uses a curated set of tasks with verified answers. This section explains how to expand coverage.
+
+### Current State
+
+- **Working tasks:** 13 tasks in `synthetic_mcp/config/seeds/working_tasks.json`
+- **Original dataset:** ~85 tasks in `src/openbench/datasets/data/progressivemcpbench.json` (most lack answers)
+- **Synthetic servers:** 11 servers defined in `synthetic_mcp/config/servers.json`
+
+### Expansion Approaches
+
+There are three ways to expand the task set:
+
+1. **Port more tasks from the original dataset** - Convert tasks that have or can have deterministic answers
+2. **Generate new tasks programmatically** - Create tasks from existing synthetic data  
+3. **Add new MCP servers** - Introduce new tool domains with backing data
+
+### Approach 1: Converting Original Tasks
+
+The original `progressivemcpbench.json` contains many tasks that can be converted to synthetic tasks.
+
+#### Step 1: Classify Original Tasks
+
+Tasks fall into categories:
+
+| Category | Characteristics | Action |
+|----------|-----------------|--------|
+| **A: Ready to use** | Has `answer`, has `required_servers`, not time-dependent | Add directly |
+| **B: Has `_answer`** | Flagged as flaky but has known answer | May need data freeze |
+| **C: No answer, but deterministic** | E.g., stock analysis, paper lookup | Create synthetic data |
+| **D: Inherently dynamic** | "today's trending", live web automation | Convert to scalar Q&A or skip |
+
+#### Step 2: Add Tasks to Seeds
+
+Create `synthetic_mcp/config/seeds/extra_working_tasks.json`:
+
+```json
+[
+  {
+    "task_id": "unique-id-here",
+    "Question": "What is the closing price of AAPL on 2024-06-15?",
+    "category": "Finance",
+    "file_name": "/root/csv/apple_prices_2024.csv",
+    "answer": "195.87",
+    "scorer_instructions": "Exact match required",
+    "required_servers": ["filesystem"],
+    "required_tools": ["read_file"],
+    "annotator_metadata": {}
+  }
+]
+```
+
+#### Step 3: Regenerate Tasks
 
 ```bash
-# Ensure you're in the repo root with venv activated
-cd /path/to/openbench
-source .venv/bin/activate
-
-# Stage 0: Extract seeds from working tasks
-python synthetic_mcp/generation/step0_extract_seeds.py
-
-# Stage 1: Generate tool schemas with handlers (requires GROQ_API_KEY)
-python synthetic_mcp/generation/step1_generate_schemas.py
-
-# Stage 2: Generate test data files
-python synthetic_mcp/generation/step2_generate_data.py
-
-# Stage 3: Generate task list
+# Regenerate (step0 pulls from progressivemcpbench.json)
 python synthetic_mcp/generation/step3_generate_tasks.py
 
-# Stage 4: Run integration tests
+# Validate
+python synthetic_mcp/generation/step4_validate_all.py
+```
+
+### Approach 2: Programmatic Task Generation
+
+Generate many tasks from existing synthetic data using templates.
+
+#### Task Templates by Handler Type
+
+**Filesystem tasks:**
+```python
+# Template: "Get line N of file X"
+# Template: "From file X, what is the [field] for [entity]?"
+# Template: "In BibTeX file X, what is the title of the first paper?"
+```
+
+**Excel tasks:**
+```python
+# Template: "Read sheet S from workbook W and return [derived scalar]"
+# Example: "What is Alice's BMI from people_data.xlsx?"
+```
+
+**Table lookup tasks:**
+```python
+# Template: "From dataset D, which row satisfies [predicate]?"
+# Example: "Which clinical trial has NCT ID NCT04280705?"
+```
+
+#### Creating a Task Generator
+
+Add `synthetic_mcp/generation/step3b_generate_tasks.py`:
+
+```python
+def generate_csv_lookup_tasks(csv_path: Path, limit: int = 5) -> list[dict]:
+    """Generate tasks that query rows from a CSV file."""
+    import csv
+    tasks = []
+    
+    with open(csv_path) as f:
+        reader = csv.DictReader(f)
+        rows = list(reader)
+    
+    for i, row in enumerate(random.sample(rows, min(limit, len(rows)))):
+        # Pick a random field to query
+        key_field = "Name"  # or detect from schema
+        value_field = random.choice([f for f in row.keys() if f != key_field])
+        
+        tasks.append({
+            "task_id": str(uuid.uuid4()),
+            "Question": f"From {csv_path.name}, what is the {value_field} for {row[key_field]}?",
+            "answer": row[value_field],
+            "required_servers": ["filesystem"],
+            "required_tools": ["read_file"],
+            # ...
+        })
+    
+    return tasks
+```
+
+### Approach 3: Adding New MCP Servers
+
+To add a new synthetic MCP server:
+
+#### Step 1: Define the Server in servers.json
+
+Add to `synthetic_mcp/config/servers.json`:
+
+```json
+{
+  "travel": {
+    "name": "Travel Planning Server",
+    "description": "Static travel data for benchmarking",
+    "tools": [
+      {
+        "name": "get_route_directions",
+        "description": "Get directions between two locations",
+        "handler": {
+          "type": "table_lookup",
+          "table": "travel/routes.json",
+          "key_fields": ["origin", "destination"]
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "origin": {"type": "string"},
+            "destination": {"type": "string"}
+          },
+          "required": ["origin", "destination"]
+        }
+      }
+    ]
+  }
+}
+```
+
+#### Step 2: Create Backing Data
+
+Add data files under `synthetic_mcp/data/`:
+
+```json
+// synthetic_mcp/data/api/travel/routes.json
+[
+  {
+    "origin": "Beijing",
+    "destination": "Shanghai", 
+    "distance_km": 1318,
+    "duration_hours": 4.5,
+    "mode": "high-speed-rail"
+  }
+]
+```
+
+#### Step 3: Add Tasks Using the New Server
+
+```json
+{
+  "task_id": "travel-task-001",
+  "Question": "How long does it take to travel from Beijing to Shanghai by high-speed rail?",
+  "answer": "4.5 hours",
+  "required_servers": ["travel"],
+  "required_tools": ["get_route_directions"]
+}
+```
+
+#### Step 4: Validate
+
+```bash
+python synthetic_mcp/generation/step4_validate_all.py
+```
+
+### Handler Types Reference
+
+| Handler | Purpose | Data Location |
+|---------|---------|---------------|
+| `filesystem` | Read files from synthetic filesystem | `data/files/root/` |
+| `table_lookup` | Query JSON tables | `data/api/` |
+| `excel_reader` | Read Excel files | `data/files/root/**/*.xlsx` |
+| `static_json` | Return fixed JSON responses | Inline in handler |
+| `compute` | Evaluate formulas | Expression in handler |
+
+---
+
+## Tasks vs Epochs
+
+When configuring evaluations, consider the trade-off between task count and epochs:
+
+| Configuration | Tasks | Epochs | Total Runs | Use Case |
+|---------------|-------|--------|------------|----------|
+| Quick smoke test | 20 | 2 | 40 | Development iteration |
+| Standard eval | 50-80 | 3-5 | 150-400 | Regular benchmarking |
+| Full eval | 100+ | 3 | 300+ | Publication-quality |
+
+**Recommendation:** Favor more unique tasks with 3-5 epochs over fewer tasks with many epochs. Diversity of tools and reasoning patterns is more valuable than reducing variance on a small set.
+
+---
+
+## Generation Pipeline
+
+The synthetic data pipeline lives in `synthetic_mcp/generation/`:
+
+```bash
+# Step 0: Extract working tasks from progressivemcpbench.json
+python synthetic_mcp/generation/step0_extract_seeds.py
+
+# Step 1: Generate tool schemas with handlers (requires GROQ_API_KEY)
+python synthetic_mcp/generation/step1_generate_schemas.py
+
+# Step 2: Generate test data files
+python synthetic_mcp/generation/step2_generate_data.py
+
+# Step 3: Generate task list from seeds
+python synthetic_mcp/generation/step3_generate_tasks.py
+
+# Step 4: Validate all tasks work with the HTTP server
 python synthetic_mcp/generation/step4_validate_all.py
 ```
 
@@ -87,192 +318,73 @@ python synthetic_mcp/generation/step4_validate_all.py
 ```
 synthetic_mcp/
 ├── config/
-│   ├── seeds/           # Stage 0 outputs
-│   └── servers.json     # Tool schemas + handlers
+│   ├── seeds/              # Step 0 outputs
+│   │   ├── servers_raw.json
+│   │   └── working_tasks.json
+│   └── servers.json        # Tool schemas + handlers
 ├── data/
-│   ├── files/root/      # Synthetic filesystem
-│   └── api/             # JSON lookup tables
+│   ├── files/root/         # Synthetic filesystem
+│   │   ├── csv/
+│   │   ├── excel/
+│   │   ├── music/
+│   │   ├── pdf/
+│   │   ├── txt/
+│   │   └── word/
+│   └── api/                # JSON lookup tables
 ├── tasks/
 │   └── progressivemcpbench_synthetic.json
 ├── server/
 │   └── http_mcp_server.py
-└── generation/          # Pipeline scripts
+└── generation/             # Pipeline scripts
 ```
 
 ---
 
-ProgressiveMCPBench is a benchmark for evaluating how effectively language models can discover and use Model Context Protocol (MCP) tools. It extends LiveMCPBench by supporting multiple **strategies** for presenting tools to the model, allowing researchers to measure the impact of different tool discovery mechanisms on agent performance.
+## Scoring
 
-## Overview
+Tasks are scored using LLM-as-a-judge with the SimpleQA grader template:
 
-The benchmark tests agents on real-world tasks that require using MCP tools - from file operations to API calls. The key innovation is that you can control *how* tools are presented to the model, ranging from semantic search to filesystem-like exploration to direct tool access.
+| Score | Meaning |
+|-------|---------|
+| 1.0 | Correct answer |
+| 0.5 | Partially correct (fuzzy match) |
+| 0.0 | Incorrect or no answer |
 
-## Live MCP Strategies
+The model must output a JSON object with a `final_answer` field containing the answer.
 
-The following strategies use live MCP servers (requires Node.js and network access):
+---
 
-### 1. Copilot (Semantic Search)
-
-```bash
-bench eval progressivemcpbench --model openai/gpt-4o -T strategy=copilot
-```
-
-The model uses two meta-tools:
-- `route(query)` - Semantic search across all available tools using embeddings
-- `execute-tool(server, tool, params)` - Execute a discovered tool
-
-This simulates an AI assistant with a large library of tools that uses RAG-style retrieval.
-
-### 2. Directory (Filesystem Exploration)
-
-```bash
-bench eval progressivemcpbench --model openai/gpt-4o -T strategy=directory
-```
-
-Tools are presented as a directory structure:
-- `ls(path)` - List available servers or tools within a server
-- `read-tool-file(paths)` - Read tool descriptions (can batch multiple)
-- `execute-tool(tool_path, params)` - Execute a tool by its path
-
-Example exploration:
-```
-ls("/tools")              → "filesystem/\nweather/\ncalendar/..."
-ls("/tools/filesystem")   → "read_file.md\nwrite_file.md\n..."
-read-tool-file("/tools/filesystem/read_file.md")
-execute-tool("/tools/filesystem/read_file.md", {"path": "/root/data.txt"})
-```
-
-### 3. Minimal Servers (Direct Server Access)
-
-```bash
-bench eval progressivemcpbench --model openai/gpt-4o -T strategy=minimal-servers
-```
-
-The model receives all tools from only the server(s) required for each task. No discovery needed - tools are provided directly based on task annotations.
-
-**Requires annotations:** The dataset must include `required_servers` for each task.
-
-### 4. Minimal Tools (Exact Tool Access)
-
-```bash
-bench eval progressivemcpbench --model openai/gpt-4o -T strategy=minimal-tools
-```
-
-The model receives only the exact tools needed for each task. This represents the ideal scenario where tool selection is perfect.
-
-**Requires annotations:** The dataset must include `required_servers` and `required_tools` for each task.
-
-### 5. Distraction-128 (Noise Testing)
-
-```bash
-bench eval progressivemcpbench --model openai/gpt-4o -T strategy=distraction-128
-```
-
-The model receives the required tools plus additional "distractor" tools, padded to exactly 128 tools total. Distractors are selected deterministically based on the task ID, ensuring reproducibility.
-
-**Requires annotations:** The dataset must include `required_servers` for each task.
-
-## Annotating the Dataset
-
-The minimal strategies require annotations about which servers and tools each task needs. Here's the workflow:
-
-### Step 1: Run with copilot or directory strategy
-
-```bash
-bench eval progressivemcpbench --model openai/gpt-4o -T strategy=copilot \
-  --log-dir logs/copilot-run
-```
-
-### Step 2: Extract success annotations
-
-```bash
-python scripts/extract_success_logs.py logs/copilot-run -o annotations.json
-```
-
-This extracts which servers and tools were used in successful task completions.
-
-### Step 3: Apply annotations to dataset
-
-```bash
-python scripts/annotate_dataset.py annotations.json
-```
-
-This adds `required_servers` and `required_tools` fields to each task in the dataset.
-
-### Step 4: Run with minimal strategies
-
-```bash
-bench eval progressivemcpbench --model openai/gpt-4o -T strategy=minimal-servers
-```
-
-## Expected Results
-
-Different strategies should yield different performance characteristics:
-
-| Strategy | Tool Discovery | Distractions | Expected Performance |
-|----------|---------------|--------------|---------------------|
-| synthetic | None | All synthetic tools | Recommended baseline |
-| synthetic-minimal-servers | None | Server-level | Recommended |
-| synthetic-minimal-tools | None | None | Best possible |
-| copilot | Semantic search | All tools via retrieval | Live MCP baseline |
-| directory | Explicit exploration | All tools browsable | Similar to copilot |
-| minimal-servers | None | Server-level | Better than baseline |
-| minimal-tools | None | None | Best possible |
-| distraction-128 | None | 128 total tools | Measures distraction resistance |
-
-## CLI Options
+## CLI Reference
 
 ```bash
 bench eval progressivemcpbench --model <model> -T strategy=<strategy> [options]
 
-# Synthetic strategies (recommended):
--T strategy=synthetic
--T strategy=synthetic-minimal-servers
--T strategy=synthetic-minimal-tools
-
-# Live MCP strategies:
--T strategy=copilot
--T strategy=directory
--T strategy=minimal-servers
--T strategy=minimal-tools
--T strategy=distraction-64
--T strategy=distraction-128
+# Strategy options:
+-T strategy=synthetic                  # All synthetic tools
+-T strategy=synthetic-minimal-servers  # Only required servers
+-T strategy=synthetic-minimal-tools    # Only exact tools
 
 # Common options:
 --limit N          # Run only N tasks
---epochs N         # Run each task N times
+--epochs N         # Run each task N times  
 --epochs-reducer   # How to combine epoch scores (mean, max, etc.)
+--log-dir DIR      # Directory for eval logs
 ```
 
-## Understanding the Benchmark
-
-The core research question ProgressiveMCPBench addresses is: **How does tool discovery mechanism affect agent performance?**
-
-- **Copilot** tests whether semantic search can effectively surface relevant tools
-- **Directory** tests whether explicit browsing is more or less effective than semantic search
-- **Minimal-servers** tests the real-world scenario of attaching the right MCP server
-- **Minimal-tools** establishes an upper bound on performance with perfect tool selection
-- **Distraction-128** tests robustness to irrelevant tools in the context
-
-## Scoring
-
-Tasks are scored using exact and fuzzy string matching against expected answers:
-- **Exact match (1.0)**: Answer matches one of the acceptable answers
-- **Fuzzy match (0.5)**: Answer is similar enough (≥85% similarity)
-- **No match (0.0)**: Answer doesn't match
-
-The model must output a JSON object with a `final_answer` field.
+---
 
 ## Requirements
 
-For synthetic strategies:
+**For synthetic strategies:**
 - Python 3.10+
 - The HTTP MCP server running (`python synthetic_mcp/server/http_mcp_server.py`)
 
-For live MCP strategies:
+**For live MCP strategies:**
 - OPENAI_API_KEY (for embeddings in copilot strategy)
 - Node.js (for running MCP servers)
 - Various MCP server dependencies (automatically managed)
+
+---
 
 ## References
 
