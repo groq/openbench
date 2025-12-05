@@ -11,10 +11,16 @@ Handler types:
 - excel_reader: Read Excel files
 - static_json: Return fixed JSON responses
 - compute: Perform simple computations
+
+Stub logging:
+When a static_json handler returns a stub response (containing "synthetic stub"),
+the call is logged to synthetic_mcp/logs/stub_calls.json for later review.
 """
 
 import csv
 import json
+import threading
+from datetime import datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from typing import Any
@@ -23,6 +29,94 @@ from urllib.parse import urlparse
 # Default paths - can be overridden
 DEFAULT_CONFIG_PATH = Path(__file__).parent.parent / "config" / "servers.json"
 DEFAULT_DATA_PATH = Path(__file__).parent.parent / "data"
+DEFAULT_LOGS_PATH = Path(__file__).parent.parent / "logs"
+
+
+class StubCallLogger:
+    """Thread-safe logger for stub handler calls.
+    
+    Logs each stub call with server name, tool name, and parameters.
+    Aggregates calls so each unique (server, tool) pair appears once
+    with a count and example parameters.
+    """
+    
+    def __init__(self, log_path: Path):
+        self.log_path = log_path
+        self.lock = threading.Lock()
+        self.calls: dict[tuple[str, str], dict] = {}
+        self._load_existing()
+    
+    def _load_existing(self) -> None:
+        """Load existing log file if it exists."""
+        if self.log_path.exists():
+            try:
+                with open(self.log_path, encoding="utf-8") as f:
+                    data = json.load(f)
+                    for entry in data.get("stub_calls", []):
+                        key = (entry["server"], entry["tool"])
+                        self.calls[key] = entry
+            except (json.JSONDecodeError, KeyError):
+                pass
+    
+    def log_call(
+        self,
+        server_name: str,
+        tool_name: str,
+        params: dict,
+        response: Any,
+    ) -> None:
+        """Log a stub handler call."""
+        with self.lock:
+            key = (server_name, tool_name)
+            
+            if key not in self.calls:
+                self.calls[key] = {
+                    "server": server_name,
+                    "tool": tool_name,
+                    "call_count": 0,
+                    "first_seen": datetime.now().isoformat(),
+                    "example_params": [],
+                    "stub_response": response,
+                    "annotation": "",  # For manual review
+                    "handler_override": None,  # For specifying a real handler
+                }
+            
+            entry = self.calls[key]
+            entry["call_count"] += 1
+            entry["last_seen"] = datetime.now().isoformat()
+            
+            # Keep up to 3 example parameter sets
+            if len(entry["example_params"]) < 3 and params not in entry["example_params"]:
+                entry["example_params"].append(params)
+            
+            self._save()
+    
+    def _save(self) -> None:
+        """Save the log to disk."""
+        self.log_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Sort by call count (most called first)
+        sorted_calls = sorted(
+            self.calls.values(),
+            key=lambda x: x["call_count"],
+            reverse=True
+        )
+        
+        data = {
+            "_comment": "Stub handler calls - review and add annotations/handler_override as needed",
+            "_last_updated": datetime.now().isoformat(),
+            "stub_calls": sorted_calls,
+        }
+        
+        with open(self.log_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+    
+    def clear(self) -> None:
+        """Clear all logged calls."""
+        with self.lock:
+            self.calls = {}
+            if self.log_path.exists():
+                self.log_path.unlink()
 
 
 class SyntheticMCPHandler(BaseHTTPRequestHandler):
@@ -32,10 +126,21 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
     data_path: Path = DEFAULT_DATA_PATH
     web_corpus_metadata: dict = {}  # Cached web corpus metadata
     decoy_urls: list = []  # Cached decoy URLs for search results
+    stub_logger: StubCallLogger | None = None  # Optional stub call logger
+    current_server_name: str = ""  # Track current server for logging
 
     def log_message(self, format: str, *args: Any) -> None:
         """Override to reduce logging noise."""
         pass  # Suppress default logging
+
+    def _is_stub_response(self, response: Any) -> bool:
+        """Check if a response is from a stub handler."""
+        if isinstance(response, dict):
+            # Check for stub marker in message field
+            message = response.get("message", "")
+            if isinstance(message, str) and "synthetic stub" in message.lower():
+                return True
+        return False
 
     def send_json_response(self, data: Any, status: int = 200) -> None:
         """Send a JSON response."""
@@ -127,17 +232,35 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
         handler_type = handler.get("type", "static_json")
 
         try:
-            result = self.execute_handler(handler_type, handler, params, tool)
+            result = self.execute_handler(
+                handler_type, handler, params, tool, server_name
+            )
             self.send_json_response({"result": result})
         except Exception as e:
             self.send_error_response(f"Handler error: {e!s}", 500)
 
     def execute_handler(
-        self, handler_type: str, handler: dict, params: dict, tool: dict
+        self,
+        handler_type: str,
+        handler: dict,
+        params: dict,
+        tool: dict,
+        server_name: str = "",
     ) -> Any:
         """Execute a handler based on its type."""
         if handler_type == "static_json":
-            return handler.get("response", {})
+            response = handler.get("response", {})
+            
+            # Check if this is a stub response and log it
+            if self.stub_logger and self._is_stub_response(response):
+                self.stub_logger.log_call(
+                    server_name=server_name,
+                    tool_name=tool.get("name", ""),
+                    params=params,
+                    response=response,
+                )
+            
+            return response
 
         elif handler_type == "compute":
             return self.handle_compute(handler, params)
@@ -682,9 +805,19 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
 def create_server(
     config_path: Path = DEFAULT_CONFIG_PATH,
     data_path: Path = DEFAULT_DATA_PATH,
+    logs_path: Path = DEFAULT_LOGS_PATH,
     port: int = 8765,
+    log_stub_calls: bool = True,
 ) -> HTTPServer:
-    """Create and configure the HTTP server."""
+    """Create and configure the HTTP server.
+    
+    Args:
+        config_path: Path to servers.json configuration
+        data_path: Path to synthetic data directory
+        logs_path: Path to logs directory
+        port: Port to listen on
+        log_stub_calls: If True, log calls to stub handlers for review
+    """
     # Load server configuration
     with open(config_path, encoding="utf-8") as f:
         servers_config = json.load(f)
@@ -692,6 +825,13 @@ def create_server(
     # Configure the handler class
     SyntheticMCPHandler.servers_config = servers_config
     SyntheticMCPHandler.data_path = data_path
+    
+    # Set up stub logging if enabled
+    if log_stub_calls:
+        stub_log_path = logs_path / "stub_calls.json"
+        SyntheticMCPHandler.stub_logger = StubCallLogger(stub_log_path)
+    else:
+        SyntheticMCPHandler.stub_logger = None
 
     server = HTTPServer(("", port), SyntheticMCPHandler)
     return server
@@ -709,14 +849,30 @@ def main():
     parser.add_argument(
         "--data", type=Path, default=DEFAULT_DATA_PATH, help="Path to data directory"
     )
+    parser.add_argument(
+        "--logs", type=Path, default=DEFAULT_LOGS_PATH, help="Path to logs directory"
+    )
+    parser.add_argument(
+        "--no-stub-logging",
+        action="store_true",
+        help="Disable logging of stub handler calls",
+    )
     args = parser.parse_args()
 
-    server = create_server(config_path=args.config, data_path=args.data, port=args.port)
+    server = create_server(
+        config_path=args.config,
+        data_path=args.data,
+        logs_path=args.logs,
+        port=args.port,
+        log_stub_calls=not args.no_stub_logging,
+    )
 
     print(f"Synthetic MCP Server starting on port {args.port}")
     print(f"Config: {args.config}")
     print(f"Data: {args.data}")
     print(f"Servers: {list(SyntheticMCPHandler.servers_config.keys())}")
+    if not args.no_stub_logging:
+        print(f"Stub call logging: {args.logs / 'stub_calls.json'}")
 
     try:
         server.serve_forever()
