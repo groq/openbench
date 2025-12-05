@@ -307,7 +307,7 @@ The synthetic data pipeline lives in `synthetic_mcp/generation/`:
 # Step 0: Extract working tasks from progressivemcpbench.json
 python synthetic_mcp/generation/step0_extract_seeds.py
 
-# Step 1: Generate tool schemas with handlers (requires GROQ_API_KEY)
+# Step 1: Generate tool schemas with handlers (optional GROQ_API_KEY for new tools)
 python synthetic_mcp/generation/step1_generate_schemas.py
 
 # Step 2: Generate test data files
@@ -318,7 +318,34 @@ python synthetic_mcp/generation/step3_generate_tasks.py
 
 # Step 4: Validate all tasks work with the HTTP server
 python synthetic_mcp/generation/step4_validate_all.py
+
+# Step 5: Apply handler overrides from stub call annotations (see below)
+python synthetic_mcp/generation/step5_apply_annotations.py
 ```
+
+### Stub Call Logging & Iteration
+
+When running evaluations, the HTTP server logs all calls to stub handlers (tools without real implementations) to `synthetic_mcp/logs/stub_calls.json`. This enables an iterative workflow:
+
+1. **Run evaluation** with `minimal-servers` strategy
+2. **Review stub_calls.json** to see which tools were actually called
+3. **Annotate entries** with what the tool should return:
+   ```json
+   {
+     "server": "word-document-server",
+     "tool": "get_document_info",
+     "call_count": 5,
+     "annotation": "Return document metadata like page count, author",
+     "handler_override": {
+       "type": "static_json",
+       "response": {"pages": 10, "author": "Unknown", "title": "Document"}
+     }
+   }
+   ```
+4. **Run step5** to apply overrides to servers.json
+5. **Re-run evaluation** to verify improvements
+
+This allows incremental development of tool handlers based on actual model usage patterns.
 
 ### Directory Structure
 
@@ -338,6 +365,8 @@ synthetic_mcp/
 │   │   ├── txt/
 │   │   └── word/
 │   └── api/                # JSON lookup tables
+├── logs/
+│   └── stub_calls.json     # Logged stub handler calls (gitignored)
 ├── tasks/
 │   └── progressivemcpbench_synthetic.json
 ├── server/
