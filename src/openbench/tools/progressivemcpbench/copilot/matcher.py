@@ -49,6 +49,8 @@ class ToolMatcher:
         self.openai_client = OpenAI(
             base_url=base_url,
             api_key=api_key,
+            max_retries=2,  # Limit built-in retries to prevent hanging on rate limits
+            timeout=30.0,  # Set a global timeout
         )
 
     def extract_tool_assistant(self, text: str) -> Tuple[Optional[str], Optional[str]]:
@@ -67,17 +69,21 @@ class ToolMatcher:
 
         for attempt in range(max_retries):
             try:
-                time.sleep(0.05)
+                time.sleep(0.1)  # Small delay to help with rate limiting
                 response = self.openai_client.embeddings.create(
                     input=[text],
                     model=self.embedding_model,
                     # dimensions=self.dimensions,
                     encoding_format="float",
+                    timeout=10.0,  # Add timeout to prevent hanging
                 )
                 return response.data[0].embedding
-            except Exception:
+            except Exception as e:
+                error_str = str(e).lower()
+                is_rate_limit = "rate" in error_str or "429" in error_str
                 if attempt < max_retries - 1:
-                    wait_time = 2**attempt
+                    # Longer backoff for rate limits
+                    wait_time = (2**attempt) * (2 if is_rate_limit else 1)
                     time.sleep(wait_time)
                 else:
                     return None
@@ -97,7 +103,10 @@ class ToolMatcher:
             raise ValueError("No server data loaded. Call load_data first.")
         query_embedding = self.get_embedding(server_desc)
         if not query_embedding:
-            raise ValueError("Failed to get embedding for server description")
+            raise ValueError(
+                "Failed to get embedding for server description. "
+                "This may be due to rate limiting. Check your OPENAI_API_KEY quota."
+            )
         server_scores: List[Dict[str, Any]] = []
         for server in self.servers_data:
             if "description_embedding" not in server:
@@ -122,7 +131,10 @@ class ToolMatcher:
     ) -> List[Dict[str, Any]]:
         query_embedding = self.get_embedding(tool_desc)
         if not query_embedding:
-            raise ValueError("Failed to get embedding for tool description")
+            raise ValueError(
+                "Failed to get embedding for tool description. "
+                "This may be due to rate limiting. Check your OPENAI_API_KEY quota."
+            )
         tool_scores = []
         for server_info in server_list:
             server = server_info["server"]
