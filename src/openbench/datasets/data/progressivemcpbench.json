@@ -1204,12 +1204,14 @@
     "file_name": "",
     "Annotator Metadata": {
       "Number of steps": "2",
-      "Number of tools": "1",
-      "Steps": "1. get the comments in story 44490510 \n2. summarize the comments",
-      "Tools": "1. getStoryWithComments"
+      "Number of tools": "2",
+      "Steps": "1. Search for the HN story URL\n2. Fetch the page and find the top comment username",
+      "Tools": "1. search_urls\n2. playwright_get_visible_html"
     },
-    "_answer": "osigurdson",
-    "scorer_instructions": null
+    "answer": "osigurdson",
+    "scorer_instructions": null,
+    "required_servers": ["url-search", "playwright"],
+    "required_tools": ["search_urls", "playwright_get_visible_html"]
   },
   {
     "task_id": "95369c49-8037-46f9-9099-8c336d03559f",
@@ -1218,12 +1220,14 @@
     "file_name": "",
     "Annotator Metadata": {
       "Number of steps": "2",
-      "Number of tools": "1",
-      "Steps": "1. get the comments in story 45973709 \n2. summarize the comments",
-      "Tools": "1. getStoryWithComments"
+      "Number of tools": "2",
+      "Steps": "1. Search for the HN story URL\n2. Fetch the page and find the top comment username",
+      "Tools": "1. search_urls\n2. playwright_get_visible_html"
     },
-    "_answer": "gucci-on-fleek",
-    "scorer_instructions": null
+    "answer": "gucci-on-fleek",
+    "scorer_instructions": null,
+    "required_servers": ["url-search", "playwright"],
+    "required_tools": ["search_urls", "playwright_get_visible_html"]
   },
   {
     "task_id": "f697107c-8004-452c-9b5c-98573f95193a",
@@ -1232,12 +1236,14 @@
     "file_name": "",
     "Annotator Metadata": {
       "Number of steps": "2",
-      "Number of tools": "1",
-      "Steps": "1. get the comments in story 44490510 \n2. summarize the comments",
-      "Tools": "1. getStoryWithComments"
+      "Number of tools": "2",
+      "Steps": "1. Search for the HN story URL\n2. Fetch the page and find the top reply to the top comment",
+      "Tools": "1. search_urls\n2. playwright_get_visible_html"
     },
-    "_answer": "cpursley",
-    "scorer_instructions": null
+    "answer": "cpursley",
+    "scorer_instructions": null,
+    "required_servers": ["url-search", "playwright"],
+    "required_tools": ["search_urls", "playwright_get_visible_html"]
   },
   {
     "task_id": "68407846-9583-405c-a539-6936635d236d",
@@ -1246,12 +1252,14 @@
     "file_name": "",
     "Annotator Metadata": {
       "Number of steps": "2",
-      "Number of tools": "1",
-      "Steps": "1. get the comments in story 45973709 \n2. summarize the comments",
-      "Tools": "1. getStoryWithComments"
+      "Number of tools": "2",
+      "Steps": "1. Search for the HN story URL\n2. Fetch the page and find the top reply to the top comment",
+      "Tools": "1. search_urls\n2. playwright_get_visible_html"
     },
-    "_answer": "eastdakota",
-    "scorer_instructions": null
+    "answer": "eastdakota",
+    "scorer_instructions": null,
+    "required_servers": ["url-search", "playwright"],
+    "required_tools": ["search_urls", "playwright_get_visible_html"]
   },
   {
     "task_id": "d1ea5598-27d2-4a21-ae9d-be30ec099ee3",
@@ -1287,13 +1295,15 @@
     "category": "Lifestyle",
     "file_name": "",
     "Annotator Metadata": {
-      "Number of steps": "3",
+      "Number of steps": "2",
       "Number of tools": "2",
-      "Steps": "1. get the article\n2. summary the article\n3. write it to path",
-      "Tools": "1. get_article\n2. write_file"
+      "Steps": "1. Search for the Wikipedia article URL\n2. Fetch the page and extract the height",
+      "Tools": "1. search_urls\n2. playwright_get_visible_html"
     },
-    "_answer": "6723 metres",
-    "scorer_instructions": "Tolerate 1% error."
+    "answer": "6723 metres",
+    "scorer_instructions": "Tolerate 1% error.",
+    "required_servers": ["url-search", "playwright"],
+    "required_tools": ["search_urls", "playwright_get_visible_html"]
   },
   {
     "task_id": "49cdaab7-39f0-4556-a3bb-7bd523916b32",
