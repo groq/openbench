@@ -88,7 +88,7 @@
   },
   {
     "task_id": "4aa079dd-9d2d-440d-a654-9ba9cb3868b0",
-    "Question": "Read the paper webarena, mind2web and mind2web2, then give me the last names of the first listed author of each paper.",
+    "Question": "Read the arxiv papers webarena, mind2web and mind2web2, then give me the last names of the first listed author of each paper.",
     "category": "Office",
     "file_name": "",
     "answer": "Deng, Gou, Zhou",
