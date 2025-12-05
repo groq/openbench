@@ -395,7 +395,11 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
             return "\n".join(entries)
 
         elif tool_name == "read_pdf":
-            # Handle PDF reading - return metadata from our API data
+            try:
+                from pypdf import PdfReader
+            except ImportError:
+                return [{"error": "pypdf library is not installed"}]
+
             sources = params.get("sources", [])
             results = []
 
@@ -407,25 +411,52 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
                 if not path.startswith("/root"):
                     path = f"/root/{path}"
 
-                if path in pdf_metadata:
-                    meta = pdf_metadata[path]
-                    # Check if metadata is empty or invalid
-                    if not meta or not isinstance(meta, dict) or not meta.get("title"):
-                        results.append(
-                            {"path": path, "error": "PDF not found in metadata"}
-                        )
-                    else:
-                        results.append(
-                            {
-                                "path": path,
-                                "metadata": meta,
-                                "page_count": meta.get("page_count", 0),
-                                "text": f"[PDF Content] Title: {meta.get('title', 'Unknown')}\nAuthors: {', '.join(meta.get('authors', []))}",
-                            }
-                        )
+                # Convert /root path to actual file path
+                if path.startswith("/root/"):
+                    rel_path = path[6:]
+                elif path.startswith("/root"):
+                    rel_path = path[5:] if len(path) > 5 else ""
                 else:
-                    # Generic response for unknown PDFs
-                    results.append({"path": path, "error": "PDF not found in metadata"})
+                    rel_path = path
+
+                actual_path = files_root / rel_path
+
+                if not actual_path.exists():
+                    results.append({"path": path, "error": f"PDF not found: {path}"})
+                    continue
+
+                try:
+                    reader = PdfReader(actual_path)
+                    page_count = len(reader.pages)
+
+                    # Extract text from all pages
+                    text_parts = []
+                    for i, page in enumerate(reader.pages):
+                        page_text = page.extract_text()
+                        if page_text:
+                            text_parts.append(f"--- Page {i + 1} ---\n{page_text}")
+
+                    full_text = "\n\n".join(text_parts)
+
+                    # Get metadata from PDF or fallback to our metadata file
+                    meta = pdf_metadata.get(path, {})
+                    pdf_info = reader.metadata
+                    if pdf_info:
+                        if not meta.get("title") and pdf_info.title:
+                            meta["title"] = pdf_info.title
+                        if not meta.get("authors") and pdf_info.author:
+                            meta["authors"] = [pdf_info.author]
+
+                    results.append(
+                        {
+                            "path": path,
+                            "metadata": meta,
+                            "page_count": page_count,
+                            "text": full_text,
+                        }
+                    )
+                except Exception as e:
+                    results.append({"path": path, "error": f"Error reading PDF: {e}"})
 
             return results
 
@@ -434,14 +465,26 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
 
     def read_docx(self, path: Path) -> str:
         """Extract text from a Word document."""
-        # For simplicity, check if we have pre-computed content
-        # In production, would use python-docx
-        filename = path.name.lower()
+        try:
+            from docx import Document
+        except ImportError:
+            return "[Error: python-docx library is not installed. Install with: pip install python-docx]"
 
-        if "exchange" in filename:
-            return "Everyone gave a gift."
+        doc = Document(path)
+        content_parts = []
 
-        return f"[DOCX content from {path.name}]"
+        for paragraph in doc.paragraphs:
+            text = paragraph.text.strip()
+            if text:
+                content_parts.append(text)
+
+        for table in doc.tables:
+            for row in table.rows:
+                row_text = " | ".join(cell.text.strip() for cell in row.cells)
+                if row_text.replace("|", "").strip():
+                    content_parts.append(row_text)
+
+        return "\n".join(content_parts)
 
     def read_csv(self, path: Path) -> list[dict]:
         """Read a CSV file and return as list of dicts."""
