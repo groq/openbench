@@ -31,6 +31,7 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
 
     servers_config: dict = {}
     data_path: Path = DEFAULT_DATA_PATH
+    web_corpus_metadata: dict = {}  # Cached web corpus metadata
 
     def log_message(self, format: str, *args: Any) -> None:
         """Override to reduce logging noise."""
@@ -136,6 +137,12 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
 
         elif handler_type == "excel_reader":
             return self.handle_excel_reader(handler, params, tool)
+
+        elif handler_type == "web_corpus":
+            return self.handle_web_corpus(handler, params, tool)
+
+        elif handler_type == "url_search":
+            return self.handle_url_search(handler, params, tool)
 
         else:
             raise ValueError(f"Unknown handler type: {handler_type}")
@@ -390,6 +397,166 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
             return {"data": rows, "row_count": len(rows)}
 
         return {"error": f"Unknown Excel tool: {tool_name}"}
+
+    def get_web_corpus_metadata(self) -> dict:
+        """Load and cache web corpus metadata."""
+        if not self.web_corpus_metadata:
+            metadata_path = self.data_path / "web" / "metadata.json"
+            if metadata_path.exists():
+                with open(metadata_path, encoding="utf-8") as f:
+                    data = json.load(f)
+                    # Filter out schema/comment fields
+                    self.web_corpus_metadata = {
+                        k: v for k, v in data.items() if not k.startswith("_")
+                    }
+        return self.web_corpus_metadata
+
+    def get_web_search_index(self) -> list:
+        """Load web search index."""
+        index_path = self.data_path / "web" / "search_index.json"
+        if index_path.exists():
+            with open(index_path, encoding="utf-8") as f:
+                data = json.load(f)
+                return data.get("entries", [])
+        return []
+
+    def handle_web_corpus(self, handler: dict, params: dict, tool: dict) -> Any:
+        """Handle web corpus operations (Playwright-like fetch)."""
+        operation = handler.get("operation", "get_visible_html")
+        url = params.get("url", "")
+
+        if not url:
+            return {"error": "URL parameter is required", "status": 400}
+
+        # Load corpus metadata
+        metadata = self.get_web_corpus_metadata()
+
+        if operation == "navigate":
+            # Check if URL exists in corpus
+            if url in metadata:
+                entry = metadata[url]
+                return {
+                    "page_id": entry.get("id", "unknown"),
+                    "url": url,
+                    "title": entry.get("title", ""),
+                    "success": True,
+                }
+            else:
+                return {
+                    "error": "URL not found in synthetic web corpus",
+                    "status": 404,
+                    "url": url,
+                }
+
+        elif operation == "get_visible_html":
+            if url not in metadata:
+                return {
+                    "error": "URL not found in synthetic web corpus",
+                    "status": 404,
+                    "url": url,
+                }
+
+            entry = metadata[url]
+            html_path = entry.get("html_path", "")
+            if not html_path:
+                return {"error": "No HTML path configured for URL", "status": 500, "url": url}
+
+            # Load HTML content
+            full_html_path = self.data_path / html_path
+            if not full_html_path.exists():
+                return {"error": "HTML file not found", "status": 500, "url": url}
+
+            with open(full_html_path, encoding="utf-8", errors="replace") as f:
+                html_content = f.read()
+
+            return {
+                "url": url,
+                "html": html_content,
+                "title": entry.get("title", ""),
+            }
+
+        elif operation == "screenshot":
+            # For screenshot, just return metadata about what would be captured
+            if url not in metadata:
+                return {
+                    "error": "URL not found in synthetic web corpus",
+                    "status": 404,
+                    "url": url,
+                }
+            entry = metadata[url]
+            return {
+                "url": url,
+                "title": entry.get("title", ""),
+                "screenshot": "[Screenshot of page - see HTML content for actual data]",
+            }
+
+        else:
+            return {"error": f"Unknown web_corpus operation: {operation}", "status": 400}
+
+    def handle_url_search(self, handler: dict, params: dict, tool: dict) -> Any:
+        """Handle URL search operations.
+
+        This performs a simple keyword-based search over the web corpus.
+        For more sophisticated search, an external LLM can be integrated.
+        """
+        query = params.get("query", "")
+        max_results = params.get("max_results", 5)
+
+        if not query:
+            return {"error": "Query parameter is required", "results": []}
+
+        # Load search index
+        search_index = self.get_web_search_index()
+        metadata = self.get_web_corpus_metadata()
+
+        # Simple keyword matching
+        query_lower = query.lower()
+        query_terms = query_lower.split()
+
+        scored_results = []
+        for entry in search_index:
+            score = 0
+            searchable_text = " ".join(
+                [
+                    entry.get("title", ""),
+                    entry.get("short_description", ""),
+                    " ".join(entry.get("tags", [])),
+                    " ".join(entry.get("example_queries", [])),
+                ]
+            ).lower()
+
+            # Score based on term matches
+            for term in query_terms:
+                if term in searchable_text:
+                    score += 1
+                # Bonus for exact phrase match
+                if query_lower in searchable_text:
+                    score += 2
+
+            if score > 0:
+                scored_results.append((score, entry))
+
+        # Sort by score descending
+        scored_results.sort(key=lambda x: x[0], reverse=True)
+
+        # Build results
+        results = []
+        for score, entry in scored_results[:max_results]:
+            url = entry.get("url", "")
+            results.append(
+                {
+                    "id": entry.get("id", ""),
+                    "url": url,
+                    "title": entry.get("title", ""),
+                    "description": entry.get("short_description", ""),
+                }
+            )
+
+        return {
+            "query": query,
+            "results": results,
+            "total_found": len(scored_results),
+        }
 
     def load_api_data(self, dataset_path: str) -> dict:
         """Load a JSON dataset from the API data directory."""
