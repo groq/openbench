@@ -1,46 +1,50 @@
 {
-  "total_tasks": 13,
+  "total_tasks": 18,
   "servers_used": [
-    "arxiv-mcp-server",
-    "searxng",
-    "word-document-server",
     "excel",
-    "maven-deps-server",
     "biomcp",
-    "filesystem",
+    "music-analysis",
+    "playwright",
     "mcp-simple-arxiv",
+    "url-search",
+    "word-document-server",
+    "arxiv-mcp-server",
+    "filesystem",
+    "maven-deps-server",
     "pdf-reader-mcp",
-    "music-analysis"
+    "searxng"
   ],
   "tools_used": [
-    "get_duration",
-    "load",
+    "search_papers",
     "list_directory",
+    "docx_to_html",
+    "get_duration",
+    "playwright_get_visible_html",
+    "excel_describe_sheets",
+    "excel_read",
+    "excel_read_sheet",
+    "get_latest_release",
+    "read_pdf",
+    "beat_track",
     "get_paper_data",
     "read_file",
-    "get_document_text",
-    "beat_track",
-    "docx_to_html",
-    "list_allowed_directories",
-    "trial_protocol_getter",
-    "excel_read_sheet",
-    "search_papers",
-    "excel_describe_sheets",
-    "read_multiple_files",
-    "tempo",
-    "read_pdf",
+    "load",
     "document_reader",
-    "excel_read",
-    "get_latest_release"
+    "tempo",
+    "get_document_text",
+    "trial_protocol_getter",
+    "read_multiple_files",
+    "list_allowed_directories",
+    "search_urls"
   ],
   "categories": [
     "Office",
-    "Leisure",
-    "Lifestyle"
+    "Lifestyle",
+    "Leisure"
   ],
   "tasks_by_category": {
     "Leisure": 2,
     "Office": 9,
-    "Lifestyle": 2
+    "Lifestyle": 7
   }
 }

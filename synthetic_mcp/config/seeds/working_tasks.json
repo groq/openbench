@@ -275,5 +275,115 @@
       "Steps": "1. Compare two text files and show differences\n2. Find different lines which contain 'ERROR'",
       "Tools": "1. text_diff"
     }
+  },
+  {
+    "task_id": "84326f9f-d4b7-4dc8-b9e0-3c8868a3f79f",
+    "Question": "Read the comments on hacker news story 44490510. Return the username of the top comment.",
+    "category": "Lifestyle",
+    "file_name": "",
+    "answer": "osigurdson",
+    "scorer_instructions": null,
+    "required_servers": [
+      "url-search",
+      "playwright"
+    ],
+    "required_tools": [
+      "search_urls",
+      "playwright_get_visible_html"
+    ],
+    "annotator_metadata": {
+      "Number of steps": "2",
+      "Number of tools": "2",
+      "Steps": "1. Search for the HN story URL\n2. Fetch the page and find the top comment username",
+      "Tools": "1. search_urls\n2. playwright_get_visible_html"
+    }
+  },
+  {
+    "task_id": "95369c49-8037-46f9-9099-8c336d03559f",
+    "Question": "Read the comments on hacker news story 45973709. Return the username of the top comment.",
+    "category": "Lifestyle",
+    "file_name": "",
+    "answer": "gucci-on-fleek",
+    "scorer_instructions": null,
+    "required_servers": [
+      "url-search",
+      "playwright"
+    ],
+    "required_tools": [
+      "search_urls",
+      "playwright_get_visible_html"
+    ],
+    "annotator_metadata": {
+      "Number of steps": "2",
+      "Number of tools": "2",
+      "Steps": "1. Search for the HN story URL\n2. Fetch the page and find the top comment username",
+      "Tools": "1. search_urls\n2. playwright_get_visible_html"
+    }
+  },
+  {
+    "task_id": "f697107c-8004-452c-9b5c-98573f95193a",
+    "Question": "Read the comments on hacker news story 44490510. Return the username of the top reply to the top comment.",
+    "category": "Lifestyle",
+    "file_name": "",
+    "answer": "cpursley",
+    "scorer_instructions": null,
+    "required_servers": [
+      "url-search",
+      "playwright"
+    ],
+    "required_tools": [
+      "search_urls",
+      "playwright_get_visible_html"
+    ],
+    "annotator_metadata": {
+      "Number of steps": "2",
+      "Number of tools": "2",
+      "Steps": "1. Search for the HN story URL\n2. Fetch the page and find the top reply to the top comment",
+      "Tools": "1. search_urls\n2. playwright_get_visible_html"
+    }
+  },
+  {
+    "task_id": "68407846-9583-405c-a539-6936635d236d",
+    "Question": "Read the comments on hacker news story 45973709. Return the username of the top reply to the top comment.",
+    "category": "Lifestyle",
+    "file_name": "",
+    "answer": "eastdakota",
+    "scorer_instructions": null,
+    "required_servers": [
+      "url-search",
+      "playwright"
+    ],
+    "required_tools": [
+      "search_urls",
+      "playwright_get_visible_html"
+    ],
+    "annotator_metadata": {
+      "Number of steps": "2",
+      "Number of tools": "2",
+      "Steps": "1. Search for the HN story URL\n2. Fetch the page and find the top reply to the top comment",
+      "Tools": "1. search_urls\n2. playwright_get_visible_html"
+    }
+  },
+  {
+    "task_id": "665e1166-1062-444f-81e3-df207d0f975b",
+    "Question": "Read the Wikipedia article on Llullaillaco, then return its height to the nearest metre.",
+    "category": "Lifestyle",
+    "file_name": "",
+    "answer": "6723 metres",
+    "scorer_instructions": "Tolerate 1% error.",
+    "required_servers": [
+      "url-search",
+      "playwright"
+    ],
+    "required_tools": [
+      "search_urls",
+      "playwright_get_visible_html"
+    ],
+    "annotator_metadata": {
+      "Number of steps": "2",
+      "Number of tools": "2",
+      "Steps": "1. Search for the Wikipedia article URL\n2. Fetch the page and extract the height",
+      "Tools": "1. search_urls\n2. playwright_get_visible_html"
+    }
   }
 ]
