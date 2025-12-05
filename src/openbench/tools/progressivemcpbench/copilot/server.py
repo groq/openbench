@@ -13,13 +13,14 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 import asyncio
+import json
 import logging
 import os
 
 import mcp.types as types
 from mcp.server.fastmcp import Context, FastMCP
 
-from .router import Router, dump_to_yaml
+from .router import Router
 
 # Reuse OpenBench arg generator to build per-server embeddings
 from .arg_generation import McpArgGenerator
@@ -189,7 +190,7 @@ This is a tool used to find MCP servers and tools that can solve user needs
         try:
             result = await router.route(query)
             return types.CallToolResult(
-                content=[types.TextContent(type="text", text=dump_to_yaml(result))]
+                content=[types.TextContent(type="text", text=json.dumps(result))]
             )
         except Exception as e:
             error_msg = f"Error routing query: {str(e)}"

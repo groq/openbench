@@ -94,18 +94,16 @@ class SyntheticMcpArgGenerator:
         self, text: str, model: str = embedding_model
     ) -> list[float]:
         if not text:
-            logger.warning("Empty text provided for embedding, returning empty list.")
-            return []
-        try:
-            response = await self.embedding_client.embeddings.create(
-                model=model,
-                input=[text],
-                encoding_format="float",
-            )
-            return response.data[0].embedding
-        except Exception as e:
-            logger.error(f"Embedding Error: {e}")
-            return []
+            raise ValueError("Empty text provided for embedding generation")
+        response = await self.embedding_client.embeddings.create(
+            model=model,
+            input=[text],
+            encoding_format="float",
+        )
+        embedding = response.data[0].embedding
+        if not embedding or len(embedding) == 0:
+            raise ValueError(f"Empty embedding returned for text: {text[:100]}...")
+        return embedding
 
     async def _generate_summary(
         self,
@@ -217,60 +215,54 @@ class SyntheticMcpArgGenerator:
 
             logger.info(f"Indexing server: {server_name}")
 
-            try:
-                # Generate summary
-                server_summary = await self._generate_summary(
-                    server_name, server_description, tools
+            # Generate summary
+            server_summary = await self._generate_summary(
+                server_name, server_description, tools
+            )
+
+            # Generate embeddings in parallel
+            embedding_tasks = {
+                "server_desc": self._get_embedding(server_description),
+                "server_summary": self._get_embedding(server_summary),
+            }
+            for i, tool in enumerate(tools):
+                if not tool.description:
+                    raise ValueError(
+                        f"Tool '{tool.name}' in server '{server_name}' has no description"
+                    )
+                embedding_tasks[f"tool_{i}"] = self._get_embedding(tool.description)
+
+            embeddings_results = await asyncio.gather(*embedding_tasks.values())
+            embeddings = dict(zip(embedding_tasks.keys(), embeddings_results))
+
+            # Format tools
+            formatted_tools = []
+            for i, tool in enumerate(tools):
+                formatted_tools.append(
+                    {
+                        "name": tool.name,
+                        "description": tool.description,
+                        "description_embedding": embeddings[f"tool_{i}"],
+                        "parameter": self._format_tool_parameters(tool),
+                    }
                 )
 
-                # Generate embeddings in parallel
-                embedding_tasks = {
-                    "server_desc": self._get_embedding(server_description),
-                    "server_summary": self._get_embedding(server_summary),
-                }
-                for i, tool in enumerate(tools):
-                    embedding_tasks[f"tool_{i}"] = self._get_embedding(
-                        tool.description or ""
-                    )
+            server_output = {
+                "server_name": server_name,
+                "server_summary": server_summary,
+                "server_description": server_description,
+                "description_embedding": embeddings["server_desc"],
+                "summary_embedding": embeddings["server_summary"],
+                "tools": formatted_tools,
+            }
 
-                embeddings_results = await asyncio.gather(*embedding_tasks.values())
-                embeddings = dict(zip(embedding_tasks.keys(), embeddings_results))
+            all_servers_info.append(server_output)
 
-                # Format tools
-                formatted_tools = []
-                for i, tool in enumerate(tools):
-                    formatted_tools.append(
-                        {
-                            "name": tool.name,
-                            "description": tool.description,
-                            "description_embedding": embeddings.get(f"tool_{i}", []),
-                            "parameter": self._format_tool_parameters(tool),
-                        }
-                    )
-
-                server_output = {
-                    "server_name": server_name,
-                    "server_summary": server_summary,
-                    "server_description": server_description,
-                    "description_embedding": embeddings.get("server_desc", []),
-                    "summary_embedding": embeddings.get("server_summary", []),
-                    "tools": formatted_tools,
-                }
-
-                all_servers_info.append(server_output)
-
-                # Write incrementally
-                try:
-                    self.output_file.parent.mkdir(parents=True, exist_ok=True)
-                    with open(self.output_file, "w", encoding="utf-8") as f:
-                        json.dump(all_servers_info, f, indent=2, ensure_ascii=False)
-                    new_servers_processed_count += 1
-                except IOError as e:
-                    logger.error(f"Error writing to output file: {e}")
-
-            except Exception as e:
-                logger.error(f"Error processing server '{server_name}': {e}")
-                continue
+            # Write incrementally
+            self.output_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(self.output_file, "w", encoding="utf-8") as f:
+                json.dump(all_servers_info, f, indent=2, ensure_ascii=False)
+            new_servers_processed_count += 1
 
         logger.info("Indexing completed.")
         if new_servers_processed_count > 0:

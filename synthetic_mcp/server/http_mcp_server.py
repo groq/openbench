@@ -881,6 +881,12 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
                 }
             )
 
+        if not results:
+            return {
+                "error": "Search service is temporarily unavailable. Please try again later.",
+                "query": query,
+            }
+
         return {
             "query": query,
             "results": results,
