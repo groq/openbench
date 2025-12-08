@@ -69,6 +69,10 @@ class TaskResult:
     strategy: str
     category: str | None
 
+    # Additional fields for deeper error analysis
+    message_count: int = 0
+    tool_errors: list[str] | None = None
+
     # Assigned by categorizer
     result_category: str = "UNKNOWN"
 
@@ -87,6 +91,21 @@ def extract_last_assistant_message(messages: list[dict]) -> str | None:
     return None
 
 
+def extract_tool_errors(messages: list[dict]) -> list[str]:
+    """Extract error messages from tool response messages."""
+    errors = []
+    for msg in messages:
+        if msg.get("role") == "tool":
+            error = msg.get("error")
+            if error:
+                if isinstance(error, dict):
+                    err_msg = error.get("message", str(error))
+                else:
+                    err_msg = str(error)
+                errors.append(err_msg)
+    return errors
+
+
 def parse_sample(sample: dict, eval_file: str, model: str, strategy: str) -> TaskResult:
     """Parse a sample into a TaskResult."""
     score_data = sample.get("scores", {}).get("progressivemcpbench_scorer", {})
@@ -95,6 +114,7 @@ def parse_sample(sample: dict, eval_file: str, model: str, strategy: str) -> Tas
 
     messages = sample.get("messages", [])
     last_msg = extract_last_assistant_message(messages)
+    tool_errors = extract_tool_errors(messages)
 
     error = sample.get("error")
     error_str = str(error) if error else None
@@ -115,6 +135,8 @@ def parse_sample(sample: dict, eval_file: str, model: str, strategy: str) -> Tas
         model=model,
         strategy=strategy,
         category=dmeta.get("category"),
+        message_count=len(messages),
+        tool_errors=tool_errors if tool_errors else None,
     )
 
 
@@ -134,6 +156,10 @@ def categorize_result(result: TaskResult) -> str:
 
     if result.grade == "incorrect":
         return "INCORRECT"
+
+    # Check for samples that never started (0 messages)
+    if result.message_count == 0:
+        return "NEVER_STARTED"
 
     # Check last assistant message for specific patterns first
     last_msg = result.last_assistant_message or ""
@@ -165,7 +191,7 @@ def categorize_result(result: TaskResult) -> str:
     if "reduce the length" in last_msg_lower or "please reduce" in last_msg_lower:
         return "API_ERROR_TOO_LONG"
 
-    # Check error message patterns
+    # Check error message patterns (from metadata)
     err_msg = result.error_message or ""
     err_msg_lower = err_msg.lower()
 
@@ -191,8 +217,16 @@ def categorize_result(result: TaskResult) -> str:
     if "badrequesterror" in err_msg_lower and "invalid schema" in err_msg_lower:
         return "SCHEMA_ERROR"
 
-    # Tool validation errors
+    # Tool validation errors from metadata error_message
     if "tool call validation failed" in err_msg_lower:
+        # More specific categorization
+        if (
+            "attempted to call tool" in err_msg_lower
+            and "not in request.tools" in err_msg_lower
+        ):
+            return "TOOL_NOT_AVAILABLE"
+        if "parameters for tool" in err_msg_lower:
+            return "TOOL_PARAM_VALIDATION_ERROR"
         return "TOOL_VALIDATION_ERROR"
 
     if "description not provided for parameter" in err_msg_lower:
@@ -204,11 +238,19 @@ def categorize_result(result: TaskResult) -> str:
     if "failed to call a function" in err_msg_lower:
         return "TOOL_CALL_FAILED"
 
-    # Parsing errors
+    # Parsing errors from metadata
+    if "parsing failed" in err_msg_lower:
+        return "PARSING_ERROR"
+
+    # Check for execution_error types
     if result.execution_error == "runtime_error":
-        if "parsing failed" in err_msg_lower:
-            return "PARSING_ERROR"
-        return "RUNTIME_ERROR"
+        # Check for more specific patterns in error_message
+        if err_msg:
+            return "RUNTIME_ERROR"
+        # Fall through to check tool errors
+
+    if result.execution_error == "missing_annotation":
+        return "MISSING_ANNOTATION"
 
     # Sample-level errors (e.g., JSONSchema validation)
     if result.sample_error:
@@ -216,6 +258,24 @@ def categorize_result(result: TaskResult) -> str:
             return "SCHEMA_ERROR"
         if "validation error" in result.sample_error.lower():
             return "VALIDATION_ERROR"
+
+    # Check tool errors from message history
+    if result.tool_errors:
+        tool_err_str = " ".join(result.tool_errors).lower()
+        if "server not found" in tool_err_str:
+            return "TOOL_SERVER_NOT_FOUND"
+        if "robots.txt" in tool_err_str or "robot" in tool_err_str:
+            return "TOOL_BLOCKED_BY_ROBOTS"
+        if "ddg detected an anomaly" in tool_err_str:
+            return "TOOL_RATE_LIMITED"
+        if "access denied" in tool_err_str:
+            return "TOOL_ACCESS_DENIED"
+        if "enoent" in tool_err_str or "no such file" in tool_err_str:
+            return "TOOL_FILE_NOT_FOUND"
+        if "tool not found" in tool_err_str:
+            return "TOOL_NOT_FOUND"
+        # Generic tool error
+        return "TOOL_ERROR"
 
     # Check if model gave up explicitly
     if last_msg:
@@ -395,6 +455,7 @@ def print_summary(results: list[TaskResult], verbose: bool = False) -> None:
             "API_ERROR_TOO_LONG",
             "SCHEMA_ERROR",
             "VALIDATION_ERROR",
+            "NEVER_STARTED",
         ]
     )
     tool_errors = sum(
@@ -404,6 +465,15 @@ def print_summary(results: list[TaskResult], verbose: bool = False) -> None:
             "TOOL_SCHEMA_MISSING_DESC",
             "TOOL_ARGS_PARSE_ERROR",
             "TOOL_CALL_FAILED",
+            "TOOL_NOT_AVAILABLE",
+            "TOOL_PARAM_VALIDATION_ERROR",
+            "TOOL_SERVER_NOT_FOUND",
+            "TOOL_BLOCKED_BY_ROBOTS",
+            "TOOL_RATE_LIMITED",
+            "TOOL_ACCESS_DENIED",
+            "TOOL_FILE_NOT_FOUND",
+            "TOOL_NOT_FOUND",
+            "TOOL_ERROR",
             "API_ERROR_INVALID_ARG",
         ]
     )
@@ -418,6 +488,7 @@ def print_summary(results: list[TaskResult], verbose: bool = False) -> None:
         ]
     )
     not_attempted = category_counts.get("NOT_ATTEMPTED", 0)
+    missing_annotation = category_counts.get("MISSING_ANNOTATION", 0)
     other = (
         total
         - success
@@ -427,6 +498,7 @@ def print_summary(results: list[TaskResult], verbose: bool = False) -> None:
         - tool_errors
         - output_errors
         - not_attempted
+        - missing_annotation
     )
 
     print("HIGH-LEVEL SUMMARY:")
@@ -443,6 +515,10 @@ def print_summary(results: list[TaskResult], verbose: bool = False) -> None:
     if not_attempted:
         print(
             f"  {'NOT_ATTEMPTED':30} {not_attempted:5} ({not_attempted / total * 100:5.1f}%)"
+        )
+    if missing_annotation:
+        print(
+            f"  {'MISSING_ANNOTATION':30} {missing_annotation:5} ({missing_annotation / total * 100:5.1f}%)"
         )
     if other:
         print(f"  {'Other/Unknown':30} {other:5} ({other / total * 100:5.1f}%)")
@@ -526,13 +602,28 @@ def print_verbose_details(results: list[TaskResult]) -> None:
         "TOOL_SCHEMA_MISSING_DESC",
         "TOOL_ARGS_PARSE_ERROR",
         "TOOL_CALL_FAILED",
+        "TOOL_NOT_AVAILABLE",
+        "TOOL_PARAM_VALIDATION_ERROR",
+        "TOOL_SERVER_NOT_FOUND",
+        "TOOL_BLOCKED_BY_ROBOTS",
+        "TOOL_RATE_LIMITED",
+        "TOOL_ACCESS_DENIED",
+        "TOOL_FILE_NOT_FOUND",
+        "TOOL_NOT_FOUND",
+        "TOOL_ERROR",
     ]
     for cat in tool_cats:
         if cat in by_category:
             print(f"\n{YELLOW}▸ {cat} ({len(by_category[cat])} cases){RESET}")
             tool_errors: Counter[str] = Counter()
             for r in by_category[cat]:
-                err = (r.error_message or "")[:120].replace("\n", " ")
+                # Use error_message if available, otherwise check tool_errors
+                if r.error_message:
+                    err = r.error_message[:120].replace("\n", " ")
+                elif r.tool_errors:
+                    err = " | ".join(r.tool_errors)[:120].replace("\n", " ")
+                else:
+                    err = "(no error details)"
                 tool_errors[err] += 1
             for err, count in tool_errors.most_common(10):
                 print(f"\n  [{count}x] {err}")
@@ -613,6 +704,30 @@ def print_verbose_details(results: list[TaskResult]) -> None:
                 schema_errors[err] += 1
             for err, count in schema_errors.most_common(5):
                 print(f"\n  [{count}x] {err}")
+
+    # NEVER_STARTED
+    if "NEVER_STARTED" in by_category:
+        print(
+            f"\n{YELLOW}▸ NEVER_STARTED ({len(by_category['NEVER_STARTED'])} cases){RESET}"
+        )
+        print(f"  {DIM}Sample had 0 messages - never executed{RESET}")
+        tasks_ns: Counter[str] = Counter()
+        for r in by_category["NEVER_STARTED"]:
+            tasks_ns[r.task_input[:60]] += 1
+        for task, count in tasks_ns.most_common(10):
+            print(f"\n  [{count}x] Task: {task!r}")
+
+    # MISSING_ANNOTATION
+    if "MISSING_ANNOTATION" in by_category:
+        print(
+            f"\n{YELLOW}▸ MISSING_ANNOTATION ({len(by_category['MISSING_ANNOTATION'])} cases){RESET}"
+        )
+        print(f"  {DIM}Missing annotation data for scoring{RESET}")
+        tasks_ma: Counter[str] = Counter()
+        for r in by_category["MISSING_ANNOTATION"]:
+            tasks_ma[r.task_input[:60]] += 1
+        for task, count in tasks_ma.most_common(10):
+            print(f"\n  [{count}x] Task: {task!r}")
 
     # NOT_ATTEMPTED
     if "NOT_ATTEMPTED" in by_category:
