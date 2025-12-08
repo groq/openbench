@@ -502,9 +502,14 @@ class SyntheticMCPHandler(BaseHTTPRequestHandler):
         """Handle table lookup from JSON data files."""
         dataset_path = handler.get("dataset", "")
         key_field = handler.get("key_field", "")
+        nested_path = handler.get("nested_path", "")
 
         # Load the dataset
         data = self.load_api_data(dataset_path)
+
+        # Navigate to nested path if specified (e.g., "commodities" or "rates")
+        if nested_path and nested_path in data:
+            data = data[nested_path]
 
         # Find the key in params - try common parameter names
         lookup_key = None

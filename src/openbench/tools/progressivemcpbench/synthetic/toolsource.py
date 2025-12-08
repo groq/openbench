@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import random
 from pathlib import Path
 from typing import Any
 
@@ -264,6 +265,12 @@ def _synthetic_distraction_tool_source(
 
     # Combine required and distractor tools
     all_selected = required_tools_list + selected_distractors
+
+    # Shuffle the combined list deterministically based on task_id
+    # This ensures random tool ordering that is reproducible across epochs
+    shuffle_seed = int(hashlib.sha256(f"{task_id}:shuffle".encode()).hexdigest(), 16)
+    rng = random.Random(shuffle_seed)
+    rng.shuffle(all_selected)
 
     # Build Tool objects
     tools: list[Tool] = []
