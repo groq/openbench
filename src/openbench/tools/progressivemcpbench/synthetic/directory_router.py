@@ -32,6 +32,16 @@ def _load_servers_config() -> dict[str, Any]:
         return json.load(f)
 
 
+def _truncate_description(description: str, max_len: int = 120) -> str:
+    """Truncate description to first line or max_len chars."""
+    if not description:
+        return ""
+    first_line = description.split("\n")[0].strip()
+    if len(first_line) <= max_len:
+        return first_line
+    return first_line[:max_len]
+
+
 def _format_input_schema(schema: dict[str, Any]) -> str:
     """Format a JSON schema as a readable markdown description."""
     if not schema:
@@ -75,10 +85,12 @@ class SyntheticDirectoryRouter:
         # Load tools from servers.json
         servers_config = _load_servers_config()
         self.tools_index: dict[str, dict[str, dict[str, Any]]] = {}
+        self.server_descriptions: dict[str, str] = {}
 
         for server_name, server in servers_config.items():
             if server_name not in self.tools_index:
                 self.tools_index[server_name] = {}
+            self.server_descriptions[server_name] = server.get("description", "")
             for tool in server.get("tools", []):
                 tool_name = tool.get("name", "")
                 if tool_name:
@@ -106,7 +118,14 @@ class SyntheticDirectoryRouter:
             servers = sorted(self.tools_index.keys())
             if not servers:
                 return "(empty directory)"
-            return "\n".join(f"{s}/" for s in servers)
+            lines = []
+            for s in servers:
+                desc = _truncate_description(self.server_descriptions.get(s, ""))
+                if desc:
+                    lines.append(f"{s}/ # {desc}")
+                else:
+                    lines.append(f"{s}/")
+            return "\n".join(lines)
 
         if path.startswith("/tools/"):
             parts = path[7:].split("/")
@@ -118,7 +137,14 @@ class SyntheticDirectoryRouter:
             tools = self.tools_index[server_name]
             if not tools:
                 return "(empty directory)"
-            return "\n".join(f"{name}.md" for name in sorted(tools.keys()))
+            lines = []
+            for name in sorted(tools.keys()):
+                desc = _truncate_description(tools[name].get("description", ""))
+                if desc:
+                    lines.append(f"{name}.md # {desc}")
+                else:
+                    lines.append(f"{name}.md")
+            return "\n".join(lines)
 
         raise ValueError(f"Invalid path: {path}")
 

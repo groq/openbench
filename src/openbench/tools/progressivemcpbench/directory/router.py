@@ -48,6 +48,16 @@ def _rewrite_params_for_root(obj: Any) -> Any:
     return obj
 
 
+def _truncate_description(description: str, max_len: int = 120) -> str:
+    """Truncate description to first line or max_len chars."""
+    if not description:
+        return ""
+    first_line = description.split("\n")[0].strip()
+    if len(first_line) <= max_len:
+        return first_line
+    return first_line[:max_len]
+
+
 def _format_input_schema(schema: dict[str, Any]) -> str:
     """Format a JSON schema as a readable markdown description."""
     if not schema:
@@ -80,6 +90,7 @@ class DirectoryRouter:
         """
         self.servers: dict[str, Server] = {}
         self.tools_index: dict[str, dict[str, dict[str, Any]]] = {}
+        self.server_descriptions: dict[str, str] = {}
 
         sandbox = _root_sandbox_dir()
         mcp_servers = config.get("mcpServers", {})
@@ -112,6 +123,11 @@ class DirectoryRouter:
                     continue
                 if server_name not in self.tools_index:
                     self.tools_index[server_name] = {}
+                # Store server description from the entry level
+                if server_name not in self.server_descriptions:
+                    self.server_descriptions[server_name] = entry.get(
+                        "description", ""
+                    )
                 for tool in server_info.get("tools", []):
                     tool_name = tool.get("name", "")
                     if tool_name:
@@ -141,7 +157,14 @@ class DirectoryRouter:
             servers = sorted(self.tools_index.keys())
             if not servers:
                 return "(empty directory)"
-            return "\n".join(f"{s}/" for s in servers)
+            lines = []
+            for s in servers:
+                desc = _truncate_description(self.server_descriptions.get(s, ""))
+                if desc:
+                    lines.append(f"{s}/ # {desc}")
+                else:
+                    lines.append(f"{s}/")
+            return "\n".join(lines)
 
         if path.startswith("/tools/"):
             parts = path[7:].split("/")
@@ -153,7 +176,14 @@ class DirectoryRouter:
             tools = self.tools_index[server_name]
             if not tools:
                 return "(empty directory)"
-            return "\n".join(f"{name}.md" for name in sorted(tools.keys()))
+            lines = []
+            for name in sorted(tools.keys()):
+                desc = _truncate_description(tools[name].get("description", ""))
+                if desc:
+                    lines.append(f"{name}.md # {desc}")
+                else:
+                    lines.append(f"{name}.md")
+            return "\n".join(lines)
 
         raise ValueError(f"Invalid path: {path}")
 
