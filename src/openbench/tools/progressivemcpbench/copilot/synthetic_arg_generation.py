@@ -6,6 +6,7 @@ storing them in the same format as the live copilot embeddings.
 """
 
 import asyncio
+import hashlib
 import json
 import logging
 import os
@@ -47,8 +48,49 @@ def _user_cache_dir() -> Path:
     ).resolve()
 
 
-def _default_output_path() -> Path:
-    """Get the default output path for embeddings."""
+def _compute_servers_hash(servers_config: dict[str, Any]) -> str:
+    """Compute a hash of the servers configuration for cache invalidation.
+
+    The hash is based on server names, descriptions, and tool definitions,
+    so any change to these will bust the cache.
+    """
+    # Extract only the fields that affect embeddings
+    hashable_data: list[dict[str, Any]] = []
+    for server_name in sorted(servers_config.keys()):
+        server = servers_config[server_name]
+        server_data = {
+            "name": server_name,
+            "description": server.get("description", ""),
+            "tools": [],
+        }
+        for tool in server.get("tools", []):
+            server_data["tools"].append(
+                {
+                    "name": tool.get("name", ""),
+                    "description": tool.get("description", ""),
+                }
+            )
+        hashable_data.append(server_data)
+
+    # Create deterministic JSON and hash it
+    content = json.dumps(hashable_data, sort_keys=True, ensure_ascii=True)
+    return hashlib.sha256(content.encode()).hexdigest()[:12]
+
+
+def _default_output_path(servers_config: dict[str, Any] | None = None) -> Path:
+    """Get the default output path for embeddings.
+
+    If servers_config is provided, includes a content hash in the filename
+    to ensure cache invalidation on any config changes.
+    """
+    if servers_config:
+        config_hash = _compute_servers_hash(servers_config)
+        return (
+            _user_cache_dir()
+            / "config"
+            / f"synthetic_mcp_arg_{embedding_model}_{abstract_model}_{config_hash}.json"
+        )
+    # Fallback without hash (for backwards compatibility)
     return (
         _user_cache_dir()
         / "config"
@@ -68,12 +110,11 @@ class SyntheticMcpArgGenerator:
 
         Args:
             servers_json_path: Path to synthetic servers.json (default: synthetic_mcp/config/servers.json)
-            output_file: Output path for embeddings (default: cache dir with model names)
+            output_file: Output path for embeddings (default: cache dir with content hash)
         """
         self.servers_json_path = servers_json_path or (
             _synthetic_mcp_dir() / "config" / "servers.json"
         )
-        self.output_file = output_file or _default_output_path()
 
         if not self.servers_json_path.exists():
             raise FileNotFoundError(
@@ -82,6 +123,9 @@ class SyntheticMcpArgGenerator:
 
         with self.servers_json_path.open("r", encoding="utf-8") as f:
             self.servers_config = json.load(f)
+
+        # Use content-hash-based path if no explicit output_file provided
+        self.output_file = output_file or _default_output_path(self.servers_config)
 
         self.embedding_client = openai.AsyncOpenAI(
             api_key=embedding_api_key, base_url=embedding_api_url
@@ -289,12 +333,21 @@ async def generate_synthetic_embeddings(force: bool = False) -> Path:
 
 
 def get_synthetic_embeddings_path() -> Path:
-    """Get the path to the synthetic embeddings file."""
+    """Get the path to the synthetic embeddings file for current servers.json.
+
+    The path includes a content hash of the servers config, so it automatically
+    points to a new file if the config has changed.
+    """
+    servers_json_path = _synthetic_mcp_dir() / "config" / "servers.json"
+    if servers_json_path.exists():
+        with servers_json_path.open("r", encoding="utf-8") as f:
+            servers_config = json.load(f)
+        return _default_output_path(servers_config)
     return _default_output_path()
 
 
 def synthetic_embeddings_exist() -> bool:
-    """Check if synthetic embeddings have been generated."""
+    """Check if synthetic embeddings have been generated for current config."""
     return get_synthetic_embeddings_path().exists()
 
 
