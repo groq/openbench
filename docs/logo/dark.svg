@@ -1,17 +1,37 @@
-<svg width="240" height="48" viewBox="0 0 240 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-  <title id="title">openbench</title>
-  <desc id="desc">openbench logo with circular ring and three ascending bars, dark variant</desc>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1775.01 1973.01">
+  <defs>
+    <style>
+      .uuid-2bee4d68-d9d7-4c86-b446-c37ad4cb0688 {
+        fill: #f3f3ee;
+      }
 
-  <!-- Monogram mark -->
-  <g transform="translate(4,4)">
-    <circle cx="20" cy="20" r="18" fill="none" stroke="#EDE6DD" stroke-width="3"/>
-    <rect x="14" y="10" width="4" height="20" rx="1.5" fill="#B39DDB"/>
-    <rect x="20" y="6"  width="4" height="28" rx="1.5" fill="#EDE6DD"/>
-    <rect x="26" y="12" width="4" height="16" rx="1.5" fill="#39434F" stroke="#EDE6DD" stroke-width="1"/>
+      .uuid-1dbc86e2-41cd-4049-b462-d8f55f5477c0 {
+        isolation: isolate;
+      }
+    </style>
+  </defs>
+  <g id="uuid-34a02bce-8866-48d9-8939-083d9533b3de" data-name="Artboard 1" class="uuid-1dbc86e2-41cd-4049-b462-d8f55f5477c0">
+    <g id="uuid-f9093115-457e-4c1f-9abc-5b77f1e93240" data-name="Rectangle 1">
+      <rect class="uuid-2bee4d68-d9d7-4c86-b446-c37ad4cb0688" x=".13" y="277.5" width="349.05" height="888.55" rx="20" ry="20"/>
+    </g>
+    <g id="uuid-6571ba52-1762-4c73-940a-106b82564cc6" data-name="Rectangle 1 copy 5">
+      <rect class="uuid-2bee4d68-d9d7-4c86-b446-c37ad4cb0688" x="0" y="1623.85" width="349.21" height="349.16" rx="20" ry="20"/>
+    </g>
+    <g id="uuid-14a1d5d7-2e89-45e1-b603-3b7fa04616b6" data-name="Rectangle 1 copy 6">
+      <rect class="uuid-2bee4d68-d9d7-4c86-b446-c37ad4cb0688" x="1425.79" y="1623.85" width="349.21" height="349.16" rx="20" ry="20"/>
+    </g>
+    <g id="uuid-53dbf7b2-4ad5-42c6-8660-ac7ff9266194" data-name="Rectangle 1 copy">
+      <rect class="uuid-2bee4d68-d9d7-4c86-b446-c37ad4cb0688" x="473.68" y="0" width="349.02" height="1166.05" rx="20" ry="20"/>
+    </g>
+    <g id="uuid-80334f89-2deb-4c97-b9fe-fcc852074c48" data-name="Rectangle 1 copy 4">
+      <rect class="uuid-2bee4d68-d9d7-4c86-b446-c37ad4cb0688" x="0" y="1307.63" width="1775.01" height="174.58" rx="20" ry="20"/>
+    </g>
+    <g id="uuid-a80d47f1-9049-4cd2-8b26-15275c285bb4" data-name="Rectangle 1 copy 2">
+      <rect class="uuid-2bee4d68-d9d7-4c86-b446-c37ad4cb0688" x="947.21" y="458.06" width="349.02" height="707.99" rx="20" ry="20"/>
+    </g>
+    <g id="uuid-9c753690-dde1-4103-b8af-46e92fe59c6c" data-name="Rectangle 1 copy 3">
+      <rect class="uuid-2bee4d68-d9d7-4c86-b446-c37ad4cb0688" x="1425.82" y="277.5" width="349.05" height="888.55" rx="20" ry="20"/>
+    </g>
   </g>
-
-  <!-- Wordmark -->
-  <text x="60" y="31" font-family="Neue Regrade, Inter, system-ui, sans-serif" font-size="22" font-weight="700" fill="#EDE6DD" letter-spacing="0.2">
-    openbench
-  </text>
 </svg>

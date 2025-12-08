@@ -225,3 +225,30 @@ export const CatalogTable = () => {
 <div className="not-prose">
   <CatalogTable />
 </div>
+
+
+## Grader Information
+
+Some benchmarks use a grader model to score the model's performance. This requires an additional API key for the grader model.
+
+To run these benchmarks, you'll need to export your `OPENAI_API_key`:
+
+```bash
+export OPENAI_API_KEY=your_openai_key
+```
+
+The following benchmarks use a grader model:
+
+| Benchmark      | Default Grader Model             |
+| :------------- | :------------------------------- |
+| `simpleqa`     | `openai/gpt-4.1-2025-04-14`      |
+| `hle`          | `openai/o3-mini-2025-01-31`      |
+| `hle_text`     | `openai/o3-mini-2025-01-31`      |
+| `browsecomp`   | `openai/gpt-4.1-2025-04-14`      |
+| `healthbench`  | `openai/gpt-4.1-2025-04-14`      |
+| `math`         | `openai/gpt-4-turbo-preview`     |
+| `math_500`     | `openai/gpt-4-turbo-preview`     |
+| `detailbench`  | `gpt-5-mini-2025-08-07`          |
+| `livemcpbench` | `openai/gpt-4.1-mini-2025-04-14` |
+| `otis_mock_aime` | `openai/gpt-4.1-mini-2025-04-14` |
+| `political_evenhandedness` | `openai/gpt-4.1-2025-04-14` |

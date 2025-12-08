@@ -1,20 +1,30 @@
 # openbench
 
-**Provider-agnostic, open-source evaluation infrastructure for language models** 🚀
+<h2 align="center">
+ <br>
+ <img src="docs/logo/dark.svg" alt="openbench" width="250">
+ <br>
+ <br>
+Provider-agnostic, open-source evaluation infrastructure for language models
+ <br>
+</h2>
 
-[![PyPI version](https://badge.fury.io/py/openbench.svg)](https://badge.fury.io/py/openbench)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+<p align="center">
+ <a href="https://badge.fury.io/py/openbench"><img src="https://badge.fury.io/py/openbench.svg">
+ <a href="https://github.com/groq/openbench/blob/main/LICENSE.md"><img src="https://img.shields.io/badge/License-MIT-yellow.svg">
+ <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10+-blue.svg">
+ <a href="https://github.com/groq/openbench/stargazers"><img src="https://img.shields.io/github/stars/groq/openbench"></a>
+ </a>
+</p>
+
 
 openbench provides standardized, reproducible benchmarking for LLMs across 30+ evaluation suites (and growing) spanning knowledge, math, reasoning, coding, science, reading comprehension, health, long-context recall, graph reasoning, and first-class support for your own local evals to preserve privacy. **Works with any model provider** - Groq, OpenAI, Anthropic, Cohere, Google, AWS Bedrock, Azure, local models via Ollama, Hugging Face, and 30+ other providers.
 
-## 🚧 Alpha Release
-
-We're building in public! This is an alpha release - expect rapid iteration. The first stable release is coming soon.
+To get started, see the tutorial below or reference the [docs](https://openbench.dev/).
 
 ## Features
 
-- **🎯 35+ Benchmarks**: MMLU, GPQA, HumanEval, SimpleQA, competition math (AIME, HMMT), SciCode, GraphWalks, and more
+- **🎯 95+ Benchmarks**: MMLU, GPQA, HumanEval, SimpleQA, competition math (AIME, HMMT), SciCode, GraphWalks, and more
 - **🔧 Simple CLI**: `bench list`, `bench describe`, `bench eval` (also available as `openbench`), `-M`/`-T` flags for model/task args, `--debug` mode for eval-retry, experimental benchmarks with `--alpha` flag
 - **🏗️ Built on inspect-ai**: Industry-standard evaluation framework
 - **📊 Extensible**: Easy to add new benchmarks and metrics
@@ -35,52 +45,14 @@ uv pip install openbench
 # Set your API key (any provider!)
 export GROQ_API_KEY=your_key  # or OPENAI_API_KEY, ANTHROPIC_API_KEY, etc.
 
-# Run your first eval (30 seconds)
-bench eval mmlu --model groq/llama-3.3-70b-versatile --limit 10
+# Run your first eval (3 seconds)
+bench eval mmlu --model groq/openai/gpt-oss-120b --limit 10
 
 # That's it! 🎉 Check results in ./logs/ or view them in an interactive UI:
 bench view
 ```
 
 https://github.com/user-attachments/assets/e99e4628-f1f5-48e4-9df2-ae28b86168c2
-
-## Optional Plugins
-
-Some benchmark suites ship as standalone plugins so they can iterate independently from the core distribution. Install them alongside `openbench` with `uv pip` and they will automatically appear in `bench list` via the plugin entry point system.
-
-- `openbench-cyber`: adds the CTI-Bench family plus CyBench (agentic CTF challenges). This plugin ships real exploit code and forensics artifacts that routinely trigger anti-malware scanners, so we require a deliberate, manual install after you read the security guidance.
-  - Install explicitly: `uv pip install "openbench-cyber @ git+https://github.com/groq/openbench-cyber.git@d93522ba70392cdceddb83f762c78a68923e70da"`
-  - Review the [plugin README](https://github.com/groq/openbench-cyber) for sandbox requirements and risk acknowledgements before using it.
-
-## Using Different Providers
-
-```bash
-# Groq (blazing fast!)
-bench eval gpqa_diamond --model groq/meta-llama/llama-4-maverick-17b-128e-instruct
-
-# OpenAI
-bench eval humaneval --model openai/o3-2025-04-16
-
-# Anthropic
-bench eval simpleqa --model anthropic/claude-sonnet-4-20250514
-
-# Google
-bench eval mmlu --model google/gemini-2.5-pro
-
-# Local models with Ollama
-bench eval musr --model ollama/llama3.1:70b
-
-# Helicone AI Gateway
-bench eval mmlu --model helicone/gpt-4o
-
-# Hugging Face Inference Providers
-bench eval mmlu --model huggingface/gpt-oss-120b:groq
-
-# OpenRouter
-bench eval gpqa_diamond --model openrouter/deepseek/deepseek-chat-v3.1
-
-# 30+ providers supported - see full list below
-```
 
 ## Supported Providers
 
@@ -125,82 +97,31 @@ openbench supports 30+ model providers through Inspect AI. Set the appropriate A
 
 ## Available Benchmarks
 
-Here are the currently available benchmarks. For an up-to-date list use `bench list`.
+See the [Benchmarks Catalog](https://openbench.dev/benchmarks/catalog) or use `bench list`.
 
-> [!NOTE]
-> Benchmark names are case-sensitive in the CLI.
-
-| Category          | Benchmarks                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Knowledge**     | MMLU (57 subjects), MMLU-Pro, GPQA (graduate-level), SuperGPQA (285 disciplines), TUMLU (9 languages), OpenBookQA, HLE (Humanity's Last Exam - 2,500 questions from 1,000+ experts), HLE_text (text-only version)                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| **Coding**        | HumanEval (164 problems), MBPP, SciCode (alpha), GMCQ, JSONSchemaBench, Exercism (code agent eval across 5 languages)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| **Math**          | AIME 2023-2025, HMMT Feb 2023-2025, BRUMO 2025, MATH (competition-level problems), MATH-500 (challenging subset), MGSM (multilingual grade school math), MGSM_en (English), MGSM_latin (5 languages), MGSM_non_latin (6 languages), OTIS Mock AIME 2024-2025                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| **Reasoning**     | SimpleQA (factuality), MuSR, MuSR murder_mysteries, MuSR object_placements, MuSR team_allocation, DROP (discrete reasoning over paragraphs), GraphWalks (multi-hop reasoning), BrowseComp (browsing agents), MMMU, MMMU_MCQ, MMMU_OPEN, MMMU_PRO, MMMU_PRO_VISION, MMMU subsets: accounting, agriculture, architecture_and_engineering, art, art_theory, basic_medical_science, biology, chemistry, clinical_medicine, design, diagnostics_and_laboratory_medicine, electronics, energy_and_power, finance, geography, history, literature, manage, marketing, materials, math, mechanical_engineering, music, pharmacy, physics, psychology, public_health, sociology |
-| **Long Context**  | OpenAI MRCR (multiple needle retrieval), OpenAI MRCR_2n (2 needle), OpenAI MRCR_4n (4 needle), OpenAI MRCR_8n (8 needle)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| **Healthcare**    | HealthBench (open-ended healthcare eval), HealthBench_hard (challenging variant), HealthBench_consensus (consensus variant)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| **Cybersecurity** *(requires `openbench-cyber` plugin)* | CTI-Bench ATE (MITRE ATT&CK technique extraction), CTI-Bench MCQ (knowledge questions on CTI standards and best practices), CTI-Bench RCM (CVE to CWE vulnerability mapping), CTI-Bench VSP (CVSS score calculation), cybench (40 tasks from CTF competitions)                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| **Community**     | ClockBench, DetailBench                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| **MCP**           | LiveMCPBench (70 MCP servers and 527 tools)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | 
-| **Jailbreak**    | SafeMT_M2S (single turn conversion of SafeMT_Attack_600), CoSafe_M2S (single turn conversion of Cosafe_300), MHJ_M2S (single turn conversion of MHJ) |
-| **Political Bias** | political_evenhandedness (Anthropic's political bias eval with 1350+ samples and 7 subsets), political_evenhandedness subsets: historical_events, political_figures, policies, social_issues, us_constitution, social_identity, science |
-
-## Configuration
-
-```bash
-# Set your API keys
-export GROQ_API_KEY=your_key
-export HF_TOKEN=your_key
-export OPENAI_API_KEY=your_key  # Optional
-export HELICONE_API_KEY=your_key  # For Helicone AI Gateway
-export OPENROUTER_API_KEY=your_key  # For OpenRouter
-
-# Set default model
-export BENCH_MODEL=groq/openai/gpt-oss-20b
-```
 
 ## Commands and Options
 
 For a complete list of all commands and options, run: `bench --help`
+See the [docs](https://openbench.dev/cli/overview) for more details. 
 
 | Command                  | Description                                        |
 | ------------------------ | -------------------------------------------------- |
-| `bench` or `openbench`   | Show main menu with available commands             |
-| `bench list`             | List available evaluations, models, and flags      |
-| `bench eval <benchmark>` | Run benchmark evaluation on a model                |
-| `bench eval-retry`       | Retry a failed evaluation                          |
-| `bench view`             | View logs from previous benchmark runs             |
-| `bench eval <path>`      | Run your local/private evals built with Inspect AI |
-| `bench cache`            | Manage OpenBench caches (info/ls/clear)            |
+| `bench list`             | List available benchmarks                          |
+| `bench eval <benchmark>` | Run benchmark evaluation                           |
+| `bench eval-retry <log_files>`  | Retry a failed evaluation                          |
+| `bench view`             | Interactive UI to view benchmark logs             |
+| `bench cache <info/ls/clear/upload>`            | Manage OpenBench caches            |
 
-### Cache Command
 
-The `bench cache` command helps manage OpenBench's caches, particularly for LiveMCPBench. It provides three subcommands:
-
-```bash
-# Show cache information and sizes
-bench cache info
-
-# List all cache contents
-bench cache ls
-
-#List specific cache with tree view
-bench cache ls --type livemcpbench --tree
-
-# Clear specific cache completely
-bench cache clear --type livemcpbench --all
-```
-
-All cache data is stored under `~/.openbench`. The cache command helps you monitor and manage this storage.
-
-### Key `eval` Command Common Configuration Options
-
+### Common `eval` Configuration Options
 | Option               | Environment Variable      | Default                   | Description                                                      |
 | -------------------- |---------------------------|---------------------------|------------------------------------------------------------------|
-| `-M <args>`          | None                      | None                      | Pass model/provider-specific arguments (e.g., `-M only=groq`)    |
-| `-T <args>`          | None                      | None                      | Pass task-specific arguments to the benchmark                    |
+| `-M <args>`          | `None`                      | `None`                      | Pass provider/model-specific arguments (e.g., `-M only=groq`)    |
+| `-T <args>`          | `None`                      | `None`                      | Pass task-specific arguments to the benchmark                    |
 | `--model`            | `BENCH_MODEL`             | `groq/openai/gpt-oss-20b` | Model(s) to evaluate                                             |
 | `--epochs`           | `BENCH_EPOCHS`            | `1`                       | Number of epochs to run each evaluation                          |
-| `--epochs-reducer`   | `BENCH_EPOCHS_REDUCER`    | None                      | Reducer(s) applied when aggregating epoch scores.                |
+| `--epochs-reducer`   | `BENCH_EPOCHS_REDUCER`    | `None`                      | Reducer(s) applied when aggregating epoch scores                |
 | `--max-connections`  | `BENCH_MAX_CONNECTIONS`   | `10`                      | Maximum parallel requests to model                               |
 | `--temperature`      | `BENCH_TEMPERATURE`       | `0.6`                     | Model temperature                                                |
 | `--top-p`            | `BENCH_TOP_P`             | `1.0`                     | Model top-p                                                      |
@@ -210,43 +131,19 @@ All cache data is stored under `~/.openbench`. The cache command helps you monit
 | `--logfile`          | `BENCH_OUTPUT`            | `None`                    | Output file for results                                          |
 | `--sandbox`          | `BENCH_SANDBOX`           | `None`                    | Environment to run evaluation (local/docker)                     |
 | `--timeout`          | `BENCH_TIMEOUT`           | `10000`                   | Timeout for each API request (seconds)                           |
+| `--fail-on-error`          | `None`           | `1`                   | Threshold of allowable sample errors (use an integer for count or a float for proportion) |
 | `--display`          | `BENCH_DISPLAY`           | `None`                    | Display type (full/conversation/rich/plain/none)                 |
 | `--reasoning-effort` | `BENCH_REASONING_EFFORT`  | `None`                    | Reasoning effort level (low/medium/high)                         |
-| `--json`             | None                      | `False`                   | Output results in JSON format                                    |
+| `--json`             | `None`                      | `False`                   | Output results in JSON format                                    |
 | `--log-format`       | `BENCH_LOG_FORMAT`        | `eval`                    | Output logging format (eval/json)                                |
 | `--hub-repo`         | `BENCH_HUB_REPO`          | `None`                    | Push results to a Hugging Face Hub dataset                       |
 | `--keep-livemcp-root` | `BENCH_KEEP_LIVEMCP_ROOT` | `False`                   | Allow preservation of root data after livemcpbench eval runs     |
 | `--code-agent`       | `BENCH_CODE_AGENT`        | `opencode`                | Select code agent for exercism tasks                             |
 
-## Grader Information
 
-Some benchmarks use a grader model to score the model's performance. This requires an additional API key for the grader model.
+## Development and Building Your Own Evals
 
-To run these benchmarks, you'll need to export your `OPENAI_API_key`:
-
-```bash
-export OPENAI_API_KEY=your_openai_key
-```
-
-The following benchmarks use a grader model:
-
-| Benchmark      | Default Grader Model             |
-| :------------- | :------------------------------- |
-| `simpleqa`     | `openai/gpt-4.1-2025-04-14`      |
-| `hle`          | `openai/o3-mini-2025-01-31`      |
-| `hle_text`     | `openai/o3-mini-2025-01-31`      |
-| `browsecomp`   | `openai/gpt-4.1-2025-04-14`      |
-| `healthbench`  | `openai/gpt-4.1-2025-04-14`      |
-| `math`         | `openai/gpt-4-turbo-preview`     |
-| `math_500`     | `openai/gpt-4-turbo-preview`     |
-| `detailbench`  | `gpt-5-mini-2025-08-07`          |
-| `livemcpbench` | `openai/gpt-4.1-mini-2025-04-14` |
-| `otis_mock_aime` | `openai/gpt-4.1-mini-2025-04-14` |
-| `political_evenhandedness` | `openai/gpt-4.1-2025-04-14` |
-
-## Building Your Own Evals
-
-openbench is built on [Inspect AI](https://inspect.aisi.org.uk/). To create custom evaluations, check out their excellent [documentation](https://inspect.aisi.org.uk/).
+For a full guide, see [Contributing Guidelines](CONTRIBUTING.md) and [Extending openbench](https://openbench.dev/development/extending). Also, check out Inspect AI's excellent [documentation](https://inspect.aisi.org.uk/).
 
 ### Quick Eval: Run from Path
 
@@ -270,20 +167,6 @@ After `pip install my-benchmark-package`, your benchmark appears in `bench list`
 - Sharing benchmarks across teams
 - Versioning evaluations independently
 - Overriding built-in benchmarks with custom implementations
-
-📖 **Full guide**: [Extending openbench](https://openbench.groq.com/development/extending)
-
-## Exporting Logs to Hugging Face
-
-openbench can export logs to a Hugging Face Hub dataset. This is useful if you want to share your results with the community or use them for further analysis.
-
-```bash
-export HF_TOKEN=<your-huggingface-token>
-
-bench eval mmlu --model groq/llama-3.3-70b-versatile --limit 10 --hub-repo <your-username>/openbench-logs
-```
-
-This will export the logs to a Hugging Face Hub dataset with the name `openbench-logs`.
 
 ## FAQ
 
@@ -327,36 +210,11 @@ HF_TOKEN="<HUGGINGFACE_TOKEN>"
 
 should fix the issue. The full HuggingFace documentation can be found [on the HuggingFace docs on Authentication](https://huggingface.co/docs/hub/en/datasets-polars-auth).
 
-## Development
+See the docs for further [Tips and Troubleshooting](https://openbench.dev/troubleshooting).
 
-For development work, you'll need to clone the repository:
+## 🚧 Alpha Release
 
-```bash
-# Clone the repo
-git clone https://github.com/groq/openbench.git
-cd openbench
-
-# Setup with UV
-uv venv && uv sync --dev
-source .venv/bin/activate
-
-# CRITICAL: Install pre-commit hooks (CI will fail without this!)
-pre-commit install
-
-# Run tests
-pytest
-```
-
-⚠️ **IMPORTANT**: You MUST run `pre-commit install` after setup or CI will fail on your PRs!
-
-## Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for detailed instructions on:
-
-- Setting up the development environment
-- Adding new benchmarks and model providers
-- Code style and testing requirements
-- Submitting issues and pull requests
+We're building in public! This is an alpha release - expect rapid iteration. The first stable release is coming soon.
 
 Quick links:
 
