@@ -1,0 +1,28 @@
+{
+  "_comment": "Foreign exchange rates with USD as base currency. Last updated: 2025-12-08",
+  "_source": "Synthetic data based on market rates",
+  "base_currency": "USD",
+  "last_updated": "2025-12-08T00:00:00Z",
+  "rates": {
+    "AUD": 1.5800,
+    "EUR": 0.9450,
+    "GBP": 0.7850,
+    "JPY": 149.50,
+    "CAD": 1.4050,
+    "CHF": 0.8850,
+    "CNY": 7.2500,
+    "NZD": 1.7200,
+    "INR": 84.50,
+    "SGD": 1.3450,
+    "HKD": 7.7850,
+    "MXN": 17.25,
+    "BRL": 5.95,
+    "ZAR": 18.25,
+    "KRW": 1380.00,
+    "SEK": 10.85,
+    "NOK": 11.05,
+    "DKK": 7.05,
+    "PLN": 4.05,
+    "THB": 34.50
+  }
+}

@@ -3476,5 +3476,178 @@
         "annotations": null
       }
     ]
+  },
+  "commodities-markets": {
+    "name": "Commodities Markets",
+    "description": "A commodities market data server providing real-time spot prices for precious metals (gold, silver, platinum, palladium) and other commodities. Supports price lookups in USD per troy ounce and simulated trading operations.",
+    "category": "Finance",
+    "web": "https://github.com/example/commodities-mcp-server",
+    "in_clean_config": true,
+    "tools": [
+      {
+        "name": "get_commodity_price",
+        "description": "Get the current spot price of a commodity in USD. Supports precious metals like gold, silver, platinum, and palladium. Prices are returned in USD per troy ounce.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "commodity": {
+              "type": "string",
+              "description": "The commodity to get the price for (e.g., 'gold', 'silver', 'platinum', 'palladium')"
+            }
+          },
+          "required": ["commodity"]
+        },
+        "annotations": null
+      },
+      {
+        "name": "list_commodities",
+        "description": "List all available commodities with their current prices.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "annotations": null
+      },
+      {
+        "name": "buy_commodity",
+        "description": "Place a buy order for a commodity. Requires an authenticated trading account.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "commodity": {
+              "type": "string",
+              "description": "The commodity to buy (e.g., 'gold', 'silver')"
+            },
+            "quantity_grams": {
+              "type": "number",
+              "description": "Amount to buy in grams"
+            },
+            "limit_price_usd": {
+              "type": "number",
+              "description": "Maximum price per troy ounce in USD (optional, for limit orders)"
+            }
+          },
+          "required": ["commodity", "quantity_grams"]
+        },
+        "annotations": null
+      },
+      {
+        "name": "sell_commodity",
+        "description": "Place a sell order for a commodity. Requires an authenticated trading account.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "commodity": {
+              "type": "string",
+              "description": "The commodity to sell (e.g., 'gold', 'silver')"
+            },
+            "quantity_grams": {
+              "type": "number",
+              "description": "Amount to sell in grams"
+            },
+            "limit_price_usd": {
+              "type": "number",
+              "description": "Minimum price per troy ounce in USD (optional, for limit orders)"
+            }
+          },
+          "required": ["commodity", "quantity_grams"]
+        },
+        "annotations": null
+      }
+    ]
+  },
+  "forex": {
+    "name": "Forex Exchange",
+    "description": "A foreign exchange (forex) server providing real-time currency exchange rates and currency conversion. Supports major world currencies with USD as the base currency. Also provides simulated trading operations.",
+    "category": "Finance",
+    "web": "https://github.com/example/forex-mcp-server",
+    "in_clean_config": true,
+    "tools": [
+      {
+        "name": "get_exchange_rate",
+        "description": "Get the current exchange rate between two currencies. Returns how much of the target currency you get for one unit of the source currency.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "from_currency": {
+              "type": "string",
+              "description": "The source currency code (e.g., 'USD', 'EUR', 'GBP')"
+            },
+            "to_currency": {
+              "type": "string",
+              "description": "The target currency code (e.g., 'AUD', 'JPY', 'CAD')"
+            }
+          },
+          "required": ["from_currency", "to_currency"]
+        },
+        "annotations": null
+      },
+      {
+        "name": "convert_currency",
+        "description": "Convert an amount from one currency to another at the current exchange rate.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number",
+              "description": "The amount to convert"
+            },
+            "from_currency": {
+              "type": "string",
+              "description": "The source currency code (e.g., 'USD')"
+            },
+            "to_currency": {
+              "type": "string",
+              "description": "The target currency code (e.g., 'AUD')"
+            }
+          },
+          "required": ["amount", "from_currency", "to_currency"]
+        },
+        "annotations": null
+      },
+      {
+        "name": "list_rates",
+        "description": "List all available exchange rates with USD as the base currency.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        },
+        "annotations": null
+      },
+      {
+        "name": "trade_currency",
+        "description": "Execute a currency trade. Requires an authenticated forex trading account.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "from_currency": {
+              "type": "string",
+              "description": "The currency to sell"
+            },
+            "to_currency": {
+              "type": "string",
+              "description": "The currency to buy"
+            },
+            "amount": {
+              "type": "number",
+              "description": "Amount of from_currency to trade"
+            },
+            "order_type": {
+              "type": "string",
+              "description": "Order type: 'market' or 'limit'",
+              "enum": ["market", "limit"]
+            },
+            "limit_rate": {
+              "type": "number",
+              "description": "For limit orders, the target exchange rate"
+            }
+          },
+          "required": ["from_currency", "to_currency", "amount"]
+        },
+        "annotations": null
+      }
+    ]
   }
 }

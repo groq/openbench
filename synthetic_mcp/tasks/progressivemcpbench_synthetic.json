@@ -89,7 +89,7 @@
   },
   {
     "task_id": "4aa079dd-9d2d-440d-a654-9ba9cb3868b0",
-    "Question": "Read the paper webarena, mind2web and mind2web2, then give me the last names of the first listed author of each paper.",
+    "Question": "Read the arxiv papers webarena, mind2web and mind2web2, then give me the last names of the first listed author of each paper.",
     "category": "Office",
     "file_name": "",
     "answer": "Deng, Gou, Zhou",
@@ -388,8 +388,52 @@
     "annotator_metadata": {
       "Number of steps": "2",
       "Number of tools": "2",
-      "Steps": "1. Search for the Wikipedia article URL\n2. Fetch the page and extract the height",
-      "Tools": "1. search_urls\n2. playwright_get_visible_html"
+      "Steps": "1. Search Wikipedia for the article URL\n2. Fetch the page and extract the height",
+      "Tools": "1. search\n2. playwright_get_visible_html"
+    }
+  },
+  {
+    "task_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "Question": "I have 18.9g silver, what is it worth in AUD as of today?",
+    "category": "Finance",
+    "file_name": "",
+    "answer": "30.25",
+    "scorer_instructions": "Accept answers between 29.50 and 31.00 AUD. The model must show it understands that silver is priced per troy ounce (31.1035g), convert grams to troy ounces, look up the spot price in USD, then convert to AUD.",
+    "required_servers": [
+      "commodities-markets",
+      "forex"
+    ],
+    "required_tools": [
+      "get_commodity_price",
+      "get_exchange_rate"
+    ],
+    "annotator_metadata": {
+      "Number of steps": "4",
+      "Number of tools": "2",
+      "Steps": "1. Get the current silver spot price in USD per troy ounce\n2. Convert 18.9 grams to troy ounces (divide by 31.1035)\n3. Calculate the USD value (troy oz × price)\n4. Get USD/AUD exchange rate and convert to AUD",
+      "Tools": "1. get_commodity_price\n2. get_exchange_rate"
+    }
+  },
+  {
+    "task_id": "b2c3d4e5-f6a7-8901-bcde-f23456789012",
+    "Question": "I have 9.5g gold, what is it worth in AUD as of today?",
+    "category": "Finance",
+    "file_name": "",
+    "answer": "1278.83",
+    "scorer_instructions": "Accept answers between 1250 and 1310 AUD. The model must show it understands that gold is priced per troy ounce (31.1035g), convert grams to troy ounces, look up the spot price in USD, then convert to AUD.",
+    "required_servers": [
+      "commodities-markets",
+      "forex"
+    ],
+    "required_tools": [
+      "get_commodity_price",
+      "get_exchange_rate"
+    ],
+    "annotator_metadata": {
+      "Number of steps": "4",
+      "Number of tools": "2",
+      "Steps": "1. Get the current gold spot price in USD per troy ounce\n2. Convert 9.5 grams to troy ounces (divide by 31.1035)\n3. Calculate the USD value (troy oz × price)\n4. Get USD/AUD exchange rate and convert to AUD",
+      "Tools": "1. get_commodity_price\n2. get_exchange_rate"
     }
   }
 ]

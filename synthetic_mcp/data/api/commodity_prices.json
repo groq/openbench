@@ -1,0 +1,38 @@
+{
+  "_comment": "Commodity spot prices for precious metals. Prices are in USD per troy ounce. Last updated: 2025-12-08",
+  "_source": "Synthetic data based on market prices",
+  "commodities": {
+    "gold": {
+      "symbol": "XAU",
+      "name": "Gold",
+      "price_usd": 2650.00,
+      "unit": "troy_ounce",
+      "currency": "USD",
+      "last_updated": "2025-12-08T00:00:00Z"
+    },
+    "silver": {
+      "symbol": "XAG",
+      "name": "Silver",
+      "price_usd": 31.50,
+      "unit": "troy_ounce",
+      "currency": "USD",
+      "last_updated": "2025-12-08T00:00:00Z"
+    },
+    "platinum": {
+      "symbol": "XPT",
+      "name": "Platinum",
+      "price_usd": 940.00,
+      "unit": "troy_ounce",
+      "currency": "USD",
+      "last_updated": "2025-12-08T00:00:00Z"
+    },
+    "palladium": {
+      "symbol": "XPD",
+      "name": "Palladium",
+      "price_usd": 1020.00,
+      "unit": "troy_ounce",
+      "currency": "USD",
+      "last_updated": "2025-12-08T00:00:00Z"
+    }
+  }
+}
