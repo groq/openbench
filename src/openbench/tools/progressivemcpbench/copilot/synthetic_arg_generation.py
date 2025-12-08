@@ -48,58 +48,43 @@ def _user_cache_dir() -> Path:
     ).resolve()
 
 
-def _compute_servers_hash(servers_config: dict[str, Any]) -> str:
-    """Compute a hash of the servers configuration for cache invalidation.
+def _per_server_cache_dir() -> Path:
+    """Get the directory for per-server embedding cache files."""
+    return _user_cache_dir() / "servers" / f"{embedding_model}_{abstract_model}"
 
-    The hash is based on server names, descriptions, and tool definitions,
-    so any change to these will bust the cache.
+
+def _compute_server_hash(server_name: str, server_config: dict[str, Any]) -> str:
+    """Compute a hash for a single server's configuration.
+
+    The hash is based on server name, description, and tool definitions.
     """
-    # Extract only the fields that affect embeddings
-    hashable_data: list[dict[str, Any]] = []
-    for server_name in sorted(servers_config.keys()):
-        server = servers_config[server_name]
-        server_data = {
-            "name": server_name,
-            "description": server.get("description", ""),
-            "tools": [],
-        }
-        for tool in server.get("tools", []):
-            server_data["tools"].append(
-                {
-                    "name": tool.get("name", ""),
-                    "description": tool.get("description", ""),
-                }
-            )
-        hashable_data.append(server_data)
-
-    # Create deterministic JSON and hash it
-    content = json.dumps(hashable_data, sort_keys=True, ensure_ascii=True)
+    server_data = {
+        "name": server_name,
+        "description": server_config.get("description", ""),
+        "tools": [
+            {
+                "name": tool.get("name", ""),
+                "description": tool.get("description", ""),
+            }
+            for tool in server_config.get("tools", [])
+        ],
+    }
+    content = json.dumps(server_data, sort_keys=True, ensure_ascii=True)
     return hashlib.sha256(content.encode()).hexdigest()[:12]
 
 
-def _default_output_path(servers_config: dict[str, Any] | None = None) -> Path:
-    """Get the default output path for embeddings.
+def _get_server_cache_path(server_name: str, server_hash: str) -> Path:
+    """Get the cache file path for a specific server version."""
+    return _per_server_cache_dir() / f"{server_name}_{server_hash}.json"
 
-    If servers_config is provided, includes a content hash in the filename
-    to ensure cache invalidation on any config changes.
-    """
-    if servers_config:
-        config_hash = _compute_servers_hash(servers_config)
-        return (
-            _user_cache_dir()
-            / "config"
-            / f"synthetic_mcp_arg_{embedding_model}_{abstract_model}_{config_hash}.json"
-        )
-    # Fallback without hash (for backwards compatibility)
-    return (
-        _user_cache_dir()
-        / "config"
-        / f"synthetic_mcp_arg_{embedding_model}_{abstract_model}.json"
-    )
+
+def _combined_embeddings_path() -> Path:
+    """Get the path for the combined embeddings file (for consumers)."""
+    return _user_cache_dir() / "config" / "synthetic_embeddings_combined.json"
 
 
 class SyntheticMcpArgGenerator:
-    """Generate embeddings for synthetic MCP servers."""
+    """Generate embeddings for synthetic MCP servers with per-server caching."""
 
     def __init__(
         self,
@@ -110,7 +95,7 @@ class SyntheticMcpArgGenerator:
 
         Args:
             servers_json_path: Path to synthetic servers.json (default: synthetic_mcp/config/servers.json)
-            output_file: Output path for embeddings (default: cache dir with content hash)
+            output_file: Output path for combined embeddings (default: combined cache file)
         """
         self.servers_json_path = servers_json_path or (
             _synthetic_mcp_dir() / "config" / "servers.json"
@@ -124,8 +109,7 @@ class SyntheticMcpArgGenerator:
         with self.servers_json_path.open("r", encoding="utf-8") as f:
             self.servers_config = json.load(f)
 
-        # Use content-hash-based path if no explicit output_file provided
-        self.output_file = output_file or _default_output_path(self.servers_config)
+        self.output_file = output_file or _combined_embeddings_path()
 
         self.embedding_client = openai.AsyncOpenAI(
             api_key=embedding_api_key, base_url=embedding_api_url
@@ -202,119 +186,134 @@ class SyntheticMcpArgGenerator:
                 formatted_params[param_name] = f"({param_type}) {param_desc}"
         return formatted_params
 
+    def _get_cached_server_embedding(
+        self, server_name: str, server_hash: str
+    ) -> dict[str, Any] | None:
+        """Load cached embedding for a server if it exists."""
+        cache_path = _get_server_cache_path(server_name, server_hash)
+        if cache_path.exists():
+            try:
+                with cache_path.open("r", encoding="utf-8") as f:
+                    return json.load(f)
+            except (json.JSONDecodeError, IOError):
+                pass
+        return None
+
+    def _save_server_embedding(
+        self, server_name: str, server_hash: str, data: dict[str, Any]
+    ) -> None:
+        """Save embedding for a server to cache."""
+        cache_path = _get_server_cache_path(server_name, server_hash)
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        with cache_path.open("w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+
+    async def _generate_server_embedding(
+        self, server_name: str, server_config: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Generate embeddings for a single server."""
+        server_description = server_config.get("description", "")
+        tools_data = server_config.get("tools", [])
+
+        # Convert to types.Tool objects
+        tools = []
+        for tool_data in tools_data:
+            tool = types.Tool(
+                name=tool_data.get("name", ""),
+                description=tool_data.get("description", ""),
+                inputSchema=tool_data.get("inputSchema", {}),
+            )
+            tools.append(tool)
+
+        # Generate summary
+        server_summary = await self._generate_summary(
+            server_name, server_description, tools
+        )
+
+        # Generate embeddings in parallel
+        embedding_tasks = {
+            "server_desc": self._get_embedding(server_description),
+            "server_summary": self._get_embedding(server_summary),
+        }
+        for i, tool in enumerate(tools):
+            if not tool.description:
+                raise ValueError(
+                    f"Tool '{tool.name}' in server '{server_name}' has no description"
+                )
+            embedding_tasks[f"tool_{i}"] = self._get_embedding(tool.description)
+
+        embeddings_results = await asyncio.gather(*embedding_tasks.values())
+        embeddings = dict(zip(embedding_tasks.keys(), embeddings_results))
+
+        # Format tools
+        formatted_tools = []
+        for i, tool in enumerate(tools):
+            formatted_tools.append(
+                {
+                    "name": tool.name,
+                    "description": tool.description,
+                    "description_embedding": embeddings[f"tool_{i}"],
+                    "parameter": self._format_tool_parameters(tool),
+                }
+            )
+
+        return {
+            "server_name": server_name,
+            "server_summary": server_summary,
+            "server_description": server_description,
+            "description_embedding": embeddings["server_desc"],
+            "summary_embedding": embeddings["server_summary"],
+            "tools": formatted_tools,
+        }
+
     async def generate(self, force: bool = False) -> Path:
-        """Generate embeddings for all synthetic servers.
+        """Generate embeddings for all synthetic servers with per-server caching.
+
+        Only servers whose content has changed will be regenerated.
 
         Args:
-            force: If True, regenerate even if output file exists
+            force: If True, regenerate all servers regardless of cache
 
         Returns:
-            Path to the generated embeddings file
+            Path to the combined embeddings file
         """
-        # Check if we can skip
-        if self.output_file.exists() and not force:
-            logger.info(f"Embeddings file already exists: {self.output_file}")
-            return self.output_file
+        all_servers_info: list[dict[str, Any]] = []
+        cached_count = 0
+        generated_count = 0
 
-        # Load existing servers if any (for incremental updates)
-        existing_servers_info: list[dict[str, Any]] = []
-        existing_server_names: set[str] = set()
-
-        if self.output_file.exists() and not force:
-            try:
-                with open(self.output_file, "r", encoding="utf-8") as f:
-                    content = json.load(f)
-                    if isinstance(content, list):
-                        existing_servers_info = content
-                        for server_data in existing_servers_info:
-                            if "server_name" in server_data:
-                                existing_server_names.add(server_data["server_name"])
-                        logger.info(
-                            f"Loaded {len(existing_server_names)} existing servers from {self.output_file}."
-                        )
-            except (json.JSONDecodeError, IOError) as e:
-                logger.error(f"Error reading existing servers: {e}")
-
-        all_servers_info = existing_servers_info.copy()
-        new_servers_processed_count = 0
-
-        for server_name, server_data in tqdm(
-            self.servers_config.items(), desc="Generating embeddings"
+        for server_name, server_config in tqdm(
+            self.servers_config.items(), desc="Processing servers"
         ):
-            if server_name in existing_server_names:
-                continue
+            server_hash = _compute_server_hash(server_name, server_config)
 
-            server_description = server_data.get("description", "")
-            tools_data = server_data.get("tools", [])
+            # Check per-server cache
+            if not force:
+                cached = self._get_cached_server_embedding(server_name, server_hash)
+                if cached:
+                    all_servers_info.append(cached)
+                    cached_count += 1
+                    continue
 
-            # Convert to types.Tool objects
-            tools = []
-            for tool_data in tools_data:
-                tool = types.Tool(
-                    name=tool_data.get("name", ""),
-                    description=tool_data.get("description", ""),
-                    inputSchema=tool_data.get("inputSchema", {}),
-                )
-                tools.append(tool)
-
-            logger.info(f"Indexing server: {server_name}")
-
-            # Generate summary
-            server_summary = await self._generate_summary(
-                server_name, server_description, tools
+            # Generate new embeddings for this server
+            logger.info(f"Generating embeddings for: {server_name}")
+            server_output = await self._generate_server_embedding(
+                server_name, server_config
             )
 
-            # Generate embeddings in parallel
-            embedding_tasks = {
-                "server_desc": self._get_embedding(server_description),
-                "server_summary": self._get_embedding(server_summary),
-            }
-            for i, tool in enumerate(tools):
-                if not tool.description:
-                    raise ValueError(
-                        f"Tool '{tool.name}' in server '{server_name}' has no description"
-                    )
-                embedding_tasks[f"tool_{i}"] = self._get_embedding(tool.description)
-
-            embeddings_results = await asyncio.gather(*embedding_tasks.values())
-            embeddings = dict(zip(embedding_tasks.keys(), embeddings_results))
-
-            # Format tools
-            formatted_tools = []
-            for i, tool in enumerate(tools):
-                formatted_tools.append(
-                    {
-                        "name": tool.name,
-                        "description": tool.description,
-                        "description_embedding": embeddings[f"tool_{i}"],
-                        "parameter": self._format_tool_parameters(tool),
-                    }
-                )
-
-            server_output = {
-                "server_name": server_name,
-                "server_summary": server_summary,
-                "server_description": server_description,
-                "description_embedding": embeddings["server_desc"],
-                "summary_embedding": embeddings["server_summary"],
-                "tools": formatted_tools,
-            }
-
+            # Cache per-server
+            self._save_server_embedding(server_name, server_hash, server_output)
             all_servers_info.append(server_output)
+            generated_count += 1
 
-            # Write incrementally
-            self.output_file.parent.mkdir(parents=True, exist_ok=True)
-            with open(self.output_file, "w", encoding="utf-8") as f:
-                json.dump(all_servers_info, f, indent=2, ensure_ascii=False)
-            new_servers_processed_count += 1
+        # Write combined file
+        self.output_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(self.output_file, "w", encoding="utf-8") as f:
+            json.dump(all_servers_info, f, indent=2, ensure_ascii=False)
 
-        logger.info("Indexing completed.")
-        if new_servers_processed_count > 0:
-            logger.info(
-                f"Added {new_servers_processed_count} new servers to {self.output_file}."
-            )
-        else:
-            logger.info("No new servers were added.")
+        logger.info(
+            f"Complete: {cached_count} cached, {generated_count} generated. "
+            f"Combined file: {self.output_file}"
+        )
 
         return self.output_file
 
@@ -322,34 +321,52 @@ class SyntheticMcpArgGenerator:
 async def generate_synthetic_embeddings(force: bool = False) -> Path:
     """Generate embeddings for synthetic MCP servers.
 
+    Uses per-server caching - only servers with changed content will be regenerated.
+
     Args:
-        force: If True, regenerate even if output file exists
+        force: If True, regenerate all servers regardless of cache
 
     Returns:
-        Path to the embeddings file
+        Path to the combined embeddings file
     """
     generator = SyntheticMcpArgGenerator()
     return await generator.generate(force=force)
 
 
 def get_synthetic_embeddings_path() -> Path:
-    """Get the path to the synthetic embeddings file for current servers.json.
-
-    The path includes a content hash of the servers config, so it automatically
-    points to a new file if the config has changed.
-    """
-    servers_json_path = _synthetic_mcp_dir() / "config" / "servers.json"
-    if servers_json_path.exists():
-        with servers_json_path.open("r", encoding="utf-8") as f:
-            servers_config = json.load(f)
-        return _default_output_path(servers_config)
-    return _default_output_path()
+    """Get the path to the combined synthetic embeddings file."""
+    return _combined_embeddings_path()
 
 
 def synthetic_embeddings_exist() -> bool:
-    """Check if synthetic embeddings have been generated for current config."""
+    """Check if the combined synthetic embeddings file exists.
+
+    Note: This only checks if the combined file exists, not whether all
+    servers have up-to-date embeddings. Run generate_synthetic_embeddings()
+    to ensure all embeddings are current.
+    """
     return get_synthetic_embeddings_path().exists()
 
 
+def all_servers_cached() -> bool:
+    """Check if all servers in servers.json have cached embeddings."""
+    servers_json_path = _synthetic_mcp_dir() / "config" / "servers.json"
+    if not servers_json_path.exists():
+        return False
+
+    with servers_json_path.open("r", encoding="utf-8") as f:
+        servers_config = json.load(f)
+
+    for server_name, server_config in servers_config.items():
+        server_hash = _compute_server_hash(server_name, server_config)
+        cache_path = _get_server_cache_path(server_name, server_hash)
+        if not cache_path.exists():
+            return False
+    return True
+
+
 if __name__ == "__main__":
-    asyncio.run(generate_synthetic_embeddings(force=True))
+    import sys
+
+    force = "--force" in sys.argv
+    asyncio.run(generate_synthetic_embeddings(force=force))
