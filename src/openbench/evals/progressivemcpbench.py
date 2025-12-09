@@ -29,6 +29,7 @@ from typing import Any
 from openai import AsyncOpenAI
 
 from openbench.datasets.progressivemcpbench import get_dataset
+from openbench.model._providers.groq_responses import GroqResponsesAPI
 from openbench.scorers.progressivemcpbench import progressivemcpbench_scorer
 from openbench.tools.progressivemcpbench.directory.toolsource import (
     directory_tool_source,
@@ -298,16 +299,15 @@ def progressive_minimal_servers_remote_solver() -> Solver:
             return state
 
         model = get_model()
-        model_name = model.name
 
-        if not model_name.startswith("groq-responses/"):
+        if not isinstance(model.api, GroqResponsesAPI):
             raise RuntimeError(
                 f"The 'minimal-servers-remote' strategy only works with the "
-                f"'groq-responses' provider. Got model: {model_name}. "
+                f"'groq-responses' provider. Got model: {model.name}. "
                 f"Use a model like: groq-responses/openai/gpt-oss-20b"
             )
 
-        groq_model_id = model_name.split("groq-responses/", 1)[1]
+        groq_model_id = model.name
 
         servers_config = _load_servers_config()
 
