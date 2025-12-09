@@ -3389,18 +3389,18 @@ _BUILTIN_BENCHMARKS = {
     "progressivemcpbench": BenchmarkMetadata(
         name="ProgressiveMCPBench",
         description=(
-            "Clone of LiveMCPBench using MCP tools with JSON-structured outputs "
-            "and exact/fuzzy answer scoring from the dataset's 'answers' field "
-            "(no LLM-as-a-judge)."
+            "Evaluating LLM agents with progressive tool discovery strategies using MCP. "
+            "Tests how effectively models discover and use MCP tools—from file operations "
+            "to API calls—while controlling how tools are presented (copilot, directory, "
+            "minimal-servers, minimal-tools, distraction modes)."
         ),
         category="agents",
         tags=[
             "agents",
             "tools",
             "mcp",
-            "json-output",
-            "exact-match",
-            "fuzzy-match",
+            "tool-discovery",
+            "synthetic",
         ],
         module_path="openbench.evals.progressivemcpbench",
         function_name="progressivemcpbench",
