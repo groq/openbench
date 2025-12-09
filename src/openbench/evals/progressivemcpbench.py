@@ -11,15 +11,19 @@ Strategies:
 - minimal-tools: Provides only the exact tools needed for each task
 - distraction-64: Minimal tools plus distraction tools to total 64 tools
 - distraction-128: Minimal tools plus distraction tools to total 128 tools
+- remote: Uses remote MCP servers via Groq's native MCP support (single-shot, no agentic loop)
 """
 
 from inspect_ai import task, Task
 from inspect_ai.solver import solver, Solver
 from inspect_ai.agent import react, AgentPrompt
 from inspect_ai.solver._task_state import TaskState
-from inspect_ai.model import GenerateConfig
+from inspect_ai.model import GenerateConfig, ChatMessageSystem
+from inspect_ai.solver import Generate
 from inspect_ai.tool import ToolError, ToolSource
 import asyncio
+import json
+from pathlib import Path
 from typing import Any
 
 from openbench.datasets.progressivemcpbench import get_dataset
@@ -51,6 +55,7 @@ VALID_STRATEGIES = {
     "minimal-tools",
     "distraction-64",
     "distraction-128",
+    "remote",
 }
 
 
@@ -247,6 +252,139 @@ def progressive_distraction_128_solver() -> Solver:
     return solve
 
 
+# Remote MCP configuration
+REMOTE_MCP_BASE_URL = "https://progressive-mcp-bench.groq-dev.workers.dev/mcp"
+
+
+def _synthetic_mcp_dir() -> Path:
+    """Get the synthetic_mcp directory path."""
+    current = Path(__file__).resolve()
+    repo_root = current.parent.parent.parent.parent
+    return repo_root / "synthetic_mcp"
+
+
+def _load_servers_config() -> dict[str, Any]:
+    """Load the synthetic servers.json configuration."""
+    config_path = _synthetic_mcp_dir() / "config" / "servers.json"
+    with open(config_path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _build_remote_mcp_tools(required_servers: list[str]) -> list[dict[str, Any]]:
+    """Build remote MCP tool definitions for the specified servers.
+
+    Each server becomes a single MCP tool entry that Groq's API will use
+    to discover and execute tools from the remote server.
+
+    Args:
+        required_servers: List of server names to include
+
+    Returns:
+        List of MCP tool definitions for use in extra_body
+    """
+    servers_config = _load_servers_config()
+
+    mcp_tools: list[dict[str, Any]] = []
+    for server_name in required_servers:
+        if server_name not in servers_config:
+            continue
+
+        server = servers_config[server_name]
+        mcp_tool = {
+            "type": "mcp",
+            "server_label": server_name,
+            "server_url": f"{REMOTE_MCP_BASE_URL}/{server_name}",
+            "server_description": server.get(
+                "description", f"MCP server: {server_name}"
+            ),
+            "require_approval": "never",
+        }
+        mcp_tools.append(mcp_tool)
+
+    return mcp_tools
+
+
+PROGRESSIVEMCPBENCH_REMOTE_SYSTEM_MESSAGE = """
+You are an agent designed to assist users with daily tasks by using external tools.
+
+You have access to remote MCP servers that provide various tools. The API will automatically
+discover the available tools from each server and execute them on your behalf.
+
+CRITICAL OUTPUT RULES:
+- Output ONLY: {"final_answer": "your answer here"}
+- DO NOT include tool_calls, reasoning, or any other fields
+- DO NOT include complex data structures
+- If you cannot determine an answer, return: {"final_answer": "I could not determine an answer"}
+- Do not wrap the JSON in backticks or any other formatting
+- The final_answer should be a concise string directly answering the user's question
+
+Example final output:
+
+{
+  "final_answer": "The file contains 42 lines of text."
+}
+
+Output only this JSON object as your final response.
+""".strip()
+
+
+@solver
+def progressive_remote_solver() -> Solver:
+    """Solver that uses remote MCP servers via Groq's native MCP support.
+
+    This strategy uses single-shot generation where Groq's API handles
+    tool discovery and execution via remote MCP servers.
+    Only works with minimal-servers configuration and Groq models.
+
+    The solver passes MCP tools to the GroqMCPAPI provider via extra_body,
+    which injects them into the request's tools array.
+    """
+
+    async def solve(state: TaskState, generate: Generate) -> TaskState:
+        metadata = state.metadata or {}
+        required_servers = metadata.get("required_servers", [])
+
+        if not required_servers:
+            state.metadata = state.metadata or {}
+            state.metadata["execution_error"] = "missing_annotation"
+            state.metadata["error_message"] = (
+                "Task is missing 'required_servers' annotation."
+            )
+            return state
+
+        mcp_tools = _build_remote_mcp_tools(required_servers)
+
+        if not mcp_tools:
+            state.metadata = state.metadata or {}
+            state.metadata["execution_error"] = "no_valid_servers"
+            state.metadata["error_message"] = (
+                f"No valid MCP servers found for: {required_servers}"
+            )
+            return state
+
+        state.messages.insert(
+            0, ChatMessageSystem(content=PROGRESSIVEMCPBENCH_REMOTE_SYSTEM_MESSAGE)
+        )
+
+        try:
+            state = await generate(
+                state,
+                tool_calls="none",
+                extra_body={
+                    "mcp_tools": mcp_tools,
+                    "mcp_tool_choice": "auto",
+                },
+            )
+        except Exception as e:
+            state.metadata = state.metadata or {}
+            state.metadata["execution_error"] = "runtime_error"
+            state.metadata["error_message"] = str(e)
+
+        return state
+
+    return solve
+
+
 def _get_solver_for_strategy(strategy: str) -> Solver:
     """Get the appropriate solver for the given strategy."""
     if strategy == "copilot":
@@ -261,6 +399,8 @@ def _get_solver_for_strategy(strategy: str) -> Solver:
         return progressive_distraction_64_solver()
     elif strategy == "distraction-128":
         return progressive_distraction_128_solver()
+    elif strategy == "remote":
+        return progressive_remote_solver()
     else:
         raise ValueError(
             f"Unknown strategy: {strategy}. Valid strategies: {VALID_STRATEGIES}"
@@ -285,6 +425,7 @@ def progressivemcpbench(
             - "minimal-tools": Direct access to exact required tools (requires annotations)
             - "distraction-64": Minimal tools + distractors to 64 total (requires annotations)
             - "distraction-128": Minimal tools + distractors to 128 total (requires annotations)
+            - "remote": Uses Groq's remote MCP support (single-shot, no local server needed)
     """
     if strategy is None:
         raise ValueError(
@@ -299,7 +440,8 @@ def progressivemcpbench(
             f"Valid strategies: {', '.join(sorted(VALID_STRATEGIES))}"
         )
 
-    ensure_mcp_server_running()
+    if strategy != "remote":
+        ensure_mcp_server_running()
 
     solver = _get_solver_for_strategy(strategy)
 

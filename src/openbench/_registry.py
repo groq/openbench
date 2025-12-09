@@ -198,12 +198,12 @@ def siliconflow() -> Type[ModelAPI]:
 def _override_builtin_groq_provider():
     """Replace Inspect AI's built-in groq provider with enhanced openbench version."""
     from inspect_ai._util.registry import _registry
-    from .model._providers.groq import GroqAPI
+    from .model._providers.groq_mcp import GroqMCPAPI
     from inspect_ai.model._registry import modelapi
 
     @modelapi(name="groq")
     def openbench_groq_override():
-        return GroqAPI
+        return GroqMCPAPI
 
     # Force override the inspect_ai/groq entry with openbench implementation
     _registry["modelapi:inspect_ai/groq"] = openbench_groq_override
