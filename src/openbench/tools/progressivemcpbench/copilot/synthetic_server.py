@@ -54,7 +54,7 @@ _GLOBAL_ROUTER: "SyntheticCopilotRouter | None" = None
 
 def serve(
     http_host: str = "localhost",
-    http_port: int = 8765,
+    http_port: int = 9123,
 ) -> None:
     """Run the Synthetic Copilot MCP server (stdio).
 

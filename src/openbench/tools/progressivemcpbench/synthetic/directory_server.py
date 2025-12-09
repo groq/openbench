@@ -51,7 +51,7 @@ _GLOBAL_ROUTER: SyntheticDirectoryRouter | None = None
 
 def serve(
     http_host: str = DEFAULT_HTTP_HOST,
-    http_port: int = DEFAULT_HTTP_PORT,
+    http_port: int = 9123,
 ) -> None:
     """Run the Synthetic Directory MCP server (stdio).
 

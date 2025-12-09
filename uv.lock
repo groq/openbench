@@ -2705,6 +2705,7 @@ name = "openbench"
 version = "0.5.2"
 source = { editable = "." }
 dependencies = [
+    { name = "aiohttp" },
     { name = "datasets" },
     { name = "groq" },
     { name = "inspect-ai" },
@@ -2773,6 +2774,7 @@ tau-bench = [
 
 [package.metadata]
 requires-dist = [
+    { name = "aiohttp", specifier = ">=3.11.18" },
     { name = "datasets", specifier = ">=3.6.0" },
     { name = "groq", specifier = ">=0.33.0" },
     { name = "inspect-ai", specifier = "==0.3.151" },

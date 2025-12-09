@@ -228,20 +228,62 @@ class SyntheticDirectoryRouter:
         tool_name: str,
         params: dict[str, Any],
     ) -> dict[str, Any]:
-        """Call a tool on the synthetic HTTP MCP server."""
+        """Call a tool on the synthetic HTTP MCP server using MCP protocol."""
         conn = HTTPConnection(self.http_host, self.http_port, timeout=self.timeout)
-        body = json.dumps(params)
+
+        # MCP protocol format
+        call_data = {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "tools/call",
+            "params": {
+                "name": tool_name,
+                "arguments": params
+            }
+        }
+        body = json.dumps(call_data)
 
         try:
             conn.request(
                 "POST",
-                f"/mcp/{server_name}/tools/{tool_name}",
+                f"/mcp/{server_name}",
                 body,
-                {"Content-Type": "application/json"},
+                {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json, text/event-stream"
+                },
             )
             response = conn.getresponse()
-            data = json.loads(response.read().decode("utf-8"))
-            return data
+            response_text = response.read().decode("utf-8")
+
+            # Parse SSE response format: "event: message\ndata: {...}\n\n"
+            try:
+                # Extract JSON from data field in SSE
+                if "data: " in response_text:
+                    # Split on event/data boundaries
+                    lines = response_text.strip().split('\n')
+                    data_line = None
+                    for line in lines:
+                        if line.startswith('data: '):
+                            data_line = line[6:]  # Remove "data: " prefix
+                            break
+
+                    if data_line:
+                        data = json.loads(data_line)
+                    else:
+                        return {"error": "No data field in SSE response"}
+                else:
+                    # Try to parse as direct JSON
+                    data = json.loads(response_text)
+
+                if "error" in data:
+                    return {"error": data["error"].get("message", str(data["error"]))}
+
+                return data
+
+            except json.JSONDecodeError as e:
+                return {"error": f"Failed to parse response: {str(e)}"}
+
         except Exception as e:
             return {"error": str(e)}
         finally:

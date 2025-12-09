@@ -2,13 +2,13 @@
 Create Inspect AI Tool wrappers for synthetic MCP tools.
 
 This module provides wrappers that route tool calls to the synthetic HTTP MCP
-server instead of real MCP servers. The HTTP server handles all tool execution
-and returns deterministic responses.
+server using proper MCP protocol instead of custom RPC.
 """
 
 from __future__ import annotations
 
 import json
+import re
 from typing import Any
 
 from inspect_ai.tool import Tool
@@ -19,7 +19,7 @@ import aiohttp
 
 
 DEFAULT_HTTP_HOST = "localhost"
-DEFAULT_HTTP_PORT = 8765
+DEFAULT_HTTP_PORT = 9123
 
 
 def _convert_json_schema(prop: dict[str, Any], name: str | None = None) -> JSONSchema:
@@ -91,7 +91,7 @@ async def _call_http_tool(
     port: int = DEFAULT_HTTP_PORT,
     timeout: int = 30,
 ) -> dict[str, Any]:
-    """Call a tool on the synthetic HTTP MCP server.
+    """Call a tool on the synthetic HTTP MCP server using MCP protocol.
 
     Args:
         server_name: Name of the MCP server
@@ -108,14 +108,58 @@ async def _call_http_tool(
         timeout=aiohttp.ClientTimeout(total=timeout)
     ) as session:
         try:
-            url = f"http://{host}:{port}/mcp/{server_name}/tools/{tool_name}"
+            url = f"http://{host}:{port}/mcp/{server_name}"
+            # MCP tools/call format
+            call_data = {
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "tools/call",
+                "params": {
+                    "name": tool_name,
+                    "arguments": params
+                }
+            }
+
+            headers = {
+                "Content-Type": "application/json",
+                "Accept": "application/json, text/event-stream"
+            }
+
             async with session.post(
                 url,
-                json=params,
-                headers={"Content-Type": "application/json"},
+                json=call_data,
+                headers=headers,
             ) as response:
-                data = await response.json()
-                return data
+                response_text = await response.text()
+
+                # Parse SSE response format: "event: message\ndata: {...}\n\n"
+                try:
+                    # Extract JSON from data field in SSE
+                    if "data: " in response_text:
+                        # Split on event/data boundaries
+                        lines = response_text.strip().split('\n')
+                        data_line = None
+                        for line in lines:
+                            if line.startswith('data: '):
+                                data_line = line[6:]  # Remove "data: " prefix
+                                break
+
+                        if data_line:
+                            data = json.loads(data_line)
+                        else:
+                            return {"error": "No data field in SSE response"}
+                    else:
+                        # Try to parse as direct JSON
+                        data = json.loads(response_text)
+
+                    if "error" in data:
+                        return {"error": data["error"].get("message", str(data["error"]))}
+
+                    return data
+
+                except json.JSONDecodeError as e:
+                    return {"error": f"Failed to parse response: {str(e)}"}
+
         except Exception as e:
             return {"error": str(e)}
 

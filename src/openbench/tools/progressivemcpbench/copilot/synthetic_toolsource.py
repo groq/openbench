@@ -17,7 +17,7 @@ def synthetic_copilot_tool_source(
     python_executable: Optional[str] = None,
     extra_env: Optional[dict[str, str]] = None,
     http_host: str = "localhost",
-    http_port: int = 8765,
+    http_port: int = 9123,
 ) -> ToolSource:
     """Create a ToolSource for the synthetic Copilot MCP server.
 
