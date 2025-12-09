@@ -351,3 +351,37 @@ def synthetic_distraction_128_tool_source(
         http_host=http_host,
         http_port=http_port,
     )
+
+
+def synthetic_minimal_servers_remote_tool_source(
+    required_servers: list[str],
+    server_base_url: str = "https://progressive-mcp-bench.groq-dev.workers.dev",
+) -> ToolSource:
+    """Create a ToolSource with all tools from the specified synthetic servers, using remote URLs.
+
+    Args:
+        required_servers: List of server names to include tools from
+        server_base_url: Base URL for remote MCP servers
+        
+    Returns:
+        ToolSource with all tools from the specified servers (remote)
+    """
+    servers_config = _load_servers_config()
+
+    tools: list[Tool] = []
+    for server_name in required_servers:
+        if server_name not in servers_config:
+            continue
+
+        server = servers_config[server_name]
+        for tool_info in server.get("tools", []):
+            tool = create_synthetic_tool_wrapper(
+                server_name=server_name,
+                tool_name=tool_info["name"],
+                tool_description=tool_info.get("description", ""),
+                input_schema=tool_info.get("inputSchema", {}),
+                server_url=f"{server_base_url}/mcp/{server_name}",
+            )
+            tools.append(tool)
+
+    return _StaticToolSource(tools)

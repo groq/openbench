@@ -1,0 +1,25 @@
+@solver
+def progressive_remote_minimal_servers_solver() -> Solver:
+    """Solver that provides all tools from the required server(s) for each task using remote MCP servers.
+
+    This strategy provides the tools from required servers with remote URLs for single-shot execution.
+    """
+
+    async def solve(state: TaskState, generate: Any) -> TaskState:
+        metadata = state.metadata or {}
+        required_servers = metadata.get("required_servers", [])
+
+        if not required_servers:
+            state.metadata = state.metadata or {}
+            state.metadata["execution_error"] = "missing_annotation"
+            state.metadata["error_message"] = (
+                "Task is missing 'required_servers' annotation."
+            )
+            return state
+
+        tool_source = synthetic_minimal_servers_remote_tool_source(required_servers)
+        return await _run_react_with_tools(
+            state, PROGRESSIVEMCPBENCH_MINIMAL_SYSTEM_MESSAGE, tool_source
+        )
+
+    return solve

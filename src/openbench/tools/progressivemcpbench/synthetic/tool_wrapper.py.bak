@@ -89,7 +89,6 @@ async def _call_http_tool(
     params: dict[str, Any],
     host: str = DEFAULT_HTTP_HOST,
     port: int = DEFAULT_HTTP_PORT,
-    server_url: str | None = None,
     timeout: int = 30,
 ) -> dict[str, Any]:
     """Call a tool on the synthetic HTTP MCP server using MCP protocol.
@@ -98,9 +97,8 @@ async def _call_http_tool(
         server_name: Name of the MCP server
         tool_name: Name of the tool to call
         params: Tool parameters as a dictionary
-        host: HTTP server host (ignored if server_url is provided)
-        port: HTTP server port (ignored if server_url is provided)
-        server_url: Full URL to the MCP server (e.g., "https://example.com")
+        host: HTTP server host
+        port: HTTP server port
         timeout: Request timeout in seconds
 
     Returns:
@@ -110,12 +108,7 @@ async def _call_http_tool(
         timeout=aiohttp.ClientTimeout(total=timeout)
     ) as session:
         try:
-            if server_url:
-                # Use the provided URL, appending the server endpoint
-                url = f"{server_url}/mcp/{server_name}"
-            else:
-                # Use host:port format (existing behavior)
-                url = f"http://{host}:{port}/mcp/{server_name}"
+            url = f"http://{host}:{port}/mcp/{server_name}"
             
             # MCP tools/call format
             call_data = {
@@ -179,7 +172,6 @@ def create_synthetic_tool_wrapper(
     input_schema: dict[str, Any],
     http_host: str = DEFAULT_HTTP_HOST,
     http_port: int = DEFAULT_HTTP_PORT,
-    server_url: str | None = None,
     timeout: int = 30,
 ) -> Tool:
     """Create an Inspect AI Tool that routes to the synthetic HTTP MCP server.
@@ -189,9 +181,8 @@ def create_synthetic_tool_wrapper(
         tool_name: Name of the tool
         tool_description: Description of the tool
         input_schema: JSON schema for tool parameters
-        http_host: HTTP server host (ignored if server_url is provided)
-        http_port: HTTP server port (ignored if server_url is provided)
-        server_url: Full URL to the MCP server (e.g., "https://example.com/mcp")
+        http_host: HTTP server host
+        http_port: HTTP server port
         timeout: Timeout in seconds for tool execution
 
     Returns:
@@ -206,7 +197,6 @@ def create_synthetic_tool_wrapper(
             params=kwargs,
             host=http_host,
             port=http_port,
-            server_url=server_url,
             timeout=timeout,
         )
 
