@@ -20,6 +20,7 @@ import aiohttp
 
 DEFAULT_HTTP_HOST = "localhost"
 DEFAULT_HTTP_PORT = 9123
+REMOTE_BASE_URL = "https://progressive-mcp-bench.groq-dev.workers.dev"
 
 
 def _convert_json_schema(prop: dict[str, Any], name: str | None = None) -> JSONSchema:
@@ -90,6 +91,7 @@ async def _call_http_tool(
     host: str = DEFAULT_HTTP_HOST,
     port: int = DEFAULT_HTTP_PORT,
     timeout: int = 30,
+    remote_url: str | None = None,
 ) -> dict[str, Any]:
     """Call a tool on the synthetic HTTP MCP server using MCP protocol.
 
@@ -97,9 +99,10 @@ async def _call_http_tool(
         server_name: Name of the MCP server
         tool_name: Name of the tool to call
         params: Tool parameters as a dictionary
-        host: HTTP server host
-        port: HTTP server port
+        host: HTTP server host (for local connections)
+        port: HTTP server port (for local connections)
         timeout: Request timeout in seconds
+        remote_url: Remote server URL (for remote connections)
 
     Returns:
         Response dictionary with 'result' or 'error' key
@@ -108,7 +111,13 @@ async def _call_http_tool(
         timeout=aiohttp.ClientTimeout(total=timeout)
     ) as session:
         try:
-            url = f"http://{host}:{port}/mcp/{server_name}"
+            if remote_url:
+                # Use remote URL format
+                url = f"{remote_url}/mcp/{server_name}"
+            else:
+                # Use local URL format
+                url = f"http://{host}:{port}/mcp/{server_name}"
+            
             # MCP tools/call format
             call_data = {
                 "jsonrpc": "2.0",
@@ -171,6 +180,7 @@ def create_synthetic_tool_wrapper(
     input_schema: dict[str, Any],
     http_host: str = DEFAULT_HTTP_HOST,
     http_port: int = DEFAULT_HTTP_PORT,
+    remote_url: str | None = None,
     timeout: int = 30,
 ) -> Tool:
     """Create an Inspect AI Tool that routes to the synthetic HTTP MCP server.
@@ -180,8 +190,9 @@ def create_synthetic_tool_wrapper(
         tool_name: Name of the tool
         tool_description: Description of the tool
         input_schema: JSON schema for tool parameters
-        http_host: HTTP server host
-        http_port: HTTP server port
+        http_host: HTTP server host (for local connections)
+        http_port: HTTP server port (for local connections)
+        remote_url: Remote server URL (for remote connections)
         timeout: Timeout in seconds for tool execution
 
     Returns:
@@ -197,6 +208,7 @@ def create_synthetic_tool_wrapper(
             host=http_host,
             port=http_port,
             timeout=timeout,
+            remote_url=remote_url,
         )
 
         if "error" in response and response["error"]:

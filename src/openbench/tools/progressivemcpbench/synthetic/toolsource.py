@@ -19,6 +19,7 @@ from .tool_wrapper import (
     create_synthetic_tool_wrapper,
     DEFAULT_HTTP_HOST,
     DEFAULT_HTTP_PORT,
+    REMOTE_BASE_URL,
 )
 
 
@@ -351,3 +352,78 @@ def synthetic_distraction_128_tool_source(
         http_host=http_host,
         http_port=http_port,
     )
+
+
+def synthetic_remote_minimal_servers_tool_source(
+    required_servers: list[str],
+    base_url: str = REMOTE_BASE_URL,
+) -> ToolSource:
+    """Create a ToolSource with all tools from the specified synthetic servers using remote URL.
+
+    Args:
+        required_servers: List of server names to include tools from
+        base_url: Remote MCP server base URL
+
+    Returns:
+        ToolSource with all tools from the specified servers via remote URL
+    """
+    servers_config = _load_servers_config()
+
+    tools: list[Tool] = []
+    for server_name in required_servers:
+        if server_name not in servers_config:
+            continue
+
+        server = servers_config[server_name]
+        for tool_info in server.get("tools", []):
+            tool = create_synthetic_tool_wrapper(
+                server_name=server_name,
+                tool_name=tool_info["name"],
+                tool_description=tool_info.get("description", ""),
+                input_schema=tool_info.get("inputSchema", {}),
+                remote_url=base_url,
+            )
+            tools.append(tool)
+
+    return _StaticToolSource(tools)
+
+
+def synthetic_remote_minimal_tools_tool_source(
+    required_tools: list[tuple[str, str]],
+    base_url: str = REMOTE_BASE_URL,
+) -> ToolSource:
+    """Create a ToolSource with only the specified synthetic tools using remote URL.
+
+    Args:
+        required_tools: List of (server_name, tool_name) tuples
+        base_url: Remote MCP server base URL
+
+    Returns:
+        ToolSource with only the specified tools via remote URL
+    """
+    servers_config = _load_servers_config()
+
+    required_set = {(s, t) for s, t in required_tools}
+    required_servers_set = {s for s, t in required_tools}
+
+    tools: list[Tool] = []
+    for server_name in required_servers_set:
+        if server_name not in servers_config:
+            continue
+
+        server = servers_config[server_name]
+        for tool_info in server.get("tools", []):
+            tool_name = tool_info["name"]
+            if (server_name, tool_name) not in required_set:
+                continue
+
+            tool = create_synthetic_tool_wrapper(
+                server_name=server_name,
+                tool_name=tool_name,
+                tool_description=tool_info.get("description", ""),
+                input_schema=tool_info.get("inputSchema", {}),
+                remote_url=base_url,
+            )
+            tools.append(tool)
+
+    return _StaticToolSource(tools)
