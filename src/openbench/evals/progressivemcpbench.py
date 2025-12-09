@@ -14,7 +14,7 @@ Strategies:
 """
 
 from inspect_ai import task, Task
-from inspect_ai.solver import solver, Solver
+from inspect_ai.solver import solver, Solver, generate
 from inspect_ai.agent import react, AgentPrompt
 from inspect_ai.solver._task_state import TaskState
 from inspect_ai.model import GenerateConfig
@@ -32,8 +32,6 @@ from openbench.tools.progressivemcpbench.synthetic.toolsource import (
     synthetic_minimal_tools_tool_source,
     synthetic_distraction_64_tool_source,
     synthetic_distraction_128_tool_source,
-    synthetic_remote_minimal_servers_tool_source,
-    synthetic_remote_minimal_tools_tool_source,
 )
 from openbench.tools.progressivemcpbench.copilot.synthetic_toolsource import (
     synthetic_copilot_tool_source,
@@ -54,7 +52,6 @@ VALID_STRATEGIES = {
     "distraction-64",
     "distraction-128",
     "remote-minimal-servers",
-    "remote-minimal-tools",
 }
 
 
@@ -197,6 +194,40 @@ def _build_required_tools(
     return required_tools
 
 
+def _create_mcp_server_config(required_servers: list[str]) -> list[dict]:
+    """Create MCP server configurations in Groq's format.
+    
+    Args:
+        required_servers: List of required MCP server names
+        
+    Returns:
+        List of MCP server configuration dictionaries
+    """
+    mcp_servers = []
+    for server_name in required_servers:
+        mcp_servers.append({
+            "type": "mcp",
+            "server_label": server_name,
+            "server_url": f"https://progressive-mcp-bench.groq-dev.workers.dev/mcp/{server_name}",
+            "server_description": f"MCP server for {server_name} operations. Provides tools for discovery and execution.",
+            "require_approval": "never"
+        })
+    return mcp_servers
+
+
+def _extract_final_response(model_response) -> str:
+    """Extract final response content from model output."""
+    # Handle different response formats from generate()
+    if hasattr(model_response, 'content'):
+        return model_response.content
+    elif hasattr(model_response, 'text'):
+        return model_response.text
+    elif isinstance(model_response, str):
+        return model_response
+    else:
+        return str(model_response)
+
+
 @solver
 def progressive_distraction_64_solver() -> Solver:
     """Solver that provides required tools plus distractors to total 64 tools."""
@@ -253,9 +284,15 @@ def progressive_distraction_128_solver() -> Solver:
 
 @solver
 def progressive_remote_minimal_servers_solver() -> Solver:
-    """Solver that provides all tools from required server(s) via remote URL."""
+    """Solver that provides MCP server definitions for single-shot remote execution.
+
+    This strategy sends MCP server configurations to the model, which discovers
+    tools directly from the servers and returns a final answer without iterative
+    agentic loops.
+    """
 
     async def solve(state: TaskState, generate: Any) -> TaskState:
+        # Get required servers from task metadata
         metadata = state.metadata or {}
         required_servers = metadata.get("required_servers", [])
 
@@ -267,36 +304,48 @@ def progressive_remote_minimal_servers_solver() -> Solver:
             )
             return state
 
-        tool_source = synthetic_remote_minimal_servers_tool_source(required_servers)
-        return await _run_react_with_tools(
-            state, PROGRESSIVEMCPBENCH_MINIMAL_SYSTEM_MESSAGE, tool_source
-        )
-
-    return solve
-
-
-@solver
-def progressive_remote_minimal_tools_solver() -> Solver:
-    """Solver that provides only exact tools needed via remote URL."""
-
-    async def solve(state: TaskState, generate: Any) -> TaskState:
-        metadata = state.metadata or {}
-        required_servers = metadata.get("required_servers", [])
-        required_tools_list = metadata.get("required_tools", [])
-
-        if not required_servers or not required_tools_list:
-            state.metadata = state.metadata or {}
-            state.metadata["execution_error"] = "missing_annotation"
-            state.metadata["error_message"] = (
-                "Task is missing 'required_servers' or 'required_tools' annotation."
+        # Create MCP server configurations (not Python tool functions)
+        mcp_servers = _create_mcp_server_config(required_servers)
+        
+        # Direct model call using generate() - NO agentic loop
+        try:
+            # Use minimal system message since model handles tool discovery
+            model_response = await generate(
+                state.input,
+                tools=mcp_servers,  # Groq MCP tool format
             )
+            
+            # Extract final response content directly
+            final_answer = _extract_final_response(model_response)
+            
+            # Set the output correctly on TaskState
+            from inspect_ai.model import ModelOutput
+            if not hasattr(state, 'output') or state.output is None:
+                state.output = ModelOutput.from_content(
+                    model="remote-minimal-servers",
+                    content=final_answer
+                )
+            else:
+                state.output.completion = final_answer
+                
             return state
-
-        required_tools = _build_required_tools(required_servers, required_tools_list)
-        tool_source = synthetic_remote_minimal_tools_tool_source(required_tools)
-        return await _run_react_with_tools(
-            state, PROGRESSIVEMCPBENCH_MINIMAL_SYSTEM_MESSAGE, tool_source
-        )
+            
+        except Exception as e:
+            state.metadata = state.metadata or {}
+            state.metadata["execution_error"] = "runtime_error"
+            state.metadata["error_message"] = str(e)
+            
+            # Set error output
+            from inspect_ai.model import ModelOutput
+            if not hasattr(state, 'output') or state.output is None:
+                state.output = ModelOutput.from_content(
+                    model="remote-minimal-servers",
+                    content=f"Task failed due to runtime error: {str(e)}"
+                )
+            else:
+                state.output.completion = f"Task failed due to runtime error: {str(e)}"
+                
+            return state
 
     return solve
 
@@ -317,8 +366,6 @@ def _get_solver_for_strategy(strategy: str) -> Solver:
         return progressive_distraction_128_solver()
     elif strategy == "remote-minimal-servers":
         return progressive_remote_minimal_servers_solver()
-    elif strategy == "remote-minimal-tools":
-        return progressive_remote_minimal_tools_solver()
     else:
         raise ValueError(
             f"Unknown strategy: {strategy}. Valid strategies: {VALID_STRATEGIES}"
@@ -333,6 +380,7 @@ def progressivemcpbench(
     """ProgressiveMCPBench using configurable tool discovery strategies.
 
     All strategies now use the synthetic MCP layer with deterministic responses.
+    Remote strategies use single-shot model calls with MCP server configurations.
 
     Args:
         working_limit: Maximum number of API calls per task.
@@ -343,8 +391,7 @@ def progressivemcpbench(
             - "minimal-tools": Direct access to exact required tools (requires annotations)
             - "distraction-64": Minimal tools + distractors to 64 total (requires annotations)
             - "distraction-128": Minimal tools + distractors to 128 total (requires annotations)
-            - "remote-minimal-servers": Remote access to required server tools (requires annotations)
-            - "remote-minimal-tools": Remote access to exact required tools (requires annotations)
+            - "remote-minimal-servers": Single-shot execution with MCP server discovery
     """
     if strategy is None:
         raise ValueError(
@@ -352,6 +399,33 @@ def progressivemcpbench(
             "Use -T strategy=directory or -T strategy=minimal-tools on the command line.\n"
             f"Valid strategies: {', '.join(sorted(VALID_STRATEGIES))}"
         )
+
+    if strategy not in VALID_STRATEGIES:
+        raise ValueError(
+            f"Invalid strategy '{strategy}'.\n"
+            f"Valid strategies: {', '.join(sorted(VALID_STRATEGIES))}"
+        )
+
+    # Only check for local MCP server for local strategies, not remote ones
+    if not strategy.startswith("remote-"):
+        ensure_mcp_server_running()
+
+    solver = _get_solver_for_strategy(strategy)
+
+    # All strategies now use the synthetic dataset
+    dataset = get_dataset()
+
+    return Task(
+        dataset=dataset,
+        solver=[solver],
+        scorer=progressivemcpbench_scorer(),
+        name=f"progressivemcpbench-{strategy}",
+        config=GenerateConfig(
+            temperature=0.7,
+            max_tokens=2048,
+        ),
+        working_limit=working_limit,
+    )
 
     if strategy not in VALID_STRATEGIES:
         raise ValueError(
