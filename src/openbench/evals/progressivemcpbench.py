@@ -218,14 +218,29 @@ def _create_mcp_server_config(required_servers: list[str]) -> list[dict]:
 def _extract_final_response(model_response) -> str:
     """Extract final response content from model output."""
     # Handle different response formats from generate()
+    
+    # Case 1: ModelOutput object with completion
+    if hasattr(model_response, 'completion'):
+        return model_response.completion
+    
+    # Case 2: ModelOutput object with content  
     if hasattr(model_response, 'content'):
-        return model_response.content
-    elif hasattr(model_response, 'text'):
+        content = model_response.content
+        if isinstance(content, str):
+            return content
+        else:
+            return str(content)
+    
+    # Case 3: Object with text attribute
+    if hasattr(model_response, 'text'):
         return model_response.text
-    elif isinstance(model_response, str):
+    
+    # Case 4: Direct string response
+    if isinstance(model_response, str):
         return model_response
-    else:
-        return str(model_response)
+        
+    # Case 5: Unknown format - convert to string
+    return str(model_response)
 
 
 @solver
@@ -292,6 +307,7 @@ def progressive_remote_minimal_servers_solver() -> Solver:
     """
 
     async def solve(state: TaskState, generate: Any) -> TaskState:
+        """Solve using MCP server configurations for direct model execution."""
         # Get required servers from task metadata
         metadata = state.metadata or {}
         required_servers = metadata.get("required_servers", [])
@@ -307,15 +323,15 @@ def progressive_remote_minimal_servers_solver() -> Solver:
         # Create MCP server configurations (not Python tool functions)
         mcp_servers = _create_mcp_server_config(required_servers)
         
-        # Direct model call using generate() - NO agentic loop
         try:
-            # Use minimal system message since model handles tool discovery
+            # Call the generate function correctly with proper parameters
+            # Using tools parameter for MCP server configuration
             model_response = await generate(
-                state.input,
-                tools=mcp_servers,  # Groq MCP tool format
+                state,
+                tools=mcp_servers,  # Pass MCP tools to generate function
             )
             
-            # Extract final response content directly
+            # Extract final response content properly
             final_answer = _extract_final_response(model_response)
             
             # Set the output correctly on TaskState
@@ -326,8 +342,14 @@ def progressive_remote_minimal_servers_solver() -> Solver:
                     content=final_answer
                 )
             else:
-                state.output.completion = final_answer
-                
+                if hasattr(state.output, 'completion'):
+                    state.output.completion = final_answer
+                else:
+                    state.output = ModelOutput.from_content(
+                        model="remote-minimal-servers",
+                        content=final_answer
+                    )
+                    
             return state
             
         except Exception as e:
@@ -337,14 +359,22 @@ def progressive_remote_minimal_servers_solver() -> Solver:
             
             # Set error output
             from inspect_ai.model import ModelOutput
+            error_content = f"Task failed due to runtime error: {str(e)}"
+            
             if not hasattr(state, 'output') or state.output is None:
                 state.output = ModelOutput.from_content(
-                    model="remote-minimal-servers",
-                    content=f"Task failed due to runtime error: {str(e)}"
+                    model="remote-minimal-servers", 
+                    content=error_content
                 )
             else:
-                state.output.completion = f"Task failed due to runtime error: {str(e)}"
-                
+                if hasattr(state.output, 'completion'):
+                    state.output.completion = error_content
+                else:
+                    state.output = ModelOutput.from_content(
+                        model="remote-minimal-servers",
+                        content=error_content
+                    )
+                    
             return state
 
     return solve
