@@ -18,9 +18,12 @@ bench eval progressivemcpbench --model openai/gpt-4o -T strategy=minimal-servers
 
 # Run with only exact required tools per task
 bench eval progressivemcpbench --model openai/gpt-4o -T strategy=minimal-tools
+
+# Run with Groq server-side MCP (single-shot, no local tool loop)
+bench eval progressivemcpbench --model groq-responses/openai/gpt-oss-20b -T strategy=minimal-servers-remote
 ```
 
-The synthetic MCP HTTP server is started automatically when you run the eval.
+The synthetic MCP HTTP server is started automatically when you run the eval (except for `minimal-servers-remote` which uses a hosted remote server).
 
 ## Architecture Overview
 
@@ -57,14 +60,15 @@ The benchmark uses a **synthetic MCP layer** that provides:
 
 All strategies use the synthetic MCP layer with deterministic responses.
 
-| Strategy          | Description                                                 | Use Case                          |
-|-------------------|-------------------------------------------------------------|-----------------------------------|
-| `copilot`         | Semantic search via `route()` + `execute-tool()`            | Tests RAG-style tool discovery    |
-| `directory`       | Filesystem-like exploration via `ls()` + `read-tool-file()` | Tests explicit tool browsing      |
-| `minimal-servers` | Direct access to required servers only                      | Tests with server-level filtering |
-| `minimal-tools`   | Direct access to exact tools needed                         | Upper bound on performance        |
-| `distraction-64`  | Required tools + distractors (64 total)                     | Tests distraction resistance      |
-| `distraction-128` | Required tools + distractors (128 total)                    | Tests distraction resistance      |
+| Strategy                 | Description                                                 | Use Case                          |
+|--------------------------|-------------------------------------------------------------|-----------------------------------|
+| `copilot`                | Semantic search via `route()` + `execute-tool()`            | Tests RAG-style tool discovery    |
+| `directory`              | Filesystem-like exploration via `ls()` + `read-tool-file()` | Tests explicit tool browsing      |
+| `minimal-servers`        | Direct access to required servers only                      | Tests with server-level filtering |
+| `minimal-servers-remote` | Groq server-side MCP (single-shot)                          | Tests remote MCP orchestration    |
+| `minimal-tools`          | Direct access to exact tools needed                         | Upper bound on performance        |
+| `distraction-64`         | Required tools + distractors (64 total)                     | Tests distraction resistance      |
+| `distraction-128`        | Required tools + distractors (128 total)                    | Tests distraction resistance      |
 
 ### Strategy Details
 
@@ -78,6 +82,13 @@ All strategies use the synthetic MCP layer with deterministic responses.
 - `execute-tool(tool_path, params)` - Execute a tool by its path
 
 **Minimal strategies** - No discovery needed; tools are provided directly based on task annotations. Requires `required_servers` and `required_tools` fields in tasks.
+
+**Minimal-servers-remote** - Uses Groq's server-side MCP capability. Instead of local tool execution, MCP server specs are sent to Groq's Responses API, which handles all tool discovery and execution internally. This is a single-shot approach - no local tool-calling loop. Only works with the `groq-responses` provider.
+
+```bash
+# Example: Run with remote MCP
+bench eval progressivemcpbench --model groq-responses/openai/gpt-oss-20b -T strategy=minimal-servers-remote
+```
 
 **Distraction strategies** - Required tools plus additional "distractor" tools, padded to exactly 64 or 128 tools total. Distractors are selected deterministically based on task ID.
 
@@ -407,12 +418,13 @@ The model must output a JSON object with a `final_answer` field containing the a
 bench eval progressivemcpbench --model <model> -T strategy=<strategy> [options]
 
 # Strategy options:
--T strategy=copilot           # Semantic search discovery
--T strategy=directory         # Filesystem-like exploration
--T strategy=minimal-servers   # Only required servers
--T strategy=minimal-tools     # Only exact tools
--T strategy=distraction-64    # Required + distractors (64 total)
--T strategy=distraction-128   # Required + distractors (128 total)
+-T strategy=copilot                 # Semantic search discovery
+-T strategy=directory               # Filesystem-like exploration
+-T strategy=minimal-servers         # Only required servers
+-T strategy=minimal-servers-remote  # Groq server-side MCP (groq-responses only)
+-T strategy=minimal-tools           # Only exact tools
+-T strategy=distraction-64          # Required + distractors (64 total)
+-T strategy=distraction-128         # Required + distractors (128 total)
 
 # Common options:
 --limit N          # Run only N tasks
