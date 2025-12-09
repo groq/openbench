@@ -1,8 +1,8 @@
 """ProgressiveMCPBench dataset loader.
 
 ProgressiveMCPBench is a benchmark for evaluating LLM agents on real-world tasks
-using the Model Context Protocol (MCP). It starts as a clone of LiveMCPBench
-but uses a local JSON dataset and exact/fuzzy answer matching.
+using the Model Context Protocol (MCP). It uses a synthetic MCP server for
+deterministic evaluation with exact/fuzzy answer matching.
 """
 
 import json
@@ -14,18 +14,12 @@ from inspect_ai.dataset import Dataset, MemoryDataset, Sample
 
 logger = logging.getLogger(__name__)
 
-# Store data relative to this file so it's editable by the user
-DATA_DIR = Path(__file__).resolve().parent / "data"
-DATA_FILE = DATA_DIR / "progressivemcpbench.json"
-
 # Synthetic MCP data directory (in repo root)
 # Path: src/openbench/datasets/ -> repo root is 3 parents up
 SYNTHETIC_MCP_DIR = (
     Path(__file__).resolve().parent.parent.parent.parent / "synthetic_mcp"
 )
-SYNTHETIC_TASKS_FILE = (
-    SYNTHETIC_MCP_DIR / "tasks" / "progressivemcpbench_synthetic.json"
-)
+TASKS_FILE = SYNTHETIC_MCP_DIR / "tasks" / "progressivemcpbench.json"
 
 
 def record_to_sample(record: dict[str, Any]) -> Optional[Sample]:
@@ -79,15 +73,19 @@ def record_to_sample(record: dict[str, Any]) -> Optional[Sample]:
 
 
 def get_dataset() -> Dataset:
-    """Load ProgressiveMCPBench dataset from a local JSON file."""
+    """Load ProgressiveMCPBench dataset.
+
+    This dataset uses the synthetic MCP server for deterministic evaluation.
+    It loads from synthetic_mcp/tasks/progressivemcpbench.json.
+    """
     try:
-        with DATA_FILE.open("r", encoding="utf-8") as f:
+        with TASKS_FILE.open("r", encoding="utf-8") as f:
             raw_records: list[dict[str, Any]] = json.load(f)
     except (json.JSONDecodeError, FileNotFoundError) as e:
-        logger.error(f"Failed to read dataset file {DATA_FILE}: {e}")
-        # If file is missing, we raise instead of downloading, as we now commit the dataset
+        logger.error(f"Failed to read dataset file {TASKS_FILE}: {e}")
         raise FileNotFoundError(
-            f"Dataset file not found at {DATA_FILE}. Please ensure it is present."
+            f"Dataset file not found at {TASKS_FILE}. "
+            "Run the generation pipeline first (see docs/evals/progressivemcpbench.mdx)."
         ) from e
 
     samples: list[Sample] = []
@@ -97,30 +95,3 @@ def get_dataset() -> Dataset:
             samples.append(sample)
 
     return MemoryDataset(samples=samples, name="progressivemcpbench")
-
-
-def get_synthetic_dataset() -> Dataset:
-    """Load the synthetic ProgressiveMCPBench dataset.
-
-    This dataset uses the synthetic MCP server for deterministic evaluation.
-    It loads from synthetic_mcp/tasks/progressivemcpbench_synthetic.json.
-    """
-    try:
-        with SYNTHETIC_TASKS_FILE.open("r", encoding="utf-8") as f:
-            raw_records: list[dict[str, Any]] = json.load(f)
-    except (json.JSONDecodeError, FileNotFoundError) as e:
-        logger.error(
-            f"Failed to read synthetic dataset file {SYNTHETIC_TASKS_FILE}: {e}"
-        )
-        raise FileNotFoundError(
-            f"Synthetic dataset file not found at {SYNTHETIC_TASKS_FILE}. "
-            "Run the synthetic generation pipeline first (see docs/evals/progressivemcpbench.mdx)."
-        ) from e
-
-    samples: list[Sample] = []
-    for record in raw_records:
-        sample = record_to_sample(record)
-        if sample:
-            samples.append(sample)
-
-    return MemoryDataset(samples=samples, name="progressivemcpbench-synthetic")

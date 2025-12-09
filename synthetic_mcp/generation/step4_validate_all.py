@@ -123,7 +123,7 @@ def run_integration_tests() -> tuple[int, int, list[str]]:
     """Run integration tests for all working tasks."""
     print("\n🧪 Running integration tests...")
 
-    tasks = load_json(TASKS_DIR / "progressivemcpbench_synthetic.json")
+    tasks = load_json(TASKS_DIR / "progressivemcpbench.json")
     passed = 0
     failed = 0
     failures = []

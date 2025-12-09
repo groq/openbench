@@ -153,8 +153,8 @@ def main():
     print("\n💾 Creating final task dataset...")
     TASKS_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Save as the main synthetic benchmark dataset
-    output_path = TASKS_DIR / "progressivemcpbench_synthetic.json"
+    # Save as the main benchmark dataset
+    output_path = TASKS_DIR / "progressivemcpbench.json"
     save_json(output_path, enriched_tasks)
 
     # Also create a summary file

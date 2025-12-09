@@ -39,9 +39,9 @@ def _load_servers_config() -> dict[str, Any]:
         return json.load(f)
 
 
-def _load_synthetic_tasks() -> list[dict[str, Any]]:
-    """Load the synthetic tasks JSON."""
-    tasks_path = _synthetic_mcp_dir() / "tasks" / "progressivemcpbench_synthetic.json"
+def _load_tasks() -> list[dict[str, Any]]:
+    """Load the tasks JSON."""
+    tasks_path = _synthetic_mcp_dir() / "tasks" / "progressivemcpbench.json"
     with open(tasks_path, encoding="utf-8") as f:
         return json.load(f)
 

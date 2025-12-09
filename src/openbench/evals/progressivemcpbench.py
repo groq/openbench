@@ -22,7 +22,7 @@ from inspect_ai.tool import ToolError, ToolSource
 import asyncio
 from typing import Any
 
-from openbench.datasets.progressivemcpbench import get_synthetic_dataset
+from openbench.datasets.progressivemcpbench import get_dataset
 from openbench.scorers.progressivemcpbench import progressivemcpbench_scorer
 from openbench.tools.progressivemcpbench.directory.toolsource import (
     directory_tool_source,
@@ -304,7 +304,7 @@ def progressivemcpbench(
     solver = _get_solver_for_strategy(strategy)
 
     # All strategies now use the synthetic dataset
-    dataset = get_synthetic_dataset()
+    dataset = get_dataset()
 
     return Task(
         dataset=dataset,
