@@ -26,6 +26,7 @@ dependencies = [
     "tiktoken>=0.11.0",
     "typer>=0.15.3",
     "numpy==2.2.6",
+    "aiohttp>=3.11.18",
 ]
 
 [project.urls]
