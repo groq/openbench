@@ -27,6 +27,7 @@ class ProviderType(str, Enum):
     FRIENDLI = "friendli"
     GOOGLE = "google"
     GROQ = "groq"
+    GROQ_RESPONSES = "groq-responses"
     HELICONE = "helicone"
     HUGGINGFACE = "huggingface"
     HYPERBOLIC = "hyperbolic"
@@ -194,6 +195,14 @@ PROVIDER_CONFIGS: Dict[ProviderType, ProviderConfig] = {
     ProviderType.GROQ: ProviderConfig(
         name="groq",
         display_name="Groq",
+        api_key_env="GROQ_API_KEY",
+        base_url="https://api.groq.com/openai/v1",
+        supports_vision=True,
+        supports_function_calling=True,
+    ),
+    ProviderType.GROQ_RESPONSES: ProviderConfig(
+        name="groq-responses",
+        display_name="Groq (Responses API)",
         api_key_env="GROQ_API_KEY",
         base_url="https://api.groq.com/openai/v1",
         supports_vision=True,

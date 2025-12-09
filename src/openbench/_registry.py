@@ -195,6 +195,20 @@ def siliconflow() -> Type[ModelAPI]:
     return SiliconFlowAPI
 
 
+@modelapi(name="groq-responses")
+def groq_responses() -> Type[ModelAPI]:
+    """Register Groq Responses API provider.
+
+    Uses Groq's Responses API (compatible with OpenAI's Responses API) which
+    enables features like MCP, browser_search, code_execution, and reasoning.
+
+    Usage: groq-responses/openai/gpt-oss-20b
+    """
+    from .model._providers.groq_responses import GroqResponsesAPI
+
+    return GroqResponsesAPI
+
+
 def _override_builtin_groq_provider():
     """Replace Inspect AI's built-in groq provider with enhanced openbench version."""
     from inspect_ai._util.registry import _registry
