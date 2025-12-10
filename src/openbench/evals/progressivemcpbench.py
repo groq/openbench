@@ -349,6 +349,15 @@ def progressive_minimal_servers_remote_solver() -> Solver:
             base_url=GROQ_RESPONSES_BASE_URL,
         )
 
+        request_payload = {
+            "model": groq_model_id,
+            "input": groq_input,
+            "tools": mcp_tools,
+            "stream": False,
+            "max_output_tokens": 2048,
+            "temperature": 0.7,
+        }
+
         try:
             response = await client.responses.create(
                 model=groq_model_id,
@@ -362,16 +371,20 @@ def progressive_minimal_servers_remote_solver() -> Solver:
             state.metadata = state.metadata or {}
             state.metadata["execution_error"] = "api_error"
             state.metadata["error_message"] = str(e)
+            state.metadata["groq_mcp_request"] = request_payload
             if state.output:
                 state.output.completion = f"API error: {str(e)}"
             return state
         finally:
             await client.close()
 
+        response_dict = response.model_dump() if hasattr(response, "model_dump") else {}
+
         output_items = getattr(response, "output", []) or []
 
         assistant_text_chunks: list[str] = []
         tool_call_detected = False
+        mcp_events: list[dict[str, Any]] = []
 
         for item in output_items:
             item_type = getattr(item, "type", "")
@@ -381,10 +394,20 @@ def progressive_minimal_servers_remote_solver() -> Solver:
                         assistant_text_chunks.append(getattr(c, "text", ""))
             elif item_type == "function_call":
                 tool_call_detected = True
+            elif item_type.startswith("mcp_"):
+                mcp_events.append(
+                    item.model_dump()
+                    if hasattr(item, "model_dump")
+                    else {"type": item_type}
+                )
 
         assistant_text = "".join(assistant_text_chunks).strip()
 
         state.metadata = state.metadata or {}
+        state.metadata["groq_mcp_request"] = request_payload
+        state.metadata["groq_mcp_response"] = response_dict
+        state.metadata["groq_mcp_events"] = mcp_events
+
         if tool_call_detected:
             state.metadata["execution_error"] = "tool_calls_not_allowed"
             state.metadata["error_message"] = (
