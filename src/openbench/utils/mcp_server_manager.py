@@ -1,106 +1,98 @@
 """
 MCP Server Manager for ProgressiveMCPBench.
 
-This module manages connectivity to the external synthetic MCP HTTP server
-that runs on port 9123 (in progressivemcpbench project), instead of starting
-a local Python server.
-
-The server should be started externally and this module will verify connectivity.
+This module verifies connectivity to the synthetic MCP server.
+By default, it connects to the production remote server; use environment
+variables to override for local development.
 """
 
-import socket
-import time
 import json
-from pathlib import Path
-from typing import Any
+import time
+from http.client import HTTPConnection, HTTPSConnection
+from urllib.parse import urlparse
 
-# Server is now externally managed
-DEFAULT_PORT = 9123
-DEFAULT_HOST = "localhost"
-
-
-def is_port_in_use(port: int, host: str = "localhost") -> bool:
-    """Check if a port is already in use."""
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        try:
-            s.connect((host, port))
-            return True
-        except (ConnectionRefusedError, OSError):
-            return False
+from openbench.tools.progressivemcpbench.mcp_config import get_mcp_base_url
 
 
-def wait_for_server(port: int, host: str = "localhost", timeout: float = 10.0) -> bool:
-    """Wait for the server to become available and test MCP connectivity."""
-    start_time = time.time()
-    while time.time() - start_time < timeout:
-        if not is_port_in_use(port, host):
-            time.sleep(0.1)
-            continue
+def _test_server_connectivity(base_url: str, timeout: float = 5.0) -> bool:
+    """Test if the MCP server is responding.
 
-        # Test actual MCP server response
-        try:
-            import http.client
-            conn = http.client.HTTPConnection(host, port, timeout=2)
-            try:
-                # Test MCP initialization endpoint
-                test_data = {
-                    "jsonrpc": "2.0",
-                    "id": 1,
-                    "method": "initialize",
-                    "params": {
-                        "protocolVersion": "2024-11-05",
-                        "capabilities": {},
-                        "clientInfo": {"name": "connectivity-test", "version": "1.0.0"}
-                    }
-                }
-                body = json.dumps(test_data)
-                conn.request(
-                    "POST",
-                    "/mcp/filesystem",
-                    body,
-                    {
-                        "Content-Type": "application/json",
-                        "Accept": "application/json, text/event-stream"
-                    }
-                )
-                response = conn.getresponse()
-                if response.status == 200:
-                    return True
-            except Exception:
-                pass
-            finally:
-                conn.close()
-        except Exception:
-            pass
+    Args:
+        base_url: Base URL for the MCP server
+        timeout: Connection timeout in seconds
 
-        time.sleep(0.1)
-    return False
+    Returns:
+        True if server responds successfully, False otherwise
+    """
+    parsed = urlparse(base_url)
+    use_https = parsed.scheme == "https"
+    host = parsed.hostname or "localhost"
+    port = parsed.port or (443 if use_https else 80)
+
+    conn: HTTPConnection | HTTPSConnection
+    if use_https:
+        conn = HTTPSConnection(host, port, timeout=timeout)
+    else:
+        conn = HTTPConnection(host, port, timeout=timeout)
+
+    try:
+        test_data = {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "initialize",
+            "params": {
+                "protocolVersion": "2024-11-05",
+                "capabilities": {},
+                "clientInfo": {"name": "connectivity-test", "version": "1.0.0"},
+            },
+        }
+        body = json.dumps(test_data)
+        conn.request(
+            "POST",
+            "/mcp/filesystem",
+            body,
+            {
+                "Content-Type": "application/json",
+                "Accept": "application/json, text/event-stream",
+            },
+        )
+        response = conn.getresponse()
+        return response.status == 200
+    except Exception:
+        return False
+    finally:
+        conn.close()
 
 
 def ensure_mcp_server_running(
-    port: int = DEFAULT_PORT, host: str = DEFAULT_HOST
+    base_url: str | None = None,
+    retries: int = 3,
+    retry_delay: float = 1.0,
 ) -> None:
-    """Ensure the MCP server is running, checking connectivity to external server.
+    """Ensure the MCP server is accessible.
 
-    This now verifies that the external MCP server is accessible rather than
-    starting a local Python server process.
+    Uses the centralized configuration by default, connecting to the production
+    remote server. Use PROGRESSIVE_MCP_LOCAL=1 or PROGRESSIVE_MCP_URL to override.
 
     Args:
-        port: Port to check for MCP server
-        host: Host to check for MCP server
+        base_url: Base URL for the MCP server (defaults to configured URL)
+        retries: Number of connection attempts
+        retry_delay: Delay between retries in seconds
 
     Raises:
-        RuntimeError: If the server is not accessible
+        RuntimeError: If the server is not accessible after all retries
     """
-    if not is_port_in_use(port, host):
-        raise RuntimeError(
-            f"MCP server is not accessible at {host}:{port}. "
-            "Please ensure the external MCP server is running."
-        )
+    resolved_url = base_url if base_url is not None else get_mcp_base_url()
 
-    # Test actual MCP server response
-    if not wait_for_server(port, host):
-        raise RuntimeError(
-            f"MCP server is not responding at {host}:{port}. "
-            "Please check that the server is running and accessible."
-        )
+    for attempt in range(retries):
+        if _test_server_connectivity(resolved_url):
+            return
+
+        if attempt < retries - 1:
+            time.sleep(retry_delay)
+
+    raise RuntimeError(
+        f"MCP server is not accessible at {resolved_url}. "
+        "For local development, ensure the server is running and set "
+        "PROGRESSIVE_MCP_LOCAL=1. Otherwise, check your network connection."
+    )
