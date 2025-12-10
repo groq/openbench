@@ -9,7 +9,7 @@ Implements the MCP Streamable HTTP Transport protocol as described in the MCP sp
 
 import json
 import logging
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 from urllib.parse import urljoin
 
 import mcp.types as types
@@ -30,12 +30,15 @@ class StreamableHTTPClient:
     def _get_connection(self) -> HTTPConnection:
         """Create HTTP connection to the MCP server."""
         from urllib.parse import urlparse
+
         parsed = urlparse(self.base_url)
         host = parsed.hostname or "localhost"
         port = parsed.port or (443 if parsed.scheme == "https" else 80)
         return HTTPConnection(host, port, timeout=self.timeout)
 
-    def _make_request(self, method: str, endpoint: str, data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def _make_request(
+        self, method: str, endpoint: str, data: Optional[Dict[str, Any]] = None
+    ) -> Dict[str, Any]:
         """Make an HTTP request to the MCP server."""
         conn = self._get_connection()
         try:
@@ -50,7 +53,10 @@ class StreamableHTTPClient:
             try:
                 return json.loads(response_data)
             except json.JSONDecodeError:
-                return {"error": f"Invalid JSON response: {response_data}", "status": response.status}
+                return {
+                    "error": f"Invalid JSON response: {response_data}",
+                    "status": response.status,
+                }
         except Exception as e:
             return {"error": f"Connection error: {str(e)}"}
         finally:
@@ -65,8 +71,11 @@ class StreamableHTTPClient:
             "params": {
                 "protocolVersion": "2024-11-05",
                 "capabilities": {},
-                "clientInfo": {"name": "openbench-synthetic-client", "version": "1.0.0"}
-            }
+                "clientInfo": {
+                    "name": "openbench-synthetic-client",
+                    "version": "1.0.0",
+                },
+            },
         }
 
         response = self._make_request("POST", "/initialize", init_data)
@@ -85,16 +94,13 @@ class StreamableHTTPClient:
                 return []
 
         # Remove the leading server path and get tools list
-        server_path = self.base_url.split("/mcp/")[-1] if "/mcp/" in self.base_url else ""
+        server_path = (
+            self.base_url.split("/mcp/")[-1] if "/mcp/" in self.base_url else ""
+        )
         if not server_path:
             return []
 
-        tools_data = {
-            "jsonrpc": "2.0",
-            "id": 2,
-            "method": "tools/list",
-            "params": {}
-        }
+        tools_data = {"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}}
 
         response = self._make_request("POST", f"/mcp/{server_path}", tools_data)
 
@@ -110,7 +116,7 @@ class StreamableHTTPClient:
             tool = types.Tool(
                 name=tool_data.get("name", ""),
                 description=tool_data.get("description", ""),
-                inputSchema=tool_data.get("inputSchema", {})
+                inputSchema=tool_data.get("inputSchema", {}),
             )
             tools.append(tool)
             # Cache the tools
@@ -126,7 +132,9 @@ class StreamableHTTPClient:
                 return {"error": "Failed to initialize MCP connection"}
 
         # Extract server name from URL
-        server_path = self.base_url.split("/mcp/")[-1] if "/mcp/" in self.base_url else ""
+        server_path = (
+            self.base_url.split("/mcp/")[-1] if "/mcp/" in self.base_url else ""
+        )
         if not server_path:
             return {"error": "No server specified in base URL"}
 
@@ -134,10 +142,7 @@ class StreamableHTTPClient:
             "jsonrpc": "2.0",
             "id": 3,
             "method": "tools/call",
-            "params": {
-                "name": tool_name,
-                "arguments": arguments
-            }
+            "params": {"name": tool_name, "arguments": arguments},
         }
 
         response = self._make_request("POST", f"/mcp/{server_path}", call_data)

@@ -24,6 +24,7 @@ from .synthetic_arg_generation import (
     get_synthetic_embeddings_path,
     synthetic_embeddings_exist,
 )
+from ..mcp_config import get_mcp_base_url
 
 logger = logging.getLogger(__name__)
 
@@ -53,21 +54,18 @@ _GLOBAL_ROUTER: "SyntheticCopilotRouter | None" = None
 
 
 def serve(
-    http_host: str = "localhost",
-    http_port: int = 9123,
+    base_url: str | None = None,
 ) -> None:
     """Run the Synthetic Copilot MCP server (stdio).
 
     Args:
-        http_host: HTTP MCP server host
-        http_port: HTTP MCP server port
+        base_url: Base URL for the MCP server (defaults to configured URL)
     """
     _configure_logging()
+    resolved_base_url = base_url if base_url is not None else get_mcp_base_url()
 
-    # Get embeddings path
     embeddings_path = get_synthetic_embeddings_path()
 
-    # Generate embeddings if missing
     if not synthetic_embeddings_exist():
         if os.getenv("OPENBENCH_COPILOT_AUTOGEN", "1") in {"1", "true", "True"}:
             if os.getenv("OPENBENCH_COPILOT_SILENT", "1") not in {"1", "true", "True"}:
@@ -82,15 +80,13 @@ def serve(
                 "python -m openbench.tools.progressivemcpbench.copilot.synthetic_arg_generation"
             )
 
-    # Point to embeddings file
     os.environ.setdefault("MCP_DATA_PATH", str(embeddings_path))
 
     @asynccontextmanager
     async def copilot_lifespan(server: FastMCP) -> AsyncIterator[dict]:
         async with SyntheticCopilotRouter(
             mcp_arg_path=embeddings_path,
-            http_host=http_host,
-            http_port=http_port,
+            base_url=resolved_base_url,
         ) as router:
             global _GLOBAL_ROUTER
             _GLOBAL_ROUTER = router

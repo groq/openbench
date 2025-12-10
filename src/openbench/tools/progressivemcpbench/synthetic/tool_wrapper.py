@@ -8,7 +8,6 @@ server using proper MCP protocol instead of custom RPC.
 from __future__ import annotations
 
 import json
-import re
 from typing import Any
 
 from inspect_ai.tool import Tool
@@ -17,9 +16,7 @@ from inspect_ai.tool._tool_params import ToolParams
 from inspect_ai.util._json import JSONSchema
 import aiohttp
 
-
-DEFAULT_HTTP_HOST = "localhost"
-DEFAULT_HTTP_PORT = 9123
+from ..mcp_config import get_mcp_base_url
 
 
 def _convert_json_schema(prop: dict[str, Any], name: str | None = None) -> JSONSchema:
@@ -87,8 +84,7 @@ async def _call_http_tool(
     server_name: str,
     tool_name: str,
     params: dict[str, Any],
-    host: str = DEFAULT_HTTP_HOST,
-    port: int = DEFAULT_HTTP_PORT,
+    base_url: str | None = None,
     timeout: int = 30,
 ) -> dict[str, Any]:
     """Call a tool on the synthetic HTTP MCP server using MCP protocol.
@@ -97,32 +93,31 @@ async def _call_http_tool(
         server_name: Name of the MCP server
         tool_name: Name of the tool to call
         params: Tool parameters as a dictionary
-        host: HTTP server host
-        port: HTTP server port
+        base_url: Base URL for the MCP server (defaults to configured URL)
         timeout: Request timeout in seconds
 
     Returns:
         Response dictionary with 'result' or 'error' key
     """
+    if base_url is None:
+        base_url = get_mcp_base_url()
+
     async with aiohttp.ClientSession(
         timeout=aiohttp.ClientTimeout(total=timeout)
     ) as session:
         try:
-            url = f"http://{host}:{port}/mcp/{server_name}"
+            url = f"{base_url}/mcp/{server_name}"
             # MCP tools/call format
             call_data = {
                 "jsonrpc": "2.0",
                 "id": 1,
                 "method": "tools/call",
-                "params": {
-                    "name": tool_name,
-                    "arguments": params
-                }
+                "params": {"name": tool_name, "arguments": params},
             }
 
             headers = {
                 "Content-Type": "application/json",
-                "Accept": "application/json, text/event-stream"
+                "Accept": "application/json, text/event-stream",
             }
 
             async with session.post(
@@ -137,10 +132,10 @@ async def _call_http_tool(
                     # Extract JSON from data field in SSE
                     if "data: " in response_text:
                         # Split on event/data boundaries
-                        lines = response_text.strip().split('\n')
+                        lines = response_text.strip().split("\n")
                         data_line = None
                         for line in lines:
-                            if line.startswith('data: '):
+                            if line.startswith("data: "):
                                 data_line = line[6:]  # Remove "data: " prefix
                                 break
 
@@ -153,7 +148,9 @@ async def _call_http_tool(
                         data = json.loads(response_text)
 
                     if "error" in data:
-                        return {"error": data["error"].get("message", str(data["error"]))}
+                        return {
+                            "error": data["error"].get("message", str(data["error"]))
+                        }
 
                     return data
 
@@ -169,8 +166,7 @@ def create_synthetic_tool_wrapper(
     tool_name: str,
     tool_description: str,
     input_schema: dict[str, Any],
-    http_host: str = DEFAULT_HTTP_HOST,
-    http_port: int = DEFAULT_HTTP_PORT,
+    base_url: str | None = None,
     timeout: int = 30,
 ) -> Tool:
     """Create an Inspect AI Tool that routes to the synthetic HTTP MCP server.
@@ -180,13 +176,13 @@ def create_synthetic_tool_wrapper(
         tool_name: Name of the tool
         tool_description: Description of the tool
         input_schema: JSON schema for tool parameters
-        http_host: HTTP server host
-        http_port: HTTP server port
+        base_url: Base URL for the MCP server (defaults to configured URL)
         timeout: Timeout in seconds for tool execution
 
     Returns:
         Inspect AI Tool that executes via the HTTP MCP server
     """
+    resolved_base_url = base_url if base_url is not None else get_mcp_base_url()
 
     async def execute(**kwargs: Any) -> str:
         """Execute the tool via HTTP MCP server."""
@@ -194,8 +190,7 @@ def create_synthetic_tool_wrapper(
             server_name=server_name,
             tool_name=tool_name,
             params=kwargs,
-            host=http_host,
-            port=http_port,
+            base_url=resolved_base_url,
             timeout=timeout,
         )
 

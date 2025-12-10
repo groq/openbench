@@ -21,7 +21,7 @@ import mcp.types as types
 from mcp.server.fastmcp import Context, FastMCP
 
 from .directory_router import SyntheticDirectoryRouter
-from .tool_wrapper import DEFAULT_HTTP_HOST, DEFAULT_HTTP_PORT
+from ..mcp_config import get_mcp_base_url
 
 logger = logging.getLogger(__name__)
 
@@ -50,20 +50,19 @@ _GLOBAL_ROUTER: SyntheticDirectoryRouter | None = None
 
 
 def serve(
-    http_host: str = DEFAULT_HTTP_HOST,
-    http_port: int = 9123,
+    base_url: str | None = None,
 ) -> None:
     """Run the Synthetic Directory MCP server (stdio).
 
     Args:
-        http_host: HTTP MCP server host
-        http_port: HTTP MCP server port
+        base_url: Base URL for the MCP server (defaults to configured URL)
     """
     _configure_logging()
+    resolved_base_url = base_url if base_url is not None else get_mcp_base_url()
 
     @asynccontextmanager
     async def directory_lifespan(server: FastMCP) -> AsyncIterator[dict[str, Any]]:
-        router = SyntheticDirectoryRouter(http_host=http_host, http_port=http_port)
+        router = SyntheticDirectoryRouter(base_url=resolved_base_url)
         async with router:
             global _GLOBAL_ROUTER
             _GLOBAL_ROUTER = router

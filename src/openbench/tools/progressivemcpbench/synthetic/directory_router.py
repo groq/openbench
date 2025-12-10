@@ -9,13 +9,14 @@ the HTTP MCP server.
 from __future__ import annotations
 
 import json
-from http.client import HTTPConnection
+from http.client import HTTPConnection, HTTPSConnection
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 import mcp.types as types
 
-from .tool_wrapper import DEFAULT_HTTP_HOST, DEFAULT_HTTP_PORT
+from ..mcp_config import get_mcp_base_url
 
 
 def _synthetic_mcp_dir() -> Path:
@@ -67,19 +68,16 @@ class SyntheticDirectoryRouter:
 
     def __init__(
         self,
-        http_host: str = DEFAULT_HTTP_HOST,
-        http_port: int = DEFAULT_HTTP_PORT,
+        base_url: str | None = None,
         timeout: int = 30,
     ):
         """Initialize the synthetic directory router.
 
         Args:
-            http_host: HTTP MCP server host
-            http_port: HTTP MCP server port
+            base_url: Base URL for the MCP server (defaults to configured URL)
             timeout: Timeout for HTTP requests
         """
-        self.http_host = http_host
-        self.http_port = http_port
+        self.base_url = base_url if base_url is not None else get_mcp_base_url()
         self.timeout = timeout
 
         # Load tools from servers.json
@@ -229,17 +227,22 @@ class SyntheticDirectoryRouter:
         params: dict[str, Any],
     ) -> dict[str, Any]:
         """Call a tool on the synthetic HTTP MCP server using MCP protocol."""
-        conn = HTTPConnection(self.http_host, self.http_port, timeout=self.timeout)
+        parsed = urlparse(self.base_url)
+        use_https = parsed.scheme == "https"
+        host = parsed.hostname or "localhost"
+        port = parsed.port or (443 if use_https else 80)
 
-        # MCP protocol format
+        conn: HTTPConnection | HTTPSConnection
+        if use_https:
+            conn = HTTPSConnection(host, port, timeout=self.timeout)
+        else:
+            conn = HTTPConnection(host, port, timeout=self.timeout)
+
         call_data = {
             "jsonrpc": "2.0",
             "id": 1,
             "method": "tools/call",
-            "params": {
-                "name": tool_name,
-                "arguments": params
-            }
+            "params": {"name": tool_name, "arguments": params},
         }
         body = json.dumps(call_data)
 
@@ -250,22 +253,19 @@ class SyntheticDirectoryRouter:
                 body,
                 {
                     "Content-Type": "application/json",
-                    "Accept": "application/json, text/event-stream"
+                    "Accept": "application/json, text/event-stream",
                 },
             )
             response = conn.getresponse()
             response_text = response.read().decode("utf-8")
 
-            # Parse SSE response format: "event: message\ndata: {...}\n\n"
             try:
-                # Extract JSON from data field in SSE
                 if "data: " in response_text:
-                    # Split on event/data boundaries
-                    lines = response_text.strip().split('\n')
+                    lines = response_text.strip().split("\n")
                     data_line = None
                     for line in lines:
-                        if line.startswith('data: '):
-                            data_line = line[6:]  # Remove "data: " prefix
+                        if line.startswith("data: "):
+                            data_line = line[6:]
                             break
 
                     if data_line:
@@ -273,7 +273,6 @@ class SyntheticDirectoryRouter:
                     else:
                         return {"error": "No data field in SSE response"}
                 else:
-                    # Try to parse as direct JSON
                     data = json.loads(response_text)
 
                 if "error" in data:

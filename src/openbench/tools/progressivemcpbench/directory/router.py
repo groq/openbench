@@ -125,9 +125,7 @@ class DirectoryRouter:
                     self.tools_index[server_name] = {}
                 # Store server description from the entry level
                 if server_name not in self.server_descriptions:
-                    self.server_descriptions[server_name] = entry.get(
-                        "description", ""
-                    )
+                    self.server_descriptions[server_name] = entry.get("description", "")
                 for tool in server_info.get("tools", []):
                     tool_name = tool.get("name", "")
                     if tool_name:

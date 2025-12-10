@@ -11,13 +11,15 @@ import asyncio
 import json
 import logging
 import os
-from http.client import HTTPConnection
+from http.client import HTTPConnection, HTTPSConnection
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 import mcp.types as types
 
 from .matcher import ToolMatcher
+from ..mcp_config import get_mcp_base_url
 
 try:
     import yaml  # type: ignore
@@ -25,10 +27,6 @@ except Exception:
     yaml = None  # type: ignore
 
 logger = logging.getLogger(__name__)
-
-
-DEFAULT_HTTP_HOST = "localhost"
-DEFAULT_HTTP_PORT = 9123
 
 
 def dump_to_yaml(data: dict[str, Any]) -> str:
@@ -54,22 +52,26 @@ def _call_http_tool(
     server_name: str,
     tool_name: str,
     params: dict[str, Any],
-    host: str = DEFAULT_HTTP_HOST,
-    port: int = DEFAULT_HTTP_PORT,
+    base_url: str,
     timeout: int = 30,
 ) -> dict[str, Any]:
     """Call a tool on the synthetic HTTP MCP server using MCP protocol."""
-    conn = HTTPConnection(host, port, timeout=timeout)
+    parsed = urlparse(base_url)
+    use_https = parsed.scheme == "https"
+    host = parsed.hostname or "localhost"
+    port = parsed.port or (443 if use_https else 80)
 
-    # MCP protocol format
+    conn: HTTPConnection | HTTPSConnection
+    if use_https:
+        conn = HTTPSConnection(host, port, timeout=timeout)
+    else:
+        conn = HTTPConnection(host, port, timeout=timeout)
+
     call_data = {
         "jsonrpc": "2.0",
         "id": 1,
         "method": "tools/call",
-        "params": {
-            "name": tool_name,
-            "arguments": params
-        }
+        "params": {"name": tool_name, "arguments": params},
     }
     body = json.dumps(call_data)
 
@@ -80,22 +82,19 @@ def _call_http_tool(
             body,
             {
                 "Content-Type": "application/json",
-                "Accept": "application/json, text/event-stream"
+                "Accept": "application/json, text/event-stream",
             },
         )
         response = conn.getresponse()
         response_text = response.read().decode("utf-8")
 
-        # Parse SSE response format: "event: message\ndata: {...}\n\n"
         try:
-            # Extract JSON from data field in SSE
             if "data: " in response_text:
-                # Split on event/data boundaries
-                lines = response_text.strip().split('\n')
+                lines = response_text.strip().split("\n")
                 data_line = None
                 for line in lines:
-                    if line.startswith('data: '):
-                        data_line = line[6:]  # Remove "data: " prefix
+                    if line.startswith("data: "):
+                        data_line = line[6:]
                         break
 
                 if data_line:
@@ -103,7 +102,6 @@ def _call_http_tool(
                 else:
                     return {"error": "No data field in SSE response"}
             else:
-                # Try to parse as direct JSON
                 data = json.loads(response_text)
 
             if "error" in data:
@@ -126,20 +124,17 @@ class SyntheticCopilotRouter:
     def __init__(
         self,
         mcp_arg_path: Path,
-        http_host: str = DEFAULT_HTTP_HOST,
-        http_port: int = DEFAULT_HTTP_PORT,
+        base_url: str | None = None,
         timeout: int = 30,
     ):
         """Initialize the synthetic copilot router.
 
         Args:
             mcp_arg_path: Path to the mcp_arg_*.json embeddings file
-            http_host: HTTP MCP server host
-            http_port: HTTP MCP server port
+            base_url: Base URL for the MCP server (defaults to configured URL)
             timeout: Timeout for HTTP requests
         """
-        self.http_host = http_host
-        self.http_port = http_port
+        self.base_url = base_url if base_url is not None else get_mcp_base_url()
         self.timeout = timeout
 
         # Initialize ToolMatcher with same settings as live router
@@ -191,8 +186,7 @@ class SyntheticCopilotRouter:
                     server_name=server_name,
                     tool_name=tool_name,
                     params=params or {},
-                    host=self.http_host,
-                    port=self.http_port,
+                    base_url=self.base_url,
                     timeout=min(timeout, self.timeout),
                 )
 

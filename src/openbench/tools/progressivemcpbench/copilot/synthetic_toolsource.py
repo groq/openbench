@@ -12,20 +12,20 @@ from typing import Optional
 
 from inspect_ai.tool import ToolSource, mcp_server_stdio, mcp_tools
 
+from ..mcp_config import get_mcp_base_url
+
 
 def synthetic_copilot_tool_source(
     python_executable: Optional[str] = None,
     extra_env: Optional[dict[str, str]] = None,
-    http_host: str = "localhost",
-    http_port: int = 9123,
+    base_url: str | None = None,
 ) -> ToolSource:
     """Create a ToolSource for the synthetic Copilot MCP server.
 
     Args:
         python_executable: Optional path to Python to run the module
         extra_env: Additional environment variables to pass through
-        http_host: HTTP MCP server host
-        http_port: HTTP MCP server port
+        base_url: Base URL for the MCP server (defaults to configured URL)
 
     Returns:
         ToolSource exposing route and execute-tool from synthetic Copilot
@@ -72,9 +72,9 @@ def synthetic_copilot_tool_source(
     env.setdefault("RUST_LOG", env.get("RUST_LOG", "error"))
     env.setdefault("DEBUG", env.get("DEBUG", "0"))
 
-    # Pass HTTP server config
-    env["SYNTHETIC_MCP_HOST"] = http_host
-    env["SYNTHETIC_MCP_PORT"] = str(http_port)
+    # Pass MCP server URL config
+    resolved_base_url = base_url if base_url is not None else get_mcp_base_url()
+    env["PROGRESSIVE_MCP_URL"] = resolved_base_url
 
     if extra_env:
         env.update(extra_env)

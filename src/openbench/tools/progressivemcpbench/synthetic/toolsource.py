@@ -15,11 +15,8 @@ from typing import Any
 
 from inspect_ai.tool import Tool, ToolSource
 
-from .tool_wrapper import (
-    create_synthetic_tool_wrapper,
-    DEFAULT_HTTP_HOST,
-    DEFAULT_HTTP_PORT,
-)
+from .tool_wrapper import create_synthetic_tool_wrapper
+from ..mcp_config import get_mcp_base_url
 
 
 def _synthetic_mcp_dir() -> Path:
@@ -58,19 +55,18 @@ class _StaticToolSource(ToolSource):
 
 def synthetic_minimal_servers_tool_source(
     required_servers: list[str],
-    http_host: str = DEFAULT_HTTP_HOST,
-    http_port: int = DEFAULT_HTTP_PORT,
+    base_url: str | None = None,
 ) -> ToolSource:
     """Create a ToolSource with all tools from the specified synthetic servers.
 
     Args:
         required_servers: List of server names to include tools from
-        http_host: HTTP MCP server host
-        http_port: HTTP MCP server port
+        base_url: Base URL for the MCP server (defaults to configured URL)
 
     Returns:
         ToolSource with all tools from the specified servers
     """
+    resolved_base_url = base_url if base_url is not None else get_mcp_base_url()
     servers_config = _load_servers_config()
 
     tools: list[Tool] = []
@@ -85,8 +81,7 @@ def synthetic_minimal_servers_tool_source(
                 tool_name=tool_info["name"],
                 tool_description=tool_info.get("description", ""),
                 input_schema=tool_info.get("inputSchema", {}),
-                http_host=http_host,
-                http_port=http_port,
+                base_url=resolved_base_url,
             )
             tools.append(tool)
 
@@ -95,19 +90,18 @@ def synthetic_minimal_servers_tool_source(
 
 def synthetic_minimal_tools_tool_source(
     required_tools: list[tuple[str, str]],
-    http_host: str = DEFAULT_HTTP_HOST,
-    http_port: int = DEFAULT_HTTP_PORT,
+    base_url: str | None = None,
 ) -> ToolSource:
     """Create a ToolSource with only the specified synthetic tools.
 
     Args:
         required_tools: List of (server_name, tool_name) tuples
-        http_host: HTTP MCP server host
-        http_port: HTTP MCP server port
+        base_url: Base URL for the MCP server (defaults to configured URL)
 
     Returns:
         ToolSource with only the specified tools
     """
+    resolved_base_url = base_url if base_url is not None else get_mcp_base_url()
     servers_config = _load_servers_config()
 
     required_set = {(s, t) for s, t in required_tools}
@@ -129,8 +123,7 @@ def synthetic_minimal_tools_tool_source(
                 tool_name=tool_name,
                 tool_description=tool_info.get("description", ""),
                 input_schema=tool_info.get("inputSchema", {}),
-                http_host=http_host,
-                http_port=http_port,
+                base_url=resolved_base_url,
             )
             tools.append(tool)
 
@@ -138,8 +131,7 @@ def synthetic_minimal_tools_tool_source(
 
 
 def synthetic_all_tools_tool_source(
-    http_host: str = DEFAULT_HTTP_HOST,
-    http_port: int = DEFAULT_HTTP_PORT,
+    base_url: str | None = None,
 ) -> ToolSource:
     """Create a ToolSource with all tools from all synthetic servers.
 
@@ -147,12 +139,12 @@ def synthetic_all_tools_tool_source(
     all available tools.
 
     Args:
-        http_host: HTTP MCP server host
-        http_port: HTTP MCP server port
+        base_url: Base URL for the MCP server (defaults to configured URL)
 
     Returns:
         ToolSource with all available synthetic tools
     """
+    resolved_base_url = base_url if base_url is not None else get_mcp_base_url()
     servers_config = _load_servers_config()
 
     tools: list[Tool] = []
@@ -163,8 +155,7 @@ def synthetic_all_tools_tool_source(
                 tool_name=tool_info["name"],
                 tool_description=tool_info.get("description", ""),
                 input_schema=tool_info.get("inputSchema", {}),
-                http_host=http_host,
-                http_port=http_port,
+                base_url=resolved_base_url,
             )
             tools.append(tool)
 
@@ -176,8 +167,7 @@ def _synthetic_distraction_tool_source(
     task_id: str,
     target_count: int,
     base_distractor_count: int | None = None,
-    http_host: str = DEFAULT_HTTP_HOST,
-    http_port: int = DEFAULT_HTTP_PORT,
+    base_url: str | None = None,
 ) -> ToolSource:
     """Create a ToolSource with required tools plus distractors to reach target count.
 
@@ -195,12 +185,12 @@ def _synthetic_distraction_tool_source(
         task_id: Task identifier used for deterministic distractor selection
         target_count: Total number of tools to include
         base_distractor_count: If provided, the first N distractors use the base hash
-        http_host: HTTP MCP server host
-        http_port: HTTP MCP server port
+        base_url: Base URL for the MCP server (defaults to configured URL)
 
     Returns:
         ToolSource with required tools plus deterministic distractors
     """
+    resolved_base_url = base_url if base_url is not None else get_mcp_base_url()
     servers_config = _load_servers_config()
 
     # Build set for quick lookup of required tools
@@ -284,31 +274,27 @@ def _synthetic_distraction_tool_source(
             tool_name=tool_name,
             tool_description=tool_info.get("description", ""),
             input_schema=tool_info.get("inputSchema", {}),
-            http_host=http_host,
-            http_port=http_port,
+            base_url=resolved_base_url,
         )
         tools.append(tool)
 
     return _StaticToolSource(tools)
 
 
-# Base distractor count for distraction-64 (used for superset consistency)
 _DISTRACTION_64_BASE = 64
 
 
 def synthetic_distraction_64_tool_source(
     required_tools: list[tuple[str, str]],
     task_id: str,
-    http_host: str = DEFAULT_HTTP_HOST,
-    http_port: int = DEFAULT_HTTP_PORT,
+    base_url: str | None = None,
 ) -> ToolSource:
     """Create a ToolSource with required tools plus distractors to reach 64 tools.
 
     Args:
         required_tools: List of (server_name, tool_name) tuples for required tools
         task_id: Task identifier used for deterministic distractor selection
-        http_host: HTTP MCP server host
-        http_port: HTTP MCP server port
+        base_url: Base URL for the MCP server (defaults to configured URL)
 
     Returns:
         ToolSource with required tools plus deterministic distractors (64 total)
@@ -317,16 +303,14 @@ def synthetic_distraction_64_tool_source(
         required_tools,
         task_id,
         target_count=64,
-        http_host=http_host,
-        http_port=http_port,
+        base_url=base_url,
     )
 
 
 def synthetic_distraction_128_tool_source(
     required_tools: list[tuple[str, str]],
     task_id: str,
-    http_host: str = DEFAULT_HTTP_HOST,
-    http_port: int = DEFAULT_HTTP_PORT,
+    base_url: str | None = None,
 ) -> ToolSource:
     """Create a ToolSource with required tools plus distractors to reach 128 tools.
 
@@ -336,8 +320,7 @@ def synthetic_distraction_128_tool_source(
     Args:
         required_tools: List of (server_name, tool_name) tuples for required tools
         task_id: Task identifier used for deterministic distractor selection
-        http_host: HTTP MCP server host
-        http_port: HTTP MCP server port
+        base_url: Base URL for the MCP server (defaults to configured URL)
 
     Returns:
         ToolSource with required tools plus deterministic distractors (128 total)
@@ -348,6 +331,5 @@ def synthetic_distraction_128_tool_source(
         task_id,
         target_count=128,
         base_distractor_count=max(0, base_distractors),
-        http_host=http_host,
-        http_port=http_port,
+        base_url=base_url,
     )
