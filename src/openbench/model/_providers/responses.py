@@ -189,8 +189,8 @@ class ResponsesFormatAPI(ModelAPI):
                                 texts.append(c.get("text", ""))  # type: ignore[misc]
                         extracted_text = "\n".join(texts) if texts else None
 
-                        # Only treat as instructions if we successfully extracted text
-                        if extracted_text:
+                        # Only treat as instructions if we successfully extracted non-whitespace text
+                        if extracted_text and extracted_text.strip():
                             instructions = extracted_text
                         else:
                             # No text content found, preserve the message
