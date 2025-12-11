@@ -276,6 +276,9 @@ class ResponsesFormatAPI(ModelAPI):
                         OpenAIResponse,
                         await self.client.responses.create(**minimal_request_dict),  # type: ignore[arg-type]
                     )
+
+                    # Update request_dict to reflect the actual request sent
+                    request_dict = minimal_request_dict
                 else:
                     # Not an unsupported parameter error, re-raise
                     raise
