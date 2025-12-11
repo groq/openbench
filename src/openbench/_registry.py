@@ -195,6 +195,14 @@ def siliconflow() -> Type[ModelAPI]:
     return SiliconFlowAPI
 
 
+@modelapi(name="burncloud")
+def burncloud() -> Type[ModelAPI]:
+    """Register BurnCloud provider."""
+    from .model._providers.burncloud import BurnCloudAPI
+
+    return BurnCloudAPI
+
+
 def _override_builtin_groq_provider():
     """Replace Inspect AI's built-in groq provider with enhanced openbench version."""
     from inspect_ai._util.registry import _registry
