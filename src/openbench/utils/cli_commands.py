@@ -1,18 +1,26 @@
 """
 Utility functions for CLI-based solvers that run tasks inside Docker sandboxes.
 
-This module provides common functionality for different CLI code agents (aider, opencode, roo)
+This module provides common functionality for different CLI code agents
+(aider, opencode, claude_code, codex, roo)
 including repository management, environment setup, and command execution.
 """
 
 from __future__ import annotations
 
+import json
+import os
 import re
+import shlex
 from typing import Any, Dict, List, Optional
 
 from inspect_ai.util import sandbox
 
 from openbench.provider_config import ProviderManager
+from openbench.utils.text import DISCOVER_TEST_FILES_SCRIPT
+
+
+AGENT_WORKSPACE_ROOT = "/workspace/.agent_workspaces"
 
 
 # =============================================================================
@@ -45,6 +53,139 @@ async def ensure_repo_and_task(language: str, task_name: str) -> bool:
         return result.returncode == 0
     except Exception:
         return False
+
+
+def _normalize_relative_path(path: str) -> str:
+    """Normalize a relative path for rsync exclude usage."""
+    if not path:
+        return ""
+    normalized = os.path.normpath(path)
+    if normalized == ".":
+        return ""
+    return normalized.lstrip("./")
+
+
+def _build_exclude_flags(hidden_paths: Dict[str, List[str]]) -> List[str]:
+    """Convert hidden path lists into rsync --exclude flags."""
+    flags: List[str] = []
+
+    for file_path in hidden_paths.get("files", []):
+        rel = _normalize_relative_path(file_path)
+        if not rel:
+            continue
+        flags.append(f"--exclude={shlex.quote(rel)}")
+
+    for dir_path in hidden_paths.get("dirs", []):
+        rel = _normalize_relative_path(dir_path)
+        if not rel:
+            continue
+        rel_dir = rel.rstrip("/")
+        flags.append(f"--exclude={shlex.quote(rel_dir)}")
+        flags.append(f"--exclude={shlex.quote(rel_dir + '/**')}")
+
+    return flags
+
+
+async def discover_hidden_paths(full_dir: str) -> Dict[str, Any]:
+    """Detect test files and directories."""
+    script = DISCOVER_TEST_FILES_SCRIPT.format(root_dir=full_dir)
+
+    result = await sandbox().exec(
+        cmd=["bash", "-lc", script],
+        timeout=120,
+    )
+
+    if result.returncode != 0:
+        return {
+            "success": False,
+            "stdout": result.stdout or "",
+            "stderr": result.stderr or "failed to detect hidden paths",
+        }
+
+    stdout = result.stdout.strip() or "{}"
+    try:
+        hidden_paths = json.loads(stdout)
+        hidden_paths.setdefault("dirs", [])
+        hidden_paths.setdefault("files", [])
+    except json.JSONDecodeError as exc:
+        return {
+            "success": False,
+            "stdout": stdout,
+            "stderr": f"failed to parse hidden path output: {exc}",
+        }
+
+    return {
+        "success": True,
+        "hidden_paths": hidden_paths,
+    }
+
+
+async def prepare_hidden_workspace(language: str, task_name: str) -> Dict[str, Any]:
+    """Create a sanitized workspace copy with tests removed."""
+    full_dir = f"/workspace/{language}/{task_name}"
+    agent_dir = os.path.join(AGENT_WORKSPACE_ROOT, language, task_name)
+    discovery = await discover_hidden_paths(full_dir)
+    if not discovery.get("success"):
+        return discovery
+
+    hidden_paths: Dict[str, List[str]] = discovery.get("hidden_paths", {})
+    exclude_flags = _build_exclude_flags(hidden_paths)
+    exclude_args = " ".join(exclude_flags)
+
+    if exclude_args:
+        rsync_cmd = f'rsync -a --delete {exclude_args} "{full_dir}/" "{agent_dir}/"'
+    else:
+        rsync_cmd = f'rsync -a --delete "{full_dir}/" "{agent_dir}/"'
+
+    script_lines = [
+        "set -euo pipefail",
+        f"rm -rf {shlex.quote(agent_dir)}",
+        f"mkdir -p {shlex.quote(agent_dir)}",
+        rsync_cmd,
+    ]
+
+    result = await sandbox().exec(
+        cmd=["bash", "-lc", "\n".join(script_lines)],
+        timeout=240,
+    )
+
+    return {
+        "success": result.returncode == 0,
+        "agent_dir": agent_dir,
+        "hidden_paths": hidden_paths,
+        "stdout": result.stdout or "",
+        "stderr": result.stderr or "",
+    }
+
+
+async def sync_agent_workspace(
+    agent_dir: str, full_dir: str, hidden_paths: Dict[str, List[str]]
+) -> Dict[str, Any]:
+    """Propagate changes from the sanitized workspace back into the full repo for grading."""
+    exclude_flags = _build_exclude_flags(hidden_paths)
+    exclude_args = " ".join(exclude_flags)
+    if exclude_args:
+        rsync_cmd = f'rsync -a --delete {exclude_args} "{agent_dir}/" "{full_dir}/"'
+    else:
+        rsync_cmd = f'rsync -a --delete "{agent_dir}/" "{full_dir}/"'
+
+    script_lines = [
+        "set -euo pipefail",
+        f"test -d {shlex.quote(agent_dir)}",
+        f"test -d {shlex.quote(full_dir)}",
+        rsync_cmd,
+    ]
+
+    result = await sandbox().exec(
+        cmd=["bash", "-lc", "\n".join(script_lines)],
+        timeout=240,
+    )
+
+    return {
+        "success": result.returncode == 0,
+        "stdout": result.stdout or "",
+        "stderr": result.stderr or "",
+    }
 
 
 async def run_setup_commands(setup_commands: List[str], workdir: str) -> str:
@@ -392,11 +533,11 @@ opencode run -m {model} "$PROMPT" 2>&1 | tee /tmp/opencode-output.log
 """
 
 
-def get_claude_script_template() -> str:
-    """Get the Claude Code execution script template.
+def get_gemini_script_template() -> str:
+    """Get the Gemini CLI execution script template.
 
     Returns:
-        Claude Code script template with placeholders
+        Gemini script template with placeholders
     """
     return """#!/bin/bash
 set +e
@@ -404,18 +545,21 @@ set +e
 cd {workdir}
 
 # Read the prompt from file
-PROMPT=$(cat /tmp/claude_code_prompt.txt)
+PROMPT=$(cat /tmp/gemini_prompt.txt)
 
 {env_setup}
 
-echo "Running Claude Code with prompt: $PROMPT"  
-echo "Model: {model}"
+# Map GOOGLE_API_KEY to GEMINI_API_KEY if GEMINI_API_KEY is not set
+if [ -z "$GEMINI_API_KEY" ] && [ -n "$GOOGLE_API_KEY" ]; then
+    export GEMINI_API_KEY="$GOOGLE_API_KEY"
+    echo "Mapped GOOGLE_API_KEY to GEMINI_API_KEY"
+fi
+
+echo "Running Gemini CLI with prompt: $PROMPT"
 echo "Working directory: $(pwd)"
 
-echo "$PROMPT" | claude -p --model "{model}" \
-    --permission-mode acceptEdits \
-    --allowedTools "Bash(*)" "Read" "Edit" \
-    2>&1 | tee /tmp/claude-code-output.log
+# Run Gemini with --yolo flag to enable automatic file editing
+gemini --model {model} -p "$PROMPT" --yolo 2>&1 | tee /tmp/gemini-output.log
 """
 
 
@@ -592,8 +736,10 @@ def format_solver_output(
     code_agent_section_map = {
         "aider": "AIDER_OUTPUT",
         "opencode": "OPENCODE_OUTPUT",
-        "claude": "CLAUDE_CODE_OUTPUT",
+        "claude_code": "CLAUDE_CODE_OUTPUT",
+        "codex": "CODEX_CLI_OUTPUT",
         "roo": "ROO_CLI_EXECUTION",
+        "gemini": "GEMINI_OUTPUT",
     }
 
     code_agent_section = code_agent_section_map.get(

@@ -16,6 +16,7 @@ from openbench.solvers.exercism_solver import exercism_solver
 from openbench.scorers.exercism import exercism_scorer
 from openbench.agents import AgentManager
 from openbench.agents.docker_manager import DockerManager
+from openbench.utils.text import EXERCISM_HIDDEN_TEST_PROMPT
 
 
 TASK_DIR = Path(__file__).parent
@@ -25,7 +26,8 @@ COMPOSE_PATH = (TASK_DIR / "compose.yaml").resolve()
 @task
 def exercism(
     languages: Optional[List[str]] = None,
-    code_agent: str = "opencode",
+    code_agent: str = "codex",
+    hide_tests: bool = False,
 ) -> Task:
     """
     Exercism: Multi-language coding benchmark.
@@ -37,8 +39,10 @@ def exercism(
         languages: List of programming languages to include (python, go, javascript, java, rust).
                   If None, includes all supported languages.
         code_agent: CLI code agent to use for code evaluation.
-                   Defaults to 'opencode'. Can also be set via --code-agent flag.
-                   Valid options: aider, opencode, claude, roo
+                   Defaults to 'codex'. Can also be set via --code-agent flag.
+                   Valid options: codex, aider, opencode, claude_code, roo
+        hide_tests: When True, run the agent in a sanitized copy that excludes
+                    Exercism test suites. Tests still execute against the full repo.
 
     Returns:
         Task configured for Exercism evaluation
@@ -60,6 +64,9 @@ def exercism(
         if not hasattr(sample, "metadata") or sample.metadata is None:
             sample.metadata = {}
         sample.metadata["code_agent"] = code_agent
+        sample.metadata["hide_tests"] = hide_tests
+        if hide_tests:
+            sample.input = EXERCISM_HIDDEN_TEST_PROMPT
 
     # Determine task name based on languages
     if languages and len(languages) == 1:
@@ -81,55 +88,57 @@ def exercism(
 
 
 @task
-def exercism_python(code_agent: str = "opencode") -> Task:
+def exercism_python(code_agent: str = "codex", hide_tests: bool = False) -> Task:
     """
     Exercism: Python coding tasks only.
 
     Returns:
         Task configured for Python-only Exercism evaluation
     """
-    return exercism(languages=["python"], code_agent=code_agent)
+    return exercism(languages=["python"], code_agent=code_agent, hide_tests=hide_tests)
 
 
 @task
-def exercism_javascript(code_agent: str = "opencode") -> Task:
+def exercism_javascript(code_agent: str = "codex", hide_tests: bool = False) -> Task:
     """
     Exercism: JavaScript coding tasks only.
 
     Returns:
         Task configured for JavaScript-only Exercism evaluation
     """
-    return exercism(languages=["javascript"], code_agent=code_agent)
+    return exercism(
+        languages=["javascript"], code_agent=code_agent, hide_tests=hide_tests
+    )
 
 
 @task
-def exercism_go(code_agent: str = "opencode") -> Task:
+def exercism_go(code_agent: str = "codex", hide_tests: bool = False) -> Task:
     """
     Exercism: Go coding tasks only.
 
     Returns:
         Task configured for Go-only Exercism evaluation
     """
-    return exercism(languages=["go"], code_agent=code_agent)
+    return exercism(languages=["go"], code_agent=code_agent, hide_tests=hide_tests)
 
 
 @task
-def exercism_java(code_agent: str = "opencode") -> Task:
+def exercism_java(code_agent: str = "codex", hide_tests: bool = False) -> Task:
     """
     Exercism: Java coding tasks only.
 
     Returns:
         Task configured for Java-only Exercism evaluation
     """
-    return exercism(languages=["java"], code_agent=code_agent)
+    return exercism(languages=["java"], code_agent=code_agent, hide_tests=hide_tests)
 
 
 @task
-def exercism_rust(code_agent: str = "opencode") -> Task:
+def exercism_rust(code_agent: str = "codex", hide_tests: bool = False) -> Task:
     """
     Exercism: Rust coding tasks only.
 
     Returns:
         Task configured for Rust-only Exercism evaluation
     """
-    return exercism(languages=["rust"], code_agent=code_agent)
+    return exercism(languages=["rust"], code_agent=code_agent, hide_tests=hide_tests)

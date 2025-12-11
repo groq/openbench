@@ -208,6 +208,19 @@ You are an expert AI technical writer. Based on the following information about 
 Please return only the generated summary text, without any additional titles or preambles.
 """
 
+
+EXERCISM_HIDDEN_TEST_PROMPT = """
+Your job is to complete a coding exercise described in the markdown files inside the `docs` directory.
+
+A file with the implementation stubbed out has been created for you, along with the surrounding project scaffolding.
+
+To successfully complete the exercise, implement the required functionality so the solution satisfies the specification.
+
+Tests have been hidden from you and you will not be able to run them. Complete the exercise to the best of your ability based on the instructions.
+
+You should start by reading the files in the `docs` directory so that you understand the exercise, and then examine the stubbed out implementation.
+""".strip()
+
 LIVEMCPBENCH_VERDICT_PATTERN = re.compile(
     r"Thoughts:\s*(.+?)\s*Status:\s*(\w+)", re.DOTALL
 )
@@ -217,7 +230,7 @@ Please solve this AIME problem step by step. The answer is an integer ranging fr
 
 {question}
 
-Remember to show your work clearly and end with ‘ANSWER: X’ where X is your final numerical answer.
+Remember to show your work clearly and end with 'ANSWER: X' where X is your final numerical answer.
 """
 
 
@@ -589,3 +602,40 @@ which provides domain filtering capabilities.
 """
 # Expected SHA-256 hash for factscore db
 FACTSCORE_DB_SHA256 = "31cf7b6b4465459844bb00f3a6ac75560fc7d1525112205a21859323dc5d33d7"
+
+# Python script template for discovering test files and directories in exercism tasks
+DISCOVER_TEST_FILES_SCRIPT = """python3 - <<'PY'
+import json
+import os
+
+root = {root_dir!r}
+root = os.path.abspath(root)
+dir_matches = set()
+file_matches = set()
+
+for current, dirnames, filenames in os.walk(root):
+    rel_current = os.path.relpath(current, root)
+    rel_current = "" if rel_current == "." else rel_current
+
+    keep_dirs = []
+    for dirname in dirnames:
+        rel_path = os.path.join(rel_current, dirname) if rel_current else dirname
+        if "test" in dirname.lower():
+            dir_matches.add(rel_path)
+        else:
+            keep_dirs.append(dirname)
+    dirnames[:] = keep_dirs
+
+    for filename in filenames:
+        lowered = filename.lower()
+        if "test" in lowered or lowered.endswith(".spec.js"):
+            rel_path = os.path.join(rel_current, filename) if rel_current else filename
+            file_matches.add(rel_path)
+
+result = {{
+    "dirs": sorted(dir_matches),
+    "files": sorted(file_matches),
+}}
+
+print(json.dumps(result))
+PY"""

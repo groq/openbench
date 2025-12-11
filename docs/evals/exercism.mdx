@@ -21,8 +21,9 @@ The benchmark places agents in realistic development environments where they mus
 - **Multiple Code Agent Harnesses**: Evaluate models across different code agent frameworks on identical tasks for fair comparison:
   - **Aider** - AI-powered pair programming tool with git integration
   - **OpenCode** - OpenAI-compatible code generation tool
-  - **Claude** - Claude-based code editor with file system access
+  - **Claude Code** - Claude-based code editor with file system access
   - **Roo** - VS Code extension with interactive development
+  - **Codex** - OpenAI Codex cli coding agent
 
 - **Realistic Development Environment**: Agents work in full file system workspaces with multiple files, build configurations, and test suites
 
@@ -32,7 +33,7 @@ The benchmark places agents in realistic development environments where they mus
 
 ## Usage
 
-Run Exercism evaluation across all languages with the default code agent (opencode):
+Run Exercism evaluation across all languages with the default code agent (codex):
 
 ```bash
 bench eval exercism
@@ -41,6 +42,7 @@ bench eval exercism
 Specify a different code agent:
 
 ```bash
+bench eval exercism --code-agent codex
 bench eval exercism --code-agent aider
 bench eval exercism --code-agent claude
 bench eval exercism --code-agent roo
@@ -51,6 +53,14 @@ Evaluate with a specific model:
 ```bash
 bench eval exercism --code-agent opencode --model groq/gpt-oss-120b
 ```
+
+Hide the Exercism test suites from the agent (tests still run after the edit loop):
+
+```bash
+bench eval exercism --hidden-tests
+```
+
+With `--hidden-tests`, the agent works inside a sanitized copy of the repo with the language-specific tests excluded, while the final verification still runs against the full workspace to ensure correctness.
 
 Run evaluation for a single language:
 
@@ -112,4 +122,3 @@ The multi-agent design allows for unique comparative analysis:
 - Compare how different models perform on identical tasks
 - Evaluate which code agent harness works best for different languages and models
 - Identify model strengths and weaknesses across programming paradigms
-

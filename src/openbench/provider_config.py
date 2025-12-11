@@ -188,6 +188,7 @@ PROVIDER_CONFIGS: Dict[ProviderType, ProviderConfig] = {
         display_name="Google AI",
         api_key_env="GOOGLE_API_KEY",
         base_url="https://generativelanguage.googleapis.com/v1beta",
+        additional_env_vars=["GEMINI_API_KEY"],
         supports_vision=True,
         supports_function_calling=True,
     ),

@@ -652,6 +652,14 @@ def run_eval(
             envvar="BENCH_CODE_AGENT",
         ),
     ] = None,
+    hidden_tests: Annotated[
+        bool,
+        typer.Option(
+            "--hidden-tests",
+            help="Run code agents in a sanitized copy of the repo with Exercism tests hidden",
+            envvar="BENCH_HIDDEN_TESTS",
+        ),
+    ] = False,
 ) -> List[EvalLog] | None:
     """
     Run a benchmark on a model.
@@ -697,6 +705,17 @@ def run_eval(
                     "For --code-agent roo, --model must be an OpenRouter model id prefixed with 'openrouter/'. "
                     "Example: --model openrouter/anthropic/claude-sonnet-4-20250514"
                 )
+    # claude code only supports anthropic models
+    if code_agent and code_agent.lower() == "claude_code":
+        for model_name in model:
+            if not model_name.startswith("anthropic/"):
+                raise typer.BadParameter(
+                    "For claude_code, --model must be an Anthropic model id prefixed with 'anthropic/'. "
+                )
+
+    # Propagate hidden test preference to tasks that support it
+    if hidden_tests:
+        task_args["hide_tests"] = True
 
     # Validate model names
     for model_name in model:
