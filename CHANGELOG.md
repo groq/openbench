@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.4](https://github.com/groq/openbench/compare/v0.5.3...v0.5.4) (2025-12-11)
+
+
+### Features
+
+* **exercism:** adding codex, claude, gemini and hidden tests flag ([#325](https://github.com/groq/openbench/issues/325)) ([6a080a2](https://github.com/groq/openbench/commit/6a080a2f59a02500a63a6f24919b6b03cdb22081))
+
 ## [0.5.3](https://github.com/groq/openbench/compare/v0.5.2...v0.5.3) (2025-12-08)
 
 
