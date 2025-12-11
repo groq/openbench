@@ -19,6 +19,7 @@ class ProviderType(str, Enum):
     AZURE = "azure"
     BASETEN = "baseten"
     CEREBRAS = "cerebras"
+    CHAT_COMPLETIONS = "chat-completions"
     COHERE = "cohere"
     CRUSOE = "crusoe"
     DEEPINFRA = "deepinfra"
@@ -42,6 +43,7 @@ class ProviderType(str, Enum):
     PARASAIL = "parasail"
     PERPLEXITY = "perplexity"
     REKA = "reka"
+    RESPONSES = "responses"
     SAMBANOVA = "sambanova"
     SILICONFLOW = "siliconflow"
     TOGETHER = "together"
@@ -133,6 +135,15 @@ PROVIDER_CONFIGS: Dict[ProviderType, ProviderConfig] = {
         base_url="https://api.cerebras.ai/v1",
         supports_vision=False,
         supports_function_calling=True,
+    ),
+    ProviderType.CHAT_COMPLETIONS: ProviderConfig(
+        name="chat-completions",
+        display_name="Generic Chat Completions Format",
+        api_key_env="CHAT_COMPLETIONS_API_KEY",
+        base_url_env="CHAT_COMPLETIONS_BASE_URL",
+        supports_vision=False,
+        supports_function_calling=True,
+        requires_auth=False,
     ),
     ProviderType.COHERE: ProviderConfig(
         name="cohere",
@@ -326,6 +337,15 @@ PROVIDER_CONFIGS: Dict[ProviderType, ProviderConfig] = {
         base_url_env="REKA_BASE_URL",
         supports_vision=True,
         supports_function_calling=True,
+    ),
+    ProviderType.RESPONSES: ProviderConfig(
+        name="responses",
+        display_name="Generic Responses Format",
+        api_key_env="RESPONSES_API_KEY",
+        base_url_env="RESPONSES_BASE_URL",
+        supports_vision=False,
+        supports_function_calling=False,
+        requires_auth=False,
     ),
     ProviderType.SAMBANOVA: ProviderConfig(
         name="sambanova",
