@@ -187,7 +187,17 @@ class ResponsesFormatAPI(ModelAPI):
                         for c in content:
                             if isinstance(c, dict) and c.get("type") == "text":  # type: ignore[misc]
                                 texts.append(c.get("text", ""))  # type: ignore[misc]
-                        instructions = "\n".join(texts) if texts else None
+                        extracted_text = "\n".join(texts) if texts else None
+
+                        # Only treat as instructions if we successfully extracted text
+                        if extracted_text:
+                            instructions = extracted_text
+                        else:
+                            # No text content found, preserve the message
+                            filtered_items.append(item)
+                    else:
+                        # Empty content, preserve the message
+                        filtered_items.append(item)
                 else:
                     filtered_items.append(item)
 
