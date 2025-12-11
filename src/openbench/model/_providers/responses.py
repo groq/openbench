@@ -166,7 +166,7 @@ class ResponsesFormatAPI(ModelAPI):
         try:
             # Convert messages to responses input format
             openai_api_adapter = _OpenAIAPIAdapter(self.actual_model_name)
-            input_items = await openai_responses_inputs(input, openai_api_adapter)  # type: ignore[arg-type]
+            input_items = await openai_responses_inputs(input, openai_api_adapter)  # type: ignore[arg-type,call-arg]
 
             # Extract instructions from first system message
             instructions: str | None = None
