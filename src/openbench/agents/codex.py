@@ -12,7 +12,7 @@ from inspect_ai.model import ChatMessageUser, ModelOutput
 from openbench.utils.cli_commands import format_execution_output
 
 from .base import BaseCodeAgent
-from inspect_swe import codex_cli
+from inspect_swe import codex_cli  # type: ignore[import-not-found, import-untyped]
 
 
 class CodexAgent(BaseCodeAgent):
