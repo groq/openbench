@@ -2733,6 +2733,7 @@ name = "openbench"
 version = "0.5.3"
 source = { editable = "." }
 dependencies = [
+    { name = "aiohttp" },
     { name = "anthropic" },
     { name = "datasets" },
     { name = "groq" },
@@ -2803,6 +2804,7 @@ tau-bench = [
 
 [package.metadata]
 requires-dist = [
+    { name = "aiohttp", specifier = ">=3.11.18" },
     { name = "anthropic", specifier = ">=0.69.0" },
     { name = "datasets", specifier = ">=3.6.0" },
     { name = "groq", specifier = ">=0.33.0" },

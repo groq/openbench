@@ -3385,6 +3385,26 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.livemcpbench",
         function_name="livemcpbench",
         is_alpha=False,
+    ),
+    "progressivemcpbench": BenchmarkMetadata(
+        name="ProgressiveMCPBench",
+        description=(
+            "Evaluating LLM agents with progressive tool discovery strategies using MCP. "
+            "Tests how effectively models discover and use MCP tools—from file operations "
+            "to API calls—while controlling how tools are presented (copilot, directory, "
+            "minimal-servers, minimal-tools, distraction modes)."
+        ),
+        category="agents",
+        tags=[
+            "agents",
+            "tools",
+            "mcp",
+            "tool-discovery",
+            "synthetic",
+        ],
+        module_path="openbench.evals.progressivemcpbench",
+        function_name="progressivemcpbench",
+        is_alpha=True,
     ),  # GLUE/SuperGLUE benchmarks
     "anli": BenchmarkMetadata(
         name="ANLI (All Rounds)",

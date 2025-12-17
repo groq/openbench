@@ -1,0 +1,223 @@
+"""
+Create Inspect AI Tool wrappers for synthetic MCP tools.
+
+This module provides wrappers that route tool calls to the synthetic HTTP MCP
+server using proper MCP protocol instead of custom RPC.
+"""
+
+from __future__ import annotations
+
+import json
+from typing import Any
+
+from inspect_ai.tool import Tool
+from inspect_ai.tool._tool_def import ToolDef
+from inspect_ai.tool._tool_params import ToolParams
+from inspect_ai.util._json import JSONSchema
+import aiohttp
+
+from ..mcp_config import get_mcp_base_url
+
+
+def _convert_json_schema(prop: dict[str, Any], name: str | None = None) -> JSONSchema:
+    """Recursively convert a JSON schema dict to a JSONSchema object."""
+    kwargs: dict[str, Any] = {}
+
+    prop_type = prop.get("type")
+    if isinstance(prop_type, list):
+        kwargs["anyOf"] = [JSONSchema(type=t) for t in prop_type]  # type: ignore[arg-type]
+    elif prop_type:
+        kwargs["type"] = prop_type
+
+    if "description" in prop:
+        kwargs["description"] = prop["description"]
+    elif name:
+        kwargs["description"] = f"The {name} parameter"
+
+    for field in ["format", "default", "enum"]:
+        if field in prop:
+            kwargs[field] = prop[field]
+
+    if "items" in prop:
+        items_schema = prop["items"]
+        if isinstance(items_schema, dict):
+            kwargs["items"] = _convert_json_schema(items_schema)
+
+    if "properties" in prop:
+        kwargs["properties"] = {
+            k: _convert_json_schema(v, k) for k, v in prop["properties"].items()
+        }
+
+    if "required" in prop:
+        kwargs["required"] = list(prop["required"])
+
+    if "additionalProperties" in prop:
+        ap = prop["additionalProperties"]
+        if isinstance(ap, bool):
+            kwargs["additionalProperties"] = ap
+        elif isinstance(ap, dict):
+            kwargs["additionalProperties"] = _convert_json_schema(ap)
+
+    if "anyOf" in prop and "anyOf" not in kwargs:
+        kwargs["anyOf"] = [_convert_json_schema(s) for s in prop["anyOf"]]
+
+    return JSONSchema(**kwargs)  # type: ignore[arg-type]
+
+
+def _json_schema_to_tool_params(schema: dict[str, Any]) -> ToolParams:
+    """Convert a JSON schema to ToolParams."""
+    properties_dict: dict[str, JSONSchema] = {}
+    properties = schema.get("properties", {})
+    required = list(schema.get("required", []))
+
+    for name, prop in properties.items():
+        properties_dict[name] = _convert_json_schema(prop, name)
+
+    return ToolParams(
+        type="object",
+        properties=properties_dict,
+        required=required,
+    )
+
+
+async def _call_http_tool(
+    server_name: str,
+    tool_name: str,
+    params: dict[str, Any],
+    base_url: str | None = None,
+    timeout: int = 30,
+) -> dict[str, Any]:
+    """Call a tool on the synthetic HTTP MCP server using MCP protocol.
+
+    Args:
+        server_name: Name of the MCP server
+        tool_name: Name of the tool to call
+        params: Tool parameters as a dictionary
+        base_url: Base URL for the MCP server (defaults to configured URL)
+        timeout: Request timeout in seconds
+
+    Returns:
+        Response dictionary with 'result' or 'error' key
+    """
+    if base_url is None:
+        base_url = get_mcp_base_url()
+
+    async with aiohttp.ClientSession(
+        timeout=aiohttp.ClientTimeout(total=timeout)
+    ) as session:
+        try:
+            url = f"{base_url}/mcp/{server_name}"
+            # MCP tools/call format
+            call_data = {
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "tools/call",
+                "params": {"name": tool_name, "arguments": params},
+            }
+
+            headers = {
+                "Content-Type": "application/json",
+                "Accept": "application/json, text/event-stream",
+            }
+
+            async with session.post(
+                url,
+                json=call_data,
+                headers=headers,
+            ) as response:
+                response_text = await response.text()
+
+                # Parse SSE response format: "event: message\ndata: {...}\n\n"
+                try:
+                    # Extract JSON from data field in SSE
+                    if "data: " in response_text:
+                        # Split on event/data boundaries
+                        lines = response_text.strip().split("\n")
+                        data_line = None
+                        for line in lines:
+                            if line.startswith("data: "):
+                                data_line = line[6:]  # Remove "data: " prefix
+                                break
+
+                        if data_line:
+                            data = json.loads(data_line)
+                        else:
+                            return {"error": "No data field in SSE response"}
+                    else:
+                        # Try to parse as direct JSON
+                        data = json.loads(response_text)
+
+                    if "error" in data:
+                        return {
+                            "error": data["error"].get("message", str(data["error"]))
+                        }
+
+                    return data
+
+                except json.JSONDecodeError as e:
+                    return {"error": f"Failed to parse response: {str(e)}"}
+
+        except Exception as e:
+            return {"error": str(e)}
+
+
+def create_synthetic_tool_wrapper(
+    server_name: str,
+    tool_name: str,
+    tool_description: str,
+    input_schema: dict[str, Any],
+    base_url: str | None = None,
+    timeout: int = 30,
+) -> Tool:
+    """Create an Inspect AI Tool that routes to the synthetic HTTP MCP server.
+
+    Args:
+        server_name: Name of the MCP server (used in URL path)
+        tool_name: Name of the tool
+        tool_description: Description of the tool
+        input_schema: JSON schema for tool parameters
+        base_url: Base URL for the MCP server (defaults to configured URL)
+        timeout: Timeout in seconds for tool execution
+
+    Returns:
+        Inspect AI Tool that executes via the HTTP MCP server
+    """
+    resolved_base_url = base_url if base_url is not None else get_mcp_base_url()
+
+    async def execute(**kwargs: Any) -> str:
+        """Execute the tool via HTTP MCP server."""
+        response = await _call_http_tool(
+            server_name=server_name,
+            tool_name=tool_name,
+            params=kwargs,
+            base_url=resolved_base_url,
+            timeout=timeout,
+        )
+
+        if "error" in response and response["error"]:
+            return f"Error: {response['error']}"
+
+        result = response.get("result", "(no result)")
+
+        if isinstance(result, str):
+            return result
+        return json.dumps(result, indent=2)
+
+    if input_schema:
+        params = _json_schema_to_tool_params(input_schema)
+    else:
+        params = ToolParams(type="object", properties={}, required=[])
+
+    safe_server_name = server_name.replace(" ", "_").replace("-", "_")
+    safe_tool_name = tool_name.replace(" ", "_").replace("-", "_")
+    prefixed_name = f"{safe_server_name}__{safe_tool_name}"
+
+    tool_def = ToolDef(
+        tool=execute,
+        name=prefixed_name,
+        description=tool_description,
+        parameters=params,
+        parallel=True,  # Synthetic tools are safe to run in parallel
+    )
+
+    return tool_def.as_tool()

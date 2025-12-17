@@ -1,0 +1,157 @@
+---
+title: ProgressiveMCPBench
+description: Evaluating LLM agents with progressive tool discovery strategies using MCP
+---
+
+# ProgressiveMCPBench
+
+ProgressiveMCPBench is a benchmark for evaluating how effectively language models can discover and use Model Context Protocol (MCP) tools. It tests agents on tasks that require using MCP tools - from file operations to API calls - while controlling *how* tools are presented to the model.
+
+## Quick Start
+
+```bash
+# Run with directory-style tool discovery
+bench eval progressivemcpbench --model openai/gpt-4o -T strategy=directory
+
+# Run with only required servers per task
+bench eval progressivemcpbench --model openai/gpt-4o -T strategy=minimal-servers
+
+# Run with only exact required tools per task
+bench eval progressivemcpbench --model openai/gpt-4o -T strategy=minimal-tools
+
+# Run with Groq server-side MCP (single-shot, no local tool loop)
+bench eval progressivemcpbench --model groq-responses/openai/gpt-oss-20b -T strategy=minimal-servers-remote
+```
+
+The dataset is automatically downloaded on first run. The synthetic MCP HTTP server is started automatically when you run the eval (except for `minimal-servers-remote` which uses a hosted remote server).
+
+## Architecture Overview
+
+The benchmark uses a **synthetic MCP layer** that provides:
+- **Deterministic responses** - Same inputs always produce same outputs
+- **Fast execution** - No network latency or server startup time  
+- **No dependencies** - No Node.js, npm packages, or external services required
+- **Reliable evaluation** - No infrastructure failures or timeouts
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     Inspect AI Eval                         │
+├─────────────────────────────────────────────────────────────┤
+│  Strategy Layer                                             │
+│  ├─ copilot ────────────► Semantic search discovery         │
+│  ├─ directory ──────────► Filesystem-like exploration       │
+│  ├─ minimal-servers ────► Server-level filtering            │
+│  ├─ minimal-tools ──────► Exact tools only                  │
+│  ├─ distraction-64 ─────► Required + distractors (64)       │
+│  └─ distraction-128 ────► Required + distractors (128)      │
+├─────────────────────────────────────────────────────────────┤
+│  Synthetic HTTP MCP Server (localhost:8765)                 │
+│  ├─ filesystem handler ──► data/files/root/                 │
+│  ├─ table_lookup handler ► data/api/*.json                  │
+│  ├─ excel_reader handler ► data/files/root/**/*.xlsx        │
+│  ├─ static_json handler ─► Fixed responses                  │
+│  └─ web_corpus handler ──► data/web/                        │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Strategies
+
+All strategies use the synthetic MCP layer with deterministic responses.
+
+| Strategy                 | Description                                                 | Use Case                          |
+|--------------------------|-------------------------------------------------------------|-----------------------------------|
+| `copilot`                | Semantic search via `route()` + `execute-tool()`            | Tests RAG-style tool discovery    |
+| `directory`              | Filesystem-like exploration via `ls()` + `read-tool-file()` | Tests explicit tool browsing      |
+| `minimal-servers`        | Direct access to required servers only                      | Tests with server-level filtering |
+| `minimal-servers-remote` | Groq server-side MCP (single-shot)                          | Tests remote MCP orchestration    |
+| `minimal-tools`          | Direct access to exact tools needed                         | Upper bound on performance        |
+| `distraction-64`         | Required tools + distractors (64 total)                     | Tests distraction resistance      |
+| `distraction-128`        | Required tools + distractors (128 total)                    | Tests distraction resistance      |
+
+### Strategy Details
+
+**Copilot** - The model uses two meta-tools:
+- `route(query)` - Semantic search across all available tools using embeddings
+- `execute-tool(server, tool, params)` - Execute a discovered tool
+
+**Directory** - Tools are presented as a filesystem:
+- `ls(path)` - List available servers or tools within a server
+- `read-tool-file(paths)` - Read tool descriptions (can batch multiple)
+- `execute-tool(tool_path, params)` - Execute a tool by its path
+
+**Minimal strategies** - No discovery needed; tools are provided directly based on task annotations.
+
+**Minimal-servers-remote** - Uses Groq's server-side MCP capability. Instead of local tool execution, MCP server specs are sent to Groq's Responses API, which handles all tool discovery and execution internally. This is a single-shot approach - no local tool-calling loop. Only works with the `groq-responses` provider.
+
+```bash
+# Example: Run with remote MCP
+bench eval progressivemcpbench --model groq-responses/openai/gpt-oss-20b -T strategy=minimal-servers-remote
+```
+
+**Distraction strategies** - Required tools plus additional "distractor" tools, padded to exactly 64 or 128 tools total. Distractors are selected deterministically based on task ID.
+
+---
+
+## Dataset
+
+The dataset is automatically downloaded from [github.com/geelen/progressivemcpbench](https://github.com/geelen/progressivemcpbench) on first run and cached at `~/.openbench/progressivemcpbench/dataset/`.
+
+You can override the dataset location by setting the `PROGRESSIVEMCPBENCH_DATA_DIR` environment variable.
+
+The dataset includes:
+- **Task definitions** - Questions, expected answers, and tool requirements
+- **Server configurations** - MCP server and tool schemas with handlers
+- **Synthetic data** - Files, API responses, and web content for deterministic evaluation
+
+---
+
+## Scoring
+
+Tasks are scored using LLM-as-a-judge with the SimpleQA grader template:
+
+| Score | Meaning                         |
+|-------|---------------------------------|
+| 1.0   | Correct answer                  |
+| 0.5   | Partially correct (fuzzy match) |
+| 0.0   | Incorrect or no answer          |
+
+The model must output a JSON object with a `final_answer` field containing the answer.
+
+---
+
+## CLI Reference
+
+```bash
+bench eval progressivemcpbench --model <model> -T strategy=<strategy> [options]
+
+# Strategy options:
+-T strategy=copilot                 # Semantic search discovery
+-T strategy=directory               # Filesystem-like exploration
+-T strategy=minimal-servers         # Only required servers
+-T strategy=minimal-servers-remote  # Groq server-side MCP (groq-responses only)
+-T strategy=minimal-tools           # Only exact tools
+-T strategy=distraction-64          # Required + distractors (64 total)
+-T strategy=distraction-128         # Required + distractors (128 total)
+
+# Common options:
+--limit N          # Run only N tasks
+--epochs N         # Run each task N times  
+--epochs-reducer   # How to combine epoch scores (mean, max, etc.)
+--log-dir DIR      # Directory for eval logs
+```
+
+---
+
+## Requirements
+
+- Python 3.10+
+- OPENAI_API_KEY (for embeddings in copilot strategy)
+
+---
+
+## References
+
+- [Dataset repository](https://github.com/geelen/progressivemcpbench)
+- Based on [LiveMCPBench](https://github.com/icip-cas/LiveMCPBench) with extensions for progressive tool discovery research.
