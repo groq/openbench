@@ -22,13 +22,26 @@ from openbench.utils.image import (
 )
 
 
-def _pad_image_to_square(image: Image.Image) -> Image.Image:
-    """Pad image to square, top-left anchored, white background, RGB."""
+def _pad_image_to_square(
+    image: Image.Image, target_size: Optional[int] = None
+) -> Image.Image:
+    """Pad image to square, top-left anchored, white background, RGB.
+
+    Args:
+        image: Input image
+        target_size: If provided, pad to this exact size. Otherwise pad to max(width, height).
+    """
     image = image.convert("RGB")
     width, height = image.size
-    if width == height:
+
+    if target_size is not None:
+        side = target_size
+    else:
+        side = max(width, height)
+
+    if width == side and height == side:
         return image
-    side = max(width, height)
+
     canvas = Image.new("RGB", (side, side), color=(255, 255, 255))
     canvas.paste(image, (0, 0))
     return canvas
@@ -108,10 +121,18 @@ def record_to_sample(
                     elif img.mode != "RGB":
                         img = img.convert("RGB")
 
-                    # Pad to square and resize to exact dimensions if max_dimension is set
+                    # Two-tier image processing when max_dimension is set:
+                    # 1. Small images (< 896px): pad to 896x896 without scaling
+                    # 2. Large images (>= 896px): pad to square then scale to max_dimension
                     if max_dimension is not None:
-                        img = _pad_image_to_square(img)
-                        img = _resize_image(img, target_side=max_dimension)
+                        longest_side = max(img.size)
+                        if longest_side < 896:
+                            # Small image: pad directly to 896x896 without scaling
+                            img = _pad_image_to_square(img, target_size=896)
+                        else:
+                            # Large image: pad to square then scale to max_dimension
+                            img = _pad_image_to_square(img)
+                            img = _resize_image(img, target_side=max_dimension)
 
                     # Always re-encode at specified quality level
                     output = io.BytesIO()
