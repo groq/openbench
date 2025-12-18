@@ -22,8 +22,27 @@ from openbench.utils.image import (
 )
 
 
+def _pad_image_to_square(image: Image.Image) -> Image.Image:
+    """Pad image to square, top-left anchored, white background, RGB."""
+    image = image.convert("RGB")
+    width, height = image.size
+    if width == height:
+        return image
+    side = max(width, height)
+    canvas = Image.new("RGB", (side, side), color=(255, 255, 255))
+    canvas.paste(image, (0, 0))
+    return canvas
+
+
+def _resize_image(image: Image.Image, target_side: int) -> Image.Image:
+    """Resize to target_side x target_side using bicubic filtering."""
+    if image.size == (target_side, target_side):
+        return image
+    return image.resize((target_side, target_side), resample=Image.Resampling.BICUBIC)
+
+
 def record_to_sample(
-    max_dimension: Optional[int] = 1536,
+    max_dimension: Optional[int] = None,
     quality: int = 75,
     max_size_mb: float = 5.0,
 ) -> Callable[[Dict[str, Any]], Sample]:
@@ -31,7 +50,7 @@ def record_to_sample(
 
     Args:
         max_dimension: Maximum width/height in pixels for image resizing.
-                       If None, disables dimension-based resizing. (default: 1536)
+                       If None, images are left untouched. (default: None)
         quality: JPEG quality (1-100) for image compression (default: 75)
         max_size_mb: Maximum allowed size in MB before compression (default: 5.0)
 
@@ -89,11 +108,10 @@ def record_to_sample(
                     elif img.mode != "RGB":
                         img = img.convert("RGB")
 
-                    # Resize if max_dimension is set and image exceeds it
-                    if max_dimension is not None and max(img.size) > max_dimension:
-                        img.thumbnail(
-                            (max_dimension, max_dimension), Image.Resampling.LANCZOS
-                        )
+                    # Pad to square and resize to exact dimensions if max_dimension is set
+                    if max_dimension is not None:
+                        img = _pad_image_to_square(img)
+                        img = _resize_image(img, target_side=max_dimension)
 
                     # Always re-encode at specified quality level
                     output = io.BytesIO()
@@ -153,7 +171,7 @@ def get_dataset(
     question_type: Optional[str] = None,
     shuffle: bool = True,
     seed: int = 42,
-    max_dimension: Optional[int] = 1536,
+    max_dimension: Optional[int] = None,
     quality: int = 75,
     max_size_mb: float = 5.0,
 ) -> Dataset:
@@ -165,7 +183,7 @@ def get_dataset(
         shuffle: Whether to shuffle the dataset
         seed: Random seed for shuffling
         max_dimension: Maximum width/height in pixels for image resizing.
-                       If None, disables dimension-based resizing. (default: 1536)
+                       If None, images are left untouched. (default: None)
         quality: JPEG quality (1-100) for image compression (default: 75)
         max_size_mb: Maximum allowed size in MB before compression (default: 5.0)
 

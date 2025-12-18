@@ -26,7 +26,7 @@ def mathvista(
     shuffle: bool = True,
     seed: int = 42,
     grader_model: str = "openai/gpt-4-turbo",
-    max_dimension: Optional[int] = 1536,
+    max_dimension: Optional[int] = None,
     quality: int = 75,
     max_size_mb: float = 5.0,
 ) -> Task:
@@ -42,7 +42,7 @@ def mathvista(
         grader_model: Model to use for LLM-based answer extraction fallback
                      (default: gpt-4-turbo, matching original paper)
         max_dimension: Maximum width/height in pixels for image resizing.
-                       If None, disables dimension-based resizing. (default: 1536)
+                       If None, images are left untouched. (default: None)
         quality: JPEG quality (1-100) for image compression (default: 75)
         max_size_mb: Maximum allowed size in MB before compression (default: 5.0)
 
