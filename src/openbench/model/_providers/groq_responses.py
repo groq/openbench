@@ -299,9 +299,7 @@ class GroqResponsesAPI(ModelAPI):
                 )
         return parts
 
-    def _parse_response(
-        self, result: Any, tools: list[ToolInfo]
-    ) -> ModelOutput:
+    def _parse_response(self, result: Any, tools: list[ToolInfo]) -> ModelOutput:
         """Parse Responses API result into ModelOutput."""
         # Extract content from output items
         text_content = ""
@@ -414,7 +412,10 @@ class GroqResponsesAPI(ModelAPI):
                 delta = getattr(event, "delta", "")
                 accumulated_reasoning += delta
 
-            elif event_type in ("response.output_item.added", "response.output_item.done"):
+            elif event_type in (
+                "response.output_item.added",
+                "response.output_item.done",
+            ):
                 # Function call item - capture the name and potentially final arguments
                 item = getattr(event, "item", None)
                 if item and getattr(item, "type", "") == "function_call":
@@ -443,10 +444,7 @@ class GroqResponsesAPI(ModelAPI):
             elif event_type == "response.function_call_arguments.delta":
                 # Accumulate function call arguments
                 # Groq uses item_id instead of call_id
-                call_id = (
-                    getattr(event, "call_id", "")
-                    or getattr(event, "item_id", "")
-                )
+                call_id = getattr(event, "call_id", "") or getattr(event, "item_id", "")
                 if call_id and call_id not in accumulated_tool_calls:
                     accumulated_tool_calls[call_id] = {
                         "id": call_id,
@@ -460,10 +458,7 @@ class GroqResponsesAPI(ModelAPI):
 
             elif event_type == "response.function_call_arguments.done":
                 # Groq uses item_id instead of call_id
-                call_id = (
-                    getattr(event, "call_id", "")
-                    or getattr(event, "item_id", "")
-                )
+                call_id = getattr(event, "call_id", "") or getattr(event, "item_id", "")
                 if call_id:
                     if call_id not in accumulated_tool_calls:
                         accumulated_tool_calls[call_id] = {
@@ -522,7 +517,9 @@ class GroqResponsesAPI(ModelAPI):
                             {
                                 "type": "reasoning",
                                 "summary": [
-                                    type("Summary", (), {"text": accumulated_reasoning})()
+                                    type(
+                                        "Summary", (), {"text": accumulated_reasoning}
+                                    )()
                                 ],
                             },
                         )()
@@ -567,7 +564,9 @@ class GroqResponsesAPI(ModelAPI):
         """Handle API errors."""
         if ex.status_code == 400:
             content = ex.message
-            if isinstance(ex.body, dict) and isinstance(ex.body.get("error", None), dict):
+            if isinstance(ex.body, dict) and isinstance(
+                ex.body.get("error", None), dict
+            ):
                 error = ex.body.get("error", {})
                 content = str(error.get("message", content))
                 code = error.get("code", "")

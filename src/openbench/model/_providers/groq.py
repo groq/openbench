@@ -523,11 +523,44 @@ async def as_chat_completion_part(
         raise RuntimeError("Groq models do not support audio or video inputs.")
 
 
-def chat_tools(tools: List[ToolInfo]) -> List[Dict[str, Any]]:
-    return [
-        {"type": "function", "function": tool.model_dump(exclude_none=True)}
-        for tool in tools
-    ]
+def _make_schema_strict(schema: Dict[str, Any]) -> Dict[str, Any]:
+    """Transform a JSON schema to be compatible with strict mode.
+
+    Strict mode requires:
+    1. additionalProperties: false on all objects
+    2. All properties must be in the required array
+    """
+    if schema.get("type") != "object":
+        return schema
+
+    schema = schema.copy()
+    props = schema.get("properties", {})
+
+    # Make all properties required
+    schema["required"] = list(props.keys())
+
+    # Set additionalProperties to false
+    schema["additionalProperties"] = False
+
+    return schema
+
+
+def chat_tools(tools: List[ToolInfo], strict: bool = True) -> List[Dict[str, Any]]:
+    result = []
+    for tool in tools:
+        func = tool.model_dump(exclude_none=True)
+        if strict:
+            # Transform parameters schema for strict mode compatibility
+            if "parameters" in func:
+                func["parameters"] = _make_schema_strict(func["parameters"])
+        result.append(
+            {
+                "type": "function",
+                "function": func,
+                "strict": strict,
+            }
+        )
+    return result
 
 
 def chat_tool_choice(tool_choice: ToolChoice) -> str | Dict[str, Any]:
