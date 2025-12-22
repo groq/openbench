@@ -16,6 +16,7 @@ Strategies:
 Tool Discovery Options (for minimal-servers-remote):
 - None: No advanced tool discovery
 - directory: Groq's deferred_mode="directory" for tool discovery
+- directory-lazy: Groq's deferred_mode="directory" with lazy loading
 - regex: Anthropic's tool_search_tool_regex for regex-based search
 - bm25: Anthropic's tool_search_tool_bm25 for BM25-based search
 """
@@ -63,7 +64,7 @@ VALID_STRATEGIES = {
     "distraction-128",
 }
 
-VALID_TOOL_DISCOVERY_OPTIONS = {"directory", "regex", "bm25"}
+VALID_TOOL_DISCOVERY_OPTIONS = {"directory", "directory-lazy", "regex", "bm25"}
 
 
 def _get_system_message(strategy: str) -> str:
@@ -372,6 +373,7 @@ def progressivemcpbench(
             - "distraction-128": Minimal tools + distractors to 128 total (requires annotations)
         tool_discovery: Optional tool discovery mode (only for minimal-servers-remote):
             - "directory": Groq's deferred_mode for directory-based tool discovery
+            - "directory-lazy": Groq's deferred_mode with lazy loading
             - "regex": Anthropic's tool_search_tool with regex patterns
             - "bm25": Anthropic's tool_search_tool with BM25 search
     """

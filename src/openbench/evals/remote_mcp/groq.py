@@ -38,7 +38,7 @@ class GroqRemoteMCPHandler(RemoteMCPHandler):
 
     @classmethod
     def valid_tool_discovery_options(cls) -> list[str]:
-        return ["directory"]
+        return ["directory", "directory-lazy"]
 
     async def execute(
         self,
@@ -65,7 +65,7 @@ class GroqRemoteMCPHandler(RemoteMCPHandler):
                 "server_description": server_desc,
             }
 
-            if self.tool_discovery == "directory":
+            if self.tool_discovery in ("directory", "directory-lazy"):
                 tool_spec["deferred_mode"] = "directory"
 
             mcp_tools.append(tool_spec)
@@ -84,10 +84,16 @@ class GroqRemoteMCPHandler(RemoteMCPHandler):
                 f"Required for 'minimal-servers-remote' strategy with Groq."
             )
 
+        beta_header = (
+            "mcp-deferred-directory-lazy"
+            if self.tool_discovery == "directory-lazy"
+            else "mcp-deferred-directory"
+        )
+
         client = AsyncOpenAI(
             api_key=api_key,
             base_url=GROQ_RESPONSES_BASE_URL,
-            default_headers={"Groq-Beta": "mcp-deferred-directory"},
+            default_headers={"Groq-Beta": beta_header},
         )
 
         request_payload = {
