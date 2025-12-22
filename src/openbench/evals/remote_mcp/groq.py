@@ -87,6 +87,7 @@ class GroqRemoteMCPHandler(RemoteMCPHandler):
         client = AsyncOpenAI(
             api_key=api_key,
             base_url=GROQ_RESPONSES_BASE_URL,
+            default_headers={"Groq-Beta": "mcp-deferred-directory"},
         )
 
         request_payload = {
