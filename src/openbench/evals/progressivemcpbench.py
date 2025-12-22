@@ -8,10 +8,16 @@ Strategies:
 - copilot: Uses semantic search with embeddings to discover tools via route/execute-tool
 - directory: Presents tools as a filesystem with ls/read-tool-file/execute-tool
 - minimal-servers: Provides only the tools from the required server(s) for each task
-- minimal-servers-remote: Uses Groq's server-side MCP (single-shot, groq-responses only)
+- minimal-servers-remote: Uses server-side MCP (Groq, Anthropic) with optional tool discovery
 - minimal-tools: Provides only the exact tools needed for each task
 - distraction-64: Minimal tools plus distraction tools to total 64 tools
 - distraction-128: Minimal tools plus distraction tools to total 128 tools
+
+Tool Discovery Options (for minimal-servers-remote):
+- None: No advanced tool discovery
+- directory: Groq's deferred_mode="directory" for tool discovery
+- regex: Anthropic's tool_search_tool_regex for regex-based search
+- bm25: Anthropic's tool_search_tool_bm25 for BM25-based search
 """
 
 from inspect_ai import task, Task
@@ -22,13 +28,10 @@ from inspect_ai.model import GenerateConfig, get_model
 from inspect_ai.tool import ToolError, ToolSource
 import asyncio
 import json
-import os
 from typing import Any
 
-from openai import AsyncOpenAI
-
 from openbench.datasets.progressivemcpbench import get_dataset
-from openbench.model._providers.groq_responses import GroqResponsesAPI
+from openbench.evals.remote_mcp import get_remote_mcp_handler
 from openbench.scorers.progressivemcpbench import progressivemcpbench_scorer
 from openbench.tools.progressivemcpbench.directory.toolsource import (
     directory_tool_source,
@@ -60,11 +63,7 @@ VALID_STRATEGIES = {
     "distraction-128",
 }
 
-GROQ_RESPONSES_BASE_URL = (
-    os.environ.get("GROQ_BASE_URL", "https://api.groq.com").rstrip("/") + "/openai/v1"
-)
-GROQ_PROGRESSIVE_MCP_BASE = "https://progressive-mcp-bench.groq-dev.workers.dev/mcp"
-GROQ_API_KEY_ENV = "GROQ_API_KEY"
+VALID_TOOL_DISCOVERY_OPTIONS = {"directory", "regex", "bm25"}
 
 
 def _get_system_message(strategy: str) -> str:
@@ -272,17 +271,23 @@ def _load_servers_config() -> dict[str, Any]:
         return json.load(f)
 
 
-@solver
-def progressive_minimal_servers_remote_solver() -> Solver:
-    """Solver for minimal-servers-remote strategy using Groq's server-side MCP.
+def _progressive_minimal_servers_remote_solver(
+    tool_discovery: str | None = None,
+) -> Solver:
+    """Solver for minimal-servers-remote strategy using server-side MCP.
 
     This strategy:
-    - Makes a single call to Groq Responses API with MCP server specs
-    - Groq handles all tool discovery and execution internally
+    - Makes a single call to the provider's API with MCP server specs
+    - Provider handles all tool discovery and execution internally
     - No local tool-calling loop (unlike other strategies)
-    - Only works with groq-responses provider
+    - Supports Groq (Responses API) and Anthropic (MCP connector)
 
-    The remote MCP server is at: https://progressive-mcp-bench.groq-dev.workers.dev/mcp/<server>
+    Args:
+        tool_discovery: Optional tool discovery mode:
+            - None: No advanced tool discovery
+            - "directory": Groq's deferred_mode for directory-based discovery
+            - "regex": Anthropic's tool_search_tool with regex patterns
+            - "bm25": Anthropic's tool_search_tool with BM25 search
     """
 
     async def solve(state: TaskState, generate: Any) -> TaskState:
@@ -299,135 +304,31 @@ def progressive_minimal_servers_remote_solver() -> Solver:
 
         model = get_model()
 
-        if not isinstance(model.api, GroqResponsesAPI):
-            raise RuntimeError(
-                f"The 'minimal-servers-remote' strategy only works with the "
-                f"'groq-responses' provider. Got model: {model.name}. "
-                f"Use a model like: groq-responses/openai/gpt-oss-20b"
-            )
-
-        groq_model_id = model.name
+        handler = get_remote_mcp_handler(model.name, tool_discovery)
 
         servers_config = _load_servers_config()
-
-        mcp_tools = []
-        for server_name in required_servers:
-            server_desc = ""
-            if server_name in servers_config:
-                server_desc = servers_config[server_name].get("description", "")
-            if not server_desc:
-                server_desc = f"MCP server '{server_name}' for ProgressiveMCPBench"
-
-            mcp_tools.append(
-                {
-                    "type": "mcp",
-                    "server_label": server_name,
-                    "server_url": f"{GROQ_PROGRESSIVE_MCP_BASE}/{server_name}",
-                    "require_approval": "never",
-                    "server_description": server_desc,
-                    "deferred_mode": "directory",
-                }
-            )
-
         system_message = _get_system_message("minimal-servers")
-        user_text = state.input_text
 
-        groq_input = [
-            {"role": "system", "content": system_message},
-            {"role": "user", "content": user_text},
-        ]
-
-        api_key = os.environ.get(GROQ_API_KEY_ENV)
-        if not api_key:
-            raise RuntimeError(
-                f"GROQ API key not found in environment variable {GROQ_API_KEY_ENV}. "
-                f"Required for 'minimal-servers-remote' strategy."
-            )
-
-        client = AsyncOpenAI(
-            api_key=api_key,
-            base_url=GROQ_RESPONSES_BASE_URL,
+        return await handler.execute(
+            state=state,
+            required_servers=required_servers,
+            servers_config=servers_config,
+            system_message=system_message,
         )
-
-        request_payload = {
-            "model": groq_model_id,
-            "input": groq_input,
-            "tools": mcp_tools,
-            "stream": False,
-            "max_output_tokens": 2048,
-            "temperature": 0.7,
-        }
-
-        try:
-            response = await client.responses.create(
-                model=groq_model_id,
-                input=groq_input,  # type: ignore[arg-type]
-                tools=mcp_tools,  # type: ignore[arg-type]
-                stream=False,
-                max_output_tokens=2048,
-                temperature=0.7,
-            )
-        except Exception as e:
-            state.metadata = state.metadata or {}
-            state.metadata["execution_error"] = "api_error"
-            state.metadata["error_message"] = str(e)
-            state.metadata["groq_mcp_request"] = request_payload
-            if state.output:
-                state.output.completion = f"API error: {str(e)}"
-            return state
-        finally:
-            await client.close()
-
-        response_dict = response.model_dump() if hasattr(response, "model_dump") else {}
-
-        output_items = getattr(response, "output", []) or []
-
-        assistant_text_chunks: list[str] = []
-        tool_call_detected = False
-        mcp_events: list[dict[str, Any]] = []
-
-        for item in output_items:
-            item_type = getattr(item, "type", "")
-            if item_type == "message":
-                for c in getattr(item, "content", []) or []:
-                    if getattr(c, "type", "") == "output_text":
-                        assistant_text_chunks.append(getattr(c, "text", ""))
-            elif item_type == "function_call":
-                tool_call_detected = True
-            elif item_type.startswith("mcp_"):
-                mcp_events.append(
-                    item.model_dump()
-                    if hasattr(item, "model_dump")
-                    else {"type": item_type}
-                )
-
-        assistant_text = "".join(assistant_text_chunks).strip()
-
-        state.metadata = state.metadata or {}
-        state.metadata["groq_mcp_request"] = request_payload
-        state.metadata["groq_mcp_response"] = response_dict
-        state.metadata["groq_mcp_events"] = mcp_events
-
-        if tool_call_detected:
-            state.metadata["execution_error"] = "tool_calls_not_allowed"
-            state.metadata["error_message"] = (
-                "Groq Responses produced tool calls for 'minimal-servers-remote'. "
-                "This strategy requires single-shot completion - the remote MCP "
-                "server should handle all tool execution internally."
-            )
-
-        if state.output:
-            state.output.completion = assistant_text
-        else:
-            state.output = type("Output", (), {"completion": assistant_text})()
-
-        return state
 
     return solve
 
 
-def _get_solver_for_strategy(strategy: str) -> Solver:
-    """Get the appropriate solver for the given strategy."""
+def _get_solver_for_strategy(
+    strategy: str,
+    tool_discovery: str | None = None,
+) -> Solver:
+    """Get the appropriate solver for the given strategy.
+
+    Args:
+        strategy: The strategy name
+        tool_discovery: Optional tool discovery mode (only for minimal-servers-remote)
+    """
     if strategy == "copilot":
         return progressive_copilot_solver()
     elif strategy == "directory":
@@ -435,7 +336,7 @@ def _get_solver_for_strategy(strategy: str) -> Solver:
     elif strategy == "minimal-servers":
         return progressive_minimal_servers_solver()
     elif strategy == "minimal-servers-remote":
-        return progressive_minimal_servers_remote_solver()
+        return _progressive_minimal_servers_remote_solver(tool_discovery)
     elif strategy == "minimal-tools":
         return progressive_minimal_tools_solver()
     elif strategy == "distraction-64":
@@ -452,6 +353,7 @@ def _get_solver_for_strategy(strategy: str) -> Solver:
 def progressivemcpbench(
     working_limit: int = 60,
     strategy: str | None = None,
+    tool_discovery: str | None = None,
 ) -> Task:
     """ProgressiveMCPBench using configurable tool discovery strategies.
 
@@ -463,10 +365,14 @@ def progressivemcpbench(
             - "copilot": Semantic search with embeddings (route/execute-tool)
             - "directory": Filesystem-like exploration (ls/read-tool-file/execute-tool)
             - "minimal-servers": Direct access to required server tools (requires annotations)
-            - "minimal-servers-remote": Groq server-side MCP (single-shot, groq-responses only)
+            - "minimal-servers-remote": Server-side MCP (Groq, Anthropic)
             - "minimal-tools": Direct access to exact required tools (requires annotations)
             - "distraction-64": Minimal tools + distractors to 64 total (requires annotations)
             - "distraction-128": Minimal tools + distractors to 128 total (requires annotations)
+        tool_discovery: Optional tool discovery mode (only for minimal-servers-remote):
+            - "directory": Groq's deferred_mode for directory-based tool discovery
+            - "regex": Anthropic's tool_search_tool with regex patterns
+            - "bm25": Anthropic's tool_search_tool with BM25 search
     """
     if strategy is None:
         raise ValueError(
@@ -481,22 +387,38 @@ def progressivemcpbench(
             f"Valid strategies: {', '.join(sorted(VALID_STRATEGIES))}"
         )
 
+    if tool_discovery is not None:
+        if strategy != "minimal-servers-remote":
+            raise ValueError(
+                f"tool_discovery='{tool_discovery}' is only valid with "
+                f"strategy='minimal-servers-remote'. Got strategy='{strategy}'."
+            )
+        if tool_discovery not in VALID_TOOL_DISCOVERY_OPTIONS:
+            raise ValueError(
+                f"Invalid tool_discovery='{tool_discovery}'.\n"
+                f"Valid options: {', '.join(sorted(VALID_TOOL_DISCOVERY_OPTIONS))}"
+            )
+
     ensure_mcp_server_running()
 
-    solver = _get_solver_for_strategy(strategy)
+    solver = _get_solver_for_strategy(strategy, tool_discovery)
 
     # All strategies now use the synthetic dataset
     dataset = get_dataset()
+
+    # Build task name including tool_discovery if set
+    task_name = f"progressivemcpbench-{strategy}"
+    if tool_discovery:
+        task_name = f"{task_name}-{tool_discovery}"
 
     return Task(
         dataset=dataset,
         solver=[solver],
         scorer=progressivemcpbench_scorer(),
-        name=f"progressivemcpbench-{strategy}",
+        name=task_name,
         config=GenerateConfig(
             temperature=0.7,
             max_tokens=2048,
-            # extra_body={"response_format": {"type": "json_object"}}, # removed to avoid 'json' tool issues
         ),
         working_limit=working_limit,
     )
