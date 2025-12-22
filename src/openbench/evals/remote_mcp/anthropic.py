@@ -24,8 +24,14 @@ ANTHROPIC_PROGRESSIVE_MCP_BASE = (
 )
 
 TOOL_SEARCH_TYPES = {
-    "regex": "tool_search_tool_regex_20251119",
-    "bm25": "tool_search_tool_bm25_20251119",
+    "regex": {
+        "type": "tool_search_tool_regex_20251119",
+        "name": "tool_search_tool_regex",
+    },
+    "bm25": {
+        "type": "tool_search_tool_bm25_20251119",
+        "name": "tool_search_tool_bm25",
+    },
 }
 
 
@@ -69,35 +75,29 @@ class AnthropicRemoteMCPHandler(RemoteMCPHandler):
             )
 
         mcp_servers: list[dict[str, Any]] = []
-        for server_name in required_servers:
-            server_desc = ""
-            if server_name in servers_config:
-                server_desc = servers_config[server_name].get("description", "")
-            if not server_desc:
-                server_desc = f"MCP server '{server_name}' for ProgressiveMCPBench"
+        tools: list[dict[str, Any]] = []
 
+        for server_name in required_servers:
             server_spec: dict[str, Any] = {
                 "type": "url",
                 "url": f"{ANTHROPIC_PROGRESSIVE_MCP_BASE}/{server_name}",
                 "name": server_name,
             }
-
-            if self.tool_discovery:
-                server_spec["default_config"] = {"defer_loading": True}
-
             mcp_servers.append(server_spec)
 
-        tools: list[dict[str, Any]] = [
-            {
-                "type": "mcp",
-                "mcp_servers": mcp_servers,
+            toolset_spec: dict[str, Any] = {
+                "type": "mcp_toolset",
+                "mcp_server_name": server_name,
             }
-        ]
+            if self.tool_discovery:
+                toolset_spec["default_config"] = {"defer_loading": True}
+
+            tools.append(toolset_spec)
 
         if self.tool_discovery:
-            tool_search_type = TOOL_SEARCH_TYPES.get(self.tool_discovery)
-            if tool_search_type:
-                tools.append({"type": tool_search_type})
+            tool_search_spec = TOOL_SEARCH_TYPES.get(self.tool_discovery)
+            if tool_search_spec:
+                tools.append(tool_search_spec)
 
         user_text = state.input_text
 
@@ -110,6 +110,7 @@ class AnthropicRemoteMCPHandler(RemoteMCPHandler):
             "max_tokens": 2048,
             "system": system_message,
             "messages": messages,
+            "mcp_servers": mcp_servers,
             "tools": tools,
             "betas": beta_headers,
         }
@@ -122,6 +123,7 @@ class AnthropicRemoteMCPHandler(RemoteMCPHandler):
                 max_tokens=2048,
                 system=system_message,
                 messages=messages,  # type: ignore[arg-type]
+                mcp_servers=mcp_servers,  # type: ignore[arg-type]
                 tools=tools,  # type: ignore[arg-type]
                 betas=beta_headers,
             )
