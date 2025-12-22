@@ -325,6 +325,7 @@ def progressive_minimal_servers_remote_solver() -> Solver:
                     "server_url": f"{GROQ_PROGRESSIVE_MCP_BASE}/{server_name}",
                     "require_approval": "never",
                     "server_description": server_desc,
+                    "deferred_mode": "directory",
                 }
             )
 
