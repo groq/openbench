@@ -13,6 +13,7 @@ from openai import AsyncOpenAI
 from inspect_ai.solver._task_state import TaskState
 
 from openbench.evals.remote_mcp.base import RemoteMCPHandler
+from openbench.model._providers.groq import GroqAPI
 from openbench.model._providers.groq_responses import GroqResponsesAPI
 
 if TYPE_CHECKING:
@@ -30,11 +31,11 @@ class GroqRemoteMCPHandler(RemoteMCPHandler):
 
     @classmethod
     def supports_api(cls, api: "ModelAPI") -> bool:
-        return isinstance(api, GroqResponsesAPI)
+        return isinstance(api, (GroqAPI, GroqResponsesAPI))
 
     @classmethod
     def provider_name(cls) -> str:
-        return "groq-responses"
+        return "groq"
 
     @classmethod
     def valid_tool_discovery_options(cls) -> list[str]:
