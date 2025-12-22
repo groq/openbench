@@ -27,12 +27,12 @@ jobs:
       id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           persist-credentials: false
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@2ddd2b9cb38ad8efd50337e8ab201519a34c9f24
+        uses: astral-sh/setup-uv@45cfcb3be5323e8be48c8a1849f80be7e5152a90
 
       - name: Resolve pyx target
         id: target
@@ -79,14 +79,14 @@ jobs:
         run: uv build --sdist --wheel
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: openbench-core-dists
           path: packages/openbench-core/dist/*
 
       - name: Authenticate to pyx (Trusted Publishing)
         id: auth
-        uses: astral-sh/pyx-auth-action@08873fa2b19cf2361327222bea1657faed760ae2
+        uses: astral-sh/pyx-auth-action@6efe097bc6bf9295cacdd21d91df45b92f438a3e
         with:
           workspace: ${{ steps.target.outputs.team }}
           registry: ${{ steps.target.outputs.registry }}
