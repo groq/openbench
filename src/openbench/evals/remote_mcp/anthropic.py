@@ -6,13 +6,17 @@ Supports tool_discovery="regex" or "bm25" for advanced tool search.
 """
 
 import os
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import anthropic
 
 from inspect_ai.solver._task_state import TaskState
+from inspect_ai.model._providers.anthropic import AnthropicAPI
 
 from openbench.evals.remote_mcp.base import RemoteMCPHandler
+
+if TYPE_CHECKING:
+    from inspect_ai.model._model import ModelAPI
 
 ANTHROPIC_API_KEY_ENV = "ANTHROPIC_API_KEY"
 ANTHROPIC_PROGRESSIVE_MCP_BASE = (
@@ -29,8 +33,12 @@ class AnthropicRemoteMCPHandler(RemoteMCPHandler):
     """Handler for Anthropic's MCP connector with optional tool search."""
 
     @classmethod
-    def supports_provider(cls, model_name: str) -> bool:
-        return model_name.startswith("anthropic/")
+    def supports_api(cls, api: "ModelAPI") -> bool:
+        return isinstance(api, AnthropicAPI)
+
+    @classmethod
+    def provider_name(cls) -> str:
+        return "anthropic"
 
     @classmethod
     def valid_tool_discovery_options(cls) -> list[str]:
@@ -50,7 +58,7 @@ class AnthropicRemoteMCPHandler(RemoteMCPHandler):
         servers_config: dict,
         system_message: str,
     ) -> TaskState:
-        model_id = self.get_model_id()
+        model_id = self.model_name
 
         api_key = os.environ.get(ANTHROPIC_API_KEY_ENV)
         if not api_key:

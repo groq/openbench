@@ -6,13 +6,17 @@ Supports tool_discovery="directory" for deferred tool loading.
 """
 
 import os
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from openai import AsyncOpenAI
 
 from inspect_ai.solver._task_state import TaskState
 
 from openbench.evals.remote_mcp.base import RemoteMCPHandler
+from openbench.model._providers.groq_responses import GroqResponsesAPI
+
+if TYPE_CHECKING:
+    from inspect_ai.model._model import ModelAPI
 
 GROQ_RESPONSES_BASE_URL = (
     os.environ.get("GROQ_BASE_URL", "https://api.groq.com").rstrip("/") + "/openai/v1"
@@ -25,8 +29,12 @@ class GroqRemoteMCPHandler(RemoteMCPHandler):
     """Handler for Groq's server-side MCP via Responses API."""
 
     @classmethod
-    def supports_provider(cls, model_name: str) -> bool:
-        return model_name.startswith("groq/")
+    def supports_api(cls, api: "ModelAPI") -> bool:
+        return isinstance(api, GroqResponsesAPI)
+
+    @classmethod
+    def provider_name(cls) -> str:
+        return "groq-responses"
 
     @classmethod
     def valid_tool_discovery_options(cls) -> list[str]:
@@ -39,7 +47,7 @@ class GroqRemoteMCPHandler(RemoteMCPHandler):
         servers_config: dict,
         system_message: str,
     ) -> TaskState:
-        groq_model_id = self.get_model_id()
+        groq_model_id = self.model_name
 
         mcp_tools: list[dict[str, Any]] = []
         for server_name in required_servers:

@@ -271,6 +271,7 @@ def _load_servers_config() -> dict[str, Any]:
         return json.load(f)
 
 
+@solver
 def _progressive_minimal_servers_remote_solver(
     tool_discovery: str | None = None,
 ) -> Solver:
@@ -304,7 +305,7 @@ def _progressive_minimal_servers_remote_solver(
 
         model = get_model()
 
-        handler = get_remote_mcp_handler(model.name, tool_discovery)
+        handler = get_remote_mcp_handler(model.api, tool_discovery)
 
         servers_config = _load_servers_config()
         system_message = _get_system_message("minimal-servers")
