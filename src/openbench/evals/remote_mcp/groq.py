@@ -14,7 +14,6 @@ from inspect_ai.solver._task_state import TaskState
 
 from openbench.evals.remote_mcp.base import RemoteMCPHandler
 from openbench.model._providers.groq import GroqAPI
-from openbench.model._providers.groq_responses import GroqResponsesAPI
 
 if TYPE_CHECKING:
     from inspect_ai.model._model import ModelAPI
@@ -31,7 +30,7 @@ class GroqRemoteMCPHandler(RemoteMCPHandler):
 
     @classmethod
     def supports_api(cls, api: "ModelAPI") -> bool:
-        return isinstance(api, (GroqAPI, GroqResponsesAPI))
+        return isinstance(api, GroqAPI)
 
     @classmethod
     def provider_name(cls) -> str:
