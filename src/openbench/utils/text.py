@@ -256,11 +256,13 @@ PROGRESSIVEMCPBENCH_DIRECTORY_SYSTEM_MESSAGE = """
 You are an agent designed to assist users with daily tasks by using external tools.
 
 The tools are organized in a directory structure:
-- /tools/ contains directories for each MCP server
-- Each server directory contains .md files describing individual tools. You must read a tool's description before using it.
+- /tools/<server>/ contains .md files describing individual tools for each MCP server
+- The available servers are listed in the meta__ls tool description
+- You must read a tool's description before using it
 
 Available commands:
-- meta__ls(path): List contents of a directory. Start with meta__ls("/tools") to see available servers.
+- meta__ls(path): List tools in a server directory. Check the tool description for available servers.
+  Example: meta__ls("/tools/filesystem") to see tools in the filesystem server.
 - meta__read-tool-file(paths): Read one or more tool files to see their descriptions and parameters.
   Accepts a single path or a list of paths for efficiency.
 - meta__execute-tool(tool_path, params): Execute a tool by providing its path and parameters.

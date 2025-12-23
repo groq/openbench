@@ -20,10 +20,31 @@ from typing import Any
 import mcp.types as types
 from mcp.server.fastmcp import Context, FastMCP
 
-from .directory_router import SyntheticDirectoryRouter
+from .directory_router import SyntheticDirectoryRouter, get_server_list
 from ..mcp_config import get_mcp_base_url
 
 logger = logging.getLogger(__name__)
+
+
+def _build_ls_description() -> str:
+    """Build the ls tool description including the list of available servers."""
+    servers = get_server_list()
+    server_list = "\n".join(f"  - {s['name']}: {s['description']}" for s in servers)
+    return f"""
+List the contents of a path in the tool directory.
+
+Use this to explore the tools available on a specific MCP server.
+- ls("/tools/<server>") - lists all tool files for a specific server
+
+Each server directory contains markdown files that describe individual tools.
+
+Available servers:
+{server_list}
+
+Note: Listing "/tools" directly is not allowed. Use one of the server paths above.
+
+IMPORTANT: You MUST call meta__read-tool-file to read a tool's full description and parameters BEFORE calling meta__execute-tool for that tool. Never execute a tool without first reading its specification.
+"""
 
 
 def _configure_logging() -> None:
@@ -75,19 +96,7 @@ def serve(
 
     @server.tool(
         name="meta__ls",
-        description=(
-            """
-List the contents of a path in the tool directory.
-
-Use this to explore available MCP servers and their tools.
-- ls("/tools") - lists all available server directories
-- ls("/tools/<server>") - lists all tool files for a specific server
-
-Each server is a directory containing markdown files that describe individual tools.
-
-IMPORTANT: You MUST call meta__read-tool-file to read a tool's full description and parameters BEFORE calling meta__execute-tool for that tool. Never execute a tool without first reading its specification.
-"""
-        ),
+        description=_build_ls_description(),
     )
     async def ls(
         path: str,

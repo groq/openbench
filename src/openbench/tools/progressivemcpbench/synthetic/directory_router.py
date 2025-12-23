@@ -29,6 +29,22 @@ def _load_servers_config() -> dict[str, Any]:
         return json.load(f)
 
 
+def get_server_list() -> list[dict[str, str]]:
+    """Get a list of available servers with their descriptions.
+
+    Returns:
+        List of dicts with 'name' and 'description' keys, sorted by name.
+    """
+    servers_config = _load_servers_config()
+    result = []
+    for server_name, server in sorted(servers_config.items()):
+        result.append({
+            "name": server_name,
+            "description": _truncate_description(server.get("description", "")),
+        })
+    return result
+
+
 def _truncate_description(description: str, max_len: int = 120) -> str:
     """Truncate description to first line or max_len chars."""
     if not description:
@@ -36,7 +52,7 @@ def _truncate_description(description: str, max_len: int = 120) -> str:
     first_line = description.split("\n")[0].strip()
     if len(first_line) <= max_len:
         return first_line
-    return first_line[:max_len]
+    return first_line[: max_len - 3] + "..."
 
 
 def _format_input_schema(schema: dict[str, Any]) -> str:
@@ -98,10 +114,13 @@ class SyntheticDirectoryRouter:
         """List contents of a path in the virtual directory structure.
 
         Args:
-            path: Path to list (e.g., "/tools" or "/tools/filesystem")
+            path: Path to list (e.g., "/tools/<server>")
 
         Returns:
             String listing of directory contents
+
+        Raises:
+            ValueError: If path is invalid or /tools is accessed directly
         """
         path = path.rstrip("/")
 
@@ -109,17 +128,11 @@ class SyntheticDirectoryRouter:
             return "tools/"
 
         if path == "/tools":
-            servers = sorted(self.tools_index.keys())
-            if not servers:
-                return "(empty directory)"
-            lines = []
-            for s in servers:
-                desc = _truncate_description(self.server_descriptions.get(s, ""))
-                if desc:
-                    lines.append(f"{s}/ # {desc}")
-                else:
-                    lines.append(f"{s}/")
-            return "\n".join(lines)
+            raise ValueError(
+                "Listing /tools directly is not allowed. "
+                "The available servers are listed in the tool description. "
+                "Use /tools/<server> to list tools for a specific server."
+            )
 
         if path.startswith("/tools/"):
             parts = path[7:].split("/")
