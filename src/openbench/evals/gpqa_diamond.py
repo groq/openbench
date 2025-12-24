@@ -9,20 +9,23 @@ from openbench.utils.text import MULTIPLE_CHOICE_PROMPT_TEMPLATE
 # There is one difference between this and the original gpqa simple eval - the prompts are not reshuffled for every epoch. Shouldn't be that big of a deal, but worth noting.
 def record_to_mcq_sample(record: dict) -> MCQSample:
     """Convert a GQPQA Diamond record to an openbench MCQSample."""
-    random.seed(0)
+    question = record["Question"]
     options = [
         record["Correct Answer"],
         record["Incorrect Answer 1"],
         record["Incorrect Answer 2"],
         record["Incorrect Answer 3"],
     ]
-    random.shuffle(options)
+    # Use a per-question random state based on question hash
+    # This ensures consistent ordering across runs while varying across samples
+    rng = random.Random(hash(question) % (2**32))
+    rng.shuffle(options)
     # Get index of correct answer and convert to A, B, C, D
     correct_index = options.index(record["Correct Answer"])
     correct_letter = "ABCD"[correct_index]
     return MCQSample(
         input=MULTIPLE_CHOICE_PROMPT_TEMPLATE.format(
-            prompt=record["Question"],
+            prompt=question,
             option_a=options[0],
             option_b=options[1],
             option_c=options[2],
