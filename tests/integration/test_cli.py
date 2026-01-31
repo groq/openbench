@@ -67,6 +67,22 @@ def test_basic_humaneval():
     assert result.exit_code == 0
 
 
+def test_basic_terraform_generation():
+    """Test basic Terraform generation evaluation (init + validate)."""
+    result = runner.invoke(
+        app,
+        [
+            "eval",
+            "terraform_generation",
+            "--limit",
+            "1",
+            "--model",
+            "groq/llama-3.1-8b-instant",
+        ],
+    )
+    assert result.exit_code == 0
+
+
 def test_invalid_benchmark():
     """Test invalid benchmark name."""
     result = runner.invoke(

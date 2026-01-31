@@ -2871,6 +2871,14 @@ _BUILTIN_BENCHMARKS = {
         module_path="openbench.evals.rootly_terraform",
         function_name="rootly_terraform",
     ),
+    "terraform_generation": BenchmarkMetadata(
+        name="Terraform Generation",
+        description="Generate Terraform (HCL) code from natural-language prompts; scored by terraform init + validate.",
+        category="community",
+        tags=["terraform", "code-generation", "sre", "infrastructure"],
+        module_path="openbench.evals.terraform_generation",
+        function_name="terraform_generation",
+    ),
     "jsonschemabench": BenchmarkMetadata(
         name="JSONSchemaBench",
         description="JSON Schema generation benchmark with ~10K real-world schemas from GitHub, Kubernetes, and other sources for evaluating constrained decoding",
