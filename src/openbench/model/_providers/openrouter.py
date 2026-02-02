@@ -29,16 +29,15 @@ Get your API Key here: https://openrouter.ai/settings/keys
 Provider Routing Docs: https://openrouter.ai/docs/features/provider-routing
 """
 
-import os
 from typing import Any, List, Dict
 
-from inspect_ai.model._providers.openai_compatible import OpenAICompatibleAPI
+from inspect_ai.model._providers.openrouter import (
+    OpenRouterAPI as InspectAIOpenRouterAPI,
+)
 from inspect_ai.model import GenerateConfig
 
 
-class OpenRouterAPI(OpenAICompatibleAPI):
-    DEFAULT_BASE_URL = "https://openrouter.ai/api/v1"
-
+class OpenRouterAPI(InspectAIOpenRouterAPI):
     def __init__(
         self,
         model_name: str,
@@ -89,15 +88,9 @@ class OpenRouterAPI(OpenAICompatibleAPI):
         if data_collection is not None:
             provider_params["data_collection"] = data_collection
 
-        base_url = base_url or self.DEFAULT_BASE_URL
-
-        api_key = api_key or os.environ.get("OPENROUTER_API_KEY")
-
-        if not api_key:
-            raise ValueError(
-                "OpenRouter API key not found. Set the OPENROUTER_API_KEY environment variable. "
-                "Get your API key at https://openrouter.ai/settings/keys"
-            )
+        # Pass provider routing to upstream via model_args (upstream expects "provider" key)
+        if provider_params:
+            model_args["provider"] = provider_params
 
         # Add custom headers for openbench identification
         if "default_headers" not in model_args:
@@ -110,39 +103,13 @@ class OpenRouterAPI(OpenAICompatibleAPI):
             }
         )
 
-        # Store provider routing parameters for injection into requests
-        self._extra_body = {}
-        if provider_params:
-            self._extra_body["provider"] = provider_params
-
         super().__init__(
             model_name=model_name_clean,
             base_url=base_url,
             api_key=api_key,
             config=config,
-            service="openrouter",
-            service_base_url=self.DEFAULT_BASE_URL,
             **model_args,
         )
-
-        # Inject provider routing parameters into all chat completion requests.
-        # This is necessary because Inspect-ai doesn't properly pass config.extra_body through to the underlying client calls
-        if self._extra_body:
-            original_create = self.client.chat.completions.create
-
-            def create_with_provider_routing(**kwargs):
-                # Merge provider routing parameters with any existing extra_body
-                if "extra_body" not in kwargs:
-                    kwargs["extra_body"] = {}
-                if kwargs["extra_body"] is None:
-                    kwargs["extra_body"] = {}
-                kwargs["extra_body"].update(self._extra_body)
-                return original_create(**kwargs)
-
-            # Replace the create method
-            setattr(
-                self.client.chat.completions, "create", create_with_provider_routing
-            )
 
     def service_model_name(self) -> str:
         """Return model name without service prefix."""
