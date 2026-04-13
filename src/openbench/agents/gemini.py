@@ -5,6 +5,7 @@ Gemini CLI agent implementation.
 from __future__ import annotations
 
 import os
+import shlex
 from typing import List
 
 from .base import BaseCodeAgent
@@ -45,7 +46,7 @@ class GeminiAgent(BaseCodeAgent):
 
             # Create gemini execution script
             script_content = get_gemini_script_template().format(
-                workdir=workdir, env_setup=env_setup, model=model
+                workdir=shlex.quote(workdir), env_setup=env_setup, model=model
             )
 
             # Execute the script

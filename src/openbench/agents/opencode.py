@@ -5,6 +5,7 @@ OpenCode agent implementation.
 from __future__ import annotations
 
 import os
+import shlex
 from typing import List
 
 from .base import BaseCodeAgent
@@ -46,7 +47,7 @@ class OpenCodeAgent(BaseCodeAgent):
 
             # Create opencode execution script
             script_content = get_opencode_script_template().format(
-                workdir=workdir, env_setup=env_setup, model=model
+                workdir=shlex.quote(workdir), env_setup=env_setup, model=model
             )
 
             # Execute the script

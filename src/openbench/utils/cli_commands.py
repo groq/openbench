@@ -204,7 +204,7 @@ async def run_setup_commands(setup_commands: List[str], workdir: str) -> str:
     joined = " && ".join(setup_commands)
     try:
         result = await sandbox().exec(
-            cmd=["bash", "-lc", f"cd {workdir} && ({joined})"],
+            cmd=["bash", "-lc", f"cd {shlex.quote(workdir)} && ({joined})"],
             timeout=900,
         )
         parts: List[str] = [
@@ -246,7 +246,7 @@ async def run_final_test(test_command: str, workdir: str) -> str:
             )
 
         result = await sandbox().exec(
-            cmd=["bash", "-lc", f"cd {workdir} && {fixed_test_command}"],
+            cmd=["bash", "-lc", f"cd {shlex.quote(workdir)} && {fixed_test_command}"],
             timeout=600,
         )
         parts: List[str] = [
@@ -573,7 +573,7 @@ def get_roo_script_template() -> str:
 set -eo pipefail
 
 # ========= Environment Setup =========
-export WORKDIR="{workdir}"
+export WORKDIR={workdir}
 export VSCODE_EXT_DIR="/opt/vscode-extensions"
 export VSCODE_USER_DIR="/opt/vscode-user"
 

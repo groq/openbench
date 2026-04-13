@@ -5,6 +5,7 @@ Roo code agent implementation.
 from __future__ import annotations
 
 import os
+import shlex
 from typing import Dict, List
 
 from .base import BaseCodeAgent
@@ -49,7 +50,7 @@ This will allow the evaluation system to know when you're done."""
 
             # Create roo execution script
             script_content = get_roo_script_template().format(
-                workdir=workdir,
+                workdir=shlex.quote(workdir),
                 env_setup=env_setup,
                 enhanced_prompt=enhanced_prompt,
                 model=model,
