@@ -195,6 +195,14 @@ def siliconflow() -> Type[ModelAPI]:
     return SiliconFlowAPI
 
 
+@modelapi(name="yutori")
+def yutori() -> Type[ModelAPI]:
+    """Register Yutori provider."""
+    from .model._providers.yutori import YutoriAPI
+
+    return YutoriAPI
+
+
 def _override_builtin_groq_provider():
     """Replace Inspect AI's built-in groq provider with enhanced openbench version."""
     from inspect_ai._util.registry import _registry

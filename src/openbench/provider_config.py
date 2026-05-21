@@ -48,6 +48,7 @@ class ProviderType(str, Enum):
     VERCEL = "vercel"
     WANDB = "wandb"
     XAI = "xai"
+    YUTORI = "yutori"
 
 
 @dataclass
@@ -375,6 +376,15 @@ PROVIDER_CONFIGS: Dict[ProviderType, ProviderConfig] = {
         api_key_env="XAI_API_KEY",
         base_url="https://api.x.ai/v1",
         supports_vision=False,
+        supports_function_calling=True,
+    ),
+    ProviderType.YUTORI: ProviderConfig(
+        name="yutori",
+        display_name="Yutori",
+        api_key_env="YUTORI_API_KEY",
+        base_url="https://api.yutori.com/v1",
+        base_url_env="YUTORI_BASE_URL",
+        supports_vision=True,
         supports_function_calling=True,
     ),
 }

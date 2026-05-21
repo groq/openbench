@@ -39,6 +39,7 @@ To access any major model, set the appropriate API key environment variable:
 | **Together AI**       | `TOGETHER_API_KEY`     | `together/model-name`            |
 | **Vercel AI Gateway** | `AI_GATEWAY_API_KEY`   | `vercel/creator-name/model-name` |
 | **W&B Inference**     | `WANDB_API_KEY`        | `wandb/model-name`               |
+| **Yutori**            | `YUTORI_API_KEY`       | `yutori/model-name`              |
 | **vLLM**              | None (local)           | `vllm/model-name`                |
 
 ## Using Unsupported Providers
@@ -138,3 +139,34 @@ bench eval mmlu
     -M only=groq,together 
     -M sort=price 
 ```
+
+### Yutori
+[Yutori](https://yutori.com/) hosts the Navigator computer-use model family. Set your API key:
+```bash
+export YUTORI_API_KEY="yt-..."
+```
+
+**Available Models**
+
+| Model                       | Description                                  |
+|-----------------------------|----------------------------------------------|
+| `yutori/n1.5-latest`        | Navigator n1.5 (recommended, tracks latest)  |
+| `yutori/n1.5-20260428`      | Datestamped Navigator n1.5 snapshot          |
+
+**Navigator-Specific Configuration Options**
+
+Navigator n1.5 accepts a few non-standard request fields, passed via the `-M` flag and forwarded to the API as `extra_body`:
+
+| Parameter              | Description                                                                | Example                                                  |
+|------------------------|----------------------------------------------------------------------------|----------------------------------------------------------|
+| **tool_set**           | Named built-in tool set                                                    | `-M tool_set=browser_tools_expanded-20260403`            |
+| **disable_tools**      | Comma-separated list of tool names to remove from the selected set         | `-M disable_tools=hold_key,drag`                         |
+| **json_schema**        | JSON Schema for structured output (returned as `parsed_json` on response)  | `-M json_schema='{"type":"object","properties":{}}'`     |
+
+```bash
+bench eval path/to/your_browser_eval.py \
+  --model yutori/n1.5-latest \
+  -M tool_set=browser_tools_core-20260403
+```
+
+<Note>Navigator is a screenshot-driven computer-use model — pair it with vision or browser-driven evaluations. Standard text-only benchmarks (MMLU, GPQA, etc.) are not a representative fit.</Note>

@@ -93,6 +93,7 @@ openbench supports 30+ model providers through Inspect AI. Set the appropriate A
 | **Together AI**       | `TOGETHER_API_KEY`     | `together/model-name`            |
 | **Vercel AI Gateway** | `AI_GATEWAY_API_KEY`   | `vercel/creator-name/model-name` |
 | **W&B Inference**     | `WANDB_API_KEY`        | `wandb/model-name`               |
+| **Yutori**            | `YUTORI_API_KEY`       | `yutori/model-name`              |
 | **vLLM**              | None (local)           | `vllm/model-name`                |
 
 ## Available Benchmarks
