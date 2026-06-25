@@ -31,6 +31,7 @@ class ProviderType(str, Enum):
     HUGGINGFACE = "huggingface"
     HYPERBOLIC = "hyperbolic"
     LAMBDA = "lambda"
+    LITELLM = "litellm"
     MINIMAX = "minimax"
     MISTRAL = "mistral"
     MOONSHOT = "moonshot"
@@ -230,6 +231,15 @@ PROVIDER_CONFIGS: Dict[ProviderType, ProviderConfig] = {
         api_key_env="LAMBDA_API_KEY",
         base_url="https://api.lambdalabs.com/v1",
         supports_vision=False,
+        supports_function_calling=True,
+    ),
+    ProviderType.LITELLM: ProviderConfig(
+        name="litellm",
+        display_name="LiteLLM AI Gateway",
+        api_key_env="LITELLM_API_KEY",
+        base_url="http://localhost:4000/v1",
+        base_url_env="LITELLM_BASE_URL",
+        supports_vision=True,
         supports_function_calling=True,
     ),
     ProviderType.MINIMAX: ProviderConfig(

@@ -107,6 +107,14 @@ def deepinfra() -> Type[ModelAPI]:
     return DeepInfraAPI
 
 
+@modelapi(name="litellm")
+def litellm() -> Type[ModelAPI]:
+    """Register LiteLLM AI gateway provider."""
+    from .model._providers.litellm import LiteLLMAPI
+
+    return LiteLLMAPI
+
+
 @modelapi(name="ai21")
 def ai21() -> Type[ModelAPI]:
     """Register AI21 Labs provider."""
