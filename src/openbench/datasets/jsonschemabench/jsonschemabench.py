@@ -94,6 +94,85 @@ def _set_all_properties_required(schema: dict) -> dict:
     return schema
 
 
+_ANNOTATION_KEYWORDS = {
+    "$comment",
+    "$id",
+    "$schema",
+    "default",
+    "deprecated",
+    "description",
+    "examples",
+    "readOnly",
+    "title",
+    "writeOnly",
+}
+
+_UNTYPED_ASSERTION_KEYWORDS = {
+    "allOf",
+    "anyOf",
+    "const",
+    "else",
+    "enum",
+    "if",
+    "not",
+    "oneOf",
+    "then",
+}
+
+
+def _normalize_nullable_type_arrays(schema: dict) -> None:
+    """Rewrite ``type: [T, null]`` for Inspect's ResponseSchema model.
+
+    Inspect currently models ``type`` as a single JSON Schema primitive even
+    though JSON Schema permits type arrays. Expressing nullable types as an
+    equivalent ``anyOf`` keeps Kubernetes-style schemas from failing locally
+    before the provider receives the request.
+    """
+    if not isinstance(schema, dict):
+        return
+
+    for value in list(schema.values()):
+        if isinstance(value, dict):
+            _normalize_nullable_type_arrays(value)
+        elif isinstance(value, list):
+            for item in value:
+                if isinstance(item, dict):
+                    _normalize_nullable_type_arrays(item)
+
+    schema_types = schema.get("type")
+    if not isinstance(schema_types, list) or len(schema_types) != 2:
+        return
+    if "null" not in schema_types:
+        return
+
+    non_null_types = [
+        schema_type for schema_type in schema_types if schema_type != "null"
+    ]
+    if len(non_null_types) != 1:
+        return
+
+    annotations = {
+        key: value for key, value in schema.items() if key in _ANNOTATION_KEYWORDS
+    }
+    assertions = {
+        key: value
+        for key, value in schema.items()
+        if key not in _ANNOTATION_KEYWORDS and key != "type"
+    }
+    null_assertions = {
+        key: value
+        for key, value in assertions.items()
+        if key in _UNTYPED_ASSERTION_KEYWORDS
+    }
+
+    schema.clear()
+    schema.update(annotations)
+    schema["anyOf"] = [
+        {"type": non_null_types[0], **assertions},
+        {"type": "null", **null_assertions},
+    ]
+
+
 def _adapt_schema(schema_str: str) -> str:
     """Adapt schema using JSONSchemaBench-style modifications for OpenAI compatibility."""
     schema_dict = json.loads(schema_str)
@@ -103,6 +182,7 @@ def _adapt_schema(schema_str: str) -> str:
     _recursively_set_additional_properties_false(adapted_schema)
     _add_root_type_if_missing(adapted_schema)
     adapted_schema = _set_all_properties_required(adapted_schema)
+    _normalize_nullable_type_arrays(adapted_schema)
 
     return json.dumps(adapted_schema)
 

@@ -228,16 +228,24 @@ class GroqAPI(ModelAPI):
         if config.num_choices is not None:
             params["n"] = config.num_choices
         if config.response_schema is not None:
+            raw_json_schema = getattr(config.response_schema, "raw_json_schema", None)
+            json_schema: dict[str, Any] = {
+                "name": config.response_schema.name,
+                "schema": (
+                    raw_json_schema
+                    if raw_json_schema is not None
+                    else config.response_schema.json_schema.model_dump(
+                        exclude_none=True
+                    )
+                ),
+                "strict": config.response_schema.strict,
+            }
+            if config.response_schema.description is not None:
+                json_schema["description"] = config.response_schema.description
+
             params["response_format"] = dict(
                 type="json_schema",
-                json_schema=dict(
-                    name=config.response_schema.name,
-                    schema=config.response_schema.json_schema.model_dump(
-                        exclude_none=True
-                    ),
-                    description=config.response_schema.description,
-                    strict=config.response_schema.strict,
-                ),
+                json_schema=json_schema,
             )
 
         # reasoning_effort support

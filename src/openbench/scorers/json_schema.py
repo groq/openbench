@@ -1,6 +1,9 @@
 import json
+import re
+from decimal import Decimal
 from typing import Callable
 from jsonschema import Draft202012Validator, ValidationError, FormatChecker
+from jsonschema.validators import validator_for
 from inspect_ai.solver import TaskState
 from inspect_ai.scorer import (
     scorer,
@@ -16,6 +19,33 @@ from openbench.metrics.json_schema import (
     schema_compliance,
     api_success_rate,
 )
+
+
+_RFC3339_TIME = re.compile(
+    r"^(?:[01]\d|2[0-3]):[0-5]\d:(?:[0-5]\d|60)"
+    r"(?:\.\d+)?(?:Z|[+-](?:[01]\d|2[0-3]):[0-5]\d)$"
+)
+
+
+def _is_rfc3339_time(value: object) -> bool:
+    return isinstance(value, str) and _RFC3339_TIME.fullmatch(value) is not None
+
+
+def _format_checker() -> FormatChecker:
+    checker = FormatChecker()
+    checker.checks("time")(_is_rfc3339_time)
+    return checker
+
+
+def _decimalize_numbers(value):
+    """Represent non-integral JSON numbers exactly during validation."""
+    if isinstance(value, float):
+        return Decimal(str(value))
+    if isinstance(value, dict):
+        return {key: _decimalize_numbers(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_decimalize_numbers(item) for item in value]
+    return value
 
 
 def _strip_markdown(text: str) -> str:
@@ -78,8 +108,10 @@ def json_schema_scorer(strip_markdown: bool = True) -> Callable:
 
         schema_data = state.metadata["schema"]
         # Handle both string (from dataset) and dict (from tests) formats
-        schema = (
-            json.loads(schema_data) if isinstance(schema_data, str) else schema_data
+        schema = _decimalize_numbers(
+            json.loads(schema_data, parse_float=Decimal)
+            if isinstance(schema_data, str)
+            else schema_data
         )
         raw_output = state.output.completion
         processed_output = raw_output.strip()
@@ -89,7 +121,7 @@ def json_schema_scorer(strip_markdown: bool = True) -> Callable:
 
         # Check if output is valid JSON
         try:
-            json_data = json.loads(processed_output)
+            json_data = json.loads(processed_output, parse_float=Decimal)
             json_valid = True
         except (json.JSONDecodeError, ValueError) as e:
             return Score(
@@ -105,8 +137,8 @@ def json_schema_scorer(strip_markdown: bool = True) -> Callable:
 
         # Validate against schema using JSONSchemaBench methodology
         try:
-            # Use Draft2020-12 with format checking (as per JSB paper)
-            validator = Draft202012Validator(schema, format_checker=FormatChecker())
+            validator_class = validator_for(schema, default=Draft202012Validator)
+            validator = validator_class(schema, format_checker=_format_checker())
             validator.validate(json_data)
             schema_compliant = True
             error_msg = None

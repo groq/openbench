@@ -1,9 +1,10 @@
 """Unit tests for Groq provider timeout configuration and streaming support."""
 
 from unittest.mock import AsyncMock, MagicMock, patch
-from inspect_ai.model import GenerateConfig
+from inspect_ai.model import GenerateConfig, ResponseSchema
 
 from openbench.model._providers.groq import GroqAPI
+from openbench.model.response_schema import RawResponseSchema
 
 
 class TestGroqProviderTimeout:
@@ -439,3 +440,90 @@ class TestGroqProviderStreaming:
 
                 # Verify usage was extracted
                 assert result.usage == chunk.x_groq.usage
+
+
+class TestGroqProviderResponseSchema:
+    """Test structured-output request serialization."""
+
+    def test_completion_params_omits_null_schema_description(self):
+        with patch("httpx.AsyncClient"):
+            with patch("openbench.model._providers.groq.AsyncGroq"):
+                config = GenerateConfig(
+                    response_schema=ResponseSchema(
+                        name="test_schema",
+                        json_schema={"type": "object"},
+                        strict=False,
+                    )
+                )
+                groq_api = GroqAPI(
+                    model_name="test-model",
+                    api_key="test-key",
+                    config=config,
+                    stream=False,
+                )
+
+                params = groq_api.completion_params(config)
+
+                assert "description" not in params["response_format"]["json_schema"]
+
+    def test_completion_params_includes_schema_description(self):
+        with patch("httpx.AsyncClient"):
+            with patch("openbench.model._providers.groq.AsyncGroq"):
+                config = GenerateConfig(
+                    response_schema=ResponseSchema(
+                        name="test_schema",
+                        json_schema={"type": "object"},
+                        description="A test response",
+                        strict=True,
+                    )
+                )
+                groq_api = GroqAPI(
+                    model_name="test-model",
+                    api_key="test-key",
+                    config=config,
+                    stream=False,
+                )
+
+                params = groq_api.completion_params(config)
+
+                assert (
+                    params["response_format"]["json_schema"]["description"]
+                    == "A test response"
+                )
+
+    def test_completion_params_preserves_raw_json_schema_keywords(self):
+        raw_schema = {
+            "type": "object",
+            "properties": {
+                "value": {
+                    "type": "string",
+                    "pattern": "^[A-Z]+$",
+                    "minLength": 2,
+                }
+            },
+            "oneOf": [
+                {"required": ["value"]},
+                {"required": [], "maxProperties": 0},
+            ],
+        }
+
+        with patch("httpx.AsyncClient"):
+            with patch("openbench.model._providers.groq.AsyncGroq"):
+                config = GenerateConfig(
+                    response_schema=RawResponseSchema(
+                        name="raw_schema",
+                        json_schema=raw_schema,
+                        raw_json_schema=raw_schema,
+                        strict=True,
+                    )
+                )
+                groq_api = GroqAPI(
+                    model_name="test-model",
+                    api_key="test-key",
+                    config=config,
+                    stream=False,
+                )
+
+                params = groq_api.completion_params(config)
+
+                assert params["response_format"]["json_schema"]["schema"] == raw_schema

@@ -227,6 +227,25 @@ class TestJSONSchemaScorer:
         assert result.metadata["api_error"]
         assert "api_error: API timeout error" in result.metadata["error"]
 
+    async def test_rfc3339_time_with_offsets(self):
+        schema = {"type": "string", "format": "time"}
+        scorer_fn = json_schema_scorer()
+
+        for value in ["23:59:00+01:00", "10:00:00Z"]:
+            state = create_mock_state(
+                completion=f'"{value}"', metadata={"schema": schema}
+            )
+            result = await scorer_fn(state, Target(TEST_TARGET))
+            assert result.value == CORRECT
+
+    async def test_multiple_of_uses_decimal_json_numbers(self):
+        schema = {"type": "number", "multipleOf": 0.01}
+        state = create_mock_state(completion="10000.89", metadata={"schema": schema})
+
+        result = await json_schema_scorer()(state, Target(TEST_TARGET))
+
+        assert result.value == CORRECT
+
 
 class TestJSONValidityMetric:
     """Test the JSON validity metric."""
