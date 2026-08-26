@@ -18,11 +18,13 @@ from jsonschema import Draft202012Validator, FormatChecker
 # Without the rfc3339-validator extra, jsonschema's built-in "time" checker
 # mis-rejects valid RFC 3339 full-time values such as "10:00:00Z" and
 # "21:00:00.000Z" (the two false-positive schema_leak results in the
-# 2026-08-26 production run). Register an exact RFC 3339 full-time grammar
-# instead so the harness matches what the API's validator accepts.
+# 2026-08-26 production run). Register an exact RFC 3339 full-time checker
+# mirroring the API's validator (santhosh-tekuri isTime), including its
+# leap-second rule: ss=60 is only valid when the offset-normalized time is
+# 23:59 UTC.
 _RFC3339_FULL_TIME = re.compile(
-    r"^(?:[01]\d|2[0-3]):[0-5]\d:(?:[0-5]\d|60)(?:\.\d+)?"
-    r"(?:[Zz]|[+-](?:[01]\d|2[0-3]):[0-5]\d)$"
+    r"^(?P<h>[01]\d|2[0-3]):(?P<m>[0-5]\d):(?P<s>[0-5]\d|60)(?:\.\d+)?"
+    r"(?P<off>[Zz]|[+-](?:[01]\d|2[0-3]):[0-5]\d)$"
 )
 
 FORMAT_CHECKER = FormatChecker()
@@ -32,7 +34,19 @@ FORMAT_CHECKER = FormatChecker()
 def _is_rfc3339_full_time(value: Any) -> bool:
     if not isinstance(value, str):
         return True
-    return bool(_RFC3339_FULL_TIME.match(value))
+    match = _RFC3339_FULL_TIME.match(value)
+    if match is None:
+        return False
+    if match.group("s") != "60":
+        return True
+    minutes = int(match.group("h")) * 60 + int(match.group("m"))
+    offset = match.group("off")
+    if offset not in ("Z", "z"):
+        sign = -1 if offset[0] == "+" else 1
+        minutes += sign * (int(offset[1:3]) * 60 + int(offset[4:6]))
+        if minutes < 0:
+            minutes += 24 * 60
+    return minutes == 23 * 60 + 59
 
 
 API_URL = os.environ.get(
