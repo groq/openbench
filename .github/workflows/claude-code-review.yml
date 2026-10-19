@@ -11,7 +11,13 @@ jobs:
     
     runs-on: ubuntu-latest
     continue-on-error: true
-    permissions: write-all
+    # Least privilege: the agent reads the PR and posts review comments. It must
+    # never hold contents/packages/actions write or an OIDC token on this repo.
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+      actions: read
     
     steps:
       - name: Checkout repository
@@ -21,13 +27,16 @@ jobs:
 
       - name: Run Claude Code Review
         id: claude-review
-        uses: anthropics/claude-code-action@v1
+        uses: anthropics/claude-code-action@58985842b834ed26087302ba27d07bc24ca8697a # v1.0.244
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          
+          # Use the job's scoped GITHUB_TOKEN; no OIDC token exchange is needed.
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
           claude_args: |
             --model claude-opus-5
             --max-turns 10
+            --allowedTools "Bash(git status:*),Bash(git log:*),Bash(git show:*),Bash(git diff:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr comment:*),Read,Glob,Grep,mcp__github_inline_comment__create_inline_comment"
           
           additional_permissions: |
             actions: read
