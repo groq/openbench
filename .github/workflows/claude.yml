@@ -22,13 +22,22 @@ jobs:
         (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')) && github.event.issue.user.login == 'AarushSah')
       )
     runs-on: ubuntu-latest
-    permissions: write-all
+    # Least privilege: the agent reads the repo and replies in comments. It must
+    # never hold contents/packages/actions write or an OIDC token on this repo.
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      actions: read
     steps:
       - name: Run Claude Code
-        uses: anthropics/claude-code-action@v1
+        uses: anthropics/claude-code-action@58985842b834ed26087302ba27d07bc24ca8697a # v1.0.244
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Use the job's scoped GITHUB_TOKEN; no OIDC token exchange is needed.
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           additional_permissions: |
             actions: read
           claude_args: |
             --model claude-opus-5
+            --allowedTools "Bash(git status:*),Bash(git log:*),Bash(git show:*),Bash(git diff:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh issue view:*),Read,Glob,Grep"
