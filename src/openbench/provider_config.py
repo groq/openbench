@@ -39,6 +39,7 @@ class ProviderType(str, Enum):
     NOVITA = "novita"
     OPENAI = "openai"
     OPENROUTER = "openrouter"
+    ORCAROUTER = "orcarouter"
     PARASAIL = "parasail"
     PERPLEXITY = "perplexity"
     REKA = "reka"
@@ -290,6 +291,15 @@ PROVIDER_CONFIGS: Dict[ProviderType, ProviderConfig] = {
         display_name="OpenAI",
         api_key_env="OPENAI_API_KEY",
         base_url="https://api.openai.com/v1",
+        supports_vision=True,
+        supports_function_calling=True,
+    ),
+    ProviderType.ORCAROUTER: ProviderConfig(
+        name="orcarouter",
+        display_name="OrcaRouter",
+        api_key_env="ORCAROUTER_API_KEY",
+        base_url="https://api.orcarouter.ai/v1",
+        base_url_env="ORCAROUTER_BASE_URL",
         supports_vision=True,
         supports_function_calling=True,
     ),
