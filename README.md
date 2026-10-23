@@ -66,6 +66,7 @@ openbench supports 30+ model providers through Inspect AI. Set the appropriate A
 | **Azure**             | `AZURE_OPENAI_API_KEY` | `azure/<deployment-name>`        |
 | **Baseten**           | `BASETEN_API_KEY`      | `baseten/model-name`             |
 | **Cerebras**          | `CEREBRAS_API_KEY`     | `cerebras/model-name`            |
+| **Cheaper Inference** | `CHEAPERINFERENCE_API_KEY` | `cheaperinference/model-name`    |
 | **Cohere**            | `COHERE_API_KEY`       | `cohere/model-name`              |
 | **Crusoe**            | `CRUSOE_API_KEY`       | `crusoe/model-name`              |
 | **DeepInfra**         | `DEEPINFRA_API_KEY`    | `deepinfra/model-name`           |

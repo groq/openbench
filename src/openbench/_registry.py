@@ -195,6 +195,14 @@ def siliconflow() -> Type[ModelAPI]:
     return SiliconFlowAPI
 
 
+@modelapi(name="cheaperinference")
+def cheaperinference() -> Type[ModelAPI]:
+    """Register Cheaper Inference provider."""
+    from .model._providers.cheaperinference import CheaperInferenceAPI
+
+    return CheaperInferenceAPI
+
+
 def _override_builtin_groq_provider():
     """Replace Inspect AI's built-in groq provider with enhanced openbench version."""
     from inspect_ai._util.registry import _registry
