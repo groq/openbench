@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 5
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version >= '3.13'",
@@ -438,7 +438,7 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 dependencies = [
-    { name = "numpy", marker = "python_full_version < '3.11'" },
+    { name = "numpy" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/66/54/eb9bfc647b19f2009dd5c7f5ec51c4e6ca831725f1aea7a993034f483147/contourpy-1.3.2.tar.gz", hash = "sha256:b6945942715a034c671b7fc54f9588126b0b8bf23db2696e3ca8328f3ff0ab54", size = 13466130, upload-time = "2025-04-15T17:47:53.79Z" }
 wheels = [
@@ -510,7 +510,7 @@ resolution-markers = [
     "python_full_version == '3.11.*'",
 ]
 dependencies = [
-    { name = "numpy", marker = "python_full_version >= '3.11'" },
+    { name = "numpy" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/58/01/1253e6698a07380cd31a736d248a3f2a50a7c88779a1813da27503cadc2a/contourpy-1.3.3.tar.gz", hash = "sha256:083e12155b210502d0bca491432bb04d56dc3432f95a979b429f2848c3dbe880", size = 13466174, upload-time = "2025-07-26T12:03:12.549Z" }
 wheels = [
@@ -1423,7 +1423,7 @@ wheels = [
 
 [[package]]
 name = "inspect-ai"
-version = "0.3.141"
+version = "0.3.142"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aioboto3" },
@@ -1462,9 +1462,9 @@ dependencies = [
     { name = "universal-pathlib" },
     { name = "zipp" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/69/d0/fcb7209b9e1b4a49a534de8bc7c12954830906756ff079782f0a2c80ae76/inspect_ai-0.3.141.tar.gz", hash = "sha256:4d82e289c8e4ea241a99c780a54ff5e3f546abdbe2a6c24dbbf4f53ffcf09631", size = 42787335, upload-time = "2025-10-27T11:57:05.748Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e1/5f/4eb973acb702e628067b5fc8ec6c6f97cf864c88c996efa18eef71184266/inspect_ai-0.3.142.tar.gz", hash = "sha256:9c0f5a0b128a26e297cc8781dcdabe0f60ab474dea0e2ef1918b9afc170e370c", size = 42790227, upload-time = "2025-10-27T13:36:53.623Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a6/43/afbed4ccb75c9864599ed571b5e0a06bb105e2d75f72e35d0f89e6761b12/inspect_ai-0.3.141-py3-none-any.whl", hash = "sha256:22339ee9619619770bca451274ff23af39a7e309ea412f2051adfdf2e7d7731d", size = 34133970, upload-time = "2025-10-27T11:56:56.99Z" },
+    { url = "https://files.pythonhosted.org/packages/9c/96/2058c58fdeaf8a03b0bccd808a72b1529238875b5ecf2e31cbf715360e84/inspect_ai-0.3.142-py3-none-any.whl", hash = "sha256:d9b6499e06e0394fd264a854b3568f0975b081e1ced36f42c5a70264cc157401", size = 34135007, upload-time = "2025-10-27T13:36:45.135Z" },
 ]
 
 [[package]]
@@ -2541,7 +2541,7 @@ wheels = [
 
 [[package]]
 name = "openbench"
-version = "0.5.2"
+version = "0.5.3"
 source = { editable = "." }
 dependencies = [
     { name = "anthropic" },
@@ -2617,10 +2617,10 @@ requires-dist = [
     { name = "anthropic", specifier = ">=0.69.0" },
     { name = "datasets", specifier = ">=3.6.0" },
     { name = "groq", specifier = ">=0.33.0" },
-    { name = "inspect-ai", specifier = "==0.3.141" },
+    { name = "inspect-ai", specifier = "==0.3.142" },
     { name = "inspect-swe", specifier = ">=0.2.26" },
     { name = "jsonschema", specifier = ">=4.23.0" },
-    { name = "mcp", specifier = ">=1.13.1" },
+    { name = "mcp", specifier = ">=1.13.1,<2" },
     { name = "numpy", specifier = "==2.2.6" },
     { name = "openai", specifier = ">=2.0.0" },
     { name = "pillow", specifier = ">=10.0.0" },
