@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.5.4](https://github.com/groq/openbench/compare/v0.5.3...v0.5.4) (2026-10-30)
+
+
+### Features
+
+* **exercism:** adding codex, claude, gemini and hidden tests flag ([#325](https://github.com/groq/openbench/issues/325)) ([6a080a2](https://github.com/groq/openbench/commit/6a080a2f59a02500a63a6f24919b6b03cdb22081))
+* **mathvista:** add image resizing flags ([#341](https://github.com/groq/openbench/issues/341)) ([f8e643b](https://github.com/groq/openbench/commit/f8e643bc3593e3e47e8fade3121b49e00f222bc5))
+
+
+### Bug Fixes
+
+* imports + sync openbench core ([#338](https://github.com/groq/openbench/issues/338)) ([24c0a32](https://github.com/groq/openbench/commit/24c0a326c9ea29514f6306702383d5e811081937))
+* pin inspect-ai 0.3.142 and mcp&lt;2 to unbreak ci ([#372](https://github.com/groq/openbench/issues/372)) ([6517588](https://github.com/groq/openbench/commit/651758875bb8800fade296cd461bcef238dea7a2))
+* replace retired claude model id in workflows ([#362](https://github.com/groq/openbench/issues/362)) ([45c63d6](https://github.com/groq/openbench/commit/45c63d641b240372e5185fa497f86aacaf2ecbac))
+
+
+### Chores
+
+* GitHub Terraform: Create/Update .github/workflows/code-freeze-bypass.yaml [skip ci] ([d03922c](https://github.com/groq/openbench/commit/d03922ccbbd9004e802c556ef9c2a40ed870659c))
+* GitHub Terraform: Create/Update .github/workflows/code-freeze-bypass.yaml [skip ci] ([76dd250](https://github.com/groq/openbench/commit/76dd2506fcfef06cc266978d53e1f2e7d9c15f30))
+* GitHub Terraform: Create/Update .github/workflows/stale.yaml [skip ci] ([cf14c60](https://github.com/groq/openbench/commit/cf14c603701f8aed62e8237ce80aa67ff7ba17ab))
+* GitHub Terraform: Create/Update .github/workflows/stale.yaml [skip ci] ([33f3646](https://github.com/groq/openbench/commit/33f3646343dad8ec2c0f5788dc78114fa8566849))
+* GitHub Terraform: Create/Update .github/workflows/stale.yaml [skip ci] ([f99b3a0](https://github.com/groq/openbench/commit/f99b3a03b94fdd60b1bedfa67d9849798e6f0183))
+* let Claude workflows use the latest Opus via the opus alias ([#371](https://github.com/groq/openbench/issues/371)) ([3101579](https://github.com/groq/openbench/commit/31015790067a4bc72719ae3f87cc6cf2d436d585))
+
 ## [0.5.3](https://github.com/groq/openbench/compare/v0.5.2...v0.5.3) (2025-12-08)
 
 
