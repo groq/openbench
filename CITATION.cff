@@ -8,7 +8,7 @@ authors:
 title: "openbench: Provider-agnostic, open-source evaluation infrastructure for language models"
 version: 0.3.0
 date-released: 2025-07-31
-url: "https://openbench.dev"
+url: "https://github.com/groq/openbench"
 repository-code: "https://github.com/groq/openbench"
 keywords:
   - "machine learning"

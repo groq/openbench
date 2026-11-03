@@ -20,7 +20,7 @@ Provider-agnostic, open-source evaluation infrastructure for language models
 
 openbench provides standardized, reproducible benchmarking for LLMs across 30+ evaluation suites (and growing) spanning knowledge, math, reasoning, coding, science, reading comprehension, health, long-context recall, graph reasoning, and first-class support for your own local evals to preserve privacy. **Works with any model provider** - Groq, OpenAI, Anthropic, Cohere, Google, AWS Bedrock, Azure, local models via Ollama, Hugging Face, and 30+ other providers.
 
-To get started, see the tutorial below or reference the [docs](https://openbench.dev/).
+To get started, see the tutorial below.
 
 ## Features
 
@@ -97,13 +97,12 @@ openbench supports 30+ model providers through Inspect AI. Set the appropriate A
 
 ## Available Benchmarks
 
-See the [Benchmarks Catalog](https://openbench.dev/benchmarks/catalog) or use `bench list`.
+Run `bench list` to see all available benchmarks.
 
 
 ## Commands and Options
 
 For a complete list of all commands and options, run: `bench --help`
-See the [docs](https://openbench.dev/cli/overview) for more details. 
 
 | Command                  | Description                                        |
 | ------------------------ | -------------------------------------------------- |
@@ -144,7 +143,7 @@ See the [docs](https://openbench.dev/cli/overview) for more details.
 
 ## Development and Building Your Own Evals
 
-For a full guide, see [Contributing Guidelines](CONTRIBUTING.md) and [Extending openbench](https://openbench.dev/development/extending). Also, check out Inspect AI's excellent [documentation](https://inspect.aisi.org.uk/).
+For a full guide, see [Contributing Guidelines](CONTRIBUTING.md). Also, check out Inspect AI's excellent [documentation](https://inspect.aisi.org.uk/).
 
 ### Quick Eval: Run from Path
 
@@ -211,8 +210,6 @@ HF_TOKEN="<HUGGINGFACE_TOKEN>"
 
 should fix the issue. The full HuggingFace documentation can be found [on the HuggingFace docs on Authentication](https://huggingface.co/docs/hub/en/datasets-polars-auth).
 
-See the docs for further [Tips and Troubleshooting](https://openbench.dev/troubleshooting).
-
 ## 🚧 Alpha Release
 
 We're building in public! This is an alpha release - expect rapid iteration. The first stable release is coming soon.
@@ -249,7 +246,7 @@ This project would not be possible without:
   title = {openbench: Provider-agnostic, open-source evaluation infrastructure for language models},
   author = {Sah, Aarush},
   year = {2025},
-  url = {https://openbench.dev}
+  url = {https://github.com/groq/openbench}
 }
 ```
 
