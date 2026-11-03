@@ -352,6 +352,34 @@ async def scrape_citations(
     return citations_groups_deduped
 
 
+def _validate_fact_judgements(response: Any, fact_count: int) -> List[Dict[str, Any]]:
+    """Validate complete one-based fact coverage, then normalize indices."""
+    if not isinstance(response, list) or len(response) != fact_count:
+        raise ValueError(f"Expected a list of {fact_count} citation judgements")
+
+    seen_indices: set[int] = set()
+    for item in response:
+        if not isinstance(item, dict):
+            raise ValueError("Each citation judgement must be an object")
+        index = item.get("idx")
+        if (
+            not isinstance(index, int)
+            or isinstance(index, bool)
+            or not 1 <= index <= fact_count
+            or index in seen_indices
+        ):
+            raise ValueError(
+                f"Citation judgement idx must cover 1..{fact_count} exactly once"
+            )
+        if item.get("result") not in ("supported", "unsupported", "unknown"):
+            raise ValueError(
+                "Citation judgement result must be supported, unsupported, or unknown"
+            )
+        seen_indices.add(index)
+
+    return [{**item, "idx": item["idx"] - 1} for item in response]
+
+
 async def validate_citations(
     citations_groups_scraped: Dict[str, Dict[str, Any]], language: str
 ) -> Dict[str, Dict[str, Any]]:
@@ -413,19 +441,7 @@ async def validate_citations(
                     response.replace("```json", "").replace("```", "")
                 )
 
-                # Adjust indices to be 0-based
-                for val_item in validate_res:
-                    val_item["idx"] -= 1
-
-                # Validate response structure
-                if len(validate_res) != len(facts):
-                    if retry < max_retries - 1:
-                        await asyncio.sleep(3)
-                        continue
-                    else:
-                        raise ValueError(
-                            f"Response length {len(validate_res)} doesn't match facts length {len(facts)}"
-                        )
+                validate_res = _validate_fact_judgements(validate_res, len(facts))
 
                 # Success
                 citation_data["validate_res"] = validate_res
