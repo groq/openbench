@@ -19,6 +19,7 @@ class ProviderType(str, Enum):
     AZURE = "azure"
     BASETEN = "baseten"
     CEREBRAS = "cerebras"
+    CHEAPERINFERENCE = "cheaperinference"
     COHERE = "cohere"
     CRUSOE = "crusoe"
     DEEPINFRA = "deepinfra"
@@ -132,6 +133,15 @@ PROVIDER_CONFIGS: Dict[ProviderType, ProviderConfig] = {
         api_key_env="CEREBRAS_API_KEY",
         base_url="https://api.cerebras.ai/v1",
         supports_vision=False,
+        supports_function_calling=True,
+    ),
+    ProviderType.CHEAPERINFERENCE: ProviderConfig(
+        name="cheaperinference",
+        display_name="Cheaper Inference",
+        api_key_env="CHEAPERINFERENCE_API_KEY",
+        base_url="https://api.cheaperinference.com/v1",
+        base_url_env="CHEAPERINFERENCE_BASE_URL",
+        supports_vision=True,
         supports_function_calling=True,
     ),
     ProviderType.COHERE: ProviderConfig(
