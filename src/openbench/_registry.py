@@ -171,6 +171,13 @@ def helicone() -> Type[ModelAPI]:
     return HeliconeAPI
 
 
+@modelapi(name="orcarouter")
+def orcarouter() -> Type[ModelAPI]:
+    from .model._providers.orcarouter import OrcaRouterAPI
+
+    return OrcaRouterAPI
+
+
 @modelapi(name="openrouter")
 def openrouter() -> Type[ModelAPI]:
     """Register OpenRouter provider."""
