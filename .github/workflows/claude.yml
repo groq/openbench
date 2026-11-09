@@ -1,14 +1,14 @@
 name: Claude Code
 
+# Interactive @claude, kept here because the groq/github-actions reusable review workflow can't do
+# it. Review-event triggers are dropped, "@claude review" goes to claude-code-review.yml, and the
+# action is pinned by SHA.
+
 on:
   issue_comment:
     types: [created]
-  pull_request_review_comment:
-    types: [created]
   issues:
     types: [opened, assigned, labeled]
-  pull_request_review:
-    types: [submitted]
 
 jobs:
   claude:
@@ -16,16 +16,14 @@ jobs:
     if: |
       (github.event.pull_request.head.repo.fork == false || github.event.pull_request.head.repo.fork == null) &&
       (
-        (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude') && github.event.comment.user.login == 'AarushSah') ||
-        (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude') && github.event.comment.user.login == 'AarushSah') ||
-        (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude') && github.event.review.user.login == 'AarushSah') ||
+        (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude') && !contains(github.event.comment.body, '@claude review') && github.event.comment.user.login == 'AarushSah') ||
         (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')) && github.event.issue.user.login == 'AarushSah')
       )
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
       - name: Run Claude Code
-        uses: anthropics/claude-code-action@v1
+        uses: anthropics/claude-code-action@9eb012b6d0900c2b9eede65ee1758cec4d2973e9 # v1.0.270
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           additional_permissions: |
