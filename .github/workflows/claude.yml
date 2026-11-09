@@ -10,14 +10,44 @@ on:
     types: [opened, assigned, labeled]
 
 jobs:
-  claude:
-    # Only run on non-fork repositories and when @AarushSah triggers it
+  # issue_comment events carry no pull_request object, so the PR's head repo is looked up here
+  # and comments on cross-repository (fork) PRs are refused before the job that holds the key.
+  same-repo:
     if: |
-      (github.event.pull_request.head.repo.fork == false || github.event.pull_request.head.repo.fork == null) &&
       (
         (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude') && github.event.comment.user.login == 'AarushSah') ||
         (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')) && github.event.issue.user.login == 'AarushSah')
       )
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      allowed: ${{ steps.check.outputs.allowed }}
+    steps:
+      - name: Refuse cross-repository PRs
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          IS_PR: ${{ github.event.issue.pull_request != null }}
+          NUMBER: ${{ github.event.issue.number }}
+        run: |
+          if [ "$IS_PR" != "true" ]; then
+            echo "allowed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          head_repo="$(gh api "repos/$REPO/pulls/$NUMBER" --jq '.head.repo.full_name // ""')"
+          if [ "$head_repo" = "$REPO" ]; then
+            echo "allowed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "PR #$NUMBER comes from '$head_repo', not $REPO; not running."
+            echo "allowed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  claude:
+    needs: same-repo
+    # Only when @AarushSah triggers it, and never on a fork PR (checked by the same-repo job)
+    if: needs.same-repo.outputs.allowed == 'true'
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
