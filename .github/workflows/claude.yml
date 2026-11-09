@@ -1,8 +1,7 @@
 name: Claude Code
 
-# Interactive @claude, kept here because the groq/github-actions reusable review workflow can't do
-# it. Review-event triggers are dropped, "@claude review" goes to claude-code-review.yml, and the
-# action is pinned by SHA.
+# Interactive @claude. This public repo can't call the internal groq/github-actions reusable
+# workflows, so it stays here: review-event triggers are dropped and the action is pinned by SHA.
 
 on:
   issue_comment:
@@ -16,7 +15,7 @@ jobs:
     if: |
       (github.event.pull_request.head.repo.fork == false || github.event.pull_request.head.repo.fork == null) &&
       (
-        (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude') && !contains(github.event.comment.body, '@claude review') && github.event.comment.user.login == 'AarushSah') ||
+        (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude') && github.event.comment.user.login == 'AarushSah') ||
         (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')) && github.event.issue.user.login == 'AarushSah')
       )
     runs-on: ubuntu-latest
