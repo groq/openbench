@@ -211,3 +211,93 @@ def aime_scorer() -> Scorer:
             )
 
     return score
+
+
+def extract_boxed_contents(text: str) -> list[str]:
+    """
+    Return the contents of every \\boxed{}, \\fbox{} or \\framebox{} in the text.
+
+    Braces are matched, so nested LaTeX like \\boxed{\\frac{1}{9}} comes back
+    whole. A box that is never closed is skipped.
+
+    Args:
+        text: The text to search
+
+    Returns:
+        The contents of each box, in order of appearance
+    """
+    contents = []
+    for match in re.finditer(r"\\(?:boxed|fbox|framebox)\s*\{", text):
+        depth = 1
+        i = match.end()
+        while i < len(text) and depth > 0:
+            if text[i] == "{":
+                depth += 1
+            elif text[i] == "}":
+                depth -= 1
+            i += 1
+        if depth == 0:
+            contents.append(text[match.end() : i - 1].strip())
+    return contents
+
+
+def normalize_latex_answer(answer: str) -> str:
+    """
+    Remove formatting differences that don't change a LaTeX answer's value.
+
+    Unwraps a \\text{}-style wrapper around the whole answer, treats \\dfrac and
+    \\tfrac as \\frac, drops \\left, \\right, spacing commands, dollar signs,
+    whitespace, thousands separators and a trailing period.
+
+    Args:
+        answer: A LaTeX answer string
+
+    Returns:
+        The normalized answer
+    """
+    answer = answer.strip().rstrip(".").strip("$").strip()
+    wrapper = re.fullmatch(r"\\(?:text|textbf|mathbf|mathrm)\{(.*)\}", answer)
+    if wrapper:
+        answer = wrapper.group(1)
+    answer = re.sub(r"\\[dt]frac", r"\\frac", answer)
+    answer = re.sub(r"\\(?:left|right)\b", "", answer)
+    answer = re.sub(r"\\[,;:!]", "", answer)
+    answer = re.sub(r"\s+", "", answer)
+    answer = re.sub(r"(?<=\d),(?=\d{3}(?!\d))", "", answer)
+    return answer.rstrip(".")
+
+
+@scorer(metrics=[accuracy(), std(), stderr()])
+def boxed_expression_scorer() -> Scorer:
+    """
+    Scorer for boxed answers that can be any LaTeX expression.
+
+    Takes the last boxed answer in the response and compares it to the target
+    after normalize_latex_answer. Unlike aime_scorer, answers don't have to be
+    integers in [0, 999]. Matching is exact after normalization, so equivalent
+    answers written differently (1/9 vs \\frac{1}{9}) don't match.
+
+    Returns:
+        Scorer: A scoring function for boxed LaTeX answers
+    """
+
+    async def score(state: TaskState, target: Target) -> Score:
+        boxed = extract_boxed_contents(state.output.completion)
+        if not boxed:
+            return Score(
+                value=INCORRECT,
+                answer=None,
+                explanation="No boxed answer found in response",
+            )
+
+        answer = boxed[-1]
+        is_correct = normalize_latex_answer(answer) == normalize_latex_answer(
+            target.text
+        )
+        return Score(
+            value=CORRECT if is_correct else INCORRECT,
+            answer=answer,
+            explanation=f"Extracted '{answer}' from response, target was '{target.text}'",
+        )
+
+    return score

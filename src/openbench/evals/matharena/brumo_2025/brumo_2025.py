@@ -1,5 +1,6 @@
 from openbench.evals.matharena.matharena import matharena_task
 from inspect_ai import Task, task
+from openbench.scorers import boxed_expression_scorer
 
 
 # instruction: "Please reason step by step, and put your final answer within \\boxed{{}}."
@@ -17,5 +18,6 @@ def brumo_2025() -> Task:
         default_temperature=0.6,
         default_max_tokens=16000,
         default_epochs=4,
+        scorer=boxed_expression_scorer(),
         name="brumo_2025",
     )

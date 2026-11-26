@@ -6,8 +6,13 @@ from openbench.scorers import (
     extract_boxed_answer,
     robust_mcq_scorer,
     aime_scorer,
+    boxed_expression_scorer,
 )
-from openbench.scorers.robust_boxed import normalize_numeric_answer
+from openbench.scorers.robust_boxed import (
+    extract_boxed_contents,
+    normalize_latex_answer,
+    normalize_numeric_answer,
+)
 from inspect_ai.scorer import Target, CORRECT, INCORRECT
 from dataclasses import dataclass
 
@@ -235,3 +240,78 @@ class TestAIMEScorer:
         score = asyncio.run(scorer(state, target))
         assert score.value == INCORRECT
         assert score.answer == "41"
+
+
+class TestBoxedContents:
+    """Test brace-balanced boxed content extraction."""
+
+    def test_nested_braces(self):
+        """Nested LaTeX is returned whole."""
+        assert extract_boxed_contents(r"\boxed{\frac{1}{9}}") == [r"\frac{1}{9}"]
+        assert extract_boxed_contents(r"\boxed{2^{99}}") == ["2^{99}"]
+
+    def test_all_boxes_in_order(self):
+        """Every box is returned, in order."""
+        text = r"\boxed{1} then \fbox{2} then \framebox{3}"
+        assert extract_boxed_contents(text) == ["1", "2", "3"]
+
+    def test_unclosed_box_skipped(self):
+        """A box that never closes is ignored."""
+        assert extract_boxed_contents(r"\boxed{\frac{1}{2}") == []
+        assert extract_boxed_contents("no box here") == []
+
+
+class TestLatexNormalization:
+    """Test LaTeX answer normalization."""
+
+    def test_cosmetic_differences(self):
+        """Formatting that doesn't change the value is removed."""
+        assert normalize_latex_answer(r"\dfrac{1}{9}") == r"\frac{1}{9}"
+        assert normalize_latex_answer(r"\tfrac{1}{9}") == r"\frac{1}{9}"
+        assert normalize_latex_answer(r"\left( 1, 2 \right)") == "(1,2)"
+        assert normalize_latex_answer(r"3 + 2\sqrt{2}") == r"3+2\sqrt{2}"
+        assert normalize_latex_answer(r"\text{9954}") == "9954"
+        assert normalize_latex_answer("$-95$.") == "-95"
+
+    def test_thousands_separator(self):
+        """Thousands separators are dropped, list commas are kept."""
+        assert normalize_latex_answer("9,954") == "9954"
+        assert normalize_latex_answer("1,234,567") == "1234567"
+        assert normalize_latex_answer("1, 2") == "1,2"
+        assert normalize_latex_answer("0,i\\sqrt{6}") == "0,i\\sqrt{6}"
+
+
+class TestBoxedExpressionScorer:
+    """Test the boxed expression scorer used for non-AIME MathArena tasks."""
+
+    def score(self, completion: str, target: str):
+        scorer = boxed_expression_scorer()
+        return asyncio.run(
+            scorer(MockTaskState(MockOutput(completion)), Target(target))
+        )
+
+    def test_answers_aime_scorer_rejects(self):
+        """Large, negative and non-integer answers can be correct."""
+        assert self.score(r"\boxed{9954}", "9954").value == CORRECT
+        assert self.score(r"\boxed{-95}", "-95").value == CORRECT
+        assert self.score(r"\boxed{\dfrac{1}{9}}", r"\frac{1}{9}").value == CORRECT
+        assert self.score(r"\boxed{2^{99}}", "2^{99}").value == CORRECT
+
+    def test_uses_last_box(self):
+        """The last boxed answer is the one scored."""
+        score = self.score(r"maybe \boxed{7} but finally \boxed{8}", "8")
+        assert score.value == CORRECT
+        assert score.answer == "8"
+
+    def test_wrong_answers_rejected(self):
+        """Wrong or differently written answers don't match."""
+        assert self.score(r"\boxed{96}", "-95").value == INCORRECT
+        assert self.score(r"\boxed{95}", "-95").value == INCORRECT
+        assert self.score(r"\boxed{\frac{1}{8}}", r"\frac{1}{9}").value == INCORRECT
+        assert self.score(r"\boxed{12}", "1,2").value == INCORRECT
+
+    def test_no_box(self):
+        """A response without a box is incorrect, with no answer."""
+        score = self.score("The answer is 42", "42")
+        assert score.value == INCORRECT
+        assert score.answer is None
