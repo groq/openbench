@@ -1,6 +1,7 @@
 from inspect_ai.dataset import hf_dataset, Sample
 from inspect_ai import Task
 from inspect_ai.model import GenerateConfig
+from inspect_ai.scorer import Scorer
 from openbench.scorers import aime_scorer
 from inspect_ai.solver import generate, prompt_template
 
@@ -25,6 +26,7 @@ def matharena_task(
     default_max_tokens: int,
     default_temperature: float = 0.6,
     default_epochs: int = 4,
+    scorer: Scorer | None = None,
 ) -> Task:
     dataset = hf_dataset(
         path=dataset_path,
@@ -36,7 +38,8 @@ def matharena_task(
     return Task(
         dataset=dataset,
         solver=[prompt_template(TEMPLATE), generate()],
-        scorer=aime_scorer(),  # Use specialized AIME scorer with robust extraction
+        # AIME answers are integers in [0, 999]; other contests pass their own scorer
+        scorer=scorer if scorer is not None else aime_scorer(),
         name=name,
         config=GenerateConfig(
             temperature=default_temperature,
