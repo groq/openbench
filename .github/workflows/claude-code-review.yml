@@ -7,7 +7,9 @@ on:
 jobs:
   claude-review:
     # Only run on non-fork repositories to protect secrets
-    if: github.event.pull_request.head.repo.fork == false
+    # This public repo can't call the internal groq/github-actions reusable review workflow, so the
+    # review stays here: same-repo, non-bot PRs only, and actions pinned by SHA.
+    if: github.event.pull_request.head.repo.fork == false && github.event.pull_request.user.type != 'Bot'
     
     runs-on: ubuntu-latest
     continue-on-error: true
@@ -15,13 +17,13 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 1
 
       - name: Run Claude Code Review
         id: claude-review
-        uses: anthropics/claude-code-action@v1
+        uses: anthropics/claude-code-action@9eb012b6d0900c2b9eede65ee1758cec4d2973e9 # v1.0.270
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           
